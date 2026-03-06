@@ -7,6 +7,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
+import com.elta.android.domain.features.devices.model.matchesTargetGlucometerName
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.analytics.Analytics
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
@@ -116,7 +117,7 @@ class ScannerDmcViewModel @Inject constructor(
         val connectedGlucometers = getGlucometersUseCase.execute()
             .await()
             .map { it.first.name }
-        if (connectedGlucometers.contains(name)) {
+        if (connectedGlucometers.any { matchesTargetGlucometerName(it, name) }) {
             setScannerError(ScannerState.AlreadyConnected)
         } else {
             router.navigateTo(Screens.ConnectingScreen(state.value.isOnBoarding, pin, name))

@@ -6,6 +6,7 @@ import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.devices.CONNECT_TIMEOUT
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.devices.model.matchesTargetGlucometerName
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.nullgr.core.interactor.ObservableListUseCase
@@ -45,7 +46,12 @@ class FindGlucometersUseCase @Inject constructor(
                 anyDeviceFound = if (p.targetGlucometerName.isNullOrEmpty()){
                     it.isNotEmpty() || anyDeviceFound
                 } else {
-                    it.find { glucometer -> glucometer.name == p.targetGlucometerName } != null
+                    it.any { glucometer ->
+                        matchesTargetGlucometerName(
+                            deviceName = glucometer.name,
+                            targetName = p.targetGlucometerName
+                        )
+                    }
                 }
             }
             .doOnNext {

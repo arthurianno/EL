@@ -274,10 +274,6 @@ fun checkPermissions(activity: Activity) {
 
     val permissionsList = mutableListOf<String>()
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        permissionsList.add(Manifest.permission.POST_NOTIFICATIONS)
-    }
-
     check(permissionsList)
 }
 

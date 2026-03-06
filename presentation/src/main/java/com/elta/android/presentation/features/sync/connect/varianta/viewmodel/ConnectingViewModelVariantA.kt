@@ -5,6 +5,7 @@ import com.elta.android.common.errors.BluetoothNotEnabledErrorVariantA
 import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCaseVariantA
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCaseVariantA
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCaseVariantA
+import com.elta.android.domain.features.devices.model.matchesTargetGlucometerName
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Events
@@ -220,7 +221,14 @@ class ConnectingViewModelVariantA @Inject constructor(
                 .timeout(CONNECT_DEVICE_TIMEOUT_SEC, TimeUnit.SECONDS)
                 .asFlow()
                 .cancellable()
-                .map { devices -> devices.filter { it.name == state.value.glucometerName } }
+                .map { devices ->
+                    devices.filter {
+                        matchesTargetGlucometerName(
+                            deviceName = it.name,
+                            targetName = state.value.glucometerName
+                        )
+                    }
+                }
                 .filter { it.isNotEmpty() }
                 .map { it.first() }
                 .map {

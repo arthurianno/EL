@@ -1,6 +1,5 @@
 package com.elta.android.data.features.devices.glucometer.client
 
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
@@ -16,11 +15,13 @@ import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideMac
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.dto.VersionDto
+import com.elta.android.data.features.devices.glucometer.fromGlucometerDateTime
 import com.elta.android.data.features.devices.glucometer.firmware.FirmwareManager
+import com.elta.android.data.features.devices.glucometer.protocol.ProtocolCapabilitiesResolver
 import com.elta.android.data.features.devices.glucometer.service.isEmptyEvent
+import com.elta.android.data.features.devices.glucometer.service.isEmptyMemoryEvent
 import com.elta.android.data.features.devices.glucometer.service.isOk
 import com.elta.android.domain.features.devices.CONNECT_TIMEOUT
-import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.awaitClose
@@ -32,11 +33,13 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import org.threeten.bp.ZonedDateTime
 import timber.log.Timber
+import java.math.BigInteger
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.math.abs
 
 @Singleton
 class GlucometerClientImpl @Inject constructor(
@@ -45,6 +48,7 @@ class GlucometerClientImpl @Inject constructor(
     private val environmentScanner: EnvironmentScanner,
     private val crashlyticsReport: CrashlyticsReport,
 ) : GlucometerClient {
+    private var lastConnectedDeviceName: String? = null
 
     private val settings: ScanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -60,32 +64,43 @@ class GlucometerClientImpl @Inject constructor(
             .build()
     )
 
-    private val dfuFilters: List<ScanFilter> = listOf<ScanFilter>(
-        ScanFilter.Builder()
-            .setDeviceName("Dfu")
-            .build()
-    )
+    private val dfuFilters: List<ScanFilter> = emptyList()
 
     override suspend fun updateFirmwareWithNordicDfu(
         address: String,
         firmwareFile: FirmwareFile
     ): String {
+        val candidateAddresses = buildCandidateDfuAddresses(address)
+        val candidateDfuName = buildCandidateDfuName()
+        crashlyticsReport.log(
+            "Start scanning DFU device. Candidates by address: $candidateAddresses, by name: ${candidateDfuName ?: "<none>"}"
+        )
         val scanResult = try {
             withTimeout(CONNECT_TIMEOUT) {
-                scan(address, dfuFilters)
+                scanDfu(candidateAddresses, candidateDfuName, dfuFilters)
             }
         } catch (e: TimeoutCancellationException) {
             val exception =
-                GlucometerSyncError(TimeoutException("Device search dfu ${address.hideMac()} timed out"))
+                GlucometerSyncError(
+                    TimeoutException(
+                        "Device search dfu ${address.hideMac()} timed out. " +
+                                "Candidates: ${candidateAddresses.map { it.hideMac() }}"
+                    )
+                )
             crashlyticsReport.writeException(exception)
             throw exception
         }
 
-        if (scanResult.device.address != address) {
+        val foundAddress = scanResult.device.address.uppercase()
+        val foundName = scanResult.device.name ?: scanResult.scanRecord?.deviceName
+        val matchesByAddress = foundAddress in candidateAddresses
+        val matchesByName = candidateDfuName?.equals(foundName, ignoreCase = true) == true
+
+        if (!matchesByAddress && !matchesByName) {
             crashlyticsReport.writeException(GlucometerNotFoundInDfuMode)
             throw GlucometerNotFoundInDfuMode
         }
-        return firmwareManager.updateFirmwareWithNordicDfu(address, firmwareFile.path)
+        return firmwareManager.updateFirmwareWithNordicDfu(foundAddress, firmwareFile.path)
     }
 
     override fun findDevices(): Flow<List<ScanResult>> {
@@ -136,6 +151,17 @@ class GlucometerClientImpl @Inject constructor(
             crashlyticsReport.log(
                 "Device versions received:\n hardware: ${version.hardware}, software: ${version.software}"
             )
+            val capabilities = ProtocolCapabilitiesResolver.resolve(version, getConnectedDeviceName())
+            if (capabilities.supportsSetZone) {
+                val currentOffsetSeconds = ZonedDateTime.now().offset.totalSeconds
+                runCatching {
+                    updateZoneOffset(currentOffsetSeconds)
+                    val confirmedOffset = getZoneOffsetSeconds()
+                    crashlyticsReport.log("Device timezone updated to $confirmedOffset seconds")
+                }.onFailure {
+                    crashlyticsReport.log("Unable to update timezone via setzone/getzone: ${it.message.orEmpty()}")
+                }
+            }
             val serial = getSerialNumber()
             crashlyticsReport.log("Serial number received")
 
@@ -157,6 +183,7 @@ class GlucometerClientImpl @Inject constructor(
         crashlyticsReport.log("Connection operations started with device ${address.hideMac()}")
         crashlyticsReport.log("Environment scanning started")
         val scanResult = scan(address, filters)
+        lastConnectedDeviceName = scanResult.device.name ?: scanResult.scanRecord?.deviceName
         crashlyticsReport.log("Scanning the environment is completed with the result")
 
         try {
@@ -201,17 +228,23 @@ class GlucometerClientImpl @Inject constructor(
         crashlyticsReport.log("The operation to obtain measurements from the device has begun")
         with(glucometerBleManager) {
             checkIsConnected(address)
+            val version = getVersion()
+            val capabilities = ProtocolCapabilitiesResolver.resolve(version, getConnectedDeviceName())
 
-            val events = mutableListOf<String>()
-
-            crashlyticsReport.log("Started reading measurements from the device")
-
-            for (index in 0 until 1000) {
-                val event = readEvent(index)
-                Timber.d("📡 Raw event from glucometer [index=$index]: '$event' (length=${event.length})")
-                onCommandSuccess.invoke()
-                if (event.isEmptyEvent() || event == lastSyncEvent) break
-                events.add(event)
+            val shouldTryGetMem = capabilities.supportsGetMem
+            val events = if (shouldTryGetMem) {
+                runCatching {
+                    readEventsFromMemory(lastSyncEvent, onCommandSuccess)
+                }.getOrElse { error ->
+                    if (error is UnknownGetMemCommandException) {
+                        crashlyticsReport.log("getmem command is not supported, fallback to rd")
+                        readEventsFromRd(lastSyncEvent, onCommandSuccess)
+                    } else {
+                        throw error
+                    }
+                }
+            } else {
+                readEventsFromRd(lastSyncEvent, onCommandSuccess)
             }
 
             crashlyticsReport.log("All measurements were successfully read, events size: ${events.size}")
@@ -225,6 +258,41 @@ class GlucometerClientImpl @Inject constructor(
         glucometerBleManager.turnOnFindMode()
     }
 
+    private suspend fun readEventsFromRd(
+        lastSyncEvent: String?,
+        onCommandSuccess: () -> Unit
+    ): List<String> {
+        val events = mutableListOf<String>()
+        crashlyticsReport.log("Started reading measurements from rd")
+        for (index in 0 until MAX_GLUCOSE_EVENTS_COUNT) {
+            val event = glucometerBleManager.readEvent(index)
+            Timber.d("📡 Raw rd event [index=$index]: '$event' (length=${event.length})")
+            onCommandSuccess.invoke()
+            if (event.isEmptyEvent() || matchesLastSyncedMeasurement(event, lastSyncEvent)) break
+            events.add(event)
+        }
+        return events
+    }
+
+    private suspend fun readEventsFromMemory(
+        lastSyncEvent: String?,
+        onCommandSuccess: () -> Unit
+    ): List<String> {
+        val events = mutableListOf<String>()
+        crashlyticsReport.log("Started reading measurements from getmem")
+        for (index in 0 until MAX_GLUCOSE_EVENTS_COUNT) {
+            val event = glucometerBleManager.readMemoryEvent(index)
+            Timber.d("📡 Raw mem event [index=$index]: '$event' (length=${event.length})")
+            if (event.isUnknownCommand()) {
+                throw UnknownGetMemCommandException
+            }
+            onCommandSuccess.invoke()
+            if (event.isEmptyMemoryEvent() || matchesLastSyncedMeasurement(event, lastSyncEvent)) break
+            events.add(event)
+        }
+        return events
+    }
+
     private suspend fun scan(address: String, filters: List<ScanFilter>): ScanResult {
         return suspendCancellableCoroutine { continuation ->
             continuation.invokeOnCancellation { environmentScanner.stopScan() }
@@ -233,7 +301,9 @@ class GlucometerClientImpl @Inject constructor(
                 filters = filters,
                 settings = settings,
                 resultCallback = { scanResults ->
-                    scanResults.firstOrNull { it.device.address == address }?.let { result ->
+                    scanResults.firstOrNull {
+                        it.device.address.equals(address, ignoreCase = true)
+                    }?.let { result ->
                         try {
                             continuation.resume(result)
                         } catch (e: IllegalStateException) {
@@ -253,6 +323,115 @@ class GlucometerClientImpl @Inject constructor(
             )
 
         }
+    }
+
+    private suspend fun scanDfu(
+        candidateAddresses: Set<String>,
+        candidateDfuName: String?,
+        filters: List<ScanFilter>
+    ): ScanResult {
+        return suspendCancellableCoroutine { continuation ->
+            continuation.invokeOnCancellation { environmentScanner.stopScan() }
+
+            environmentScanner.startScan(
+                filters = filters,
+                settings = settings,
+                resultCallback = { scanResults ->
+                    scanResults.firstOrNull { result ->
+                        val resultAddress = result.device.address.uppercase()
+                        val resultName = result.device.name ?: result.scanRecord?.deviceName
+                        val addressMatched = resultAddress in candidateAddresses
+                        val nameMatched = when {
+                            candidateDfuName != null -> resultName.equals(candidateDfuName, ignoreCase = true)
+                            else -> resultName?.startsWith(DFU_NAME_PREFIX, ignoreCase = true) == true
+                        }
+                        addressMatched || nameMatched
+                    }?.let { result ->
+                        try {
+                            continuation.resume(result)
+                        } catch (e: IllegalStateException) {
+                            crashlyticsReport.log("Already resumed scan")
+                        } finally {
+                            environmentScanner.stopScan()
+                        }
+                    }
+                },
+                errorCallback = {
+                    try {
+                        continuation.resumeWithException(it)
+                    } finally {
+                        environmentScanner.stopScan()
+                    }
+                }
+            )
+        }
+    }
+
+    private fun buildCandidateDfuAddresses(address: String): Set<String> {
+        val normalized = address.uppercase()
+        return linkedSetOf(normalized).apply {
+            normalized.shiftLastMacByteBy(-1)?.let(::add)
+            normalized.shiftLastMacByteBy(1)?.let(::add)
+        }
+    }
+
+    private fun buildCandidateDfuName(): String? {
+        val suffix = lastConnectedDeviceName
+            ?.takeLast(DFU_NAME_SUFFIX_LENGTH)
+            ?.takeIf { it.length == DFU_NAME_SUFFIX_LENGTH && it.all(Char::isDigit) }
+            ?: return null
+        return "$DFU_NAME_PREFIX$suffix"
+    }
+
+    private fun String.shiftLastMacByteBy(delta: Int): String? {
+        val tokens = split(MAC_SEPARATOR)
+        if (tokens.size != MAC_TOKENS_COUNT) return null
+        val currentToken = tokens.last()
+        val current = runCatching { BigInteger(currentToken, HEX_RADIX) }.getOrNull() ?: return null
+        val shifted = current + BigInteger.valueOf(delta.toLong())
+        if (shifted < BigInteger.ZERO || shifted > MAX_MAC_TOKEN) return null
+        val shiftedToken = shifted.toString(HEX_RADIX).padStart(MAC_TOKEN_LENGTH, '0').takeLast(MAC_TOKEN_LENGTH)
+        return tokens.dropLast(1).plus(shiftedToken).joinToString(MAC_SEPARATOR).uppercase()
+    }
+
+    private fun String.isUnknownCommand(): Boolean =
+        contains(UNKNOWN_COMMAND_RESPONSE, ignoreCase = true)
+
+    private fun matchesLastSyncedMeasurement(
+        currentMeasurement: String,
+        lastSyncEvent: String?
+    ): Boolean {
+        if (lastSyncEvent.isNullOrBlank()) return false
+        if (currentMeasurement == lastSyncEvent) return true
+
+        val currentIdentity = currentMeasurement.toMeasurementIdentity() ?: return false
+        val lastIdentity = lastSyncEvent.toMeasurementIdentity() ?: return false
+        return currentIdentity.glucoseX10 == lastIdentity.glucoseX10 &&
+                abs(currentIdentity.epochSeconds - lastIdentity.epochSeconds) <= LAST_EVENT_TIME_TOLERANCE_SECONDS
+    }
+
+    private fun String.toMeasurementIdentity(): MeasurementIdentity? {
+        RD_IDENTITY_REGEX.matchEntire(this)?.let { match ->
+            val dateToken = match.groupValues[1]
+            val valueToken = match.groupValues[3]
+            val epochSeconds = runCatching {
+                dateToken.fromGlucometerDateTime().toEpochSecond()
+            }.getOrNull() ?: return null
+            return MeasurementIdentity(
+                epochSeconds = epochSeconds,
+                glucoseX10 = valueToken.toInt()
+            )
+        }
+
+        MEM_IDENTITY_REGEX.matchEntire(this)?.let { match ->
+            val unixHex = match.groupValues[1]
+            val valueHex = match.groupValues[3]
+            return MeasurementIdentity(
+                epochSeconds = unixHex.toLong(HEX_RADIX),
+                glucoseX10 = valueHex.toInt(HEX_RADIX)
+            )
+        }
+        return null
     }
 
 
@@ -309,3 +488,23 @@ class GlucometerClientImpl @Inject constructor(
 }
 
 private const val MIN_BATTERY_LEVEL = 1
+private const val MAX_GLUCOSE_EVENTS_COUNT = 1000
+private const val UNKNOWN_COMMAND_RESPONSE = "unknown command"
+private const val DFU_NAME_PREFIX = "Dfu"
+private const val DFU_NAME_SUFFIX_LENGTH = 4
+private const val MAC_SEPARATOR = ":"
+private const val MAC_TOKENS_COUNT = 6
+private const val MAC_TOKEN_LENGTH = 2
+private const val HEX_RADIX = 16
+private const val LAST_EVENT_TIME_TOLERANCE_SECONDS = 1L
+private val MAX_MAC_TOKEN = BigInteger("FF", HEX_RADIX)
+private val RD_IDENTITY_REGEX = Regex("^rd(\\d{12})(\\d{3})(\\d{3})$", RegexOption.IGNORE_CASE)
+private val MEM_IDENTITY_REGEX =
+    Regex("^mem\\.([0-9A-F]{8})([0-9A-F]{4})([0-9A-F]{4})$", RegexOption.IGNORE_CASE)
+
+private object UnknownGetMemCommandException : Exception("getmem command is not supported")
+
+private data class MeasurementIdentity(
+    val epochSeconds: Long,
+    val glucoseX10: Int
+)

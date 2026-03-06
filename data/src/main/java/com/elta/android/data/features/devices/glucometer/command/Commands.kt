@@ -16,6 +16,8 @@ sealed class Commands(val command: String) {
 
     data object GetDate : Commands(command = "gettime")
 
+    data object GetZone : Commands(command = "getzone")
+
     data object GetVersion : Commands(command = "version")
 
     data object GetBatteryAndTemperature : Commands(command = "battery")
@@ -25,8 +27,14 @@ sealed class Commands(val command: String) {
     data class SetTime(val date: ZonedDateTime) :
         Commands("settime.${date.toGlucometerDateTime()}")
 
+    data class SetZone(val zoneOffsetHex: String) :
+        Commands("setzone.$zoneOffsetHex")
+
     data class ReadEvent(val cell: Int) :
         Commands(command = "rd.${cell.toString().padStart(3, '0')}")
+
+    data class ReadMemoryEvent(val cell: Int) :
+        Commands(command = "getmem.${cell.toString().padStart(3, '0')}")
 
     data class SetPin(val pin: String) : Commands(command = "pin.$pin")
 

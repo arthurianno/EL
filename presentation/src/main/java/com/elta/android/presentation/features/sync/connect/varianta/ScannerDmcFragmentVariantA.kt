@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
@@ -77,6 +76,8 @@ import kotlin.coroutines.suspendCoroutine
 private const val NUMBER_SUFFIX = "D"
 private const val NUMBER_SUFFIX_2 = "E"
 private const val NUMBERS_COUNT_FOR_NAME = 4
+private const val SATELLITE_ONLINE_MODEL = "SatelliteOnline"
+private const val SATELLITE_VOICE_MODEL = "SatelliteVoice"
 
 // fixme Variant A : improved_enabling_location
 
@@ -275,14 +276,14 @@ class ScannerDmcFragmentVariantA : BaseComposeFragment<ScannerDmcViewModelVarian
     ) {
         if (barcodes.isNotEmpty()) {
             barcodes.forEach { code ->
-                val value = code.rawValue.orEmpty()
-                if (value.startsWith(NUMBER_SUFFIX)) {
+                val value = code.rawValue.orEmpty().trim()
+                val isVoice = value.startsWith(NUMBER_SUFFIX_2)
+                val isOnline = value.startsWith(NUMBER_SUFFIX)
+                if (isVoice || isOnline) {
                     runCatching {
                         val pin = value.extractPinCode()
-                        val name =
-                            "$GLUCOMETER_MODEL${
-                                value.drop(1).takeLast(NUMBERS_COUNT_FOR_NAME)
-                            }"
+                        val modelName = if (isVoice) SATELLITE_VOICE_MODEL else SATELLITE_ONLINE_MODEL
+                        val name = "$modelName${value.takeLast(NUMBERS_COUNT_FOR_NAME)}"
                         viewModel sendAction ConnectAction.StartConnecting(pin, name)
                         scanner?.close()
                     }

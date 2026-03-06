@@ -14,7 +14,6 @@ import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.rxObservable
-import java.math.BigInteger
 import javax.inject.Inject
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -62,35 +61,14 @@ class UpdateFirmwareWithDfuModeUseCase @Inject constructor(
                 cancelTimer()
             }
 
-            crashlyticsReport.log("Creating dfu address")
-            val dfuAddress = address.toDfuAddress()
-
-            crashlyticsReport.log("Start updating device: $dfuAddress firmware with file ${p.file.path}")
+            crashlyticsReport.log("Start updating device (with address fallback) firmware with file ${p.file.path}")
             try {
-                updateRepository.updateFirmwareWithDfuMode(dfuAddress, p.file)
+                updateRepository.updateFirmwareWithDfuMode(address, p.file)
             } catch (e: Exception) {
                 crashlyticsReport.writeException(e)
                 throw e
             }
         }
-    }
-
-    /**
-     * Функция перевода mac-адреса глюкометра в адрес для BootMode. Берётся последний октет и повышается на 1.
-     * Пример: адрес 00:11:22:33:FF:00 станет 00:11:22:33:FF:01.
-     */
-    private fun String.toDfuAddress(): String {
-        val tokens = this.split(":")
-        val token = tokens.last()
-        val hex = BigInteger(token, 16)
-        val new = hex.plus(BigInteger.ONE).toString(16).padStart(2, '0').takeLast(2)
-
-        return tokens.joinToString(
-            separator = ":",
-            limit = tokens.size - 1,
-            postfix = new,
-            truncated = ""
-        ).uppercase()
     }
 
     data class Params(

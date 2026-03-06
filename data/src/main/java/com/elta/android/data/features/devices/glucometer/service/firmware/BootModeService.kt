@@ -114,10 +114,11 @@ class BootModeService : DaggerService() {
         receiveStatus(BootModeStatus.Progress)
         if (fileBytes.size % 4 != 0) throw Exception("File must division by 4")
 
-        val numberOfFullChunk = fileBytes.size / MAX_DATA_BYTES_IN_CHUNK
-        val sizeOfEndChunk = fileBytes.size % MAX_DATA_BYTES_IN_CHUNK
-
-        val chunkCount = if (fileType == FileType.Bin) numberOfFullChunk + 1 else 1
+        val chunkSizes = when (fileType) {
+            FileType.Bin -> splitChunkSizes(fileBytes.size, MAX_DATA_BYTES_IN_CHUNK)
+            FileType.Dat -> listOf(NUM_DAT)
+        }
+        val chunkCount = chunkSizes.size
         val command = when (fileType) {
             FileType.Bin -> CMD_BIN_CODE
             FileType.Dat -> CMD_DAT_CODE
@@ -126,19 +127,15 @@ class BootModeService : DaggerService() {
         var address = START_ADDRESS
         var index = 0
 
-        for (counter in 1..chunkCount) {
+        chunkSizes.forEachIndexed { indexCounter, number ->
+            val counter = indexCounter + 1
             updateNotificationBar(counter, chunkCount)
 
             receiveStatus(BootModeStatus.Progress)
             crashlyticsReport.log("Send $counter $fileType-chunk of $chunkCount")
 
             val dataChunk =
-                fileBytes.copyOfRange(index, minOf(index + MAX_DATA_BYTES_IN_CHUNK, fileBytes.size))
-
-            val number = when (fileType) {
-                FileType.Bin -> if (counter == chunkCount) sizeOfEndChunk else MAX_DATA_BYTES_IN_CHUNK
-                FileType.Dat -> NUM_DAT
-            }
+                fileBytes.copyOfRange(index, minOf(index + number, fileBytes.size))
 
             val chunk = FirmwareChunk(
                 cmd = command,
@@ -149,9 +146,9 @@ class BootModeService : DaggerService() {
 
             handleChunkSending(chunk)
 
-            index += MAX_DATA_BYTES_IN_CHUNK
+            index += number
             address += when (fileType) {
-                FileType.Bin -> MAX_DATA_BYTES_IN_CHUNK
+                FileType.Bin -> number
                 FileType.Dat -> START_ADDRESS
             }
         }

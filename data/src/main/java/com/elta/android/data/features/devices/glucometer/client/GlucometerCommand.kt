@@ -36,6 +36,11 @@ interface GlucometerCommand {
     suspend fun getDate(): ZonedDateTime?
 
     /**
+     * Получение локального смещения времени устройства относительно UTC в секундах.
+     */
+    suspend fun getZoneOffsetSeconds(): Int
+
+    /**
      * Получение версий устройства
      * @return модель с версиям софта и железа
      */
@@ -61,10 +66,20 @@ interface GlucometerCommand {
     suspend fun updateTime(date: ZonedDateTime): String
 
     /**
+     * Обновление локального смещения времени устройства относительно UTC в секундах.
+     */
+    suspend fun updateZoneOffset(offsetSeconds: Int): String
+
+    /**
      * считывание замера с устройства
      * @return строковое представление замера с устройства
      */
     suspend fun readEvent(index: Int): String
+
+    /**
+     * Считывание замера из буфера памяти по расширенному протоколу 2.07.
+     */
+    suspend fun readMemoryEvent(index: Int): String
 
     /**
      * Получение серийного номер устройства

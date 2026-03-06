@@ -11,6 +11,7 @@ import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
+import com.elta.android.domain.features.devices.model.matchesTargetGlucometerName
 import com.elta.android.domain.features.diary.home.interactor.GetLocationNeededUseCase
 import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.domain.features.multiLangsConfig.model.Resource
@@ -268,7 +269,12 @@ class ConnectingViewModel @Inject constructor(
                 .asFlow()
                 .cancellable()
                 .map { devices ->
-                    devices.filter { it.name == state.value.glucometerName }
+                    devices.filter {
+                        matchesTargetGlucometerName(
+                            deviceName = it.name,
+                            targetName = state.value.glucometerName
+                        )
+                    }
                 }
                 .filter {
                     it.isNotEmpty()

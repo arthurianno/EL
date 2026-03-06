@@ -14,6 +14,7 @@ import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 
 class DeviceDataRepository @Inject constructor(
@@ -74,14 +75,19 @@ class DeviceDataRepository @Inject constructor(
         measurements: List<String>,
         glucometerName: String?
     ): List<GlucometerEvent> {
-        return measurements.map { event ->
-            glucometerEventBuilder.buildFrom(
-                email,
-                address,
-                event,
-                serial,
-                glucometerName
-            )
+        return measurements.mapNotNull { event ->
+            runCatching {
+                glucometerEventBuilder.buildFrom(
+                    email,
+                    address,
+                    event,
+                    serial,
+                    glucometerName
+                )
+            }.getOrElse {
+                Timber.e(it, "Skip malformed glucometer payload: $event")
+                null
+            }
         }
     }
 }

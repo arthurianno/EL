@@ -95,6 +95,9 @@ class GlucometerBleManager @Inject constructor(
         return ZonedDateTime.of(dateTime.extractDate(), ZoneId.systemDefault())
     }
 
+    override suspend fun getZoneOffsetSeconds(): Int =
+        startCommand(Commands.GetZone).extractZoneOffsetSeconds()
+
     override suspend fun getVersion(): VersionDto =
         startCommand(Commands.GetVersion).extractVersion()
 
@@ -107,74 +110,79 @@ class GlucometerBleManager @Inject constructor(
     override suspend fun updateTime(date: ZonedDateTime): String =
         startCommand(Commands.SetTime(date)).checkCommandForError()
 
+    override suspend fun updateZoneOffset(offsetSeconds: Int): String =
+        startCommand(Commands.SetZone(offsetSeconds.toZoneHexString())).checkCommandForError()
+
     override suspend fun getSerialNumber(): String =
         startCommand(Commands.Serial).extractSerial()
 
     override suspend fun readEvent(index: Int): String =
         startCommand(Commands.ReadEvent(index))
 
+    override suspend fun readMemoryEvent(index: Int): String =
+        startCommand(Commands.ReadMemoryEvent(index))
+
     override suspend fun sendFirmwareChunk(chunk: FirmwareChunk): String =
-        startCommand(Commands.SendFirmwareChunk(chunk)).checkChunkWritingResult()
+        sendFirmwareChunkCommand(chunk).checkChunkWritingResult(chunk)
+
+    fun getConnectedDeviceName(): String? = bluetoothDevice?.name
 
     private suspend fun startCommand(command: Commands): String {
-        //Получение байтового массива из команды (строки)
-        val byteCommand =
-            if (command is Commands.SendFirmwareChunk) command.chunk.toByteArray()
-            else command.getByteCommand()
-
-        //Запись характеристики методом BleManager. split() устанавливает Mtu(Maximum Transmission Unit)
-        //сплиттер и вызывает функцию расширение suspend() для преобразования асинхронного кода
-        //c помощью расширения suspend приостанавливается корутина до получения отклика на комманду
-        val request = try {
-            writeCharacteristic(
-                glucometerCharacteristic,
-                byteCommand,
-                BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
-            )
-                .split()
-                .suspend()
-        } catch (e: Exception) {
-            crashlyticsReport.writeException(e)
-            throw CommandError(e.message.orEmpty())
+        require(command !is Commands.SendFirmwareChunk) {
+            "SendFirmwareChunk must be handled by sendFirmwareChunkCommand()"
         }
-
-        //Результат по сути является индикатором что
-        //операция завершена успешно, но сами данные получаем через notificationCharacteristic
-        val requestResult = request.value?.toString(Charset.defaultCharset())
-            ?: throw Exception("Empty writeCharacteristic result")
-
-        val log =
-            when (command) {
+        val response = writeAndAwaitNotification(
+            payload = command.getByteCommand(),
+            requestLog = when (command) {
                 is Commands.SetPin -> "Sent pin to device"
-                is Commands.SendFirmwareChunk -> "Sent a chunk of bytes"
-                else -> "Sent $command with result: $requestResult"
+                else -> "Sent $command"
             }
-        crashlyticsReport.log(log)
-
-
-        //Тут подписываемся на уведомление из характеристики notificationCharacteristic,
-        //Метод waitForNotification вешает одноразовый коллбек который преобразуется
-        //c помощью расширения suspend приостанавливается корутина до получения уведомления
-        //suspend тут так же выбрасывает исключения
-        val response = try {
-            waitForNotification(notificationCharacteristic).suspend()
-        } catch (e: Exception) {
-            crashlyticsReport.writeException(e)
-            throw CommandError(e.message.orEmpty())
-        }
-
-        // Получаем ответ устройства в строковом представлении
-        val resultResponse = response.value?.parseToString(command is Commands.SendFirmwareChunk)
-            ?: throw Exception("Empty waitForNotification result")
-
+        )
+        val resultResponse = response.toString(Charset.defaultCharset())
         val logResponse = if (command is Commands.Serial) {
             "Serial number received"
         } else {
             resultResponse
         }
         crashlyticsReport.log("Received notification for ${command.javaClass.name} with result: $logResponse")
-
         return resultResponse
+    }
+
+    private suspend fun sendFirmwareChunkCommand(chunk: FirmwareChunk): BootChunkResponse {
+        val response = writeAndAwaitNotification(
+            payload = chunk.toByteArray(),
+            requestLog = "Sent a chunk of bytes"
+        )
+        val parsedResponse = response.toBootChunkResponse()
+        crashlyticsReport.log(
+            "Received firmware response: flag=${parsedResponse.flag}, cmd=${parsedResponse.cmd}, " +
+                    "adr=${parsedResponse.adr}, num=${parsedResponse.num}"
+        )
+        return parsedResponse
+    }
+
+    private suspend fun writeAndAwaitNotification(
+        payload: ByteArray,
+        requestLog: String
+    ): ByteArray {
+        try {
+            writeCharacteristic(
+                glucometerCharacteristic,
+                payload,
+                BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+            ).split().suspend()
+        } catch (e: Exception) {
+            crashlyticsReport.writeException(e)
+            throw CommandError(e.message.orEmpty())
+        }
+        crashlyticsReport.log(requestLog)
+        return try {
+            waitForNotification(notificationCharacteristic).suspend().value
+                ?: throw CommandError("Empty waitForNotification result")
+        } catch (e: Exception) {
+            crashlyticsReport.writeException(e)
+            throw CommandError(e.message.orEmpty())
+        }
     }
 
     /**
@@ -202,11 +210,6 @@ class GlucometerBleManager @Inject constructor(
         notificationCharacteristic = null
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
-    private fun ByteArray?.parseToString(isFirmwareUpdate: Boolean): String? =
-        if (isFirmwareUpdate) this?.toUByteArray()?.map { it.toString() }?.first()
-        else this?.toString(Charset.defaultCharset())
-
     @Throws(CommandError::class)
     private fun String.checkCommandForError(): String {
         return if (isError()) throw CommandError(this) else this
@@ -214,20 +217,52 @@ class GlucometerBleManager @Inject constructor(
 
     private fun String.isError(): Boolean = contains("error")
 
-    @Throws(CommandError::class)
-    private fun String.checkChunkWritingResult(): String {
-        val resultCode = this.toInt()
-        return when (resultCode) {
-            0x00 -> this
+    private fun BootChunkResponse.checkChunkWritingResult(chunk: FirmwareChunk): String {
+        if (cmd != chunk.cmd || adr != chunk.adr || num != chunk.num) {
+            throw CommandError(
+                "Boot response mismatch. Expected cmd=${chunk.cmd}, adr=${chunk.adr}, num=${chunk.num}; " +
+                        "received cmd=$cmd, adr=$adr, num=$num"
+            )
+        }
+        return when (flag) {
+            0x00 -> flag.toString()
             0x01 -> throw CommandStillWritingError
             0x02 -> throw CommandError("Command ended with error")
             else -> throw CommandError("Command not accepted. Format or syntax error")
         }
     }
+
+    private fun ByteArray.toBootChunkResponse(): BootChunkResponse {
+        if (size < BOOT_MODE_RESPONSE_SIZE_BYTES) {
+            throw CommandError("Invalid boot response size: $size")
+        }
+        val responseCmd = this[1]
+        val responseAddress =
+            (this[2].toInt() and BYTE_MASK) or
+                    ((this[3].toInt() and BYTE_MASK) shl 8) or
+                    ((this[4].toInt() and BYTE_MASK) shl 16) or
+                    ((this[5].toInt() and BYTE_MASK) shl 24)
+        val responseNum = (this[6].toInt() and BYTE_MASK).toUByte()
+        return BootChunkResponse(
+            flag = this[0].toInt() and BYTE_MASK,
+            cmd = responseCmd,
+            adr = responseAddress,
+            num = responseNum
+        )
+    }
 }
+
+private data class BootChunkResponse(
+    val flag: Int,
+    val cmd: Byte,
+    val adr: Int,
+    val num: UByte
+)
 
 private val SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e")
 private val CHAR_UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
 private val NOTIFICATION_UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
 
 private const val DEFAULT_MTU_VALUE = 512
+private const val BOOT_MODE_RESPONSE_SIZE_BYTES = 7
+private const val BYTE_MASK = 0xFF

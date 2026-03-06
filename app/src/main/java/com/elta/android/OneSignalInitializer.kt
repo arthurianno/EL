@@ -10,9 +10,6 @@ import com.onesignal.notifications.INotificationClickEvent
 import com.onesignal.notifications.INotificationClickListener
 import com.onesignal.notifications.INotificationLifecycleListener
 import com.onesignal.notifications.INotificationWillDisplayEvent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 object OneSignalInitializer {
@@ -22,11 +19,7 @@ object OneSignalInitializer {
     fun initialize(context: Context) {
         // Инициализация OneSignal в версии 5.x
         OneSignal.initWithContext(context, ONESIGNAL_APP_ID)
-
-        CoroutineScope(Dispatchers.Main).launch {
-            val accepted = OneSignal.Notifications.requestPermission(true)
-            Log.e("OneSignal", "Permission accepted: $accepted")
-        }
+        Log.i("OneSignal", "Initialized. Notification permission request is delegated to visible Activity")
 
         // Apply default tags for anonymous user immediately after init.
         OneSignalTags.apply(context)

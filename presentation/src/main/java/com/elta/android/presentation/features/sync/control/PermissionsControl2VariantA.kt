@@ -190,9 +190,6 @@ fun checkPermissionsVariantA(activity: Activity) {
 
     val permissionsList = mutableListOf<String>()
 
-    if (androidVersion >= Build.VERSION_CODES.TIRAMISU) {
-        permissionsList.add(Manifest.permission.POST_NOTIFICATIONS)
-    }
     if (androidVersion >= Build.VERSION_CODES.S) {
         permissionsList.add(Manifest.permission.BLUETOOTH_SCAN)
         permissionsList.add(Manifest.permission.BLUETOOTH_CONNECT)
