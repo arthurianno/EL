@@ -14,4 +14,5 @@ interface ProfileRepository {
     fun getUserId(): Single<String>
     fun sync(): Completable
     fun updateProfileSettings(isOnboarded: Boolean?, glucoseFormat: GlucoseFormat): Completable
+    fun updateLanguageTag(languageTag: String): Completable
 }

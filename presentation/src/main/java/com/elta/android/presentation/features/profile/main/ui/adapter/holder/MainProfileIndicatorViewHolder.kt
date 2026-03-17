@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.main.ui.adapter.holder
 
+import android.util.Log
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
@@ -19,15 +20,19 @@ class MainProfileIndicatorViewHolder(
             weightValueView.text = item.weight
             hemoglobinValueView.text = item.hemoglobin
             glucoseLevelView.setOnClickListener {
+                Log.i("NavTrace", "MainProfileIndicatorViewHolder click(type=GLUCOSE_LEVEL)")
                 bus.click(Clicks.ProfileIndicatorClicked(MainProfileIndicatorItem.Type.GLUCOSE_LEVEL))
             }
             diabetesTypeView.setOnClickListener {
+                Log.i("NavTrace", "MainProfileIndicatorViewHolder click(type=DIABETES)")
                 bus.click(Clicks.ProfileIndicatorClicked(MainProfileIndicatorItem.Type.DIABETES))
             }
             weightView.setOnClickListener {
+                Log.i("NavTrace", "MainProfileIndicatorViewHolder click(type=WEIGHT)")
                 bus.click(Clicks.ProfileIndicatorClicked(MainProfileIndicatorItem.Type.WEIGHT))
             }
             hemoglobinView.setOnClickListener {
+                Log.i("NavTrace", "MainProfileIndicatorViewHolder click(type=HEMOGLOBIN)")
                 bus.click(Clicks.ProfileIndicatorClicked(MainProfileIndicatorItem.Type.HEMOGLOBIN))
             }
         }

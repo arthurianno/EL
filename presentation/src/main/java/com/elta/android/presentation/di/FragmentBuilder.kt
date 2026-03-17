@@ -23,6 +23,7 @@ import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragmentVariantA
+import com.elta.android.presentation.features.language.ui.LanguageSelectionFragment
 import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
@@ -134,6 +135,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindAuthFlowFragment(): AuthFlowFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindLanguageSelectionFragment(): LanguageSelectionFragment
 
     @FragmentScope
     @ContributesAndroidInjector

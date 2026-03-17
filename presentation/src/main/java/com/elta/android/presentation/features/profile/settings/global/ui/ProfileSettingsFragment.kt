@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.ListAdapter
@@ -28,6 +29,8 @@ import me.dmdev.rxpm.widget.bindTo
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
+private const val NAV_TRACE_TAG = "NavTrace"
+
 class ProfileSettingsFragment :
     BaseRecyclerViewFragment<ProfileSettingsPm, FragmentProfileSettingsBinding>(
         FragmentProfileSettingsBinding::inflate
@@ -46,6 +49,7 @@ class ProfileSettingsFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.i(NAV_TRACE_TAG, "ProfileSettingsFragment.onViewCreated(parentBackStack=${parentFragmentManager.backStackEntryCount})")
         binding.toolbar.toolbarTitleView.text = getString(R.string.profile_settings)
         itemsView?.addItemDecoration(
             SettingsMarginItemDecoration(
@@ -54,6 +58,11 @@ class ProfileSettingsFragment :
                 R.dimen.settings_bottom_margin
             )
         )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.i(NAV_TRACE_TAG, "ProfileSettingsFragment.onResume(parentBackStack=${parentFragmentManager.backStackEntryCount})")
     }
 
     override fun onBindPresentationModel(pm: ProfileSettingsPm) {

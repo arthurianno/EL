@@ -1,10 +1,12 @@
 package com.elta.android.presentation.features.auth.login.pm
 
+import android.content.Context
 import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.domain.features.auth.interactor.LoginUseCase
 import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
+import com.elta.android.domain.features.user.interactor.UpdateLanguageTagUseCase
 import com.elta.android.domain.features.userinfo.interactor.GetProfileSettingsUseCase
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.presentation.Screens
@@ -17,6 +19,8 @@ import com.elta.android.presentation.analytic.updateStableParam
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.elta.android.presentation.features.registration.main.variantA.pm.BaseRegistrationPmVariantA
+import com.elta.android.presentation.utils.LocaleHelper
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import kotlinx.coroutines.rx2.asObservable
@@ -32,9 +36,11 @@ class LoginPmVariantA @Inject constructor(
     private val getProfileSettings: GetProfileSettingsUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val getUserId: GetUserIdUseCase,
+    private val updateLanguageTagUseCase: UpdateLanguageTagUseCase,
     private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
     private val firebaseStorage: FirebaseStorage,
     private val appMetric: AppMetricTracker,
+    private val context: Context,
     services: ServiceFacade
 ) : BaseRegistrationPmVariantA(services) {
 
@@ -110,24 +116,25 @@ class LoginPmVariantA @Inject constructor(
                     getProfileSettings.execute()
                         .map { userInfo to it.isOnboarded }
                 }
-                .doOnSuccess { info ->
-                    getUserId.execute()
-                        .doOnSuccess { firebaseStorage.userLogin = it }
-                        .subscribe()
-                    when {
-                        info.first.isEmailConfirmed != true -> router.navigateTo(ActivateProfile)
-                        info.second -> {
-                            // fixme Variant A : improved_enabling_location
-                            val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
-                            val screen = if (improvedEnablingLocation) Screens.HomeFlow
-                            else Screens.HomeFlowVariantA
+                .flatMap { info ->
+                    updateUserEmail()
+                        .andThen(updateLanguageTag())
+                        .andThen(Single.fromCallable {
+                            when {
+                                info.first.isEmailConfirmed != true -> router.navigateTo(ActivateProfile)
+                                info.second -> {
+                                    // fixme Variant A : improved_enabling_location
+                                    val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
+                                    val screen = if (improvedEnablingLocation) Screens.HomeFlow
+                                    else Screens.HomeFlowVariantA
 
-                            remindersManager.scheduleReminders()
-                            router.newRootFlow(screen)
-                        }
+                                    remindersManager.scheduleReminders()
+                                    router.newRootFlow(screen)
+                                }
 
-                        else -> router.newRootFlow(Screens.OnBoardingFlow)
-                    }
+                                else -> router.newRootFlow(Screens.OnBoardingFlow)
+                            }
+                        })
                 }
 
         } else {
@@ -136,4 +143,16 @@ class LoginPmVariantA @Inject constructor(
             }
         }
     }
+
+    private fun updateUserEmail(): Completable =
+        getUserId.execute()
+            .doOnSuccess { firebaseStorage.userLogin = it }
+            .ignoreElement()
+
+    private fun updateLanguageTag(): Completable =
+        updateLanguageTagUseCase.execute(
+            UpdateLanguageTagUseCase.Params(
+                languageTag = LocaleHelper.getLanguage(context)
+            )
+        ).onErrorComplete()
 }

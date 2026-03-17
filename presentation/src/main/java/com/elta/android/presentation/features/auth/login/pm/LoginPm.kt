@@ -15,6 +15,7 @@ import com.elta.android.domain.features.multiLangsConfig.model.Resource
 import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
+import com.elta.android.domain.features.user.interactor.UpdateLanguageTagUseCase
 import com.elta.android.domain.features.userinfo.interactor.GetProfileSettingsUseCase
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.presentation.Dialogs
@@ -31,6 +32,7 @@ import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.elta.android.presentation.features.registration.main.pm.BaseRegistrationPm
+import com.elta.android.presentation.utils.LocaleHelper
 import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -55,6 +57,7 @@ class LoginPm @Inject constructor(
     private val getProfileSettings: GetProfileSettingsUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val getUserId: GetUserIdUseCase,
+    private val updateLanguageTagUseCase: UpdateLanguageTagUseCase,
     private val getFeatureConfigUseCase:GetFeatureConfigUseCase,
     private val firebaseStorage: FirebaseStorage,
     private val appMetric: AppMetricTracker,
@@ -152,6 +155,7 @@ class LoginPm @Inject constructor(
             }
             .flatMapCompletable { (isEmailConfirmed, isOnboarded) ->
                 updateUserEmail()
+                    .andThen(updateLanguageTag())
                     .andThen(navigateToScreen(isEmailConfirmed, isOnboarded))
             }
     }
@@ -160,6 +164,13 @@ class LoginPm @Inject constructor(
         getUserId.execute()
             .doOnSuccess { firebaseStorage.userLogin = it }
             .ignoreElement()
+
+    private fun updateLanguageTag(): Completable =
+        updateLanguageTagUseCase.execute(
+            UpdateLanguageTagUseCase.Params(
+                languageTag = LocaleHelper.getLanguage(context)
+            )
+        ).onErrorComplete()
 
     private fun navigateToScreen(
         isEmailConfirmed: Boolean,

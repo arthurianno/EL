@@ -125,6 +125,8 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
     @CallSuper
     override fun onBindPresentationModel(pm: T) {
+        // PM может пережить recreate, поэтому всегда обновляем router на текущий.
+        pm.router = router
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }

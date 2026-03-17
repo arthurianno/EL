@@ -490,6 +490,7 @@
 
     <string name="profile_change_password">Изменить пароль</string>
     <string name="profile_notification">Напоминания</string>
+    <string name="profile_language">Язык</string>
     <string name="profile_glucose_format">Формат отображения глюкозы</string>
     <string name="profile_legal_information">Юридическая информация</string>
     <string name="profile_emias_account">ЕМИАС</string>
@@ -1023,6 +1024,10 @@
     <string name="insulin_type_prolong">Продлённый</string>
     <string name="insulin_type_mixed">Смешанный</string>
     <string name="language_selection_dialog_title">Выбор языка</string>
+    <string name="language_selection_subtitle">Выберите язык приложения</string>
+    <string name="language_selection_intro">Давайте знакомиться</string>
+    <string name="language_selection_title">Выберите язык интерфейса для дальнейшего использования приложения</string>
+    <string name="language_settings_title">Выберите язык интерфейса</string>
     <string name="language_russian">Русский</string>
     <string name="language_english">Английский</string>
     <string name="statistic_general_index_description_by_hour_bread">По результатам записей вы потребляете %s за день.</string>

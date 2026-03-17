@@ -34,6 +34,7 @@ import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragmentVariantA
+import com.elta.android.presentation.features.language.ui.LanguageSelectionFragment
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
@@ -134,6 +135,10 @@ object Screens {
     // AUTH FLOW
     object AuthFlow : SupportAppScreen() {
         override fun getFragment(): Fragment = AuthFlowFragment.newInstance()
+    }
+
+    data class LanguageSelection(val isFirstLaunch: Boolean) : SupportAppScreen() {
+        override fun getFragment(): Fragment = LanguageSelectionFragment.newInstance(isFirstLaunch)
     }
 
     object Login : SupportAppScreen() {

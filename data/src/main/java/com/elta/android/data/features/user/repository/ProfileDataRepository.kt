@@ -5,6 +5,7 @@ import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.dto.ProfileSettingsNetworkResponse
+import com.elta.android.data.features.user.dto.SupportedLanguageTag
 import com.elta.android.data.features.user.mapper.toDomain
 import com.elta.android.data.features.user.mapper.toNetwork
 import com.elta.android.domain.features.user.model.GlucoseFormat
@@ -13,6 +14,7 @@ import com.elta.android.domain.features.user.model.ProfileSettings
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import io.reactivex.Completable
 import io.reactivex.Single
+import java.util.Locale
 import javax.inject.Inject
 
 class ProfileDataRepository @Inject constructor(
@@ -98,15 +100,42 @@ class ProfileDataRepository @Inject constructor(
         isOnboarded: Boolean?,
         glucoseFormat: GlucoseFormat
     ): Completable = cachedSource.getProfileSettings()
-        .map { it.isOnboarded }
-        .onErrorReturn { true }
-        .flatMapCompletable { isOnboardedCache ->
+        .onErrorReturn {
+            ProfileSettingsNetworkResponse(
+                isOnboarded = true,
+                glucoseFormat = glucoseFormat.toNetwork(),
+                languageTag = resolveLanguageTag()
+            )
+        }
+        .flatMapCompletable { cachedSettings ->
             val response = ProfileSettingsNetworkResponse(
-                isOnboarded = isOnboarded ?: isOnboardedCache,
-                glucoseFormat = glucoseFormat.toNetwork()
+                isOnboarded = isOnboarded ?: cachedSettings.isOnboarded,
+                glucoseFormat = glucoseFormat.toNetwork(),
+                languageTag = resolveLanguageTag(cachedSettings.languageTag)
             )
             cachedSource.updateProfileSettings(response)
                 .andThen(remoteSource.updateProfileSettings(response).onErrorComplete())
         }
 
+    override fun updateLanguageTag(languageTag: String): Completable =
+        cachedSource.getProfileSettings()
+            .onErrorReturn {
+                ProfileSettingsNetworkResponse(
+                    isOnboarded = true,
+                    glucoseFormat = GlucoseFormat.CAPILLARY.toNetwork(),
+                    languageTag = resolveLanguageTag(languageTag)
+                )
+            }
+            .flatMapCompletable { cachedSettings ->
+                val response = cachedSettings.copy(
+                    languageTag = resolveLanguageTag(languageTag)
+                )
+                cachedSource.updateProfileSettings(response)
+                    .andThen(remoteSource.updateProfileSettings(response).onErrorComplete())
+            }
+
+    private fun resolveLanguageTag(languageTag: String? = null): String {
+        val rawLanguage = languageTag ?: Locale.getDefault().language
+        return SupportedLanguageTag.fromRawValue(rawLanguage).value
+    }
 }

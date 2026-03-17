@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.main.pm
 
+import android.util.Log
 import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
@@ -41,6 +42,8 @@ import me.dmdev.rxpm.state
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
+
+private const val NAV_TRACE_TAG = "NavTrace"
 
 class MainProfilePm @Inject constructor(
     private val remindersManager: RemindersManager,
@@ -97,20 +100,33 @@ class MainProfilePm @Inject constructor(
         bus.clicks<Clicks.ProfileIndicatorClicked>()
             .debounceAction()
             .map { it.item }
+            .doOnNext { type -> Log.i(NAV_TRACE_TAG, "MainProfilePm.ProfileIndicatorClicked(type=$type)") }
             .doOnNext(::navigateIndicatorScreen)
+            .doOnError { error ->
+                Log.e(NAV_TRACE_TAG, "MainProfilePm.ProfileIndicatorClicked stream error", error)
+                handleError(error)
+            }
+            .retry()
             .subscribe()
             .untilDestroy()
 
         bus.clicks<Clicks.ProfileAdditionalClicked>()
             .map { it.item.type }
+            .doOnNext { type -> Log.i(NAV_TRACE_TAG, "MainProfilePm.ProfileAdditionalClicked(type=$type)") }
             .filter { it !is ExitFromApp }
             .doOnNext(::navigateAdditionalSettingsScreen)
+            .doOnError { error ->
+                Log.e(NAV_TRACE_TAG, "MainProfilePm.ProfileAdditionalClicked stream error", error)
+                handleError(error)
+            }
+            .retry()
             .subscribe()
             .untilDestroy()
 
         bus.clicks<Clicks.ProfileAdditionalClicked>()
             .map { it.item.type }
             .filter { it is ExitFromApp }
+            .doOnNext { Log.i(NAV_TRACE_TAG, "MainProfilePm.ExitFromApp clicked") }
             .flatMapCompletable {
                 logOutUseCase.execute()
                     .startWith(Completable.fromCallable { remindersManager.cancelAll() })
@@ -120,11 +136,24 @@ class MainProfilePm @Inject constructor(
                         router.newRootFlow(Screens.GreetingFlow)
                     }
             }
+            .doOnError { error ->
+                Log.e(NAV_TRACE_TAG, "MainProfilePm.ExitFromApp stream error", error)
+                handleError(error)
+            }
+            .retry()
             .subscribe()
             .untilDestroy()
 
         profileSettingsAction.observable
-            .doOnNext { router.startFlow(Screens.ProfileSettings) }
+            .doOnNext {
+                Log.i(NAV_TRACE_TAG, "MainProfilePm.profileSettingsAction -> startFlow(ProfileSettings)")
+                router.startFlow(Screens.ProfileSettings)
+            }
+            .doOnError { error ->
+                Log.e(NAV_TRACE_TAG, "MainProfilePm.profileSettingsAction stream error", error)
+                handleError(error)
+            }
+            .retry()
             .subscribe()
             .untilDestroy()
     }
@@ -186,7 +215,7 @@ class MainProfilePm @Inject constructor(
                 appMetricTracker.trackEvent(AppMetricEvent.TapSupport)
                 router.startFlow(Screens.Support)
             }
-            else -> throw IllegalArgumentException("$type  type doesn't support.")
+            else -> Log.w(NAV_TRACE_TAG, "MainProfilePm.navigateAdditionalSettingsScreen unsupported type=$type")
         }
 
     private fun observeProfileUpdates() {

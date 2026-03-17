@@ -27,6 +27,8 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
         private const val KEY_LAST_REFRESH = "last_refresh_timestamp"
         private const val KEY_RANDOM_OFFSET = "random_offset_minutes"
         private const val TWENTY_FOUR_HOURS_MILLIS = 24 * 60 * 60 * 1000L
+        private const val LANGUAGE_PREFS_NAME = "language_preference"
+        private const val LANGUAGE_KEY_SELECTED = "selected_language"
     }
 
     private val prefs: SharedPreferences by lazy {
@@ -41,7 +43,7 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
             val networkDuration = System.currentTimeMillis() - networkStartTime
 
             if (response.isSuccessful && response.body() != null) {
-                val lang = getSystemLanguageCode()
+                val lang = getAppLanguageCode()
                 val dtoList = response.body()!!.content
                 val newEntities = dtoList.map { it.toRoomEntity() }
 
@@ -97,9 +99,14 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun getSystemLanguageCode(): String {
-        val locale = java.util.Locale.getDefault()
-        return locale.language
+    private fun getAppLanguageCode(): String {
+        val languagePrefs = context.getSharedPreferences(LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
+        val savedLanguage = languagePrefs.getString(LANGUAGE_KEY_SELECTED, null)
+        val rawLanguage = savedLanguage ?: java.util.Locale.getDefault().language
+        return when (rawLanguage?.lowercase()) {
+            "en" -> "en"
+            else -> "ru"
+        }
     }
 
     override suspend fun getScreenConfigFromCache(slug:String): Resource<ScreenEntity> {
@@ -107,7 +114,7 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
 
             val cachedScreen = dao.getConfigBySlug(slug)
             if (cachedScreen != null) {
-                val lang = getSystemLanguageCode()  // Получаем системный язык (ru, en и т.д.)
+                val lang = getAppLanguageCode()
                 val screenEntity = cachedScreen.toLocalizedScreenEntity(lang)
 
                 Resource.Success(screenEntity)

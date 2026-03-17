@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pale_gray"
+    android:fitsSystemWindows="true">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contentStartGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="24dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contentEndGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="24dp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/greetingView"
+        style="@style/Body2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="84dp"
+        android:paddingHorizontal="6dp"
+        android:text="@string/language_selection_intro"
+        android:textColor="@color/shade_black1"
+        app:layout_constraintEnd_toEndOf="@id/contentEndGuideline"
+        app:layout_constraintStart_toStartOf="@id/contentStartGuideline"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/titleView"
+        style="@style/Headline1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:paddingHorizontal="6dp"
+        android:text="@string/language_selection_title"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@id/contentEndGuideline"
+        app:layout_constraintStart_toStartOf="@id/contentStartGuideline"
+        app:layout_constraintTop_toBottomOf="@id/greetingView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/russianLanguageView"
+        style="@style/Body1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="68dp"
+        android:background="@drawable/bg_language_option_default"
+        android:gravity="center"
+        android:minHeight="56dp"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp"
+        android:text="@string/language_russian"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@id/contentEndGuideline"
+        app:layout_constraintStart_toStartOf="@id/contentStartGuideline"
+        app:layout_constraintTop_toBottomOf="@id/titleView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/englishLanguageView"
+        style="@style/Body1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_language_option_selected"
+        android:gravity="center"
+        android:minHeight="56dp"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp"
+        android:text="@string/language_english"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@id/contentEndGuideline"
+        app:layout_constraintStart_toStartOf="@id/contentStartGuideline"
+        app:layout_constraintTop_toBottomOf="@id/russianLanguageView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/continueButtonView"
+        style="@style/Button.Large"
+        android:text="@string/on_boarding_next_button_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

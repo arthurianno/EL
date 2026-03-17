@@ -19,6 +19,7 @@ import com.elta.android.presentation.features.feedback.pm.FeedbackPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.home.pm.HomeFlowPmVariantA
+import com.elta.android.presentation.features.language.pm.LanguageSelectionPm
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
 import com.elta.android.presentation.features.main.events.create.pm.EventCreationPm
 import com.elta.android.presentation.features.main.events.edit.pm.EditEventPm
@@ -120,6 +121,11 @@ abstract class PmModule {
     @IntoMap
     @PmKey(AuthFlowPm::class)
     abstract fun bindAuthFlowPm(pm: AuthFlowPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(LanguageSelectionPm::class)
+    abstract fun bindLanguageSelectionPm(pm: LanguageSelectionPm): PresentationModel
 
     @Binds
     @IntoMap

@@ -36,6 +36,7 @@ import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.rxkotlin.Observables
+import io.reactivex.rxkotlin.addTo
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.DialogControl
@@ -62,7 +63,9 @@ class HomeFlowFragmentVariantA :
     private val rxPermissions by lazy { RxPermissions(requireActivity()) }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        savedInstanceState?.getInt(KEY_SELECTED_MENU_ID)
+        savedInstanceState
+            ?.takeIf { it.containsKey(KEY_SELECTED_MENU_ID) }
+            ?.getInt(KEY_SELECTED_MENU_ID)
             ?.passTo(presentationModel.menuItemRestoredAction)
         initBottomSheetItemsView()
     }
@@ -78,6 +81,7 @@ class HomeFlowFragmentVariantA :
         super.onBindPresentationModel(pm)
         binding.homeActionView.clicks()
             .subscribe { binding.homeActionView.isSelected.not().passTo(pm.homeAction) }
+            .addTo(compositeDestroy)
         pm.selectedItemIdState.bindTo(binding.homeBottomNavigationView.selection())
         pm.bottomSheetItems.bindTo { adapter.submitList(it) }
         pm.closeBottomSheetCommand.bindTo { binding.homeBottomSheetView.hide() }
@@ -99,11 +103,14 @@ class HomeFlowFragmentVariantA :
                     }
                 }
             }
+            .addTo(compositeDestroy)
         binding.homeBottomSheetView.visibilityChanges().subscribe { visible ->
             binding.homeActionView.isSelected = visible
             bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
-        binding.homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
+            .addTo(compositeDestroy)
+        binding.homeBottomNavigationView.tabClicks()
+            .bindTo(pm.menuItemSelectedAction)
         pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
 
         pm.likeAppDialogControl.bindLikeAppDialog()
@@ -122,9 +129,11 @@ class HomeFlowFragmentVariantA :
         binding.helpBottomSheetView.visibilityChanges().subscribe {
             binding.homeActionView.isVisible = !it
         }
+            .addTo(compositeDestroy)
         binding.helpBottomSheetView.findViewById<AppCompatTextView>(R.id.confirmButtonView)
             .clicks()
             .subscribe(pm.firstSyncAction.consumer)
+            .addTo(compositeDestroy)
         pm.glucoseFormat.bindTo {
             val (drawableId, textId, textSecondId) = when (it) {
                 GlucoseFormat.CAPILLARY -> Triple(R.drawable.img_help_glucose_caplilary, R.string.on_boarding_glucose_format_event_text_capillary, R.string.on_boarding_glucose_format_event_text_second_capillary)
@@ -156,6 +165,7 @@ class HomeFlowFragmentVariantA :
         binding.syncErrorBottomSheetView.visibilityChanges().subscribe {
             binding.homeActionView.isVisible = !it
         }
+            .addTo(compositeDestroy)
         pm.manualSyncErrorBottomSheetCommand.bindTo {
             binding.homeActionView.hide()
             binding.syncErrorBottomSheetView.show()
@@ -170,7 +180,11 @@ class HomeFlowFragmentVariantA :
     override fun onAttach(context: Context) {
         super.onAttach(context)
         addOnBackPressedCallback {
-            if (!binding.homeBottomSheetView.handleBack()) router.exit()
+            val handled = view
+                ?.findViewById<com.elta.android.presentation.widgets.bottom_sheet.BottomSheetView>(R.id.homeBottomSheetView)
+                ?.handleBack()
+                ?: false
+            if (!handled) router.exit()
         }
     }
 

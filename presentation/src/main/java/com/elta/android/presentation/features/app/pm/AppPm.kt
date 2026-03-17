@@ -41,6 +41,7 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.features.app.model.SyncStatus
+import com.elta.android.presentation.utils.LocaleHelper
 import com.elta.android.presentation.utils.OneSignalTags
 import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
 import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkNavigationMapper
@@ -63,6 +64,7 @@ import kotlin.invoke
 
 private const val EMPTY_STATUS_DELAY_MILLIS = 400L
 private const val STATUS_DELAY_MILLIS = 2000L
+private const val LANG_FLOW_TAG = "LangFlow"
 
 class AppPm @Inject constructor(
     private val getUserInfo: GetUserInfoUseCase,
@@ -115,11 +117,28 @@ class AppPm @Inject constructor(
 
         coldStartAction.observable
             .skipWhileInProgress()
+            .doOnNext { Log.i(LANG_FLOW_TAG, "AppPm.coldStartAction triggered") }
             .flatMapSingle {
                 getUserInfo.execute()
+                    .onErrorResumeNext { error ->
+                        if (error is UnauthorizedError) {
+                            Single.just(
+                                UserInfo(
+                                    isUserLoggedIn = false,
+                                    isEmailConfirmed = false
+                                )
+                            )
+                        } else {
+                            Single.error(error)
+                        }
+                    }
                     .flatMap { userInfo ->
-                        getProfileSettings.execute()
-                            .map { userInfo to it.isOnboarded }
+                        if (userInfo.isUserLoggedIn == true) {
+                            getProfileSettings.execute()
+                                .map { userInfo to it.isOnboarded }
+                        } else {
+                            Single.just(userInfo to false)
+                        }
                     }
                     .flatMap { info ->
                         if (info.first.isUserLoggedIn == true) {
@@ -137,23 +156,35 @@ class AppPm @Inject constructor(
                         }
                     }
                     .doOnSuccess { info ->
+                        Log.i(
+                            LANG_FLOW_TAG,
+                            "AppPm.coldStart resolved: isLoggedIn=${info.first.isUserLoggedIn}, isEmailConfirmed=${info.first.isEmailConfirmed}, isOnboarded=${info.second}, appLanguage=${LocaleHelper.getLanguage(context)}"
+                        )
                         when {
-                            info.first.isUserLoggedIn != true ->
-                                router.newRootFlow(Screens.GreetingFlow)
+                            info.first.isUserLoggedIn != true -> {
+                                Log.i(LANG_FLOW_TAG, "AppPm.coldStart route: guest")
+                                router.newRootFlow(getGuestStartScreen())
+                            }
 
-                            info.first.isEmailConfirmed != true ->
+                            info.first.isEmailConfirmed != true -> {
+                                Log.i(LANG_FLOW_TAG, "AppPm.coldStart route: activate profile")
                                 router.newRootChain(
                                     Screens.GreetingFlow,
                                     Screens.ActivateProfile
                                 )
+                            }
 
-                            !info.second -> router.newRootFlow(Screens.OnBoardingFlow)
+                            !info.second -> {
+                                Log.i(LANG_FLOW_TAG, "AppPm.coldStart route: onboarding")
+                                router.newRootFlow(Screens.OnBoardingFlow)
+                            }
                             else -> {
                                 // fixme Variant A : improved_enabling_location
 
                                 val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
                                 val screen = if (improvedEnablingLocation) Screens.HomeFlow
                                 else Screens.HomeFlowVariantA
+                                Log.i(LANG_FLOW_TAG, "AppPm.coldStart route: home=${screen::class.java.simpleName}")
                                 router.newRootFlow(screen)
                             }
                         }
@@ -569,5 +600,20 @@ class AppPm @Inject constructor(
 
     private fun setStatusVisibility(visibility: Visibility) {
         syncStatusVisibility.consumer.accept(visibility)
+    }
+
+    private fun getGuestStartScreen() : com.elta.android.presentation.core.navigation.support.SupportAppScreen {
+        val shouldShowLanguageSelection = LocaleHelper.shouldShowLanguageSelection(context)
+        val selectedLanguage = LocaleHelper.getLanguage(context)
+        val nextScreen = if (shouldShowLanguageSelection) {
+            Screens.LanguageSelection(isFirstLaunch = true)
+        } else {
+            Screens.GreetingFlow
+        }
+        Log.i(
+            LANG_FLOW_TAG,
+            "AppPm.getGuestStartScreen: shouldShowLanguageSelection=$shouldShowLanguageSelection, selectedLanguage=$selectedLanguage, next=${nextScreen::class.java.simpleName}"
+        )
+        return nextScreen
     }
 }

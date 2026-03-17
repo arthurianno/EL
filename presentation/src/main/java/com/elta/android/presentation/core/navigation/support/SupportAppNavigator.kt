@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -25,6 +26,7 @@ import com.github.terrakok.cicerone.Replace
 private const val MARKET_SCHEME = "market"
 private const val MARKET_AUTHORITY = "details"
 private const val MARKET_ID = "id"
+private const val NAV_TRACE_TAG = "NavTrace"
 
 open class SupportAppNavigator(
     private val activity: FragmentActivity,
@@ -35,8 +37,16 @@ open class SupportAppNavigator(
 
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     override fun applyCommands(commands: Array<out Command>) {
+        Log.i(
+            NAV_TRACE_TAG,
+            "applyCommands(start, navigator=${javaClass.simpleName}, commandCount=${commands.size}, fragmentBackStack=${fragmentManager.backStackEntryCount})"
+        )
         fragmentManager.executePendingTransactions()
         copyStackToLocal()
+        Log.i(
+            NAV_TRACE_TAG,
+            "applyCommands(afterCopy, localStack=${localStackCopy.size}, fragmentBackStack=${fragmentManager.backStackEntryCount})"
+        )
         commands.forEach { applyCommand(it) }
     }
 
@@ -50,6 +60,10 @@ open class SupportAppNavigator(
 
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     protected fun applyCommand(command: Command) {
+        Log.i(
+            NAV_TRACE_TAG,
+            "applyCommand(${command.javaClass.simpleName}, localStack=${localStackCopy.size}, fragmentBackStack=${fragmentManager.backStackEntryCount})"
+        )
         when (command) {
             is Forward -> activityForward(command)
             is Replace -> activityReplace(command)
@@ -85,15 +99,47 @@ open class SupportAppNavigator(
     }
 
     protected fun fragmentBack() {
+        val realBackStackCount = fragmentManager.backStackEntryCount
+        Log.i(
+            NAV_TRACE_TAG,
+            "fragmentBack(start, localStack=${localStackCopy.size}, fragmentBackStack=$realBackStackCount)"
+        )
+
+        if (realBackStackCount > 0) {
+            val popped = fragmentManager.popBackStackImmediate()
+            if (popped && localStackCopy.isNotEmpty()) {
+                localStackCopy.removeAt(localStackCopy.size - 1)
+            }
+            Log.i(
+                NAV_TRACE_TAG,
+                "fragmentBack(pop real stack immediate=$popped, localStack=${localStackCopy.size}, fragmentBackStackAfter=${fragmentManager.backStackEntryCount})"
+            )
+            return
+        }
+
         if (localStackCopy.isNotEmpty()) {
-            fragmentManager.popBackStack()
-            localStackCopy.removeAt(localStackCopy.size - 1) // Замена remove() на removeAt()
+            val popped = fragmentManager.popBackStackImmediate()
+            if (popped) {
+                localStackCopy.removeAt(localStackCopy.size - 1)
+            }
+            Log.i(
+                NAV_TRACE_TAG,
+                "fragmentBack(pop local stack immediate=$popped, localStack=${localStackCopy.size}, fragmentBackStackAfter=${fragmentManager.backStackEntryCount})"
+            )
         } else {
+            Log.w(
+                NAV_TRACE_TAG,
+                "fragmentBack(empty stacks -> activityBack, activity=${activity::class.java.simpleName}, isTaskRoot=${activity.isTaskRoot})"
+            )
             activityBack()
         }
     }
 
     protected fun activityBack() {
+        Log.w(
+            NAV_TRACE_TAG,
+            "activityBack(finish, activity=${activity::class.java.simpleName}, fragmentBackStack=${fragmentManager.backStackEntryCount})"
+        )
         activity.finish()
     }
 

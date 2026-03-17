@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.global.pm
 
+import android.util.Log
 import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.domain.features.appsettings.interactor.ChangeBackendVariantUseCase
 import com.elta.android.domain.features.appsettings.interactor.GetBackendVariantUseCase
@@ -48,6 +49,8 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
+
+private const val NAV_TRACE_TAG = "NavTrace"
 
 class ProfileSettingsPm @Inject constructor(
     private val tokenUseCase: TokenUseCase,
@@ -175,6 +178,7 @@ class ProfileSettingsPm @Inject constructor(
     private fun observeClicks() {
         bus.clicks<Clicks.ProfileSettingsItemClicked>()
             .map { it.type }
+            .doOnNext { type -> Log.i(NAV_TRACE_TAG, "ProfileSettingsPm.ProfileSettingsItemClicked(type=$type)") }
             .doOnNext { type ->
                 when (type) {
                     Type.NAME -> router.navigateTo(Screens.SetName)
@@ -183,6 +187,7 @@ class ProfileSettingsPm @Inject constructor(
                     Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
                     Type.EMIAS_ACCOUNT -> handleEmiasStatus()
                     Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
+                    Type.LANGUAGE -> router.navigateTo(Screens.LanguageSelection(isFirstLaunch = false))
                     Type.GLUCOSE_FORMAT -> router.navigateTo(Screens.GlucoseFormat)
                     Type.DELETE_PROFILE -> deleteProfile()
                     Type.TOKEN -> copyToken()
@@ -191,7 +196,11 @@ class ProfileSettingsPm @Inject constructor(
                     Type.APP_VERSION, Type.EMAIL -> {}
                 }
             }
-            .doOnError(::handleError)
+            .doOnError { error ->
+                Log.e(NAV_TRACE_TAG, "ProfileSettingsPm.ProfileSettingsItemClicked stream error", error)
+                handleError(error)
+            }
+            .retry()
             .subscribe()
             .untilDestroy()
 
@@ -201,7 +210,11 @@ class ProfileSettingsPm @Inject constructor(
                 changeBackendVariantUseCase.execute(it)
                     .doOnComplete { logoutAction.consumer.accept(Unit) }
             }
-            .doOnError(::handleError)
+            .doOnError { error ->
+                Log.e(NAV_TRACE_TAG, "ProfileSettingsPm.ChangeBackendVariant stream error", error)
+                handleError(error)
+            }
+            .retry()
             .subscribe()
             .untilDestroy()
 
@@ -212,6 +225,7 @@ class ProfileSettingsPm @Inject constructor(
             bus.clicks<Clicks.ProfileSettingsHealthAppItemClicked>()
                 .map { it.type }
         )
+            .doOnNext { type -> Log.i(NAV_TRACE_TAG, "ProfileSettingsPm.HealthAppClicked(type=$type)") }
             .flatMapSingle { type ->
                 checkGoogleFitAuthUseCase.execute()
                     .doOnError(::handleError)
@@ -234,6 +248,10 @@ class ProfileSettingsPm @Inject constructor(
                     .bindProgress()
                     .handleProfileUseCase()
                     .doOnError(::handleError)
+            }
+            .doOnError { error ->
+                Log.e(NAV_TRACE_TAG, "ProfileSettingsPm.HealthApp stream error", error)
+                handleError(error)
             }
             .retry()
             .subscribe()

@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.main.ui.adapter.holder
 
+import android.util.Log
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
@@ -20,6 +21,7 @@ class MainProfileAdditionalViewHolder(
             functionDescriptionNameView.toggleView(item.description != null)
             functionStateView.toggleView(item.showGoArrow)
             functionView.setOnClickListener {
+                Log.i("NavTrace", "MainProfileAdditionalViewHolder click(type=${item.type})")
                 bus.click(Clicks.ProfileAdditionalClicked(item))
             }
         }

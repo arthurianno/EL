@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.permissions.requestStatus
 import com.elta.android.presentation.core.ui.activity.BaseActivity
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
@@ -18,6 +19,7 @@ import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.features.sync.control.checkPermissions
 import com.elta.android.presentation.features.sync.control.checkPermissionsVariantA
+import com.elta.android.presentation.utils.LocaleHelper
 import com.elta.android.presentation.features.version.optional.ui.OptionalUpdateDialogFragment
 import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkProcessor
 import com.elta.android.presentation.utils.keyboard.KeyboardEventListener
@@ -30,10 +32,12 @@ import kotlinx.coroutines.launch
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import javax.inject.Inject
+import java.util.Locale
 
 class AppActivity : BaseActivity<AppPm>() {
     companion object {
        // const val OPEN_CONSULTANT_CHAT = "open_consultant_chat"
+        private const val TAG = "LangFlow"
     }
 
     @Inject
@@ -55,12 +59,34 @@ class AppActivity : BaseActivity<AppPm>() {
     private var isOneSignalPermissionSynced = false
 
     private val rxPermissions by lazy { RxPermissions(this) }
+    private val splashFallbackRunnable = Runnable {
+        Log.w(TAG, "splashFallbackRunnable fired after timeout")
+        hideSplashOverlay("fallback_timeout")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i(
+            TAG,
+            "AppActivity.onCreate(savedInstanceState=${savedInstanceState != null}, localeDefault=${Locale.getDefault().language}, appLanguage=${LocaleHelper.getLanguage(this)})"
+        )
         window.decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
+
+        if (LocaleHelper.consumePendingGreetingAfterLanguageSelection(this)) {
+            Log.i(TAG, "AppActivity.onCreate: pending Greeting consumed, routing to GreetingFlow")
+            router.newRootFlow(Screens.GreetingFlow)
+        }
+
+        if (savedInstanceState != null) {
+            Log.i(TAG, "AppActivity.onCreate: restored activity, hide splash immediately")
+            hideSplashOverlay("restored_activity")
+        } else {
+            Log.i(TAG, "AppActivity.onCreate: scheduling splash fallback 12000ms")
+            splashOverlay.postDelayed(splashFallbackRunnable, 12_000L)
+        }
+
         // fixme Variant A : improved_enabling_location
         val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
         if (improvedEnablingLocation) checkPermissions(this)
@@ -84,6 +110,10 @@ class AppActivity : BaseActivity<AppPm>() {
 
     override fun onResume() {
         super.onResume()
+        Log.i(
+            TAG,
+            "AppActivity.onResume(localeDefault=${Locale.getDefault().language}, appLanguage=${LocaleHelper.getLanguage(this)})"
+        )
         syncOneSignalPermissionOnce()
         KeyboardEventListener(this) { isKeyboardOpen ->
             connectionStatusView.isVisible = !isKeyboardOpen
@@ -113,19 +143,15 @@ class AppActivity : BaseActivity<AppPm>() {
             supportFragmentManager.showDialog(OptionalUpdateDialogFragment.newInstance())
         }
         pm.imagesLoadedCommand.bindTo {
-            Log.i("AppPM", "All images loaded, hiding splash screen")
-            if (splashOverlay == null) {
-                Log.i("AppPM", "All images not loaded, hiding splash screen")
-                return@bindTo
-            }
-            splashOverlay.animate()
-                .alpha(0f)
-                .setDuration(400)
-                .withEndAction {
-                    splashOverlay.visibility = View.GONE
-                }
-                .start()
+            Log.i(TAG, "AppActivity: imagesLoadedCommand received")
+            hideSplashOverlay("images_loaded_command")
         }
+    }
+
+    override fun onDestroy() {
+        Log.i(TAG, "AppActivity.onDestroy: remove splash fallback callback")
+        splashOverlay.removeCallbacks(splashFallbackRunnable)
+        super.onDestroy()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -154,5 +180,26 @@ class AppActivity : BaseActivity<AppPm>() {
         } else {
             findLastNestedFragmentAndSendEvent(nestedFragment)
         }
+    }
+
+    private fun hideSplashOverlay(reason: String) {
+        Log.i(
+            TAG,
+            "hideSplashOverlay(reason=$reason, isVisible=${splashOverlay.visibility == View.VISIBLE}, alpha=${splashOverlay.alpha})"
+        )
+        splashOverlay.removeCallbacks(splashFallbackRunnable)
+        if (splashOverlay.visibility != View.VISIBLE) {
+            Log.i(TAG, "hideSplashOverlay: already hidden, skip")
+            return
+        }
+
+        splashOverlay.animate()
+            .alpha(0f)
+            .setDuration(250)
+            .withEndAction {
+                splashOverlay.visibility = View.GONE
+                Log.i(TAG, "hideSplashOverlay: animation complete, splash hidden")
+            }
+            .start()
     }
 }

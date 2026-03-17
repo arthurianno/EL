@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.main.ui
 
+import android.util.Log
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
@@ -16,9 +17,12 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.fragments.showDialog
+import io.reactivex.rxkotlin.addTo
 import me.dmdev.rxpm.bindTo
 import javax.inject.Inject
 import kotlin.math.abs
+
+private const val NAV_TRACE_TAG = "NavTrace"
 
 class MainProfileFragment :
     BaseRecyclerViewFragment<MainProfilePm, FragmentMainProfileBinding>(FragmentMainProfileBinding::inflate) {
@@ -34,12 +38,19 @@ class MainProfileFragment :
 
     override val backgroundColor = R.color.pale_gray
 
+    override fun onResume() {
+        super.onResume()
+        Log.i(NAV_TRACE_TAG, "MainProfileFragment.onResume(parentBackStack=${parentFragmentManager.backStackEntryCount})")
+    }
+
     override fun onBindPresentationModel(pm: MainProfilePm) {
         super.onBindPresentationModel(pm)
         observeAppBarChanges()
         pm.userFullNameState.bindTo(binding.toolbarTitleView.text())
         pm.userFullNameState.bindTo(binding.titleTextView.text())
-        binding.toolbarProfileSettingsButtonView.clicks().bindTo(pm.profileSettingsAction)
+        binding.toolbarProfileSettingsButtonView.clicks()
+            .doOnNext { Log.i(NAV_TRACE_TAG, "MainProfileFragment UI click: profileSettingsButton") }
+            .bindTo(pm.profileSettingsAction)
         bindProgressDialog(pm)
         pm.openDiabetesTypeDialogCommand.bindTo {
             childFragmentManager.showDialog(DiabetesSettingDialogFragment.newInstance())
@@ -56,6 +67,7 @@ class MainProfileFragment :
             binding.profileInfoView.alpha = if (alpha < 1) alpha - 0.7f else alpha
             binding.toolbarProfileContainerView.alpha = 1 - alpha
         }
+            .addTo(compositeDestroy)
     }
 
     companion object {

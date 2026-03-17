@@ -14,9 +14,15 @@ import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.hide
 import me.dmdev.rxpm.bindTo
+import java.util.Locale
 
 class GreetingFlowFragment :
     BaseFragment<GreetingPm, FragmentGreetingBinding>(FragmentGreetingBinding::inflate) {
+    companion object {
+        private const val TAG = "LangFlow"
+
+        fun newInstance(): GreetingFlowFragment = GreetingFlowFragment()
+    }
 
     override val screenLayout: Int = R.layout.fragment_greeting
     override val classToken: Class<GreetingPm> = GreetingPm::class.java
@@ -26,6 +32,10 @@ class GreetingFlowFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.toolbar.homeButtonView.hide()
         binding.toolbar.menuButtonView.setText(R.string.greeting_menu_action)
+        Log.i(
+            TAG,
+            "GreetingFlowFragment.onViewCreated(locale=${Locale.getDefault().language}, menu='${binding.toolbar.menuButtonView.text}')"
+        )
     }
 
     override fun onBindPresentationModel(pm: GreetingPm) {
@@ -37,15 +47,13 @@ class GreetingFlowFragment :
             withTitle(binding.greetingTitleView, R.string.greeting_title)
             withDescription(binding.greetingMessageView, R.string.greeting_message)
             withRootView(binding.root)
+            onConfigLoaded { screenEntity ->
+                Log.i(
+                    TAG,
+                    "Greeting config applied(lang=${screenEntity?.lang}, title='${screenEntity?.title}', description='${screenEntity?.description}')"
+                )
+            }
         }
 
-    }
-
-
-
-
-
-    companion object {
-        fun newInstance(): GreetingFlowFragment = GreetingFlowFragment()
     }
 }

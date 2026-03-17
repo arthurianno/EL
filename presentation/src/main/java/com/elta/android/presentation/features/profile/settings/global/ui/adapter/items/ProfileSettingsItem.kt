@@ -32,6 +32,7 @@ data class ProfileSettingsItem(
         EMAIL,
         TOKEN,
         NOTIFICATION,
+        LANGUAGE,
         GLUCOSE_FORMAT,
         LEGAL_INFO,
         EMIAS_ACCOUNT,

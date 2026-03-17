@@ -1,5 +1,6 @@
 package com.elta.android.presentation.core.navigation
 
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -11,6 +12,8 @@ import com.elta.android.presentation.core.navigation.support.SupportAppNavigator
 import com.elta.android.presentation.core.navigation.support.SupportAppScreen
 import com.github.terrakok.cicerone.Command
 import com.nullgr.core.collections.isNotNullOrEmpty
+
+private const val NAV_TRACE_TAG = "NavTrace"
 
 open class ExtendedNavigator(
     activity: FragmentActivity,
@@ -33,11 +36,21 @@ open class ExtendedNavigator(
     }
 
     override fun applyCommands(commands: Array<out Command>) {
+        Log.i(
+            NAV_TRACE_TAG,
+            "ExtendedNavigator.applyCommands(start, commandCount=${commands.size}, fragmentBackStack=${fragmentManager.backStackEntryCount})"
+        )
         commands.forEach { command ->
-            when (checkCondition(command)) {
-                is AttachTab -> attachTabFragment((command as AttachTab).screen)
-                is AddTabs -> replaceTabFragments((command as AddTabs).screens)
-                else -> super.applyCommand(command)
+            when (val checkedCommand = checkCondition(command)) {
+                is AttachTab -> {
+                    Log.i(NAV_TRACE_TAG, "ExtendedNavigator command=AttachTab(${checkedCommand.screen.screenKey})")
+                    attachTabFragment(checkedCommand.screen)
+                }
+                is AddTabs -> {
+                    Log.i(NAV_TRACE_TAG, "ExtendedNavigator command=AddTabs(count=${checkedCommand.screens.size})")
+                    replaceTabFragments(checkedCommand.screens)
+                }
+                else -> super.applyCommands(arrayOf(checkedCommand))
             }
         }
     }

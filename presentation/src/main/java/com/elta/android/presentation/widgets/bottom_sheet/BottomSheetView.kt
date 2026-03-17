@@ -71,7 +71,8 @@ class BottomSheetView @JvmOverloads constructor(
         behavior.isHideable = true
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
         setBackgroundColor(color1)
-        visibility = View.INVISIBLE
+        visibility = View.GONE
+        updateTouchInterception(false)
 
         binding.touchOutsideView.setOnClickListener {
             if (isShowing) {
@@ -80,8 +81,8 @@ class BottomSheetView @JvmOverloads constructor(
         }
 
         binding.bottomSheetContainer.setOnTouchListener { _, _ ->
-            // Consume the event and prevent it from falling through
-            true
+            // Consume touches only when sheet is visible.
+            isShowing
         }
 
         inAnimator = ObjectAnimator.ofInt(this, "backgroundColor", color1, color2)
@@ -125,6 +126,9 @@ class BottomSheetView @JvmOverloads constructor(
                     hideInternal(true)
                 }
             }.addTo(compositeDisposable)
+
+        // Re-sync visual/touch state after recreation or view re-attach.
+        changeVisibility()
     }
 
     override fun onDetachedFromWindow() {
@@ -173,11 +177,23 @@ class BottomSheetView @JvmOverloads constructor(
     }
 
     private fun changeVisibility() {
-        if (!isShowing && isOutAnimationEnded) {
-            visibility = View.INVISIBLE
-        } else if (isInAnimationStarted) {
+        val showing = isShowing
+        updateTouchInterception(showing)
+
+        if (!showing && isOutAnimationEnded) {
+            visibility = View.GONE
+        } else if (isInAnimationStarted || showing) {
             visibility = View.VISIBLE
         }
+    }
+
+    private fun updateTouchInterception(enabled: Boolean) {
+        isClickable = enabled
+        isFocusable = enabled
+        binding.touchOutsideView.isClickable = enabled
+        binding.touchOutsideView.isFocusable = enabled
+        binding.bottomSheetContainer.isClickable = enabled
+        binding.bottomSheetContainer.isFocusable = enabled
     }
 
     companion object {

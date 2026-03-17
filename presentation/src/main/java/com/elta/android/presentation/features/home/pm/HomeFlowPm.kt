@@ -80,6 +80,7 @@ import javax.inject.Inject
 private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
 private const val META_SYNC = "meta_sync"
 private const val SYNC_AFTER_CONNECTION_RESTORED_DELAY_MILLIS = 2800L
+private const val NAV_TRACE_TAG = "NavTrace"
 
 class HomeFlowPm @Inject constructor(
     private val getUserInfoUseCase: GetUserInfoUseCase,
@@ -181,6 +182,11 @@ class HomeFlowPm @Inject constructor(
 
         menuItemRestoredAction.observable
             .subscribe(selectedItemIdState.consumer)
+            .untilDestroy()
+
+        selectedItemIdState.observable
+            .doOnNext { id -> Log.i(NAV_TRACE_TAG, "HomeFlowPm.selectedItemIdState(id=$id)") }
+            .subscribe()
             .untilDestroy()
 
         homeAction.observable
@@ -325,10 +331,27 @@ class HomeFlowPm @Inject constructor(
             .untilDestroy()
 
         menuItemSelectedAction.observable
+            .doOnNext { id ->
+                Log.i(
+                    NAV_TRACE_TAG,
+                    "HomeFlowPm.menuItemSelectedAction(id=$id,current=${selectedItemIdState.valueOrNull})"
+                )
+            }
             .map { it to handleBottomMenuClick(it) }
+            .doOnNext { pair ->
+                Log.i(
+                    NAV_TRACE_TAG,
+                    "HomeFlowPm.navigateToTab(screen=${pair.second.first.screenKey}, event=${pair.second.second})"
+                )
+            }
             .trackEvent { AnalyticsEvent(it.second.second) }
             .doOnNext { router.navigateToTab(it.second.first) }
             .map { it.first }
+            .doOnError { error ->
+                Log.e(NAV_TRACE_TAG, "HomeFlowPm.menuItemSelectedAction stream error", error)
+                handleError(error)
+            }
+            .retry()
             .subscribe(selectedItemIdState.consumer)
             .untilDestroy()
     }
