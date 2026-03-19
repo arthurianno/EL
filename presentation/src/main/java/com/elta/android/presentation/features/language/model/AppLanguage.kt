@@ -8,7 +8,14 @@ enum class AppLanguage(val code: String) {
 
     companion object {
         fun fromCode(code: String?): AppLanguage {
-            return when (code?.lowercase(Locale.ROOT)) {
+            val normalized = code
+                ?.trim()
+                ?.replace('_', '-')
+                ?.lowercase(Locale.ROOT)
+                ?.takeIf { it.isNotEmpty() }
+                ?.substringBefore('-')
+
+            return when (normalized) {
                 EN.code -> EN
                 else -> RU
             }

@@ -77,6 +77,8 @@ class LanguageSelectionPm @Inject constructor(
             .doOnNext { Log.i(TAG, "continueAction clicked") }
             .map { selectedLanguageState.valueOrNull ?: AppLanguage.fromCode(LocaleHelper.getLanguage(context)) }
             .flatMapCompletable { language ->
+                val currentLanguage = AppLanguage.fromCode(LocaleHelper.getLanguage(context))
+
                 if (isFirstLaunchState.value) {
                     Log.i(TAG, "continueAction: first launch, applying language=${language.code}")
                     applyLanguage(language)
@@ -89,6 +91,14 @@ class LanguageSelectionPm @Inject constructor(
                             }
                         )
                 } else {
+                    if (language == currentLanguage) {
+                        Log.i(
+                            TAG,
+                            "continueAction: settings mode, language unchanged (${language.code}), skip apply/recreate"
+                        )
+                        return@flatMapCompletable Completable.complete()
+                    }
+
                     Log.i(TAG, "continueAction: settings mode, applying language=${language.code}")
                     applyLanguage(language)
                         .andThen(

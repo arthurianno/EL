@@ -1,5 +1,6 @@
 package com.elta.android.data.features.calculator.datasource.fatsecret
 
+import android.content.Context
 import android.util.Base64
 import com.elta.android.common.di.qualifires.FatSecret
 import com.elta.android.common.di.qualifires.FatSecretAnnotationType
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx2.asFlow
 import java.net.URLEncoder
 import java.util.Date
+import java.util.Locale
 import java.util.UUID
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -48,8 +50,12 @@ private const val POST_METHOD = "POST"
 private const val SIGNATURE_METHOD = "HMAC-SHA1"
 private const val HMAC_SHA1_ALGORITHM = "HmacSHA1"
 private const val OAUTH_VERSION = "1.0"
-private const val REGION = "RU"
-private const val LANGUAGE = "ru"
+private const val REGION_RU = "RU"
+private const val REGION_EN = "US"
+private const val LANGUAGE_RU = "ru"
+private const val LANGUAGE_EN = "en"
+private const val LANGUAGE_PREFS_NAME = "language_preference"
+private const val LANGUAGE_KEY_SELECTED = "selected_language"
 private const val STRING_SEPARATOR = "&"
 private const val FOOD_ID_PARAMETER = "food_id"
 
@@ -63,7 +69,8 @@ class FatSecretDataSource @Inject constructor(
     @FatSecret(FatSecretAnnotationType.IsOAuth2) private val isOAuth2: Boolean,
     private val storage: FatSecretStorage,
     private val api: FatSecretApi,
-    private val tokenApi: FatSecretTokenApi
+    private val tokenApi: FatSecretTokenApi,
+    private val context: Context
 ) {
 
     private val oAuth1BaseParameters = mapOf(
@@ -72,25 +79,29 @@ class FatSecretDataSource @Inject constructor(
         OAUTH_VERSION_PARAMETER to OAUTH_VERSION
     )
 
-    private val searchFoodBaseParameters = mapOf(
+    private fun searchFoodBaseParameters(region: String, language: String) = mapOf(
         METHOD_PARAMETER to METHOD_SEARCH_FOOD,
-        REGION_PARAMETER to REGION,
-        LANGUAGE_PARAMETER to LANGUAGE,
+        REGION_PARAMETER to region,
+        LANGUAGE_PARAMETER to language,
         FORMAT_PARAMETER to FORMAT_RESPONSE,
     )
 
-    private val foodBaseParameters = mapOf(
+    private fun foodBaseParameters(region: String, language: String) = mapOf(
         METHOD_PARAMETER to METHOD_GET_FOOD,
-        REGION_PARAMETER to REGION,
-        LANGUAGE_PARAMETER to LANGUAGE,
+        REGION_PARAMETER to region,
+        LANGUAGE_PARAMETER to language,
         FORMAT_PARAMETER to FORMAT_RESPONSE,
     )
 
     fun getFood(id: String, type: DishType): Flow<Dish> {
         val timeStamp = getTimeStamp()
         val nonce = UUID.randomUUID().toString()
+        val localeParams = resolveLocaleParams()
 
-        val parameters = foodBaseParameters + mapOf(
+        val parameters = foodBaseParameters(
+            region = localeParams.region,
+            language = localeParams.language
+        ) + mapOf(
             FOOD_ID_PARAMETER to id,
             OAUTH_TIMESTAMP_PARAMETER to timeStamp,
             OAUTH_NONCE_PARAMETER to nonce
@@ -103,8 +114,8 @@ class FatSecretDataSource @Inject constructor(
                 api.getFoodGeneric(
                     foodId = id,
                     method = METHOD_GET_FOOD,
-                    language = LANGUAGE,
-                    region = REGION,
+                    language = localeParams.language,
+                    region = localeParams.region,
                     format = FORMAT_RESPONSE,
                     oauthSignature = oauthSignature.takeIsAuth1(),
                     oauthConsumerKey = consumerKey.takeIsAuth1(),
@@ -119,8 +130,8 @@ class FatSecretDataSource @Inject constructor(
                 api.getFoodBrand(
                     foodId = id,
                     method = METHOD_GET_FOOD,
-                    language = LANGUAGE,
-                    region = REGION,
+                    language = localeParams.language,
+                    region = localeParams.region,
                     format = FORMAT_RESPONSE,
                     oauthSignature = oauthSignature,
                     oauthConsumerKey = consumerKey.takeIsAuth1(),
@@ -142,8 +153,12 @@ class FatSecretDataSource @Inject constructor(
     ): SearchFoodsResponse {
         val timeStamp = getTimeStamp()
         val nonce = UUID.randomUUID().toString()
+        val localeParams = resolveLocaleParams()
 
-        val parameters = searchFoodBaseParameters + mapOf(
+        val parameters = searchFoodBaseParameters(
+            region = localeParams.region,
+            language = localeParams.language
+        ) + mapOf(
             SEARCH_EXPRESSION_PARAMETER to name.encode(),
             OAUTH_TIMESTAMP_PARAMETER to timeStamp,
             OAUTH_NONCE_PARAMETER to nonce,
@@ -160,8 +175,8 @@ class FatSecretDataSource @Inject constructor(
             maxResults = maxResults,
             format = FORMAT_RESPONSE,
             method = METHOD_SEARCH_FOOD,
-            region = REGION,
-            language = LANGUAGE,
+            region = localeParams.region,
+            language = localeParams.language,
             oauthConsumerKey = consumerKey.takeIsAuth1(),
             oauthNonce = nonce.takeIsAuth1(),
             oauthSignatureMethod = SIGNATURE_METHOD.takeIsAuth1(),
@@ -171,6 +186,38 @@ class FatSecretDataSource @Inject constructor(
             oauthSignature = oauthSignature
         )
     }
+
+    private data class LocaleParams(
+        val region: String,
+        val language: String
+    )
+
+    private fun resolveLocaleParams(): LocaleParams {
+        val rawLanguage = context
+            .getSharedPreferences(LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(LANGUAGE_KEY_SELECTED, null)
+            ?: Locale.getDefault().toLanguageTag()
+
+        return when (normalizeLanguage(rawLanguage)) {
+            LANGUAGE_EN -> LocaleParams(
+                region = REGION_EN,
+                language = LANGUAGE_EN
+            )
+            else -> LocaleParams(
+                region = REGION_RU,
+                language = LANGUAGE_RU
+            )
+        }
+    }
+
+    private fun normalizeLanguage(rawLanguage: String?): String =
+        rawLanguage
+            ?.trim()
+            ?.replace('_', '-')
+            ?.lowercase(Locale.ROOT)
+            ?.takeIf { it.isNotEmpty() }
+            ?.substringBefore('-')
+            ?: LANGUAGE_RU
 
     private fun <T> runFlowWithCatchToken(apiMethod: () -> Flow<T>) =
         apiMethod()

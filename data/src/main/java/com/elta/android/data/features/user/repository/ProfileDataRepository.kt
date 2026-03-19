@@ -1,5 +1,6 @@
 package com.elta.android.data.features.user.repository
 
+import android.content.Context
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.data.features.sync.manger.LocalSyncManager
@@ -20,8 +21,14 @@ import javax.inject.Inject
 class ProfileDataRepository @Inject constructor(
     @Cache private val cachedSource: ProfileDataSource,
     @Remote private val remoteSource: ProfileDataSource,
-    private val syncManger: LocalSyncManager
+    private val syncManger: LocalSyncManager,
+    private val context: Context
 ) : ProfileRepository {
+
+    companion object {
+        private const val LANGUAGE_PREFS_NAME = "language_preference"
+        private const val LANGUAGE_KEY_SELECTED = "selected_language"
+    }
 
     override fun updateProfile(profile: Profile): Completable {
         val dto = profile.toNetwork()
@@ -118,24 +125,30 @@ class ProfileDataRepository @Inject constructor(
         }
 
     override fun updateLanguageTag(languageTag: String): Completable =
-        cachedSource.getProfileSettings()
-            .onErrorReturn {
-                ProfileSettingsNetworkResponse(
-                    isOnboarded = true,
-                    glucoseFormat = GlucoseFormat.CAPILLARY.toNetwork(),
-                    languageTag = resolveLanguageTag(languageTag)
-                )
-            }
-            .flatMapCompletable { cachedSettings ->
-                val response = cachedSettings.copy(
+        getProfileSettingsForUpdate()
+            .flatMapCompletable { currentSettings ->
+                val response = currentSettings.copy(
                     languageTag = resolveLanguageTag(languageTag)
                 )
                 cachedSource.updateProfileSettings(response)
                     .andThen(remoteSource.updateProfileSettings(response).onErrorComplete())
             }
 
+    private fun getProfileSettingsForUpdate(): Single<ProfileSettingsNetworkResponse> =
+        cachedSource.getProfileSettings()
+            .onErrorResumeNext {
+                remoteSource.getProfileSettings()
+                    .flatMap { remoteSettings ->
+                        cachedSource.updateProfileSettings(remoteSettings)
+                            .toSingleDefault(remoteSettings)
+                    }
+            }
+
     private fun resolveLanguageTag(languageTag: String? = null): String {
-        val rawLanguage = languageTag ?: Locale.getDefault().language
+        val selectedLanguage = context
+            .getSharedPreferences(LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(LANGUAGE_KEY_SELECTED, null)
+        val rawLanguage = languageTag ?: selectedLanguage ?: Locale.getDefault().language
         return SupportedLanguageTag.fromRawValue(rawLanguage).value
     }
 }

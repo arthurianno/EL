@@ -23,6 +23,7 @@ import com.elta.android.presentation.core.pm.widgets.networkControl
 import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.core.ui.stateview.StateData
+import com.elta.android.presentation.utils.LocaleHelper
 import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
 import com.nullgr.core.rx.bindProgress
 import io.reactivex.Completable
@@ -76,6 +77,9 @@ abstract class BasePm(
     val errorControl = stateControl()
     val emptyControl = stateControl()
 
+    private var reloadScreenConfigAction: (() -> Unit)? = null
+    private var loadedScreenConfigLanguage: String? = null
+
     internal val resources = services.resources
     internal val network = services.network
     internal val analytics = services.analytics
@@ -114,6 +118,9 @@ abstract class BasePm(
     }
 
     protected fun loadScreenConfig(context: Context) {
+        reloadScreenConfigAction = { loadScreenConfig(context) }
+        loadedScreenConfigLanguage = LocaleHelper.getLanguage(context)
+
         val key = screenConfigKey
         val useCase = getScreenConfigUseCase
 
@@ -182,6 +189,15 @@ abstract class BasePm(
         configs: Map<String, String>, // ключ -> slug
         onUpdate: (results: Map<String, Pair<ScreenEntity?, Boolean>>) -> Unit
     ) {
+        reloadScreenConfigAction = {
+            loadMultipleScreenConfigs(
+                context = context,
+                configs = configs,
+                onUpdate = onUpdate
+            )
+        }
+        loadedScreenConfigLanguage = LocaleHelper.getLanguage(context)
+
         val useCase = getScreenConfigUseCase
 
         if (useCase == null) {
@@ -226,6 +242,21 @@ abstract class BasePm(
                 val emptyResults = configs.keys.associateWith { null to true }
                 onUpdate(emptyResults)
             }
+        }
+    }
+
+    fun reloadScreenConfigIfLanguageChanged(context: Context) {
+        val reloadAction = reloadScreenConfigAction ?: return
+        val currentLanguage = LocaleHelper.getLanguage(context)
+        val lastLanguage = loadedScreenConfigLanguage ?: run {
+            loadedScreenConfigLanguage = currentLanguage
+            return
+        }
+
+        if (lastLanguage != currentLanguage) {
+            Log.i("BasePm", "🌐 Язык изменился ($lastLanguage -> $currentLanguage), перезагружаем screen config")
+            loadedScreenConfigLanguage = currentLanguage
+            reloadAction.invoke()
         }
     }
 

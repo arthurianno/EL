@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.elta.android.common.utils.EltaMessageClient
 import com.elta.android.presentation.features.app.ui.AppActivity
+import com.elta.android.presentation.utils.LocaleHelper
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.android.AndroidInjection
@@ -42,6 +43,7 @@ class EltaMessageService : FirebaseMessagingService() {
     override fun onCreate() {
         AndroidInjection.inject(this)
         super.onCreate()
+        LocaleHelper.onAttach(this)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {

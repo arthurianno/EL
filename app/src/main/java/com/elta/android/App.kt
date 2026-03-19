@@ -13,6 +13,7 @@ import com.elta.android.data.features.auth.datasource.social.SocialNetworks
 import com.elta.android.presentation.di.AnalyticModule
 import com.elta.android.presentation.features.app.ui.AppActivity
 import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
+import com.elta.android.presentation.utils.LocaleHelper
 import com.google.firebase.FirebaseApp
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nullgr.core.hardware.NetworkChecker
@@ -61,6 +62,7 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, Ha
 
     override fun onCreate() {
         super.onCreate()
+        LocaleHelper.onAttach(this)
         initFirebase()
         initInjector()
         initLogger()
@@ -86,7 +88,7 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, Ha
     }
 
     override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base)
+        super.attachBaseContext(LocaleHelper.onAttach(base))
         MultiDex.install(this)
     }
 

@@ -13,6 +13,7 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
+import com.elta.android.presentation.utils.LocaleHelper
 import com.github.terrakok.cicerone.Router
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -58,6 +59,9 @@ abstract class BaseViewModel<ST> : ViewModel() {
     private val _event = MutableSharedFlow<Event?>()
     val event: SharedFlow<Event?>
         get() = _event.asSharedFlow()
+
+    private var reloadScreenConfigAction: (() -> Unit)? = null
+    private var loadedScreenConfigLanguage: String? = null
 
     init {
         this.action
@@ -137,6 +141,14 @@ abstract class BaseViewModel<ST> : ViewModel() {
         context: Context,
         updateState: (screenEntity: ScreenEntity?, isImageReady: Boolean) -> ST
     ) {
+        reloadScreenConfigAction = {
+            loadScreenConfig(
+                context = context,
+                updateState = updateState
+            )
+        }
+        loadedScreenConfigLanguage = LocaleHelper.getLanguage(context)
+
         // Проверяем, реализует ли ViewModel интерфейс
         if (this !is ComposeScreenConfigurable) {
             Log.w("BaseViewModel", "⏭️ ViewModel не реализует ComposeScreenConfigurable, используем дефолты")
@@ -182,6 +194,15 @@ abstract class BaseViewModel<ST> : ViewModel() {
         configs: Map<String, String>, // ключ -> slug
         onUpdate: (results: Map<String, Pair<ScreenEntity?, Boolean>>) -> ST
     ) {
+        reloadScreenConfigAction = {
+            loadMultipleScreenConfigs(
+                context = context,
+                configs = configs,
+                onUpdate = onUpdate
+            )
+        }
+        loadedScreenConfigLanguage = LocaleHelper.getLanguage(context)
+
         Log.i("BaseViewModel", "🔄 [Compose] Загружаем ${configs.size} конфигураций")
         Log.d("BaseViewModel", "📋 [Compose] Карта конфигураций: ${configs.entries.joinToString { "${it.key} -> ${it.value}" }}")
 
@@ -224,6 +245,24 @@ abstract class BaseViewModel<ST> : ViewModel() {
             } catch (e: Exception) {
                 Log.e("BaseViewModel", "❌ [Compose] Исключение в loadMultipleScreenConfigs: ${e.message}", e)
             }
+        }
+    }
+
+    fun reloadScreenConfigIfLanguageChanged(context: Context) {
+        val reloadAction = reloadScreenConfigAction ?: return
+        val currentLanguage = LocaleHelper.getLanguage(context)
+        val lastLanguage = loadedScreenConfigLanguage ?: run {
+            loadedScreenConfigLanguage = currentLanguage
+            return
+        }
+
+        if (lastLanguage != currentLanguage) {
+            Log.i(
+                "BaseViewModel",
+                "🌐 [Compose] Язык изменился ($lastLanguage -> $currentLanguage), перезагружаем screen config"
+            )
+            loadedScreenConfigLanguage = currentLanguage
+            reloadAction.invoke()
         }
     }
 }

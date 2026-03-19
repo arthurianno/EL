@@ -29,6 +29,7 @@ abstract class BaseComposeFragment<VM : BaseViewModel<*>> :
         super.onCreate(savedInstanceState)
         viewModel.init()
         arguments?.let { viewModel.handleFragmentArguments(it) }
+        viewModel.reloadScreenConfigIfLanguageChanged(requireContext())
         addOnBackPressedCallback()
     }
 

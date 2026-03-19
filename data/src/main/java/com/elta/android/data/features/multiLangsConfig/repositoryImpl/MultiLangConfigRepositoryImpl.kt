@@ -15,6 +15,7 @@ import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.domain.features.multiLangsConfig.repository.MultilangConfigRepository
 import javax.inject.Inject
 import androidx.core.content.edit
+import java.util.Locale
 
 class MultiLangConfigRepositoryImpl @Inject constructor(
     private val api: MultiLangConfigApi,
@@ -102,8 +103,14 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
     private fun getAppLanguageCode(): String {
         val languagePrefs = context.getSharedPreferences(LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
         val savedLanguage = languagePrefs.getString(LANGUAGE_KEY_SELECTED, null)
-        val rawLanguage = savedLanguage ?: java.util.Locale.getDefault().language
-        return when (rawLanguage?.lowercase()) {
+        val rawLanguage = savedLanguage ?: java.util.Locale.getDefault().toLanguageTag()
+        val normalized = rawLanguage
+            ?.trim()
+            ?.replace('_', '-')
+            ?.lowercase(Locale.ROOT)
+            ?.takeIf { it.isNotEmpty() }
+            ?.substringBefore('-')
+        return when (normalized) {
             "en" -> "en"
             else -> "ru"
         }

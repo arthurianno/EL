@@ -97,23 +97,38 @@ object LocaleHelper {
         Locale.setDefault(locale)
 
         val configuration = Configuration(context.resources.configuration)
-        configuration.setLocale(locale)
-        @Suppress("DEPRECATION")
-        context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
+        val appContext: Context? = context.applicationContext
 
-        val appContext = context.applicationContext
-        @Suppress("DEPRECATION")
-        appContext.resources.updateConfiguration(configuration, appContext.resources.displayMetrics)
-
-        val updatedContext = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.createConfigurationContext(configuration)
-        } else {
-            @Suppress("DEPRECATION")
-            context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
-            context
+        val updatedContext = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N -> {
+                val localeList = android.os.LocaleList(locale)
+                android.os.LocaleList.setDefault(localeList)
+                configuration.setLocales(localeList)
+                updateAppResourcesIfAvailable(appContext, configuration)
+                context.createConfigurationContext(configuration)
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 -> {
+                configuration.setLocale(locale)
+                updateAppResourcesIfAvailable(appContext, configuration)
+                context.createConfigurationContext(configuration)
+            }
+            else -> {
+                @Suppress("DEPRECATION")
+                configuration.locale = locale
+                @Suppress("DEPRECATION")
+                context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
+                updateAppResourcesIfAvailable(appContext, configuration)
+                context
+            }
         }
         Log.i(TAG, "LocaleHelper.updateResources(complete, default=${Locale.getDefault().language})")
         return updatedContext
+    }
+
+    @Suppress("DEPRECATION")
+    private fun updateAppResourcesIfAvailable(appContext: Context?, configuration: Configuration) {
+        val resources = appContext?.resources ?: return
+        resources.updateConfiguration(configuration, resources.displayMetrics)
     }
 
     fun onAttach(context: Context): Context {
@@ -122,9 +137,17 @@ object LocaleHelper {
         return updateResources(context, lang)
     }
 
-    private fun normalizeLanguage(languageCode: String): String {
-        return when (languageCode.lowercase(Locale.ROOT)) {
+    private fun normalizeLanguage(languageCode: String?): String {
+        val normalized = languageCode
+            ?.trim()
+            ?.replace('_', '-')
+            ?.lowercase(Locale.ROOT)
+            ?.takeIf { it.isNotEmpty() }
+            ?: return LANGUAGE_RU
+
+        return when (normalized.substringBefore('-')) {
             LANGUAGE_EN -> LANGUAGE_EN
+            LANGUAGE_RU -> LANGUAGE_RU
             else -> LANGUAGE_RU
         }
     }
