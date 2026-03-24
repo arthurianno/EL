@@ -5,6 +5,7 @@ import android.view.View
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.events
@@ -46,8 +47,8 @@ class MainRecordsFragment :
     override val backgroundColor: Int = R.color.pale_gray
     private val secondaryProvider: StatusBarConfigProvider = MainScreenLightStatusBarConfigProvider
     private val bottomSheetState = BehaviorRelay.createDefault(false)
-
     private val headerState = BehaviorRelay.createDefault(true)
+    private var lastMainScreenConfig: ScreenEntity? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -64,19 +65,34 @@ class MainRecordsFragment :
     override fun onBindPresentationModel(pm: MainRecordsPm) {
         super.onBindPresentationModel(pm)
 
+        fun applyMainScreenConfig(config: ScreenEntity?) {
+            config ?: return
+            binding.mainScreenStateView.updateFromConfig(
+                title = config.title,
+                description = config.description,
+                imageUrl = config.backgroundImageUrl
+            )
+        }
+
         // Биндим конфигурацию main screen
         pm.mainScreenConfig.bindTo { config ->
-            config?.let {
-                // Обновляем title, description и изображение из конфига
-                binding.mainScreenStateView.updateFromConfig(
-                    title = it.title,
-                    description = it.description,
-                    imageUrl = it.backgroundImageUrl
-                )
-            }
+            lastMainScreenConfig = config
+            applyMainScreenConfig(config)
         }
 
         pm.mainScreenState.bind(binding.mainScreenStateView, compositeUnbind)
+        compositeUnbind.add(
+            pm.mainScreenState
+                .dataState
+                .observable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    {
+                        applyMainScreenConfig(lastMainScreenConfig)
+                    },
+                    {}
+                )
+        )
         pm.mainScreenState
             .visibilityState
             .observable.map { !it }

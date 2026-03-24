@@ -1,5 +1,6 @@
 package com.elta.android.data.features.diary.medicines.datasource.remote
 
+import com.elta.android.common.utils.currentMillisUtc
 import com.elta.android.common.utils.timestamp
 import com.elta.android.data.features.common.storage.SyncStorage
 import com.elta.android.data.features.diary.medicines.api.MedicinesApi
@@ -14,7 +15,13 @@ class MedicamentRemoteDataSource @Inject constructor(
 ) : MedicamentRemoteSource {
 
     override fun syncMedicaments(): Single<List<MedicamentNetworkResponse>> {
-        return api.getMedicaments(syncStorage.lastMedicamentSync)
-            .doOnSuccess { syncStorage.lastMedicamentSync = timestamp() }
+        val touchedAfterMs = normalizeToMillis(syncStorage.lastMedicamentSync)
+        return api.getMedicaments(touchedAfterMs)
+            .doOnSuccess { syncStorage.lastMedicamentSync = currentMillisUtc() }
+    }
+
+    private fun normalizeToMillis(value: Long?): Long? {
+        if (value == null) return null
+        return if (value < 1_000_000_000_000L) value * 1000L else value
     }
 }

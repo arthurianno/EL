@@ -72,10 +72,16 @@ class AddNewDeviceUseCase @Inject constructor(
             val (hardware, software) = deviceRepository.getVersions(address)
 
             crashlyticsReport.log("Start saving device versions to storage")
-            val deviceInfo = deviceData?.second?.copy(
+            val existingInfo = deviceInfoRepository.getLastDeviceInfo(address)
+            val deviceInfo = existingInfo?.copy(
                 hardwareVersion = hardware,
                 softwareVersion = software
-            ) ?: GlucometerInfo(id = address, hardwareVersion = hardware, softwareVersion = software)
+            )
+                ?: GlucometerInfo(
+                    id = address,
+                    hardwareVersion = hardware,
+                    softwareVersion = software
+                )
 
             deviceInfoRepository.updateGlucometerInfo(deviceInfo, null)
 

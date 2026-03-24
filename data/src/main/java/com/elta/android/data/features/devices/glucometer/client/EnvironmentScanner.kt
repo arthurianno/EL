@@ -98,18 +98,22 @@ class EnvironmentScanner @Inject constructor(
             callback?.let {
                 adapter.bluetoothLeScanner?.stopScan(it)
                 crashlyticsReport.log("The environment scan has been canceled")
+                callback = null
             }
         }
     }
 
     @SuppressLint("MissingPermission")
     private fun ScanResult.isFiltered(filters: List<ScanFilter>): Boolean {
+        // Если фильтры не заданы, считаем что подходят все устройства
+        if (filters.isEmpty()) return true
+
         val deviceName = device.name ?: scanRecord?.deviceName
-        filters.forEach { filter ->
+        // Используем any вместо forEach с return, чтобы проверить все фильтры
+        return filters.any { filter ->
             val nameToFilter = filter.deviceName
-            return nameToFilter != null && deviceName != null && deviceName.contains(nameToFilter)
+            nameToFilter != null && deviceName != null && deviceName.contains(nameToFilter)
         }
-        return false
     }
 
     data class ScanError(val code: Int) : RuntimeException()
