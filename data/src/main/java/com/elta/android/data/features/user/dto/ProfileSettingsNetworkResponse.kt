@@ -5,5 +5,6 @@ import com.google.gson.annotations.SerializedName
 data class ProfileSettingsNetworkResponse(
     @SerializedName("onboarded") val isOnboarded: Boolean,
     @SerializedName("glucoseFormat") val glucoseFormat: GlucoseFormatNetworkEntity,
-    @SerializedName(LanguageTagQueryParam) val languageTag: String? = null
+    @SerializedName(LanguageTagQueryParam) val languageTag: String? = null,
+    @SerializedName("countryCode") val countryCode: String? = null
 )

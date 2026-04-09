@@ -4,6 +4,7 @@ import com.elta.android.data.features.auth.model.AuthNetworkRequest
 import com.elta.android.data.features.auth.model.ChangePasswordNetworkRequest
 import com.elta.android.data.features.auth.model.EmailStatusNetworkResponse
 import com.elta.android.data.features.auth.model.LoginNetworkResponse
+import com.elta.android.data.features.auth.model.RegisterNetworkRequest
 import com.elta.android.data.features.auth.model.ResetPasswordLinkNetworkRequest
 import com.elta.android.data.features.auth.model.ResetPasswordNetworkRequest
 import com.elta.android.data.features.auth.model.TokenNetworkRequest
@@ -21,7 +22,7 @@ import retrofit2.http.PUT
 interface AuthApi {
 
     @POST("api/auth/v1/accounts")
-    fun register(@Body request: AuthNetworkRequest): Single<TokensNetworkResponse>
+    fun register(@Body request: RegisterNetworkRequest): Single<TokensNetworkResponse>
 
     @POST("api/auth/v1/accounts/login")
     fun login(@Body request: AuthNetworkRequest): Single<LoginNetworkResponse>

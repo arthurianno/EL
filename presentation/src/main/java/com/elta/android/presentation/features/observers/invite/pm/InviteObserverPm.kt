@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.observers.invite.pm
 
+import android.content.Context
 import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.observers.interactor.GetObserverInvitesUseCase
 import com.elta.android.domain.features.observers.interactor.SendObserverInviteUseCase
@@ -12,6 +13,7 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.messages.SnackBarMessageData
+import com.elta.android.presentation.utils.LocaleHelper
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.inputControl
@@ -23,6 +25,7 @@ class InviteObserverPm @Inject constructor(
     private val getObserverInvitesUseCase: GetObserverInvitesUseCase,
     private val sendObserverInviteUseCase: SendObserverInviteUseCase,
     private val getProfileUseCase: GetUpdatedProfileUseCase,
+    private val context: Context,
     services: ServiceFacade
 ) : BasePm(services) {
 
@@ -129,5 +132,9 @@ class InviteObserverPm @Inject constructor(
     }
 
     private fun createObserverInviteUseCaseParams(i: Unit) =
-        SendObserverInviteUseCase.Params(emailInput.text.value)
+        SendObserverInviteUseCase.Params(
+            email = emailInput.text.value,
+            languageTag = LocaleHelper.getLanguage(context),
+            countryCode = LocaleHelper.getRegion(context)
+        )
 }

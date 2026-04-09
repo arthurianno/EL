@@ -883,10 +883,23 @@
     <string name="language_selection_subtitle">Select the app language</string>
     <string name="language_selection_intro">Let\'s get acquainted</string>
     <string name="language_selection_title">Choose the interface language for further use of the app</string>
-    <string name="language_settings_title">Choose interface language</string>
+    <string name="language_settings_title">Interface language</string>
+    <string name="language_settings_subtitle">Change the interface language of the Satellite Online app</string>
 
     <string name="language_russian">Русский</string>
     <string name="language_english">English</string>
+    <string name="region_section_title">Region</string>
+    <string name="region_section_subtitle">Change your region of residence</string>
+    <string name="region_hint">Select region</string>
+    <string name="region_selected_label">Selected region: %s</string>
+    <string name="region_russia">Russia</string>
+    <string name="region_kazakhstan">Kazakhstan</string>
+    <string name="region_india">India</string>
+    <string name="region_uzbekistan">Uzbekistan</string>
+    <string name="region_belarus">Belarus</string>
+    <string name="region_turkey">Turkey</string>
+    <string name="region_china">China</string>
+    <string name="region_africa">Africa</string>
     <string name="error_600">Incorrect email or password</string>
     <string name="error_602">Account is locked</string>
     <string name="error_603">Attention! The specified email already exists.</string>

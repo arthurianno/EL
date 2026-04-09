@@ -10,6 +10,7 @@ import com.elta.android.presentation.States
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.utils.LocaleHelper
 import io.reactivex.rxkotlin.Observables
 import javax.inject.Inject
 
@@ -69,7 +70,12 @@ class RegistrationMainPm @Inject constructor(
     }
 
     private fun createRegisterParams(i: Unit): RegisterUseCase.Params =
-        RegisterUseCase.Params(emailInput.text.value, passwordInput.text.value)
+        RegisterUseCase.Params(
+            email = emailInput.text.value,
+            password = passwordInput.text.value,
+            languageTag = LocaleHelper.getLanguage(context),
+            countryCode = LocaleHelper.getRegion(context)
+        )
 
     private fun handleSuccess() {
         appMetric.trackEvent(AppMetricEvent.RegistrationContinueClick)

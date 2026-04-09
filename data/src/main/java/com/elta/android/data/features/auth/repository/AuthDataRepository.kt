@@ -31,8 +31,8 @@ class AuthDataRepository @Inject constructor(
     @Cache private val cachedSource: ProfileDataSource,
 ) : AuthRepository {
 
-    override fun register(email: String, password: String): Completable =
-        source.register(email, password)
+    override fun register(email: String, password: String, languageTag: String?, countryCode: String?): Completable =
+        source.register(email, password, languageTag, countryCode)
             .doOnSuccess { response ->
                 saveUserCredentials(response, email)
             }

@@ -26,8 +26,18 @@ class ObserverRemoteDataSource @Inject constructor(
     override fun updateObserverName(id: String, name: String) =
         api.updateObserverName(id, ObserverUpdateNameNetworkRequest(name))
 
-    override fun sendObserverInvite(email: String): Single<ObserverNetworkResponse> =
-        api.sendObserverInvite(ObserverInviteEmailNetworkRequest(email))
+    override fun sendObserverInvite(
+        email: String,
+        languageTag: String?,
+        countryCode: String?
+    ): Single<ObserverNetworkResponse> =
+        api.sendObserverInvite(
+            ObserverInviteEmailNetworkRequest(
+                email = email,
+                languageTag = languageTag,
+                countryCode = countryCode
+            )
+        )
 
     override fun deleteObserverInvite(observables: List<SimpleObserverNetworkEntity>): Completable =
         api.deleteObserverInvite(observables.first().id)

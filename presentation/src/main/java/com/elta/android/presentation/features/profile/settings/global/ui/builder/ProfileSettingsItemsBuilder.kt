@@ -88,13 +88,15 @@ class ProfileSettingsItemsBuilder @Inject constructor(
                         type = ProfileSettingsItem.Type.NOTIFICATION
                     )
                 )
-                add(
-                    ProfileSettingsItem(
-                        icon = R.drawable.ic_language,
-                        title = resources.getString(R.string.profile_language),
-                        type = ProfileSettingsItem.Type.LANGUAGE
+                if (BuildConfig.SHOW_LANGUAGE_SELECTION) {
+                    add(
+                        ProfileSettingsItem(
+                            icon = R.drawable.ic_language,
+                            title = resources.getString(R.string.profile_language),
+                            type = ProfileSettingsItem.Type.LANGUAGE
+                        )
                     )
-                )
+                }
                 add(
                     ProfileSettingsItem(
                         icon = R.drawable.ic_glucose_format,

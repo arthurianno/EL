@@ -7,6 +7,7 @@ import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.language.model.AppLanguage
+import com.elta.android.presentation.features.language.model.AppRegion
 import com.elta.android.presentation.utils.LocaleHelper
 import com.elta.android.presentation.utils.OneSignalTags
 import io.reactivex.Completable
@@ -25,10 +26,13 @@ class LanguageSelectionPm @Inject constructor(
 ) : BasePm(services) {
 
     val selectLanguageAction = action<AppLanguage>()
+    val selectRegionAction = action<AppRegion>()
     val continueAction = action<Unit>()
+    /** Нажатие кнопки «X» — закрыть экран без применения языка. */
+    val closeAction = action<Unit>()
 
     val selectedLanguageState = state<AppLanguage>()
-    val showContinueButtonState = state<Boolean>(true)
+    val selectedRegionState = state<AppRegion>()
     val recreateActivityCommand = command<Unit>()
 
     private val isFirstLaunchState = state(true)
@@ -46,27 +50,44 @@ class LanguageSelectionPm @Inject constructor(
             .subscribe(selectedLanguageState.consumer)
             .untilDestroy()
 
-        isFirstLaunchState.observable
-            .doOnNext { isFirstLaunch ->
-                Log.i(TAG, "isFirstLaunchState changed: $isFirstLaunch")
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .map {
+                val regionCode = LocaleHelper.getRegion(context)
+                val region = AppRegion.fromCode(regionCode)
+                Log.i(TAG, "Initial selected region from LocaleHelper: ${region.code}")
+                region
             }
-            .map { true }
-            .subscribe(showContinueButtonState.consumer)
+            .subscribe(selectedRegionState.consumer)
+            .untilDestroy()
+
+        // X-кнопка: закрываем экран без применения языка.
+        closeAction.observable
+            .doOnNext { Log.i(TAG, "closeAction: navigating back without language change") }
+            .doOnNext { router.exit() }
+            .doOnError(::handleError)
+            .retry()
+            .subscribe()
             .untilDestroy()
 
         selectLanguageAction.observable
             .skipWhileInProgress()
             .doOnNext { language ->
-                Log.i(
-                    TAG,
-                    "selectLanguageAction: clicked=${language.code}, current=${selectedLanguageState.valueOrNull?.code}, firstLaunch=${isFirstLaunchState.value}"
-                )
+                Log.i(TAG, "selectLanguageAction: clicked=${language.code}, current=${selectedLanguageState.valueOrNull?.code}")
             }
             .filter { language -> selectedLanguageState.valueOrNull != language }
             .doOnNext(selectedLanguageState.consumer)
-            .doOnNext {
-                Log.i(TAG, "selectLanguageAction: language selected, waiting for button click")
+            .doOnError(::handleError)
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        selectRegionAction.observable
+            .skipWhileInProgress()
+            .doOnNext { region ->
+                Log.i(TAG, "selectRegionAction: clicked=${region.code}, current=${selectedRegionState.valueOrNull?.code}")
             }
+            .filter { region -> selectedRegionState.valueOrNull != region }
+            .doOnNext(selectedRegionState.consumer)
             .doOnError(::handleError)
             .retry()
             .subscribe()
@@ -75,9 +96,17 @@ class LanguageSelectionPm @Inject constructor(
         continueAction.observable
             .skipWhileInProgress()
             .doOnNext { Log.i(TAG, "continueAction clicked") }
-            .map { selectedLanguageState.valueOrNull ?: AppLanguage.fromCode(LocaleHelper.getLanguage(context)) }
-            .flatMapCompletable { language ->
+            .map {
+                val language = selectedLanguageState.valueOrNull ?: AppLanguage.fromCode(LocaleHelper.getLanguage(context))
+                val region = selectedRegionState.valueOrNull ?: AppRegion.fromCode(LocaleHelper.getRegion(context))
+                language to region
+            }
+            .flatMapCompletable { (language, region) ->
                 val currentLanguage = AppLanguage.fromCode(LocaleHelper.getLanguage(context))
+
+                // Всегда сохраняем регион
+                LocaleHelper.saveRegion(context, region.code)
+                Log.i(TAG, "continueAction: region saved=${region.code}")
 
                 if (isFirstLaunchState.value) {
                     Log.i(TAG, "continueAction: first launch, applying language=${language.code}")
@@ -85,18 +114,21 @@ class LanguageSelectionPm @Inject constructor(
                         .andThen(
                             Completable.fromAction {
                                 LocaleHelper.markPendingGreetingAfterLanguageSelection(context)
-                                Log.i(TAG, "continueAction: pending Greeting flag saved")
-                                Log.i(TAG, "continueAction: recreateActivityCommand sent")
-                                recreateActivityCommand.consumer.accept(Unit)
+                                Log.i(TAG, "continueAction: pending Greeting flag saved (committed)")
+                                // Fix 9: on API 33+ LocaleManager triggers recreation automatically.
+                                if (LocaleHelper.needsManualRecreate()) {
+                                    Log.i(TAG, "continueAction: recreateActivityCommand sent (< API 33)")
+                                    recreateActivityCommand.consumer.accept(Unit)
+                                } else {
+                                    Log.i(TAG, "continueAction: skip manual recreate — LocaleManager handles it (API 33+)")
+                                }
                             }
                         )
                 } else {
                     if (language == currentLanguage) {
-                        Log.i(
-                            TAG,
-                            "continueAction: settings mode, language unchanged (${language.code}), skip apply/recreate"
-                        )
-                        return@flatMapCompletable Completable.complete()
+                        // Fix 2: navigate back instead of silently doing nothing.
+                        Log.i(TAG, "continueAction: settings mode, language unchanged (${language.code}), navigating back")
+                        return@flatMapCompletable Completable.fromAction { router.exit() }
                     }
 
                     Log.i(TAG, "continueAction: settings mode, applying language=${language.code}")
@@ -104,8 +136,17 @@ class LanguageSelectionPm @Inject constructor(
                         .andThen(
                             Completable.fromAction {
                                 syncLanguageInBackground(language.code)
-                                Log.i(TAG, "continueAction: recreateActivityCommand sent")
-                                recreateActivityCommand.consumer.accept(Unit)
+                                // После смены языка из настроек — переходим на главный экран (HomeFlow),
+                                // а не оставляем пользователя на экране выбора языка.
+                                LocaleHelper.markPendingHomeAfterLanguageChange(context)
+                                Log.i(TAG, "continueAction: pendingHome flag saved")
+                                // Fix 9: same guard as above.
+                                if (LocaleHelper.needsManualRecreate()) {
+                                    Log.i(TAG, "continueAction: recreateActivityCommand sent (< API 33)")
+                                    recreateActivityCommand.consumer.accept(Unit)
+                                } else {
+                                    Log.i(TAG, "continueAction: skip manual recreate — LocaleManager handles it (API 33+)")
+                                }
                             }
                         )
                 }
@@ -132,13 +173,15 @@ class LanguageSelectionPm @Inject constructor(
 
     private fun syncLanguageInBackground(languageTag: String) {
         Log.i(TAG, "syncLanguageInBackground: start tag=$languageTag")
+        // Fix 5: .untilDestroy() removed — the subscription must survive activity.recreate()
+        // which destroys this PM. onErrorComplete() guarantees the chain always terminates.
+        @Suppress("CheckResult")
         updateLanguageOnBackend(languageTag)
             .doOnComplete { Log.i(TAG, "syncLanguageInBackground: complete tag=$languageTag") }
             .doOnError { error ->
                 Log.e(TAG, "syncLanguageInBackground: error tag=$languageTag, message=${error.message}", error)
             }
             .subscribe()
-            .untilDestroy()
     }
 
     private fun updateLanguageOnBackend(languageTag: String): Completable {

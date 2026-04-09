@@ -6,5 +6,9 @@ import io.reactivex.Single
 
 interface ObserverRemoteSource : ObserverSource {
 
-    fun sendObserverInvite(email: String): Single<ObserverNetworkResponse>
+    fun sendObserverInvite(
+        email: String,
+        languageTag: String? = null,
+        countryCode: String? = null
+    ): Single<ObserverNetworkResponse>
 }

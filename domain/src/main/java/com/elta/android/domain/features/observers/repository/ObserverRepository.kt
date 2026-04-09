@@ -13,7 +13,11 @@ interface ObserverRepository {
 
     fun updateObserverName(id: String, name: String): Completable
 
-    fun sendObserverInvite(email: String): Completable
+    fun sendObserverInvite(
+        email: String,
+        languageTag: String? = null,
+        countryCode: String? = null
+    ): Completable
 
     fun deleteObserverInvite(id: String): Completable
 }

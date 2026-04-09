@@ -79,6 +79,11 @@ class AppActivity : BaseActivity<AppPm>() {
             router.newRootFlow(Screens.GreetingFlow)
         }
 
+        if (LocaleHelper.consumePendingHomeAfterLanguageChange(this)) {
+            Log.i(TAG, "AppActivity.onCreate: pending Home consumed, routing to HomeFlow")
+            router.newRootScreen(Screens.HomeFlow)
+        }
+
         if (savedInstanceState != null) {
             Log.i(TAG, "AppActivity.onCreate: restored activity, hide splash immediately")
             hideSplashOverlay("restored_activity")

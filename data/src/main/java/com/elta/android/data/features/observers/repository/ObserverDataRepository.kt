@@ -36,8 +36,12 @@ class ObserverDataRepository @Inject constructor(
         remoteSource.updateObserverName(id, name)
             .andThen(cacheSource.updateObserverName(id, name))
 
-    override fun sendObserverInvite(email: String): Completable =
-        remoteSource.sendObserverInvite(email)
+    override fun sendObserverInvite(
+        email: String,
+        languageTag: String?,
+        countryCode: String?
+    ): Completable =
+        remoteSource.sendObserverInvite(email, languageTag, countryCode)
             .flatMapCompletable { observer -> cacheSource.addObserver(observer) }
 
     override fun deleteObserverInvite(id: String): Completable =

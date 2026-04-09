@@ -18,6 +18,7 @@ import com.elta.android.domain.features.user.model.HealthApp
 import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetworkType
+import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
@@ -187,7 +188,11 @@ class ProfileSettingsPm @Inject constructor(
                     Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
                     Type.EMIAS_ACCOUNT -> handleEmiasStatus()
                     Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
-                    Type.LANGUAGE -> router.navigateTo(Screens.LanguageSelection(isFirstLaunch = false))
+                    Type.LANGUAGE -> {
+                        if (BuildConfig.SHOW_LANGUAGE_SELECTION) {
+                            router.navigateTo(Screens.LanguageSelection(isFirstLaunch = false))
+                        }
+                    }
                     Type.GLUCOSE_FORMAT -> router.navigateTo(Screens.GlucoseFormat)
                     Type.DELETE_PROFILE -> deleteProfile()
                     Type.TOKEN -> copyToken()

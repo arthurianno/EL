@@ -30,13 +30,15 @@ internal fun ProfileSettingsNetworkResponse.toDb(id: Long): ProfileSettingsDbEnt
     ProfileSettingsDbEntity(
         id = id,
         isOnboarded = isOnboarded,
-        glucoseFormat = glucoseFormat.name
+        glucoseFormat = glucoseFormat.name,
+        countryCode = countryCode
     )
 
 internal fun ProfileSettingsDbEntity.toNetwork(): ProfileSettingsNetworkResponse =
     ProfileSettingsNetworkResponse(
         isOnboarded = isOnboarded,
-        glucoseFormat = GlucoseFormatNetworkEntity.valueOf(glucoseFormat)
+        glucoseFormat = GlucoseFormatNetworkEntity.valueOf(glucoseFormat),
+        countryCode = countryCode
     )
 
 internal fun ProfileSettingsNetworkResponse.toDomain(): ProfileSettings =

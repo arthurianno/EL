@@ -11,8 +11,14 @@ class SendObserverInviteUseCase @Inject constructor(
     schedulersFacade: SchedulersFacade
 ) : CompletableUseCase<SendObserverInviteUseCase.Params>(schedulersFacade) {
 
-    override fun buildUseCaseObservable(params: Params?): Completable =
-        repository.sendObserverInvite(checkNotNull(params).email)
+    override fun buildUseCaseObservable(params: Params?): Completable {
+        val p = checkNotNull(params)
+        return repository.sendObserverInvite(p.email, p.languageTag, p.countryCode)
+    }
 
-    data class Params(val email: String)
+    data class Params(
+        val email: String,
+        val languageTag: String? = null,
+        val countryCode: String? = null
+    )
 }

@@ -28,6 +28,8 @@ class ProfileDataRepository @Inject constructor(
     companion object {
         private const val LANGUAGE_PREFS_NAME = "language_preference"
         private const val LANGUAGE_KEY_SELECTED = "selected_language"
+        private const val REGION_KEY_SELECTED = "selected_region"
+        private const val DEFAULT_COUNTRY_CODE = "RU"
     }
 
     override fun updateProfile(profile: Profile): Completable {
@@ -128,7 +130,8 @@ class ProfileDataRepository @Inject constructor(
         getProfileSettingsForUpdate()
             .flatMapCompletable { currentSettings ->
                 val response = currentSettings.copy(
-                    languageTag = resolveLanguageTag(languageTag)
+                    languageTag = resolveLanguageTag(languageTag),
+                    countryCode = resolveCountryCode(currentSettings.countryCode)
                 )
                 cachedSource.updateProfileSettings(response)
                     .andThen(remoteSource.updateProfileSettings(response).onErrorComplete())
@@ -150,5 +153,18 @@ class ProfileDataRepository @Inject constructor(
             .getString(LANGUAGE_KEY_SELECTED, null)
         val rawLanguage = languageTag ?: selectedLanguage ?: Locale.getDefault().language
         return SupportedLanguageTag.fromRawValue(rawLanguage).value
+    }
+
+    /**
+     * Читает сохранённый код страны из SharedPreferences (тот же преф-файл, что у LocaleHelper).
+     * Если код уже передан в [existingCode] — возвращает его (не перезаписываем то, что пришло с сервера).
+     * По умолчанию — "RU".
+     */
+    private fun resolveCountryCode(existingCode: String? = null): String {
+        if (existingCode != null) return existingCode
+        return context
+            .getSharedPreferences(LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(REGION_KEY_SELECTED, DEFAULT_COUNTRY_CODE)
+            ?: DEFAULT_COUNTRY_CODE
     }
 }

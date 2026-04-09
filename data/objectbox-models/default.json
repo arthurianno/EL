@@ -728,7 +728,7 @@
     },
     {
       "id": "23:4287864010729913530",
-      "lastPropertyId": "3:4451880316256054772",
+      "lastPropertyId": "4:5445087423287439870",
       "name": "ProfileSettingsDbEntity",
       "properties": [
         {
@@ -745,6 +745,11 @@
         {
           "id": "3:4451880316256054772",
           "name": "glucoseFormat",
+          "type": 9
+        },
+        {
+          "id": "4:5445087423287439870",
+          "name": "countryCode",
           "type": 9
         }
       ],

@@ -16,6 +16,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         vectorDrawables.useSupportLibrary = true
+        buildConfigField("boolean", "SHOW_LANGUAGE_SELECTION", "false")
     }
 
     compileOptions {
@@ -49,6 +50,8 @@ android {
             buildConfigField("String", "BUILD_NUMBER", "\"${version.buildNumber}\"")
             buildConfigField("String", "BUILD_TYPE", "\"${version.buildType}\"")
             buildConfigField("String", "HOTFIX_VERSION", "\"${version.hotfixVersion}\"")
+            // Fix 6: explicit false so intent is clear and searching the codebase is unambiguous.
+            buildConfigField("boolean", "SHOW_LANGUAGE_SELECTION", "false")
         }
         debug {
             val debugVersionName = "\"${version.versionName}-debug(${version.buildNumber})\""
@@ -56,6 +59,7 @@ android {
             buildConfigField("String", "CLEAN_VERSION", "\"${version.versionName}\"")
             buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
             buildConfigField("boolean", "DEBUG", "true")
+            buildConfigField("boolean", "SHOW_LANGUAGE_SELECTION", "true")
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
             buildConfigField("String", "BUILD_NUMBER", "\"${version.buildNumber}\"")
             buildConfigField("String", "BUILD_TYPE", "\"${version.buildType}\"")
@@ -69,6 +73,8 @@ android {
             buildConfigField("String", "BUILD_NUMBER", "\"${version.buildNumber}\"")
             buildConfigField("String", "BUILD_TYPE", "\"${version.buildType}\"")
             buildConfigField("String", "HOTFIX_VERSION", "\"${version.hotfixVersion}\"")
+            // Fix 6: explicit false so intent is clear and searching the codebase is unambiguous.
+            buildConfigField("boolean", "SHOW_LANGUAGE_SELECTION", "false")
         }
     }
     namespace = "com.elta.android.presentation"

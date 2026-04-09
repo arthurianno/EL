@@ -6,7 +6,7 @@ import io.reactivex.Single
 @Suppress("TooManyFunctions", "ComplexInterface")
 interface AuthRepository {
 
-    fun register(email: String, password: String): Completable
+    fun register(email: String, password: String, languageTag: String? = null, countryCode: String? = null): Completable
 
     /**
      * Авторизация аккаунта и восстановление.

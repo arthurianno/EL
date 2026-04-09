@@ -2,6 +2,9 @@ package com.elta.android.presentation.features.registration.main.variantA.ui
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
@@ -34,6 +37,11 @@ abstract class BaseAuthFragmentVariantA<PM : BaseAuthPmVariantA> :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            view.updatePadding(top = top)
+            insets
+        }
         with(binding) {
             toolbar.menuButtonView.setText(menuButtonText)
             continueButtonView.setText(continueButtonText)

@@ -26,6 +26,7 @@ import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.domain.features.version.interactor.CheckAppVersionUseCase
 import com.elta.android.domain.features.version.model.VersionStatus
+import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
@@ -603,7 +604,9 @@ class AppPm @Inject constructor(
     }
 
     private fun getGuestStartScreen() : com.elta.android.presentation.core.navigation.support.SupportAppScreen {
-        val shouldShowLanguageSelection = LocaleHelper.shouldShowLanguageSelection(context)
+        val shouldShowLanguageSelection =
+            BuildConfig.SHOW_LANGUAGE_SELECTION &&
+                LocaleHelper.shouldShowLanguageSelection(context)
         val selectedLanguage = LocaleHelper.getLanguage(context)
         val nextScreen = if (shouldShowLanguageSelection) {
             Screens.LanguageSelection(isFirstLaunch = true)

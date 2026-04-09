@@ -6,6 +6,7 @@ import com.elta.android.data.features.auth.model.AuthNetworkRequest
 import com.elta.android.data.features.auth.model.ChangePasswordNetworkRequest
 import com.elta.android.data.features.auth.model.EmailStatusNetworkResponse
 import com.elta.android.data.features.auth.model.LoginNetworkResponse
+import com.elta.android.data.features.auth.model.RegisterNetworkRequest
 import com.elta.android.data.features.auth.model.ResetPasswordLinkNetworkRequest
 import com.elta.android.data.features.auth.model.ResetPasswordNetworkRequest
 import com.elta.android.data.features.auth.model.TokenNetworkRequest
@@ -19,8 +20,21 @@ class AuthRemoteDataSource @Inject constructor(
     private val api: AuthApi
 ) : AuthDataSource {
 
-    override fun register(email: String, password: String): Single<TokensNetworkResponse> =
-        api.register(AuthNetworkRequest(email, password, activateAccount = false))
+    override fun register(
+        email: String,
+        password: String,
+        languageTag: String?,
+        countryCode: String?
+    ): Single<TokensNetworkResponse> =
+        api.register(
+            RegisterNetworkRequest(
+                email = email,
+                password = password,
+                activateAccount = false,
+                languageTag = languageTag,
+                countryCode = countryCode
+            )
+        )
 
     override fun login(email: String, password: String, activateAccount: Boolean): Single<LoginNetworkResponse> =
         api.login(AuthNetworkRequest(email, password, activateAccount))

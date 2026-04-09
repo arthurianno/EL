@@ -9,7 +9,12 @@ import io.reactivex.Single
 
 interface AuthDataSource {
 
-    fun register(email: String, password: String): Single<TokensNetworkResponse>
+    fun register(
+        email: String,
+        password: String,
+        languageTag: String? = null,
+        countryCode: String? = null
+    ): Single<TokensNetworkResponse>
 
     /**
     * Авторизация аккаунта и восстановление.

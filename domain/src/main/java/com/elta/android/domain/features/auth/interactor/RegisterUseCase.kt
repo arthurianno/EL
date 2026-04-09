@@ -13,8 +13,13 @@ class RegisterUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Params?): Completable {
         val p = checkNotNull(params)
-        return repository.register(p.email, p.password)
+        return repository.register(p.email, p.password, p.languageTag, p.countryCode)
     }
 
-    data class Params(val email: String, val password: String)
+    data class Params(
+        val email: String,
+        val password: String,
+        val languageTag: String? = null,
+        val countryCode: String? = null
+    )
 }
