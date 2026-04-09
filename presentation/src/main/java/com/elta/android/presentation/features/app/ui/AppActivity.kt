@@ -69,8 +69,11 @@ class AppActivity : BaseActivity<AppPm>() {
             TAG,
             "AppActivity.onCreate(savedInstanceState=${savedInstanceState != null}, localeDefault=${Locale.getDefault().language}, appLanguage=${LocaleHelper.getLanguage(this)})"
         )
+        @Suppress("DEPRECATION")
         window.decorView.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+            View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR  // тёмные иконки nav bar на светлой теме
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
 

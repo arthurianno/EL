@@ -8,6 +8,9 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetTransparentStyle</item>
         <item name="actionMenuTextAppearance">@style/New.Button3.White</item>
         <item name="actionMenuTextColor">@color/white</item>
+        <!-- Цвет системного nav bar совпадает со статус-баром — чисто и единообразно -->
+        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
     <style name="AppTheme.Transparent" parent="AppTheme">
