@@ -40,13 +40,15 @@ object OneSignalInitializer {
                 val data = event.notification.additionalData
                 var launchUrl: String? = null
                 try {
-                    if (data != null && data.has("launchURL")) {
+                    launchUrl = event.notification.launchURL
+                    if (launchUrl.isNullOrEmpty() && data != null && data.has("launchURL")) {
                         launchUrl = data.getString("launchURL")
-                        Timber.d("OneSignal: Parsed launchURL = $launchUrl")
                     }
+                    Timber.d("OneSignal: Resolved launchURL = $launchUrl")
                 } catch (e: Exception) {
-                    Timber.e(e, "Ошибка парсинга launchURL из additionalData")
+                    Timber.e(e, "Ошибка получения launchURL")
                 }
+
 
                 // Создаем Intent для AppActivity
                 val intent = Intent(context, AppActivity::class.java).apply {

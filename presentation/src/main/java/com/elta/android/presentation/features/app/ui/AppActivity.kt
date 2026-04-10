@@ -166,10 +166,13 @@ class AppActivity : BaseActivity<AppPm>() {
         super.onNewIntent(intent)
         DynamicLinkProcessor.from(intent)
             .deepLinkStartPassTo(presentationModel.deepLinkAction)
+            .consultantDeeplink(presentationModel.consultantDeepLinkAction)
+            .newsDeeplink(presentationModel.newsDeepLinkAction)
             .notificationStartPassTo(presentationModel.notificationStartAction)
             .build()
             .process()
     }
+
 
     override fun onStop() {
         presentationModel.uploadLogs()

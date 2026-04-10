@@ -1,6 +1,7 @@
 package com.elta.android.data.features.user.repository
 
 import android.content.Context
+import android.util.Log
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.data.features.sync.manger.LocalSyncManager
@@ -26,6 +27,7 @@ class ProfileDataRepository @Inject constructor(
 ) : ProfileRepository {
 
     companion object {
+        private const val TAG = "LangFlow"
         private const val LANGUAGE_PREFS_NAME = "language_preference"
         private const val LANGUAGE_KEY_SELECTED = "selected_language"
         private const val REGION_KEY_SELECTED = "selected_region"
@@ -113,28 +115,46 @@ class ProfileDataRepository @Inject constructor(
             ProfileSettingsNetworkResponse(
                 isOnboarded = true,
                 glucoseFormat = glucoseFormat.toNetwork(),
-                languageTag = resolveLanguageTag()
+                languageTag = resolveLanguageTag(null)
             )
         }
         .flatMapCompletable { cachedSettings ->
+            val resolvedTag = resolveLanguageTag(cachedSettings.languageTag)
             val response = ProfileSettingsNetworkResponse(
                 isOnboarded = isOnboarded ?: cachedSettings.isOnboarded,
                 glucoseFormat = glucoseFormat.toNetwork(),
-                languageTag = resolveLanguageTag(cachedSettings.languageTag)
+                languageTag = resolvedTag
             )
+            Log.i(TAG, "updateProfileSettings: sending languageTag=$resolvedTag, countryCode=${response.countryCode}, isOnboarded=${response.isOnboarded}")
+
             cachedSource.updateProfileSettings(response)
-                .andThen(remoteSource.updateProfileSettings(response).onErrorComplete())
+                .andThen(
+                    remoteSource.updateProfileSettings(response)
+                        .doOnComplete { Log.i(TAG, "updateProfileSettings: remote success languageTag=$resolvedTag, countryCode=${response.countryCode}") }
+                        .doOnError { e -> Log.e(TAG, "updateProfileSettings: remote error languageTag=$resolvedTag, countryCode=${response.countryCode}, msg=${e.message}") }
+                        .onErrorComplete()
+                )
         }
 
     override fun updateLanguageTag(languageTag: String): Completable =
         getProfileSettingsForUpdate()
             .flatMapCompletable { currentSettings ->
+                val resolvedTag = resolveLanguageTag(languageTag)
+                val resolvedCountry = resolveCountryCode(currentSettings.countryCode)
                 val response = currentSettings.copy(
-                    languageTag = resolveLanguageTag(languageTag),
-                    countryCode = resolveCountryCode(currentSettings.countryCode)
+                    languageTag = resolvedTag,
+                    countryCode = resolvedCountry
                 )
+
+                Log.i(TAG, "updateLanguageTag: sending languageTag=$resolvedTag (input=$languageTag), countryCode=$resolvedCountry (prev=${currentSettings.countryCode})")
+
                 cachedSource.updateProfileSettings(response)
-                    .andThen(remoteSource.updateProfileSettings(response).onErrorComplete())
+                    .andThen(
+                        remoteSource.updateProfileSettings(response)
+                            .doOnComplete { Log.i(TAG, "updateLanguageTag: remote success languageTag=$resolvedTag, countryCode=$resolvedCountry") }
+                            .doOnError { e -> Log.e(TAG, "updateLanguageTag: remote error languageTag=$resolvedTag, countryCode=$resolvedCountry, msg=${e.message}") }
+                            .onErrorComplete()
+                    )
             }
 
     private fun getProfileSettingsForUpdate(): Single<ProfileSettingsNetworkResponse> =
@@ -152,7 +172,9 @@ class ProfileDataRepository @Inject constructor(
             .getSharedPreferences(LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
             .getString(LANGUAGE_KEY_SELECTED, null)
         val rawLanguage = languageTag ?: selectedLanguage ?: Locale.getDefault().language
-        return SupportedLanguageTag.fromRawValue(rawLanguage).value
+        val resolved = SupportedLanguageTag.fromRawValue(rawLanguage).value
+        Log.i(TAG, "resolveLanguageTag(input=$languageTag, savedInPrefs=$selectedLanguage, systemDefault=${Locale.getDefault().language}) → resolved=$resolved")
+        return resolved
     }
 
     /**
@@ -161,10 +183,15 @@ class ProfileDataRepository @Inject constructor(
      * По умолчанию — "RU".
      */
     private fun resolveCountryCode(existingCode: String? = null): String {
-        if (existingCode != null) return existingCode
-        return context
+        if (existingCode != null) {
+            Log.i(TAG, "resolveCountryCode(existingCode=$existingCode) → kept as-is")
+            return existingCode
+        }
+        val fromPrefs = context
             .getSharedPreferences(LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
             .getString(REGION_KEY_SELECTED, DEFAULT_COUNTRY_CODE)
             ?: DEFAULT_COUNTRY_CODE
+        Log.i(TAG, "resolveCountryCode(existingCode=null, savedInPrefs=$fromPrefs) → resolved=$fromPrefs")
+        return fromPrefs
     }
 }

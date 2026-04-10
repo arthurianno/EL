@@ -61,7 +61,15 @@ class LanguageSelectionFragment :
         super.onViewCreated(view, savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-            v.updatePadding(top = statusBars.top)
+            val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            // В онбординге фрагмент отображается поверх системного nav bar (edge-to-edge),
+            // поэтому добавляем bottom-padding чтобы кнопка не перекрывалась.
+            // В настройках nav bar inset уже потреблён родительским контейнером → 0, лишний отступ не нужен.
+            v.updatePadding(
+                top = statusBars.top,
+                bottom = if (isFirstLaunch) navBars.bottom else 0
+            )
+            Log.i(TAG, "WindowInsets: statusBarTop=${statusBars.top}, navBarBottom=${navBars.bottom}, isFirstLaunch=$isFirstLaunch, appliedBottom=${if (isFirstLaunch) navBars.bottom else 0}")
             insets
         }
         Log.i(TAG, "LanguageSelectionFragment.onViewCreated(isFirstLaunch=$isFirstLaunch)")

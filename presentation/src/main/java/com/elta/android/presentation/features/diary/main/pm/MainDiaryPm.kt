@@ -1,11 +1,11 @@
 package com.elta.android.presentation.features.diary.main.pm
 
-import com.elta.android.common.utils.MONTH_NAMES
 import com.elta.android.common.utils.isToday
 import com.elta.android.domain.features.diary.events.interactor.GetEventsByDateUseCase
 import com.elta.android.domain.features.diary.home.model.EventsBlock
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
@@ -29,6 +29,10 @@ class MainDiaryPm @Inject constructor(
     private val getEventsByDateUseCase: GetEventsByDateUseCase,
     services: ServiceFacade
 ) : ExpandableListPm(services) {
+
+    private val monthNames: Array<String> by lazy {
+        services.resources.getStringArray(R.array.month_names)
+    }
 
     override val isEmptyScreen = false
 
@@ -135,7 +139,7 @@ class MainDiaryPm @Inject constructor(
             .doOnNext { datePickerDateState.consumer.accept(it) }
             .map {
                 todayButtonVisibilityState.consumer.accept(!it.isToday())
-                "${MONTH_NAMES[it.monthValue.minus(1)]} ${it.year}"
+                "${monthNames[it.monthValue.minus(1)]} ${it.year}"
             }
             .subscribe(monthTitleState.consumer)
             .untilDestroy()

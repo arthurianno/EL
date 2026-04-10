@@ -10,7 +10,6 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.elta.android.common.utils.MONTH_NAMES
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.BaseSettingsDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
@@ -83,7 +82,7 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
         }
 
         val inset = view.resources.getDimensionPixelSize(R.dimen.calendar_day_padding)
-        calendarView.setTitleMonths(MONTH_NAMES)
+        calendarView.setTitleMonths(resources.getStringArray(R.array.month_names))
         calendarView.addDecorator(
             BackgroundDecorator(
                 drawable(

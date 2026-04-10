@@ -25,17 +25,19 @@ object OneSignalTags {
         val version = BuildConfig.CLEAN_VERSION
         val environment = if (BuildConfig.DEBUG) "dev" else "prod"
         val newsSegment = "$languageTag|$platform|$version"
+        val countryCode = LocaleHelper.getRegion(context)
         Log.d(
             "OneSignalTags",
-            "Applying tags: env=$environment, lang=$languageTag, platform=$platform, ver=$version, seg=$newsSegment"
+            "Applying tags: env=$environment, lang=$languageTag, platform=$platform, ver=$version, seg=$newsSegment, country=$countryCode"
         )
         OneSignal.User.addTags(
             mapOf(
                 "environment" to environment,
                 "language_tag" to languageTag,
-                "platfom" to platform,
+                "platform" to platform,
                 "version" to version,
-                "news_segmnt" to newsSegment
+                "news_segment" to newsSegment,
+                "country_code" to countryCode
             )
         )
     }
