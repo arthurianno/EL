@@ -44,6 +44,12 @@ class LanguageSelectionFragment :
         if (isFirstLaunch) AppRegion.firstLaunchRegions() else AppRegion.settingsRegions()
     }
 
+    /** Флаг, подавляющий срабатывание onItemSelected при программной установке выбора */
+    private var suppressSpinnerCallback = false
+
+    /** Игнорируем первый auto-callback Spinner после установки adapter */
+    private var ignoreInitialSpinnerSelection = true
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         addOnBackPressedCallback {
@@ -62,25 +68,20 @@ class LanguageSelectionFragment :
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
             val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-            // В онбординге фрагмент отображается поверх системного nav bar (edge-to-edge),
-            // поэтому добавляем bottom-padding чтобы кнопка не перекрывалась.
-            // В настройках nav bar inset уже потреблён родительским контейнером → 0, лишний отступ не нужен.
             v.updatePadding(
                 top = statusBars.top,
                 bottom = if (isFirstLaunch) navBars.bottom else 0
             )
-            Log.i(TAG, "WindowInsets: statusBarTop=${statusBars.top}, navBarBottom=${navBars.bottom}, isFirstLaunch=$isFirstLaunch, appliedBottom=${if (isFirstLaunch) navBars.bottom else 0}")
+            Log.i(
+                TAG,
+                "WindowInsets: statusBarTop=${statusBars.top}, navBarBottom=${navBars.bottom}, isFirstLaunch=$isFirstLaunch, appliedBottom=${if (isFirstLaunch) navBars.bottom else 0}"
+            )
             insets
         }
         Log.i(TAG, "LanguageSelectionFragment.onViewCreated(isFirstLaunch=$isFirstLaunch)")
 
-        // Приветствие — только при первом запуске
         binding.greetingView.visibility = if (isFirstLaunch) View.VISIBLE else View.GONE
-
-        // X-кнопка — только в режиме настроек
         binding.closeButtonView.visibility = if (isFirstLaunch) View.GONE else View.VISIBLE
-
-        // Описание под заголовком языка — только в режиме настроек
         binding.languageSubtitleView.visibility = if (isFirstLaunch) View.GONE else View.VISIBLE
 
         binding.titleView.text = getString(
@@ -91,7 +92,6 @@ class LanguageSelectionFragment :
         )
         binding.continueButtonView.visibility = View.VISIBLE
 
-        // Настраиваем дропдаун регионов
         setupRegionDropdown()
     }
 
@@ -100,21 +100,35 @@ class LanguageSelectionFragment :
         Log.i(TAG, "LanguageSelectionFragment.onResume(parentBackStackCount=${parentFragmentManager.backStackEntryCount})")
     }
 
-    /** Флаг, подавляющий срабатывание onItemSelected при программной установке выбора */
-    private var suppressSpinnerCallback = false
-
     private fun setupRegionDropdown() {
         val displayNames = regions.map { getString(it.displayNameResId) }
+
+        regions.forEachIndexed { index, region ->
+            Log.i(TAG, "setupRegionDropdown: regions[$index]=${region.code}")
+        }
+
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, displayNames)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
         binding.regionDropdownMenu.adapter = adapter
         binding.regionDropdownMenu.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (suppressSpinnerCallback) return
+                if (suppressSpinnerCallback) {
+                    Log.i(TAG, "regionSpinner: callback suppressed, position=$position")
+                    return
+                }
+
+                if (ignoreInitialSpinnerSelection) {
+                    ignoreInitialSpinnerSelection = false
+                    Log.i(TAG, "regionSpinner: ignore initial auto-selection position=$position")
+                    return
+                }
+
                 val selected = regions.getOrNull(position) ?: return
                 Log.i(TAG, "regionSpinner: itemSelected position=$position, region=${selected.code}")
                 presentationModel.selectRegionAction.consumer.accept(selected)
             }
+
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
     }
@@ -130,10 +144,12 @@ class LanguageSelectionFragment :
             .doOnNext { Log.i(TAG, "UI click: Russian language") }
             .map { AppLanguage.RU }
             .bindTo(pm.selectLanguageAction)
+
         binding.englishLanguageView.clicks()
             .doOnNext { Log.i(TAG, "UI click: English language") }
             .map { AppLanguage.EN }
             .bindTo(pm.selectLanguageAction)
+
         binding.continueButtonView.clicks()
             .doOnNext { Log.i(TAG, "UI click: Save/Continue") }
             .bindTo(pm.continueAction)
@@ -147,10 +163,18 @@ class LanguageSelectionFragment :
 
         pm.selectedRegionState.bindTo { selectedRegion ->
             Log.i(TAG, "selectedRegionState=${selectedRegion.code}")
-            val index = regions.indexOfFirst { it == selectedRegion }.coerceAtLeast(0)
+
+            val rawIndex = regions.indexOfFirst { it == selectedRegion }
+            val index = rawIndex.coerceAtLeast(0)
+
+            Log.i(TAG, "selectedRegionState: rawIndex=$rawIndex, appliedIndex=$index")
+
             suppressSpinnerCallback = true
-            binding.regionDropdownMenu.setSelection(index)
-            binding.regionDropdownMenu.post { suppressSpinnerCallback = false }
+            binding.regionDropdownMenu.setSelection(index, false)
+            binding.regionDropdownMenu.post {
+                suppressSpinnerCallback = false
+                Log.i(TAG, "selectedRegionState: spinner callback re-enabled")
+            }
         }
 
         pm.recreateActivityCommand.bindTo {
@@ -175,7 +199,10 @@ class LanguageSelectionFragment :
 
     private fun updateLanguageOption(view: View, isSelected: Boolean) {
         val optionView = view as? androidx.appcompat.widget.AppCompatTextView ?: return
-        Log.i(TAG, "updateLanguageOption(viewId=${optionView.resources.getResourceEntryName(optionView.id)}, isSelected=$isSelected)")
+        Log.i(
+            TAG,
+            "updateLanguageOption(viewId=${optionView.resources.getResourceEntryName(optionView.id)}, isSelected=$isSelected)"
+        )
         optionView.setBackgroundResource(
             if (isSelected) R.drawable.bg_language_option_selected else R.drawable.bg_language_option_default
         )

@@ -18,28 +18,33 @@ interface EventsV2Api {
         @Query("touchedAfter") touchedAfter: Long?,
         @Query("ignoreDeleted") ignoreDeleted: Boolean,
         @Query("pageIndex") page: Int,
-        @Query("pageSize") pageSize: Int
+        @Query("pageSize") pageSize: Int,
+        @Query("languageTag") languageTag: String
     ): Observable<EventsV2Dto>
 
     @POST("api/diary/events/v2")
     fun addEvents(
         @Query("sendToRostech") sendToRostech: Boolean,
+        @Query("languageTag") languageTag: String,
         @Body events: List<EventV2Dto>
     ): Observable<List<EventV2Dto>>
 
     @POST("api/diary/events/v2")
     suspend fun addEventsSuspend(
         @Query("sendToRostech") sendToRostech: Boolean,
+        @Query("languageTag") languageTag: String,
         @Body events: List<EventV2Dto>
     ): List<EventV2Dto>
 
     @PUT("api/diary/events/v2")
     fun updateEvents(
+        @Query("languageTag") languageTag: String,
         @Body events: List<EventV2Dto>
     ): Observable<List<EventV2Dto>>
 
     @HTTP(method = "DELETE", path = "api/diary/events/v2", hasBody = true)
     fun deleteEvents(
+        @Query("languageTag") languageTag: String,
         @Body events: List<SimpleEventDto>
     ): Observable<List<EventV2Dto>>
 }

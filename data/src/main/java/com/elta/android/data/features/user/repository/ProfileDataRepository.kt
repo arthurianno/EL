@@ -115,23 +115,26 @@ class ProfileDataRepository @Inject constructor(
             ProfileSettingsNetworkResponse(
                 isOnboarded = true,
                 glucoseFormat = glucoseFormat.toNetwork(),
-                languageTag = resolveLanguageTag(null)
+                languageTag = resolveLanguageTag(null),
+                countryCode = resolveCountryCode(null)
             )
         }
         .flatMapCompletable { cachedSettings ->
             val resolvedTag = resolveLanguageTag(cachedSettings.languageTag)
+            val resolvedCountry = resolveCountryCode(cachedSettings.countryCode)
             val response = ProfileSettingsNetworkResponse(
                 isOnboarded = isOnboarded ?: cachedSettings.isOnboarded,
                 glucoseFormat = glucoseFormat.toNetwork(),
-                languageTag = resolvedTag
+                languageTag = resolvedTag,
+                countryCode = resolvedCountry
             )
-            Log.i(TAG, "updateProfileSettings: sending languageTag=$resolvedTag, countryCode=${response.countryCode}, isOnboarded=${response.isOnboarded}")
+            Log.i(TAG, "updateProfileSettings: sending languageTag=$resolvedTag, countryCode=$resolvedCountry, isOnboarded=${response.isOnboarded}")
 
             cachedSource.updateProfileSettings(response)
                 .andThen(
                     remoteSource.updateProfileSettings(response)
-                        .doOnComplete { Log.i(TAG, "updateProfileSettings: remote success languageTag=$resolvedTag, countryCode=${response.countryCode}") }
-                        .doOnError { e -> Log.e(TAG, "updateProfileSettings: remote error languageTag=$resolvedTag, countryCode=${response.countryCode}, msg=${e.message}") }
+                        .doOnComplete { Log.i(TAG, "updateProfileSettings: remote success languageTag=$resolvedTag, countryCode=$resolvedCountry") }
+                        .doOnError { e -> Log.e(TAG, "updateProfileSettings: remote error languageTag=$resolvedTag, countryCode=$resolvedCountry, msg=${e.message}") }
                         .onErrorComplete()
                 )
         }
@@ -177,21 +180,21 @@ class ProfileDataRepository @Inject constructor(
         return resolved
     }
 
-    /**
-     * Читает сохранённый код страны из SharedPreferences (тот же преф-файл, что у LocaleHelper).
-     * Если код уже передан в [existingCode] — возвращает его (не перезаписываем то, что пришло с сервера).
-     * По умолчанию — "RU".
-     */
     private fun resolveCountryCode(existingCode: String? = null): String {
-        if (existingCode != null) {
-            Log.i(TAG, "resolveCountryCode(existingCode=$existingCode) → kept as-is")
-            return existingCode
-        }
         val fromPrefs = context
             .getSharedPreferences(LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(REGION_KEY_SELECTED, DEFAULT_COUNTRY_CODE)
-            ?: DEFAULT_COUNTRY_CODE
-        Log.i(TAG, "resolveCountryCode(existingCode=null, savedInPrefs=$fromPrefs) → resolved=$fromPrefs")
-        return fromPrefs
+            .getString(REGION_KEY_SELECTED, null)
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.uppercase(Locale.ROOT)
+
+        val normalizedExisting = existingCode
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.uppercase(Locale.ROOT)
+
+        val resolved = fromPrefs ?: normalizedExisting ?: DEFAULT_COUNTRY_CODE
+        Log.i(TAG, "resolveCountryCode(existingCode=$existingCode, savedInPrefs=$fromPrefs) → resolved=$resolved")
+        return resolved
     }
 }

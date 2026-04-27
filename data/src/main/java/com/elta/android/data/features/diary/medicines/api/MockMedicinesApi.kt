@@ -7,7 +7,7 @@ import io.reactivex.Single
 
 class MockMedicinesApi : MedicinesApi {
 
-    override fun getMedicaments(touchedAfter: Long?): Single<List<MedicamentNetworkResponse>> {
+    override fun getMedicaments(touchedAfter: Long?, languageTag: String): Single<List<MedicamentNetworkResponse>> {
         return Single.fromCallable { generateMedicament(20) }
     }
 
@@ -27,7 +27,7 @@ class MockMedicinesApi : MedicinesApi {
         return list
     }
 
-    override fun getInsulinMedicines(): Single<InsulinMedicamentsNetworkResponse> {
+    override fun getInsulinMedicines(languageTag: String?): Single<InsulinMedicamentsNetworkResponse> {
         val json = """
     
     {
@@ -131,7 +131,5 @@ class MockMedicinesApi : MedicinesApi {
     }
 
 }
-
-
 
 

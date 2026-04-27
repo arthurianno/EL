@@ -19,7 +19,13 @@ class MockedEventsApi : EventsV2Api {
 
     private val list: MutableList<EventV2Dto> = mutableListOf()
 
-    override fun getEvents(touchedAfter: Long?, ignoreDeleted: Boolean, page: Int, pageSize: Int): Observable<EventsV2Dto> =
+    override fun getEvents(
+        touchedAfter: Long?,
+        ignoreDeleted: Boolean,
+        page: Int,
+        pageSize: Int,
+        languageTag: String
+    ): Observable<EventsV2Dto> =
         Observable.fromCallable {
             if (list.isEmpty()) {
                 (0..3).forEach { inner ->
@@ -68,22 +74,24 @@ class MockedEventsApi : EventsV2Api {
 
     override fun addEvents(
         sendToRostech: Boolean,
+        languageTag: String,
         events: List<EventV2Dto>
     ): Observable<List<EventV2Dto>> =
         Observable.just(events)
 
     override suspend fun addEventsSuspend(
         sendToRostech: Boolean,
+        languageTag: String,
         events: List<EventV2Dto>
     ): List<EventV2Dto> {
         return events
     }
 
-    override fun updateEvents(events: List<EventV2Dto>): Observable<List<EventV2Dto>> {
+    override fun updateEvents(languageTag: String, events: List<EventV2Dto>): Observable<List<EventV2Dto>> {
         return Observable.just(events)
     }
 
 
-    override fun deleteEvents(events: List<SimpleEventDto>): Observable<List<EventV2Dto>> =
+    override fun deleteEvents(languageTag: String, events: List<SimpleEventDto>): Observable<List<EventV2Dto>> =
         Observable.empty()
 }

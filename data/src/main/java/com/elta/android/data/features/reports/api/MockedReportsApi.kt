@@ -16,7 +16,20 @@ class MockedReportsApi(
     override fun getReportToken(report: ReportNetworkRequest): Single<TokenDto> =
         Single.just(TokenDto("Test-token-bro"))
 
+    override fun downloadGlycemicProfileReport(
+        reportPeriodStart: String,
+        reportPeriodEnd: String,
+        glucoseFormat: String,
+        glucoseUnit: String,
+        locale: String,
+        timezoneOffset: String
+    ): Single<ResponseBody> =
+        loadReport()
+
     override fun downloadReport(token: String): Single<ResponseBody> =
+        loadReport()
+
+    private fun loadReport(): Single<ResponseBody> =
         Single.fromCallable {
             val stream = context.resources.openRawResource(R.raw.test_report)
             stream.readBytes().toResponseBody("application/octet-stream".toMediaTypeOrNull())

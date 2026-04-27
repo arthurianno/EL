@@ -14,6 +14,16 @@ interface ReportsApi {
     @POST("api/reports/v1/analytics/tokens")
     fun getReportToken(@Body report: ReportNetworkRequest): Single<TokenDto>
 
+    @GET("api/reports/v2/glycemic-profile")
+    fun downloadGlycemicProfileReport(
+        @Query("reportPeriodStart") reportPeriodStart: String,
+        @Query("reportPeriodEnd") reportPeriodEnd: String,
+        @Query("glucoseFormat") glucoseFormat: String,
+        @Query("glucoseUnit") glucoseUnit: String,
+        @Query("locale") locale: String,
+        @Query("timezoneOffset") timezoneOffset: String
+    ): Single<ResponseBody>
+
     @GET("api/reports/v1/analytics")
     fun downloadReport(@Query("token") token: String): Single<ResponseBody>
 }

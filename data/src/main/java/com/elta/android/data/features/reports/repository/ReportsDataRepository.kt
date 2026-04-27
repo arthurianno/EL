@@ -22,11 +22,12 @@ class ReportsDataRepository @Inject constructor(
     override fun getReport(range: Range): Single<Uri> =
         profileRepository.getProfile()
             .flatMap { profile ->
-                remoteDataSource.getReportToken(range.start, range.end, profile.glucoseFormat)
-                    .map { it to profile }
-            }
-            .flatMap {
-                remoteDataSource.downloadReport(it.first.token, buildFileName(it.second, range))
+                remoteDataSource.downloadReport(
+                    startDate = range.start,
+                    endDate = range.end,
+                    glucoseFormat = profile.glucoseFormat,
+                    fileName = buildFileName(profile, range)
+                )
             }
 
     private fun buildFileName(profile: Profile, range: Range): String =

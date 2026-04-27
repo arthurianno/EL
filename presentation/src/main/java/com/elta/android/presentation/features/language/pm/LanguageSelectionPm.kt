@@ -53,8 +53,10 @@ class LanguageSelectionPm @Inject constructor(
         lifecycleObservable.filter { it == Lifecycle.CREATED }
             .map {
                 val regionCode = LocaleHelper.getRegion(context)
+                Log.i(TAG, "INIT: region from prefs=$regionCode")
+
                 val region = AppRegion.fromCode(regionCode)
-                Log.i(TAG, "Initial selected region from LocaleHelper: ${region.code}")
+                Log.i(TAG, "INIT: mapped region=${region.code}")
                 region
             }
             .subscribe(selectedRegionState.consumer)
@@ -107,6 +109,9 @@ class LanguageSelectionPm @Inject constructor(
                 // Всегда сохраняем регион
                 LocaleHelper.saveRegion(context, region.code)
                 Log.i(TAG, "continueAction: region saved=${region.code}")
+                // сразу читаем обратно
+                val savedNow = LocaleHelper.getRegion(context)
+                Log.i(TAG, "SAVE: region read right after save=$savedNow")
 
                 if (isFirstLaunchState.value) {
                     Log.i(TAG, "continueAction: first launch, applying language=${language.code}")
@@ -126,9 +131,9 @@ class LanguageSelectionPm @Inject constructor(
                         )
                 } else {
                     if (language == currentLanguage) {
-                        // Fix 2: navigate back instead of silently doing nothing.
-                        Log.i(TAG, "continueAction: settings mode, language unchanged (${language.code}), navigating back")
-                        return@flatMapCompletable Completable.fromAction { router.exit() }
+                        Log.i(TAG, "continueAction: settings mode, language unchanged (${language.code}), syncing region/country and navigating back")
+                        return@flatMapCompletable updateLanguageOnBackend(language.code)
+                            .andThen(Completable.fromAction { router.exit() })
                     }
 
                     Log.i(TAG, "continueAction: settings mode, applying language=${language.code}")

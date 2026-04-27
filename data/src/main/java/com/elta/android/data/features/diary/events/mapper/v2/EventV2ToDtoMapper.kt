@@ -22,6 +22,11 @@ class EventV2ToDtoMapper @Inject constructor() : Mapper<EventV2, EventV2Dto> {
     override fun mapFromObject(source: EventV2): EventV2Dto =
         with(source) {
             val eventType = type.toEventTypeDto()
+            val tabletsNumberForRequest = if (eventType == EventTypeDto.MEDICAMENTS) {
+                tabletsNumber ?: DEFAULT_MEDICAMENT_TABLETS_NUMBER
+            } else {
+                tabletsNumber
+            }
             EventV2Dto(
                 id = id,
                 state = StateDto.valueOf(state.name),
@@ -40,7 +45,7 @@ class EventV2ToDtoMapper @Inject constructor() : Mapper<EventV2, EventV2Dto> {
                     mealTag = mealTag?.let { MealTagDto.valueOf(it.name) },
                     insulinMedicament = insulinMedicament?.toDto(),
                     medicament = medicament?.toDto(),
-                    tabletsNumber = tabletsNumber,
+                    tabletsNumber = tabletsNumberForRequest,
                     glucometerSerialNumber = glucometerSerialNumber,
                     products = dishes.toNetwork(eventType),
                     productsCount = if (eventType == EventTypeDto.BREAD) dishes.countOrZero() else null,
@@ -48,4 +53,8 @@ class EventV2ToDtoMapper @Inject constructor() : Mapper<EventV2, EventV2Dto> {
                 )
             )
         }
+
+    private companion object {
+        const val DEFAULT_MEDICAMENT_TABLETS_NUMBER = 1.0
+    }
 }
