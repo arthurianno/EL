@@ -1,6 +1,9 @@
 package com.elta.android.presentation.features.devices.search.viewmodel
 
 import android.os.Bundle
+import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.LocationNotEnabledError
+import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.interactor.LocateGlucometerUserCase
 import com.elta.android.presentation.analytic.core.analytics.Analytics
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
@@ -12,6 +15,7 @@ import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWi
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.features.devices.search.ADDRESS_ARGUMENT_ID
 import com.elta.android.presentation.features.devices.search.model.GlucometerSearchAction
+import com.elta.android.presentation.features.devices.search.model.GlucometerSearchEvent
 import com.elta.android.presentation.features.devices.search.model.GlucometerSearchStatus
 import com.elta.android.presentation.features.devices.search.model.GlucometerSearchViewState
 import com.elta.android.presentation.features.devices.search.model.SnackBarText
@@ -56,9 +60,22 @@ class GlucometerSearchViewModel @Inject constructor(
     override fun handleUserAction(action: Action) {
         when (action) {
             is GlucometerSearchAction.StartConnection -> connectAndLaunchSearch()
+            is GlucometerSearchAction.Location.AllowPermission -> {
+                sendEvent(GlucometerSearchEvent.Location.Enable)
+            }
+            is GlucometerSearchAction.Location.Enable,
+            is GlucometerSearchAction.Bluetooth.Enable -> {
+                connectAndLaunchSearch()
+            }
+            is GlucometerSearchAction.Location.DeniedPermission,
+            is GlucometerSearchAction.Bluetooth.Reject -> {
+                searchButton.resetSearch()
+                reduceState { state.value.copy(searchStatus = GlucometerSearchStatus.Off) }
+            }
             is AppAction.BackPressure -> backClick()
         }
     }
+
 
     override fun reduceStateByAction(
         currentState: GlucometerSearchViewState,
@@ -94,10 +111,27 @@ class GlucometerSearchViewModel @Inject constructor(
         findingJob = launch {
             analytics.trackEvent(AnalyticsEvent(name = AnalyticsEventType.FIND_GLUCOMETER))
             findGlucometer(state.value.glucometerAddress)
-                .catch {
-                    reduceState { state.value.copy(searchStatus = GlucometerSearchStatus.DeviceNotFound) }
-                    searchButton.resetSearch()
+                .catch { error ->
+                    when (error) {
+                        LocationPermissionNotGrantedError -> {
+                            sendEvent(GlucometerSearchEvent.Location.RequestPermission)
+                        }
+
+                        LocationNotEnabledError -> {
+                            sendEvent(GlucometerSearchEvent.Location.Enable)
+                        }
+
+                        BluetoothNotEnabledError -> {
+                            sendEvent(GlucometerSearchEvent.Bluetooth.Enable)
+                        }
+
+                        else -> {
+                            reduceState { state.value.copy(searchStatus = GlucometerSearchStatus.DeviceNotFound) }
+                            searchButton.resetSearch()
+                        }
+                    }
                 }
+
                 .onStart {
                     reduceState {
                         state.value.copy(

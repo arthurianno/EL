@@ -4,7 +4,9 @@ import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideMac
 import com.elta.android.domain.features.devices.COMMAND_TIMEOUT
+import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
+import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
 import kotlinx.coroutines.TimeoutCancellationException
@@ -20,9 +22,14 @@ import javax.inject.Inject
 class LocateGlucometerUserCase @Inject constructor(
     private val deviceRepository: DeviceRepository,
     private val pinRepository: PinRepository,
+    private val bluetoothStateRepository: BluetoothStateRepository,
     private val crashlyticsReport: CrashlyticsReport
 ) {
     operator fun invoke(address: String): Flow<Unit> = flow {
+        bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(
+            isLocationNeeded = true,
+            crashlyticsReport = crashlyticsReport
+        )
         crashlyticsReport.log("start locating device with address ${address.hideMac()}")
         val pin = pinRepository.getPin(address)
         if (pin == null) {

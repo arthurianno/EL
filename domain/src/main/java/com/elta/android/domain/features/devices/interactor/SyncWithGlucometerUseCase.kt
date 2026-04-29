@@ -47,9 +47,8 @@ class SyncWithGlucometerUseCase @Inject constructor(
 
             bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(
                 crashlyticsReport = crashlyticsReport,
-                isLocationNeeded = appSettingsRepository.isLocationNeeded
+                isLocationNeeded = true
             )
-
             crashlyticsReport.log("Getting a user profile")
             val profile = try {
                 profileRepository.getProfile().blockingGet()

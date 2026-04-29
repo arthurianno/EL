@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Shadow -->
+    <item android:bottom="2dp" android:left="1dp" android:right="1dp" android:top="0dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#20000000" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+    
+    <!-- Background -->
+    <item android:bottom="0dp" android:left="0dp" android:right="0dp" android:top="0dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+    
+    <!-- Content padding -->
+    <item android:bottom="16dp" android:left="16dp" android:right="16dp" android:top="16dp">
+        <vector
+            android:width="110dp"
+            android:height="110dp"
+            android:viewportWidth="110"
+            android:viewportHeight="110">
+            
+            <!-- Glucose value -->
+            <path
+                android:fillColor="#1A1A1A"
+                android:pathData="M40,35 L70,35 L70,40 L40,40 Z" />
+            <path
+                android:fillColor="#1A1A1A"
+                android:pathData="M35,30 L75,30 L75,35 L35,35 Z" />
+            <path
+                android:fillColor="#1A1A1A"
+                android:pathData="M40,25 L70,25 L70,30 L40,30 Z" />
+            
+            <!-- Unit mg/dl -->
+            <path
+                android:fillColor="#757575"
+                android:pathData="M50,42 L75,42 L75,45 L50,45 Z" />
+            <path
+                android:fillColor="#757575"
+                android:pathData="M55,45 L70,45 L70,48 L55,48 Z" />
+            
+            <!-- Trend arrow up -->
+            <path
+                android:fillColor="#E53935"
+                android:pathData="M80,28 L85,33 L82,33 L82,38 L78,38 L78,33 L75,33 Z" />
+            
+            <!-- Time -->
+            <path
+                android:fillColor="#757575"
+                android:pathData="M50,52 L65,52 L65,55 L50,55 Z" />
+            
+            <!-- Sync status -->
+            <path
+                android:fillColor="#4CAF50"
+                android:pathData="M45,85 A5,5 0 1,1 45,95 A5,5 0 1,1 45,85 M50,88 L55,93 L65,83"
+                android:strokeWidth="2"
+                android:strokeColor="#4CAF50"
+                android:strokeLineCap="round"
+                android:strokeLineJoin="round" />
+        </vector>
+    </item>
+</layer-list>

@@ -120,6 +120,64 @@
             </intent-filter>
         </receiver>
 
+        <!-- Glucose Widget Small -->
+        <receiver
+            android:name=".presentation.features.glucose.widget.ui.GlucoseSmallAppWidgetReceiver"
+            android:exported="true"
+            tools:ignore="Instantiatable"
+            android:label="@string/glucose_widget_small_label"
+            android:icon="@drawable/ic_glucose_widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/glucose_widget_small_info" />
+        </receiver>
+
+        <!-- Glucose Widget Medium -->
+        <receiver
+            android:name=".presentation.features.glucose.widget.ui.GlucoseMediumAppWidgetReceiver"
+            android:exported="true"
+            tools:ignore="Instantiatable"
+            android:label="@string/glucose_widget_medium_label"
+            android:icon="@drawable/ic_glucose_widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/glucose_widget_medium_info" />
+        </receiver>
+
+        <!-- Glucose Widget Large -->
+        <receiver
+            android:name=".presentation.features.glucose.widget.ui.GlucoseLargeAppWidgetReceiver"
+            android:exported="true"
+            tools:ignore="Instantiatable"
+            android:label="@string/glucose_widget_large_label"
+            android:icon="@drawable/ic_glucose_widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/glucose_widget_large_info" />
+        </receiver>
+
+        <!-- Glucose Widget Boot Receiver -->
+        <receiver
+            android:name=".presentation.features.glucose.widget.receiver.GlucoseWidgetBootReceiver"
+            android:exported="true"
+            android:directBootAware="true"
+            tools:ignore="UnusedAttribute">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
         <!-- Huawei App ID -->
         <meta-data
             android:name="com.huawei.hms.client.appid"

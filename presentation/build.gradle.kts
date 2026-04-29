@@ -114,6 +114,8 @@ dependencies {
     implementation(Dependencies.Jetpack.Compose.bomRxJava2)
     implementation(Dependencies.Jetpack.Compose.Accompanist.permissions)
     implementation(Dependencies.Coil.compose)
+    implementation("androidx.glance:glance:1.1.1")
+    implementation("androidx.glance:glance-preview:1.1.1")
     bomUiToolingDependencies()
     bomComposeTestsDependencies()
     implementation(Dependencies.Jetpack.Compose.activity)
@@ -175,6 +177,13 @@ dependencies {
 
     implementation(Dependencies.Jetpack.Paging.pagingRuntime)
     implementation(Dependencies.Jetpack.Paging.pagingCompose)
+
+    // Glance AppWidget
+    implementation(Dependencies.Jetpack.Glance.appwidget)
+    implementation(Dependencies.Jetpack.Glance.material3)
+    implementation(Dependencies.Jetpack.Glance.preview)
+    implementation(Dependencies.Jetpack.Glance.appwidgetPreview)
+    implementation(Dependencies.Jetpack.WorkManager.core)
 
     testBaseDependencies()
     testImplementation(Dependencies.Test.kotlinJUnit)

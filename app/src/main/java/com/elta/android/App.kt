@@ -10,8 +10,10 @@ import androidx.multidex.MultiDex
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
+import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.presentation.di.AnalyticModule
 import com.elta.android.presentation.features.app.ui.AppActivity
+import com.elta.android.presentation.features.glucose.widget.di.GlucoseWidgetDependencies
 import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.elta.android.presentation.utils.LocaleHelper
 import com.google.firebase.FirebaseApp
@@ -39,7 +41,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
 import javax.inject.Inject
 
-class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, HasServiceInjector {
+class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, HasServiceInjector,
+    GlucoseWidgetDependencies {
 
     @Inject
     lateinit var dispatchingActivityInjector: DispatchingAndroidInjector<Activity>
@@ -56,9 +59,9 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, Ha
     @Inject
     lateinit var remindersManager: RemindersManager
 
-
-
     @Inject lateinit var networkChecker: NetworkChecker
+    @Inject
+    override lateinit var getHomeModelUseCase: GetHomeModelUseCase
 
     override fun onCreate() {
         super.onCreate()

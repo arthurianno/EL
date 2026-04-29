@@ -59,6 +59,14 @@ object Dependencies {
             const val test = "androidx.work:work-testing:$version"
         }
 
+        object Glance {
+            private const val version = "1.1.0"
+            const val appwidget = "androidx.glance:glance-appwidget:$version"
+            const val material3 = "androidx.glance:glance-material3:$version"
+            const val preview = "androidx.glance:glance-preview:$version"
+            const val appwidgetPreview = "androidx.glance:glance-appwidget-preview:$version"
+        }
+
         object Compose {
             const val compilerVersion = "2.2.0"
             private const val bomVersion = "2024.09.01"

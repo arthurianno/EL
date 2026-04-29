@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
+import androidx.core.location.LocationManagerCompat
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import javax.inject.Inject
@@ -35,12 +36,13 @@ class BluetoothStateDataRepository @Inject constructor(
     }
 
     override fun isLocationPermissionGranted(): Boolean {
-        val accessFineLocationIsGranted = checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+        if (!isLegacyBleLocationRequired) return true
 
-        crashlyticsReport.log("Permission fine location granted: $accessFineLocationIsGranted")
-
-        return accessFineLocationIsGranted
+        val granted = checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+        crashlyticsReport.log("Permission fine location granted: $granted")
+        return granted
     }
+
 
     override fun isBluetoothEnabled(): Boolean {
         val bluetoothIsEnable = adapter.isEnabled
@@ -51,12 +53,15 @@ class BluetoothStateDataRepository @Inject constructor(
     }
 
     override fun isLocationEnabled(): Boolean {
-        val locationIsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        if (!isLegacyBleLocationRequired) return true
 
-        crashlyticsReport.log("Location is enabled: $locationIsEnabled")
-
-        return locationIsEnabled
+        val enabled = LocationManagerCompat.isLocationEnabled(locationManager)
+        crashlyticsReport.log("Location is enabled: $enabled")
+        return enabled
     }
+
+    private val isLegacyBleLocationRequired: Boolean
+        get() = Build.VERSION.SDK_INT < Build.VERSION_CODES.S
 
     private fun checkPermission(permissionName: String): Boolean =
         context.checkSelfPermission(permissionName) == PackageManager.PERMISSION_GRANTED

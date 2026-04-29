@@ -1,6 +1,9 @@
 package com.elta.android.presentation.features.devices.search
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -13,9 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
@@ -32,11 +37,18 @@ import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWi
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.snackbar.BaseSnackBar
 import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
+import com.elta.android.presentation.features.devices.search.model.GlucometerSearchAction
+import com.elta.android.presentation.features.devices.search.model.GlucometerSearchEvent
 import com.elta.android.presentation.features.devices.search.model.GlucometerSearchStatus
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
 import com.elta.android.presentation.features.devices.search.widgets.GlucometerSearchButton
+import com.elta.android.presentation.features.sync.control.checkSelfPermissionByName
+import com.elta.android.presentation.features.sync.control.requestEnableBluetooth
+import com.elta.android.presentation.features.sync.control.requestEnableLocation
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
+import com.elta.android.presentation.utils.openSettingsIntent
+import kotlinx.coroutines.flow.collectLatest
 
 internal const val ADDRESS_ARGUMENT_ID = "address_argument"
 
@@ -78,7 +90,38 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
 
     @Composable
     override fun Content(viewModel: GlucometerSearchViewModel) {
+        val context = LocalContext.current
+
+        LaunchedEffect(Unit) {
+            viewModel.event.collectLatest { event ->
+                when (event) {
+                    is GlucometerSearchEvent.Location.RequestPermission ->
+                        context.checkSelfPermissionByName(
+                            permissionName = Manifest.permission.ACCESS_FINE_LOCATION,
+                            onRequestPermission = { permissionName ->
+                                locationPermissionLauncher.launch(permissionName)
+                            },
+                            showPermissionRationale = {
+                                // тут можно открыть settings dialog, если добавишь его во VM
+                                openSettingsIntent(requireContext())
+                            },
+                            onGranted = {
+                                viewModel sendAction GlucometerSearchAction.Location.AllowPermission
+                            }
+                        )
+
+                    is GlucometerSearchEvent.Location.Enable ->
+                        locationEnableResultLauncher.requestEnableLocation(context) {
+                            viewModel sendAction GlucometerSearchAction.Location.Enable
+                        }
+
+                    is GlucometerSearchEvent.Bluetooth.Enable ->
+                        bluetoothResultLauncher.requestEnableBluetooth()
+                }
+            }
+        }
         GetLocalProperties { dimens, _, _, _, _ ->
+
             val state = viewModel.state.collectAsState().value
             Column(
                 modifier = Modifier
@@ -243,4 +286,36 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
             startIcon = R.drawable.ic_back
         )
     }
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        val action = if (isGranted) {
+            GlucometerSearchAction.Location.AllowPermission
+        } else {
+            GlucometerSearchAction.Location.DeniedPermission
+        }
+
+        viewModel sendAction action
+    }
+
+    private val locationEnableResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel sendAction GlucometerSearchAction.Location.Enable
+        }
+    }
+
+    private val bluetoothResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val action = if (result.resultCode == Activity.RESULT_OK) {
+            GlucometerSearchAction.Bluetooth.Enable
+        } else {
+            GlucometerSearchAction.Bluetooth.Reject
+        }
+
+        viewModel sendAction action
+    }
+
 }

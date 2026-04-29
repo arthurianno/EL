@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="crypto_key_alias">elta-secure-key</string>
+
+    <!-- Widget -->
+    <string name="glucose_widget_label">Глюкоза</string>
+    <string name="glucose_widget_small_label">Глюкоза · Small</string>
+    <string name="glucose_widget_medium_label">Глюкоза · Medium</string>
+    <string name="glucose_widget_large_label">Глюкоза · Large</string>
+    <string name="glucose_widget_description">Отображение уровня глюкозы, хлебных единиц и напоминаний на рабочем столе</string>
 </resources>

@@ -181,8 +181,5 @@ dependencies {
     implementation(Dependencies.OneSignal.core) // OneSignal уже есть
     implementation ("com.huawei.hms:push:6.3.0.304") // Новая строка
 
-    implementation("androidx.room:room-common:2.7.2")
-    implementation("androidx.room:room-runtime:2.7.2")
-
     testBaseDependencies()
 }
