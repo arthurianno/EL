@@ -38,6 +38,7 @@ class AppActivity : BaseActivity<AppPm>() {
     companion object {
        // const val OPEN_CONSULTANT_CHAT = "open_consultant_chat"
         private const val TAG = "LangFlow"
+        private const val DEBUG_OPEN_HOW_TO_CONNECT = "debug_open_how_to_connect"
     }
 
     @Inject
@@ -76,6 +77,8 @@ class AppActivity : BaseActivity<AppPm>() {
             View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR  // тёмные иконки nav bar на светлой теме
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
+
+        if (openDebugHowToConnectIfRequested(intent)) return
 
         if (LocaleHelper.consumePendingGreetingAfterLanguageSelection(this)) {
             Log.i(TAG, "AppActivity.onCreate: pending Greeting consumed, routing to GreetingFlow")
@@ -164,6 +167,8 @@ class AppActivity : BaseActivity<AppPm>() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        if (openDebugHowToConnectIfRequested(intent)) return
+
         DynamicLinkProcessor.from(intent)
             .deepLinkStartPassTo(presentationModel.deepLinkAction)
             .consultantDeeplink(presentationModel.consultantDeepLinkAction)
@@ -173,6 +178,20 @@ class AppActivity : BaseActivity<AppPm>() {
             .process()
     }
 
+    private fun openDebugHowToConnectIfRequested(intent: Intent?): Boolean {
+        if (!BuildConfig.DEBUG) return false
+        if (intent?.getBooleanExtra(DEBUG_OPEN_HOW_TO_CONNECT, false) != true) return false
+
+        Log.i(TAG, "AppActivity: opening HowToConnect via debug hook")
+        val screen = if (getFeatureConfigUseCase.invoke().improvedEnablingLocation) {
+            Screens.HowToConnectScreen(isOnBoarding = false)
+        } else {
+            Screens.HowToConnectScreenVariantA(isOnBoarding = false)
+        }
+        router.newRootScreen(screen)
+        hideSplashOverlay("debug_how_to_connect")
+        return true
+    }
 
     override fun onStop() {
         presentationModel.uploadLogs()

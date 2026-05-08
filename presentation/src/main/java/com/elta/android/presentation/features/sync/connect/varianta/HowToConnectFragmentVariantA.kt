@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -123,7 +123,7 @@ class HowToConnectFragmentVariantA : BaseComposeFragment<HowToConnectViewModelVa
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = colors.white)
-                    .systemBarsPadding()
+                    .statusBarsPadding()
             ) {
                 TopAppBar(viewModel)
                 MainImage(imageId = R.drawable.img_dmc_connect)

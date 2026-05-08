@@ -12,15 +12,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.viewModels
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -30,7 +32,9 @@ import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
+import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
+import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.features.sync.connect.model.howtoconnect.HowToConnectAction
 import com.elta.android.presentation.features.sync.connect.model.howtoconnect.HowToConnectEvent
@@ -166,7 +170,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                     modifier = Modifier
                         .fillMaxSize()
                         .background(color = colors.white)
-                        .systemBarsPadding()
+                        .statusBarsPadding()
                 ) {
                     TopAppBar(viewModel)
                     MainImage(
@@ -274,5 +278,83 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
             else -> HowToConnectAction.Bluetooth.Rejected
         }
         viewModel sendAction connectAction
+    }
+}
+
+@Preview(
+    name = "HowToConnect",
+    showBackground = true,
+    widthDp = 360,
+    heightDp = 800
+)
+@Composable
+private fun PreviewHowToConnectScreen() {
+    HowToConnectPreviewContent()
+}
+
+@Composable
+private fun HowToConnectPreviewContent() {
+    val topBarModel = remember {
+        BaseAppTopBarWidgetModel().apply {
+            setStartIconAction(AppAction.BackPressure)
+        }
+    }
+    val downButtonModel = remember {
+        DownButtonWidgetModel().apply {
+            setText("Сканировать")
+            setEnableState(true)
+            visibilityState(true)
+        }
+    }
+
+    GetLocalProperties { dimens, _, colors, _, _ ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = colors.white)
+                .statusBarsPadding()
+        ) {
+            BaseAppTopBar(
+                widgetModel = topBarModel,
+                backgroundColor = colors.white,
+                startIcon = R.drawable.ic_back,
+                startIconColor = colors.blackBlue
+            )
+            MainImage(imageId = R.drawable.img_dmc_connect)
+            HowToConnectPreviewInfo()
+            VSpacer(dimens.bigDim)
+            DownButton(widgetModel = downButtonModel)
+        }
+    }
+}
+
+@Composable
+private fun HowToConnectPreviewInfo() {
+    GetLocalProperties { dimens, _, _, _, types ->
+        Column(Modifier.padding(dimens.contentPadding)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(id = R.string.sync_how_to_connect_title),
+                    style = types.h1
+                )
+                HSpacerSmall()
+                Image(
+                    painter = painterResource(id = R.drawable.ic_how_to_connect),
+                    contentDescription = null
+                )
+            }
+            VSpacer(dimens.halfMediumDim)
+            TextNumericItem(
+                number = R.string.list_numbering_1_dot,
+                text = R.string.how_to_connect_description_check_ble
+            )
+            VSpacerSmall()
+            BluetoothString()
+            VSpacerMedium()
+            TextNumericItem(
+                number = R.string.list_numbering_2_dot,
+                text = R.string.sync_how_to_connect_text_2
+            )
+        }
     }
 }

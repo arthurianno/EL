@@ -8,6 +8,7 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentAuthPasswordCreateBinding
 import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
+import com.elta.android.presentation.utils.applyStatusBarInsetsPadding
 import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.toggleSecure
@@ -34,6 +35,7 @@ class AuthPasswordCreateFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.root.applyStatusBarInsetsPadding(applyNavigationBarInset = true)
         binding.toolbar.homeButtonView.setImageResource(R.drawable.ic_dialog_close)
     }
 

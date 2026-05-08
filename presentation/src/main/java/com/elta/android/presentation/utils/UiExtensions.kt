@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.core.widget.NestedScrollView
 import com.elta.android.presentation.R
 import com.jakewharton.rxbinding2.view.longClicks
@@ -44,6 +45,37 @@ fun ImageView.toggleSecureIcon(isSecure: Boolean) {
 
 fun View.applyInsetsToContentView(fitsSystemWindows: Boolean) {
     this.fitsSystemWindows = fitsSystemWindows
+    ViewCompat.requestApplyInsets(this)
+}
+
+fun View.applyStatusBarInsetsPadding(
+    onApplyInsets: (View) -> Unit = {},
+    applyNavigationBarInset: Boolean = false,
+    applyImeInset: Boolean = false
+) {
+    val initialLeft = paddingLeft
+    val initialTop = paddingTop
+    val initialRight = paddingRight
+    val initialBottom = paddingBottom
+    ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
+        val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+        val navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+        val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+        val isImeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+        val bottomInset = when {
+            applyImeInset && isImeVisible -> ime.bottom
+            applyNavigationBarInset -> navigationBars.bottom
+            else -> 0
+        }
+        view.updatePadding(
+            left = initialLeft,
+            top = initialTop + statusBars.top,
+            right = initialRight,
+            bottom = initialBottom + bottomInset
+        )
+        onApplyInsets(view)
+        insets
+    }
     ViewCompat.requestApplyInsets(this)
 }
 

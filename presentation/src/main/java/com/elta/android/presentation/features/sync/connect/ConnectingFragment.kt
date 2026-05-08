@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
@@ -172,7 +171,6 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .systemBarsPadding()
                 ) {
                     Header(viewModel, state.stageType)
                     Footer(

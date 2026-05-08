@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
@@ -152,7 +152,7 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                     sheetGesturesEnabled = false,
                     sheetShape = shapes.sheet,
                     sheetContent = { BottomSheet(viewModel, state.scannerState) },
-                    modifier = Modifier.systemBarsPadding()
+                    modifier = Modifier.statusBarsPadding()
                 ) {
                     CameraPreView(viewModel)
                 }

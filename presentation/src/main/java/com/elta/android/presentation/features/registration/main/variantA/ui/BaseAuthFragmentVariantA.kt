@@ -2,9 +2,6 @@ package com.elta.android.presentation.features.registration.main.variantA.ui
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
@@ -12,6 +9,7 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentAuthBaseBinding
 import com.elta.android.presentation.features.registration.main.variantA.pm.BaseAuthPmVariantA
+import com.elta.android.presentation.utils.applyStatusBarInsetsPadding
 import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.isKeyboardOpen
@@ -37,11 +35,11 @@ abstract class BaseAuthFragmentVariantA<PM : BaseAuthPmVariantA> :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            val top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
-            view.updatePadding(top = top)
-            insets
-        }
+        binding.root.applyStatusBarInsetsPadding(
+            onApplyInsets = ::clearFocusesFromInputs,
+            applyNavigationBarInset = true,
+            applyImeInset = true
+        )
         with(binding) {
             toolbar.menuButtonView.setText(menuButtonText)
             continueButtonView.setText(continueButtonText)
@@ -52,10 +50,6 @@ abstract class BaseAuthFragmentVariantA<PM : BaseAuthPmVariantA> :
             }
             frameView.setOnTouchListener { view, event ->
                 requireActivity().lostFocusOnClickOutside<MaterialEditText>(event, binding.root)
-            }
-            root.setOnApplyWindowInsetsListener { view, insets ->
-                clearFocusesFromInputs(view)
-                view.onApplyWindowInsets(insets)
             }
         }
     }

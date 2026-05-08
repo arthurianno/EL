@@ -9,6 +9,7 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentAuthPasswordRecoveryBinding
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
+import com.elta.android.presentation.utils.applyStatusBarInsetsPadding
 import com.elta.android.presentation.utils.error
 import com.jakewharton.rxbinding2.view.clicks
 import me.dmdev.rxpm.bindTo
@@ -25,6 +26,7 @@ class AuthPasswordRecoveryFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.root.applyStatusBarInsetsPadding(applyNavigationBarInset = true)
         binding.toolbar.homeButtonView.setImageResource(R.drawable.ic_dialog_close)
     }
 

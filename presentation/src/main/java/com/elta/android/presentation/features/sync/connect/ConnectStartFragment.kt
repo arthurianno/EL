@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -73,7 +73,7 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
                     modifier = Modifier
                         .fillMaxSize()
                         .background(color = colors.white)
-                        .systemBarsPadding()
+                        .statusBarsPadding()
                 ) {
                     TopAppBar(viewModel)
                     MainImage(
