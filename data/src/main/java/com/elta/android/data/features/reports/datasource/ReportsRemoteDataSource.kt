@@ -70,16 +70,19 @@ class ReportsRemoteDataSource @Inject constructor(
         endDate: String,
         glucoseFormat: String,
         fileName: String
-    ): Single<Uri> =
-        reportsApi.getReportToken(
+    ): Single<Uri> {
+        val languageTag = ApiLocaleResolver.languageTag()
+        return reportsApi.getReportToken(
             ReportNetworkRequest(
                 startDate = startDate,
                 endDate = endDate,
-                glucoseFormat = glucoseFormat
+                glucoseFormat = glucoseFormat,
+                languageTag = languageTag
             )
         ).flatMap { tokenDto ->
             reportsApi.downloadReport(tokenDto.token)
         }.map { fileManager.saveReport(fileName, it) }
+    }
 
     companion object {
         private const val DATE_PATTERN = "yyyyMMdd"

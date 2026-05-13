@@ -13,6 +13,7 @@ import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
 import com.elta.android.data.features.diary.events.dto.v2.EventsV2Dto
+import com.elta.android.data.features.diary.events.dto.v2.toRequestDto
 import com.elta.android.domain.features.FeatureToggles
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -36,16 +37,27 @@ class EventsRemoteDataSource @Inject constructor(
         getEvents()
 
     override fun addEvents(events: List<EventV2Dto>): Completable =
-        api.addEvents(!FeatureToggles.isEnableIiotSdkFeature, currentLanguageTag(), events)
+        api.addEvents(
+            sendToRostech = !FeatureToggles.isEnableIiotSdkFeature,
+            languageTag = currentLanguageTag(),
+            events = events.map { it.toRequestDto() }
+        )
             .flatMapCompletable { Completable.complete() }
 
     override suspend fun addEventsSuspend(events: List<EventV2Dto>) {
-        api.addEventsSuspend(!FeatureToggles.isEnableIiotSdkFeature, currentLanguageTag(), events)
+        api.addEventsSuspend(
+            sendToRostech = !FeatureToggles.isEnableIiotSdkFeature,
+            languageTag = currentLanguageTag(),
+            events = events.map { it.toRequestDto() }
+        )
     }
 
 
     override fun updateEvents(events: List<EventV2Dto>): Completable =
-        api.updateEvents(currentLanguageTag(), events)
+        api.updateEvents(
+            languageTag = currentLanguageTag(),
+            events = events.map { it.toRequestDto() }
+        )
             .flatMapCompletable { Completable.complete() }
 
     override fun deleteEvents(events: List<SimpleEventDto>): Completable =

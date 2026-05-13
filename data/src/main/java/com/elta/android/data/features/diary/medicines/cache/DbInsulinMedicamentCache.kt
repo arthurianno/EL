@@ -24,7 +24,7 @@ class DbInsulinMedicamentCache @Inject constructor(
     private fun getMedicinesByInsulinType(type: InsulinTypeDbEntity): List<InsulinMedicamentDbEntity> {
         return box
             .query()
-            .filter { it.insulinType == type }
+            .filter { it.insulinType.code == type.code }
             .build()
             .find()
     }

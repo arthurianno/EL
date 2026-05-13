@@ -7,7 +7,11 @@ import io.reactivex.Single
 
 class MockMedicinesApi : MedicinesApi {
 
-    override fun getMedicaments(touchedAfter: Long?, languageTag: String): Single<List<MedicamentNetworkResponse>> {
+    override fun getMedicaments(
+        touchedAfter: Long?,
+        languageTag: String,
+        countryCode: String
+    ): Single<List<MedicamentNetworkResponse>> {
         return Single.fromCallable { generateMedicament(20) }
     }
 
@@ -27,17 +31,22 @@ class MockMedicinesApi : MedicinesApi {
         return list
     }
 
-    override fun getInsulinMedicines(languageTag: String?): Single<InsulinMedicamentsNetworkResponse> {
+    override fun getInsulinMedicines(
+        languageTag: String?,
+        countryCode: String?
+    ): Single<InsulinMedicamentsNetworkResponse> {
         val json = """
     
     {
    "insulinMedicamentsByType":{
-      "ULTRA_SHORT":[
+      "SHORT":[
          {
             "id":1,
             "name":"Фиасп",
+            "deleted":false,
+            "isOther":false,
             "insulinType":{
-               "code":"ULTRA_SHORT",
+               "code":"SHORT",
                "name":"Ультракороткий",
                "id":1
             }
@@ -45,8 +54,10 @@ class MockMedicinesApi : MedicinesApi {
          {
             "id":56,
             "name":"Другое",
+            "deleted":false,
+            "isOther":true,
             "insulinType":{
-               "code":"ULTRA_SHORT",
+               "code":"SHORT",
                "name":"Ультракороткий",
                "id":1
             }
@@ -56,6 +67,8 @@ class MockMedicinesApi : MedicinesApi {
          {
             "id":21,
             "name":"Протафан HM",
+            "deleted":false,
+            "isOther":false,
             "insulinType":{
                "code":"PROLONGED",
                "name":"Продлённый",
@@ -65,6 +78,8 @@ class MockMedicinesApi : MedicinesApi {
          {
             "id":32,
             "name":"РинГлар",
+            "deleted":false,
+            "isOther":false,
             "insulinType":{
                "code":"PROLONGED",
                "name":"Продлённый",
@@ -74,6 +89,8 @@ class MockMedicinesApi : MedicinesApi {
          {
             "id":54,
             "name":"Другое",
+            "deleted":false,
+            "isOther":true,
             "insulinType":{
                "code":"PROLONGED",
                "name":"Продлённый",
@@ -85,6 +102,8 @@ class MockMedicinesApi : MedicinesApi {
          {
             "id":37,
             "name":"Хумулин М3",
+            "deleted":false,
+            "isOther":false,
             "insulinType":{
                "code":"MIXED",
                "name":"Смешанный",
@@ -94,6 +113,8 @@ class MockMedicinesApi : MedicinesApi {
          {
             "id":49,
             "name":"Райзодег",
+            "deleted":false,
+            "isOther":false,
             "insulinType":{
                "code":"MIXED",
                "name":"Смешанный",
@@ -103,6 +124,8 @@ class MockMedicinesApi : MedicinesApi {
          {
             "id":55,
             "name":"Другое",
+            "deleted":false,
+            "isOther":true,
             "insulinType":{
                "code":"MIXED",
                "name":"Смешанный",
@@ -115,7 +138,7 @@ class MockMedicinesApi : MedicinesApi {
       "PROLONGED"
    ],
    "bolusInsulinTypes":[
-      "ULTRA_SHORT"
+      "SHORT"
    ]
 }
     
@@ -131,5 +154,3 @@ class MockMedicinesApi : MedicinesApi {
     }
 
 }
-
-

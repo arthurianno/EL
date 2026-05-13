@@ -1,6 +1,8 @@
 package com.elta.android.data.features.newsChannel.datasource
-import com.elta.android.common.di.qualifires.NewsApiAnnotationType
+import com.elta.android.data.BuildConfig
 import com.elta.android.data.core.qualifires.ServerUrl
+import com.elta.android.data.features.common.network.ApiCountryCodeResolver
+import com.elta.android.data.features.common.network.ApiLocaleResolver
 import com.elta.android.domain.features.newsChannel.model.News
 import com.elta.android.domain.features.newsChannel.model.NewsFile
 import com.elta.android.domain.features.newsChannel.model.NewsImage
@@ -11,11 +13,21 @@ import java.util.UUID
 import javax.inject.Inject
 class NewsDataSource @Inject constructor(
     private val api: NewsApi,
+    private val countryCodeResolver: ApiCountryCodeResolver,
     @ServerUrl private val baseUrl: String
 ) {
     suspend fun fetchNewsList(cursor: Long?, limit: Int?, direction: String?): NewsListResponse {
         try {
-            val response = api.getNewsList(cursor, limit, direction)
+            val params = buildRequestParams(cursor, limit, direction)
+            val response = api.getNewsList(
+                cursor = params.cursor,
+                limit = params.limit,
+                direction = params.direction,
+                languageTag = params.languageTag,
+                platform = params.platform,
+                appVersion = params.appVersion,
+                countryCode = params.countryCode
+            )
             val domainResponse = response.toDomain(baseUrl)  // Передаём baseUrl
             return domainResponse
         } catch (e: Exception) {
@@ -28,6 +40,23 @@ class NewsDataSource @Inject constructor(
     }
     suspend fun fetchNewsFile(id: UUID): ByteArray {
         return api.getNewsFile(id.toString())
+    }
+
+    fun buildRequestParams(cursor: Long?, limit: Int?, direction: String?): NewsRequestParams =
+        NewsRequestParams(
+            cursor = cursor,
+            limit = limit?.coerceIn(MIN_LIMIT, MAX_LIMIT),
+            direction = direction,
+            languageTag = ApiLocaleResolver.languageTag(),
+            platform = MOBILE_PLATFORM_ANDROID,
+            appVersion = BuildConfig.VERSION_NAME,
+            countryCode = countryCodeResolver.countryCode()
+        )
+
+    private companion object {
+        const val MOBILE_PLATFORM_ANDROID = "android"
+        const val MIN_LIMIT = 1
+        const val MAX_LIMIT = 100
     }
 }
 private fun NewsListResponseDto.toDomain(baseUrl: String): NewsListResponse {

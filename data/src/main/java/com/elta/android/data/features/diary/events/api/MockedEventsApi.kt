@@ -9,6 +9,7 @@ import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
+import com.elta.android.data.features.diary.events.dto.v2.EventV2RequestDto
 import com.elta.android.data.features.diary.events.dto.v2.EventsV2Dto
 import com.elta.android.data.features.diary.events.dto.v2.InsulinMedicamentDto
 import com.elta.android.data.features.diary.tags.api.TagMockedFactory
@@ -75,20 +76,20 @@ class MockedEventsApi : EventsV2Api {
     override fun addEvents(
         sendToRostech: Boolean,
         languageTag: String,
-        events: List<EventV2Dto>
+        events: List<EventV2RequestDto>
     ): Observable<List<EventV2Dto>> =
-        Observable.just(events)
+        Observable.just(emptyList())
 
     override suspend fun addEventsSuspend(
         sendToRostech: Boolean,
         languageTag: String,
-        events: List<EventV2Dto>
+        events: List<EventV2RequestDto>
     ): List<EventV2Dto> {
-        return events
+        return emptyList()
     }
 
-    override fun updateEvents(languageTag: String, events: List<EventV2Dto>): Observable<List<EventV2Dto>> {
-        return Observable.just(events)
+    override fun updateEvents(languageTag: String, events: List<EventV2RequestDto>): Observable<List<EventV2Dto>> {
+        return Observable.just(emptyList())
     }
 
 

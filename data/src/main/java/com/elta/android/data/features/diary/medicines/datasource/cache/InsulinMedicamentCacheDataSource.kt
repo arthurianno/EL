@@ -6,8 +6,10 @@ import com.elta.android.data.features.diary.medicines.cache.conditions.InsulinMe
 import com.elta.android.data.features.diary.medicines.cache.entity.InsulinMedicamentDbEntity
 import com.elta.android.data.features.diary.medicines.cache.entity.InsulinStatisticDbEntity
 import com.elta.android.data.features.diary.medicines.cache.entity.InsulinTypeDbEntity
+import com.elta.android.data.features.diary.medicines.mapper.normalizedCountryCode
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import javax.inject.Inject
 
 class InsulinMedicamentCacheDataSource @Inject constructor(
@@ -23,15 +25,22 @@ class InsulinMedicamentCacheDataSource @Inject constructor(
         }
     }
 
-    override fun getInsulinMedicaments(): Observable<List<InsulinMedicamentDbEntity>> {
+    override fun getInsulinMedicaments(countryCode: String): Observable<List<InsulinMedicamentDbEntity>> {
         return Observable.just(
             insulinMedicamentCache.getAll(CommonConditions.All)
+                .filterMedicamentsByCountry(countryCode)
+                .ordered()
         )
     }
 
-    override fun getInsulinMedicaments(type: InsulinTypeDbEntity): Observable<List<InsulinMedicamentDbEntity>> {
+    override fun getInsulinMedicaments(
+        type: InsulinTypeDbEntity,
+        countryCode: String
+    ): Observable<List<InsulinMedicamentDbEntity>> {
         return Observable.just(
             insulinMedicamentCache.getAll(InsulinMedicamentConditions.ByInsulinType(type))
+                .filterMedicamentsByCountry(countryCode)
+                .ordered()
         )
     }
 
@@ -42,9 +51,11 @@ class InsulinMedicamentCacheDataSource @Inject constructor(
         }
     }
 
-    override fun getInsulinTypes(): Observable<List<InsulinTypeDbEntity>> {
+    override fun getInsulinTypes(countryCode: String): Observable<List<InsulinTypeDbEntity>> {
         return Observable.just(
             insulinTypeCache.getAll(CommonConditions.All)
+                .filterTypesByCountry(countryCode)
+                .sortedBy { it.sortOrder }
         )
     }
 
@@ -55,9 +66,48 @@ class InsulinMedicamentCacheDataSource @Inject constructor(
         }
     }
 
-    override fun getInsulinStatisticType(): Observable<InsulinStatisticDbEntity> {
+    override fun getInsulinStatisticType(countryCode: String): Observable<InsulinStatisticDbEntity> {
         return Observable.just(
-            statisticCache.getAll(CommonConditions.All).first()
+            statisticCache.getAll(CommonConditions.All)
+                .firstOrNull { it.matchesCountry(countryCode) }
+                ?: InsulinStatisticDbEntity.empty(countryCode.normalizedCountryCode())
         )
     }
+
+    override fun hasInsulinCache(countryCode: String): Single<Boolean> =
+        Single.fromCallable {
+            statisticCache.getAll(CommonConditions.All).any { it.matchesCountry(countryCode) } &&
+                insulinMedicamentCache.getAll(CommonConditions.All).any { it.matchesCountry(countryCode) }
+        }
+
+    override fun clearInsulinCache(): Completable =
+        Completable.fromCallable {
+            insulinMedicamentCache.delete(CommonConditions.All)
+            insulinTypeCache.delete(CommonConditions.All)
+            statisticCache.delete(CommonConditions.All)
+        }
+
+    private fun List<InsulinMedicamentDbEntity>.filterMedicamentsByCountry(
+        countryCode: String
+    ): List<InsulinMedicamentDbEntity> =
+        filter { it.matchesCountry(countryCode) }
+
+    private fun List<InsulinTypeDbEntity>.filterTypesByCountry(countryCode: String): List<InsulinTypeDbEntity> =
+        filter { it.matchesCountry(countryCode) }
+
+    private fun List<InsulinMedicamentDbEntity>.ordered(): List<InsulinMedicamentDbEntity> =
+        sortedWith(
+            compareBy<InsulinMedicamentDbEntity> { it.insulinType.code }
+                .thenBy { it.isOther }
+                .thenBy { it.sortOrder }
+        )
+
+    private fun InsulinMedicamentDbEntity.matchesCountry(countryCode: String): Boolean =
+        this.countryCode?.normalizedCountryCode() == countryCode.normalizedCountryCode()
+
+    private fun InsulinTypeDbEntity.matchesCountry(countryCode: String): Boolean =
+        this.countryCode?.normalizedCountryCode() == countryCode.normalizedCountryCode()
+
+    private fun InsulinStatisticDbEntity.matchesCountry(countryCode: String): Boolean =
+        this.countryCode?.normalizedCountryCode() == countryCode.normalizedCountryCode()
 }

@@ -4,5 +4,6 @@ data class InsulinMedicament(
     val id: Int,
     val name: String,
     val insulinType: MedicamentInsulinType,
-    val deleted: Boolean
+    val deleted: Boolean,
+    val isOther: Boolean = false
 )

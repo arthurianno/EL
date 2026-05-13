@@ -1,16 +1,19 @@
 package com.elta.android.data.features.common.storage
 
+import android.content.Context
 import com.elta.android.data.features.common.cache.BoxScope
 import com.elta.android.data.features.common.cache.BoxStoreFactory
 import io.objectbox.Box
 import io.objectbox.kotlin.boxFor
 import io.reactivex.Completable
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class DbSyncStorage @Inject constructor(
-    private val factory: BoxStoreFactory
+    private val factory: BoxStoreFactory,
+    private val context: Context
 ) : SyncStorage {
 
     private val userBox: Box<SyncInfoDto>
@@ -70,8 +73,40 @@ class DbSyncStorage @Inject constructor(
             )
         }
 
+    private val medicamentSyncPrefs
+        get() = context.getSharedPreferences(MEDICAMENT_SYNC_PREFS, Context.MODE_PRIVATE)
+
+    override fun getLastMedicamentSync(countryCode: String, languageTag: String): Long? {
+        val key = medicamentSyncKey(countryCode, languageTag)
+        return medicamentSyncPrefs
+            .takeIf { it.contains(key) }
+            ?.getLong(key, DEFAULT_MISSING_SYNC)
+            ?.takeIf { it != DEFAULT_MISSING_SYNC }
+    }
+
+    override fun setLastMedicamentSync(countryCode: String, languageTag: String, value: Long?) {
+        val key = medicamentSyncKey(countryCode, languageTag)
+        medicamentSyncPrefs.edit().apply {
+            if (value == null) remove(key) else putLong(key, value)
+        }.apply()
+    }
 
     override fun deleteDbFiles() =
         Completable
-            .fromCallable { factory.deleteDbFiles() }
+            .fromCallable {
+                medicamentSyncPrefs.edit().clear().apply()
+                factory.deleteDbFiles()
+            }
+
+    private fun medicamentSyncKey(countryCode: String, languageTag: String): String {
+        val country = countryCode.trim().uppercase(Locale.ROOT)
+        val language = languageTag.trim().lowercase(Locale.ROOT)
+        return "$MEDICAMENT_SYNC_PREFIX:$country:$language"
+    }
+
+    private companion object {
+        const val MEDICAMENT_SYNC_PREFS = "medicament_sync_storage"
+        const val MEDICAMENT_SYNC_PREFIX = "last_medicament_sync"
+        const val DEFAULT_MISSING_SYNC = -1L
+    }
 }

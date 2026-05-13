@@ -1,6 +1,7 @@
 package com.elta.android.data.features.diary.events.api
 
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
+import com.elta.android.data.features.diary.events.dto.v2.EventV2RequestDto
 import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
 import com.elta.android.data.features.diary.events.dto.v2.EventsV2Dto
 import io.reactivex.Observable
@@ -26,20 +27,20 @@ interface EventsV2Api {
     fun addEvents(
         @Query("sendToRostech") sendToRostech: Boolean,
         @Query("languageTag") languageTag: String,
-        @Body events: List<EventV2Dto>
+        @Body events: List<EventV2RequestDto>
     ): Observable<List<EventV2Dto>>
 
     @POST("api/diary/events/v2")
     suspend fun addEventsSuspend(
         @Query("sendToRostech") sendToRostech: Boolean,
         @Query("languageTag") languageTag: String,
-        @Body events: List<EventV2Dto>
+        @Body events: List<EventV2RequestDto>
     ): List<EventV2Dto>
 
     @PUT("api/diary/events/v2")
     fun updateEvents(
         @Query("languageTag") languageTag: String,
-        @Body events: List<EventV2Dto>
+        @Body events: List<EventV2RequestDto>
     ): Observable<List<EventV2Dto>>
 
     @HTTP(method = "DELETE", path = "api/diary/events/v2", hasBody = true)

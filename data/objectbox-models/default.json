@@ -1028,7 +1028,7 @@
     },
     {
       "id": "28:5144191993375478689",
-      "lastPropertyId": "3:8099593574415654037",
+      "lastPropertyId": "4:7846817598243696022",
       "name": "InsulinStatisticDbEntity",
       "properties": [
         {
@@ -1046,13 +1046,18 @@
           "id": "3:8099593574415654037",
           "name": "basalInsulinTypes",
           "type": 30
+        },
+        {
+          "id": "4:7846817598243696022",
+          "name": "countryCode",
+          "type": 9
         }
       ],
       "relations": []
     },
     {
       "id": "29:3408591854101484041",
-      "lastPropertyId": "3:4114526565001258250",
+      "lastPropertyId": "5:115608238626416699",
       "name": "InsulinTypeDbEntity",
       "properties": [
         {
@@ -1070,13 +1075,23 @@
           "id": "3:4114526565001258250",
           "name": "name",
           "type": 9
+        },
+        {
+          "id": "4:8298750649425248772",
+          "name": "countryCode",
+          "type": 9
+        },
+        {
+          "id": "5:115608238626416699",
+          "name": "sortOrder",
+          "type": 5
         }
       ],
       "relations": []
     },
     {
       "id": "30:8999350013555102540",
-      "lastPropertyId": "4:4379323195446670924",
+      "lastPropertyId": "7:7048180648040515880",
       "name": "InsulinMedicamentDbEntity",
       "properties": [
         {
@@ -1099,13 +1114,28 @@
           "id": "4:4379323195446670924",
           "name": "deleted",
           "type": 1
+        },
+        {
+          "id": "5:3446636840200983760",
+          "name": "isOther",
+          "type": 1
+        },
+        {
+          "id": "6:1960852074895476696",
+          "name": "countryCode",
+          "type": 9
+        },
+        {
+          "id": "7:7048180648040515880",
+          "name": "sortOrder",
+          "type": 5
         }
       ],
       "relations": []
     },
     {
       "id": "31:3282265351876994341",
-      "lastPropertyId": "6:5726612670656249490",
+      "lastPropertyId": "9:6195817317123026551",
       "name": "MedicamentDBEntity",
       "properties": [
         {
@@ -1138,6 +1168,21 @@
           "id": "6:5726612670656249490",
           "name": "lastUsed",
           "type": 6
+        },
+        {
+          "id": "7:317753261428627104",
+          "name": "medicamentId",
+          "type": 6
+        },
+        {
+          "id": "8:6791724989120384186",
+          "name": "countryCode",
+          "type": 9
+        },
+        {
+          "id": "9:6195817317123026551",
+          "name": "languageTag",
+          "type": 9
         }
       ],
       "relations": []

@@ -10,4 +10,5 @@ data class InsulinMedicamentChooser(
     val insulinCode: String,
     val insulinId: Int,
     val insulinName: String,
+    val isOther: Boolean = false
 ) : Parcelable

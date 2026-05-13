@@ -13,5 +13,8 @@ data class InsulinMedicamentDbEntity(
     val name: String,
     @Convert(converter = InsulinTypeDbEntityConverter::class, dbType = String::class)
     val insulinType: InsulinTypeDbEntity,
-    val deleted: Boolean
+    val deleted: Boolean,
+    val isOther: Boolean = false,
+    val countryCode: String? = null,
+    val sortOrder: Int = 0
 )

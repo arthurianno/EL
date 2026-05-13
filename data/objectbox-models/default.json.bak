@@ -728,7 +728,7 @@
     },
     {
       "id": "23:4287864010729913530",
-      "lastPropertyId": "3:4451880316256054772",
+      "lastPropertyId": "4:5445087423287439870",
       "name": "ProfileSettingsDbEntity",
       "properties": [
         {
@@ -745,6 +745,11 @@
         {
           "id": "3:4451880316256054772",
           "name": "glucoseFormat",
+          "type": 9
+        },
+        {
+          "id": "4:5445087423287439870",
+          "name": "countryCode",
           "type": 9
         }
       ],
@@ -1071,7 +1076,7 @@
     },
     {
       "id": "30:8999350013555102540",
-      "lastPropertyId": "4:4379323195446670924",
+      "lastPropertyId": "5:3446636840200983760",
       "name": "InsulinMedicamentDbEntity",
       "properties": [
         {
@@ -1094,13 +1099,18 @@
           "id": "4:4379323195446670924",
           "name": "deleted",
           "type": 1
+        },
+        {
+          "id": "5:3446636840200983760",
+          "name": "isOther",
+          "type": 1
         }
       ],
       "relations": []
     },
     {
       "id": "31:3282265351876994341",
-      "lastPropertyId": "6:5726612670656249490",
+      "lastPropertyId": "9:6195817317123026551",
       "name": "MedicamentDBEntity",
       "properties": [
         {
@@ -1133,6 +1143,21 @@
           "id": "6:5726612670656249490",
           "name": "lastUsed",
           "type": 6
+        },
+        {
+          "id": "7:317753261428627104",
+          "name": "medicamentId",
+          "type": 6
+        },
+        {
+          "id": "8:6791724989120384186",
+          "name": "countryCode",
+          "type": 9
+        },
+        {
+          "id": "9:6195817317123026551",
+          "name": "languageTag",
+          "type": 9
         }
       ],
       "relations": []

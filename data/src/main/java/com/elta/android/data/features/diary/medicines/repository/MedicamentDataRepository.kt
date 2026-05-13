@@ -1,6 +1,8 @@
 package com.elta.android.data.features.diary.medicines.repository
 
 import com.elta.android.common.di.qualifires.Cache
+import com.elta.android.data.features.common.network.ApiCountryCodeResolver
+import com.elta.android.data.features.common.network.ApiLocaleResolver
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource
 import com.elta.android.data.features.diary.events.mapper.toDomain
 import com.elta.android.data.features.diary.medicines.datasource.cache.MedicamentCacheSource
@@ -23,6 +25,7 @@ class MedicamentDataRepository @Inject constructor(
     private val medicamentRemoteDataSource: MedicamentRemoteDataSource,
     private val medicamentCacheSource: MedicamentCacheSource,
     @Cache private val eventsCacheSource: EventsCacheDataSource,
+    private val countryCodeResolver: ApiCountryCodeResolver,
     override val dispatcher: CoroutineDispatcher
 ) : MedicamentRepository {
 
@@ -50,18 +53,26 @@ class MedicamentDataRepository @Inject constructor(
     }
 
     override fun getRecentlySearches(): Flow<List<Medicament>> {
-        return medicamentCacheSource.getRecentlySearches()
+        val countryCode = countryCodeResolver.countryCode()
+        val languageTag = ApiLocaleResolver.languageTag()
+        return medicamentCacheSource.getRecentlySearches(countryCode, languageTag)
             .map { it.toDomain() }
             .flowOn(dispatcher)
     }
 
     override fun saveRecentlySearches(medicament: Medicament) {
-        val medicamentDb = medicament.toDb(lastUsed = Calendar.getInstance().timeInMillis)
+        val medicamentDb = medicament.toDb(
+            lastUsed = Calendar.getInstance().timeInMillis,
+            countryCode = countryCodeResolver.countryCode(),
+            languageTag = ApiLocaleResolver.languageTag()
+        )
         medicamentCacheSource.saveRecentlySearches(medicamentDb)
     }
 
     override fun getMedicaments(): Flow<List<Medicament>> {
-        return medicamentCacheSource.getMedicaments()
+        val countryCode = countryCodeResolver.countryCode()
+        val languageTag = ApiLocaleResolver.languageTag()
+        return medicamentCacheSource.getMedicaments(countryCode, languageTag)
             .map { it.toDomain() }
             .flowOn(dispatcher)
     }
@@ -69,9 +80,20 @@ class MedicamentDataRepository @Inject constructor(
 
     override fun sync(): Completable =
         medicamentRemoteDataSource.syncMedicaments()
-            .map { list -> list.map { it.toDB() } }
-            .flatMapCompletable { list ->
-                medicamentCacheSource.saveMedicaments(list)
+            .map { result ->
+                result to result.medicaments.map {
+                    it.toDB(
+                        countryCode = result.countryCode,
+                        languageTag = result.languageTag
+                    )
+                }
+            }
+            .flatMapCompletable { (result, list) ->
+                medicamentCacheSource.saveMedicaments(
+                    medicaments = list,
+                    countryCode = result.countryCode,
+                    languageTag = result.languageTag
+                )
             }
 
 }

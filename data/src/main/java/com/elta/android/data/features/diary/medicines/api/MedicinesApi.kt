@@ -11,12 +11,14 @@ interface MedicinesApi {
     @GET("api/diary/medicaments")
     fun getMedicaments(
         @Query("touchedAfter") touchedAfter: Long?,
-        @Query("languageTag") languageTag: String
+        @Query("languageTag") languageTag: String,
+        @Query("countryCode") countryCode: String
     ): Single<List<MedicamentNetworkResponse>>
 
     @GET("api/diary/insulin-medicaments/v2")
     fun getInsulinMedicines(
-        @Query("languageTag") languageTag: String?
+        @Query("languageTag") languageTag: String?,
+        @Query("countryCode") countryCode: String?
     ): Single<InsulinMedicamentsNetworkResponse>
 
 }

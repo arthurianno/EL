@@ -8,8 +8,14 @@ data class InsulinStatisticDbEntity(
     @Id(assignable = true) var id: Long = 0,
     val bolusInsulinTypes: List<String>,
     val basalInsulinTypes: List<String>,
+    val countryCode: String? = null
 ) {
     companion object {
-        fun empty() = InsulinStatisticDbEntity(id = 0, basalInsulinTypes = emptyList(), bolusInsulinTypes = emptyList())
+        fun empty(countryCode: String? = null) = InsulinStatisticDbEntity(
+            id = 0,
+            basalInsulinTypes = emptyList(),
+            bolusInsulinTypes = emptyList(),
+            countryCode = countryCode
+        )
     }
 }

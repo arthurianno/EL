@@ -58,6 +58,7 @@ import java.io.FileOutputStream
 import androidx.core.content.FileProvider
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.newsChannel.model.PreviewStateNews
+import com.elta.android.presentation.utils.LocaleHelper
 import com.nullgr.core.hardware.NetworkChecker
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -82,6 +83,8 @@ class NewsViewModel @Inject constructor(
     private var isSwipeRefreshing = false
     private var swipeRefreshCount = 0
     private var lastSwipeRefreshTime: Long? = null
+    private var loadedLanguageTag: String = LocaleHelper.getLanguage(context)
+    private var loadedCountryCode: String = LocaleHelper.getRegion(context)
 
     private companion object {
         const val LIMIT = 5
@@ -141,11 +144,28 @@ class NewsViewModel @Inject constructor(
         when (this) {
             Lifecycle.Event.ON_CREATE -> Log.e("NewsViewModel", "ON_CREATE")
             Lifecycle.Event.ON_START -> Log.e("NewsViewModel", "ON_START")
-            Lifecycle.Event.ON_RESUME -> Log.e("NewsViewModel", "ON_RESUME")
+            Lifecycle.Event.ON_RESUME -> {
+                Log.e("NewsViewModel", "ON_RESUME")
+                reloadIfTargetingChanged()
+            }
             Lifecycle.Event.ON_PAUSE -> Log.e("NewsViewModel", "ON_PAUSE")
             Lifecycle.Event.ON_DESTROY -> Log.e("NewsViewModel", "ON_DESTROY")
             else -> Unit
         }
+    }
+
+    private fun reloadIfTargetingChanged() {
+        val currentLanguageTag = LocaleHelper.getLanguage(context)
+        val currentCountryCode = LocaleHelper.getRegion(context)
+        if (currentLanguageTag == loadedLanguageTag && currentCountryCode == loadedCountryCode) return
+
+        loadedLanguageTag = currentLanguageTag
+        loadedCountryCode = currentCountryCode
+        currentCursor = null
+        hasMoreMessages = true
+        isLoadingNextPage = false
+        reduceState { state.value.copy(chat = state.value.chat.copy(messages = emptyList())) }
+        loadNewsPage()
     }
 
     override fun onCleared() {

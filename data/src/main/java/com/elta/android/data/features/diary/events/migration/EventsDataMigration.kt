@@ -73,7 +73,8 @@ fun toInsulinMedicament(medicament: String?, insulinType: String?): InsulinMedic
             id = insulinType.hashCode(),
             name = insulinType.getName()
         ),
-        deleted = false
+        deleted = false,
+        isOther = false
     )
 }
 

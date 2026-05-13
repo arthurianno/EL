@@ -5,16 +5,20 @@ import com.elta.android.data.features.diary.medicines.cache.entity.InsulinStatis
 import com.elta.android.data.features.diary.medicines.cache.entity.InsulinTypeDbEntity
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 
 interface InsulinMedicamentCacheSource {
 
     fun saveInsulinMedicaments(medicines: List<InsulinMedicamentDbEntity>): Completable
-    fun getInsulinMedicaments(): Observable<List<InsulinMedicamentDbEntity>>
-    fun getInsulinMedicaments(type: InsulinTypeDbEntity): Observable<List<InsulinMedicamentDbEntity>>
+    fun getInsulinMedicaments(countryCode: String): Observable<List<InsulinMedicamentDbEntity>>
+    fun getInsulinMedicaments(type: InsulinTypeDbEntity, countryCode: String): Observable<List<InsulinMedicamentDbEntity>>
 
     fun saveInsulinType(insulinTypes: List<InsulinTypeDbEntity>): Completable
-    fun getInsulinTypes(): Observable<List<InsulinTypeDbEntity>>
+    fun getInsulinTypes(countryCode: String): Observable<List<InsulinTypeDbEntity>>
 
     fun saveInsulinStatisticType(insulinStatisticDbEntity: InsulinStatisticDbEntity): Completable
-    fun getInsulinStatisticType(): Observable<InsulinStatisticDbEntity>
+    fun getInsulinStatisticType(countryCode: String): Observable<InsulinStatisticDbEntity>
+
+    fun hasInsulinCache(countryCode: String): Single<Boolean>
+    fun clearInsulinCache(): Completable
 }

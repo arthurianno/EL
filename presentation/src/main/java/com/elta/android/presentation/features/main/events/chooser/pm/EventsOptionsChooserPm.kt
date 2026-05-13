@@ -112,9 +112,9 @@ class EventsOptionsChooserPm @Inject constructor(
                         GetInsulinMedicamentsChooserOptionsUseCase.Params(
                             MedicamentInsulinType(
                                 id = medicamentChooser.insulinId,
-                                code = medicamentChooser.insulinCode,
-                                name = medicamentChooser.insulinName,
-                            )
+                code = medicamentChooser.insulinCode,
+                name = medicamentChooser.insulinName,
+            )
                         )
                     }
                     getInsulinMedicamentsChooserOptionsUseCase.execute(insulinType)
@@ -301,7 +301,8 @@ class EventsOptionsChooserPm @Inject constructor(
             InsulinMedicamentChooser(
                 insulinCode = insulinType.code,
                 insulinName = insulinType.getLocalizedName(resources),
-                insulinId = insulinType.id
+                insulinId = insulinType.id,
+                isOther = medicament?.isOther == true
             )
 
         return ChooserConfiguration(

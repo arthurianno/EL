@@ -1,56 +1,47 @@
 package com.elta.android.data.features.diary.medicines.datasource.remote
 
+import com.elta.android.data.features.common.network.ApiCountryCodeResolver
 import com.elta.android.data.features.common.network.ApiLocaleResolver
+import com.elta.android.data.features.common.network.CountryCodeProvider
 import com.elta.android.data.features.diary.medicines.api.MedicinesApi
-import com.elta.android.data.features.diary.medicines.dto.InsulinMedicamentsNetworkResponse
-import android.util.Log
 import io.reactivex.Single
 import retrofit2.HttpException
-import java.util.Locale
 import javax.inject.Inject
 
-class InsulinMedicamentRemoteDataSource @Inject constructor(
+class InsulinMedicamentRemoteDataSource internal constructor(
     private val api: MedicinesApi,
+    private val countryCodeProvider: CountryCodeProvider
 ) : InsulinMedicamentRemoteSource {
 
+    @Inject
+    constructor(
+        api: MedicinesApi,
+        countryCodeResolver: ApiCountryCodeResolver
+    ) : this(
+        api = api,
+        countryCodeProvider = countryCodeResolver
+    )
 
-    override fun getInsulinMedicines(): Single<InsulinMedicamentsNetworkResponse> {
+    override fun getInsulinMedicines(): Single<InsulinMedicamentsSyncResult> {
         val resolvedLanguageTag = ApiLocaleResolver.languageTag()
-        Log.i(
-            TAG,
-            "getInsulinMedicines: request /api/diary/insulin-medicaments/v2 " +
-                "locale=${Locale.getDefault().toLanguageTag()} " +
-                "country=${Locale.getDefault().country} " +
-                "resolvedLanguageTag=$resolvedLanguageTag"
-        )
-        return api.getInsulinMedicines(languageTag = resolvedLanguageTag)
+        val countryCode = countryCodeProvider.countryCode()
+        return api.getInsulinMedicines(languageTag = resolvedLanguageTag, countryCode = countryCode)
             .onErrorResumeNext { error ->
                 if (error is HttpException && error.code() == HTTP_BAD_REQUEST) {
-                    Log.w(
-                        TAG,
-                        "getInsulinMedicines: backend rejected languageTag=$resolvedLanguageTag, fallback without languageTag"
-                    )
-                    api.getInsulinMedicines(languageTag = null)
+                    api.getInsulinMedicines(languageTag = null, countryCode = countryCode)
                 } else {
                     Single.error(error)
                 }
             }
-            .doOnSuccess { response ->
-                val totalItems = response.insulinMedicamentsByType.values.sumOf { it.size }
-                val preview = response.insulinMedicamentsByType.entries
-                    .take(3)
-                    .joinToString { (type, items) ->
-                        "$type=[${items.take(2).joinToString { it.name }}]"
-                    }
-                Log.i(TAG, "getInsulinMedicines: response totalItems=$totalItems preview=$preview")
-            }
-            .doOnError { error ->
-                Log.e(TAG, "getInsulinMedicines: request failed", error)
+            .map { response ->
+                InsulinMedicamentsSyncResult(
+                    response = response,
+                    countryCode = countryCode
+                )
             }
     }
 
     private companion object {
-        const val TAG = "InsulinMedicamentApi"
         const val HTTP_BAD_REQUEST = 400
     }
 }

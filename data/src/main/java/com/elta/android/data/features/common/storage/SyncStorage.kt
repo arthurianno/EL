@@ -14,5 +14,9 @@ interface SyncStorage {
 
     var lastMedicamentSync: Long?
 
+    fun getLastMedicamentSync(countryCode: String, languageTag: String): Long?
+
+    fun setLastMedicamentSync(countryCode: String, languageTag: String, value: Long?)
+
     fun deleteDbFiles(): Completable
 }

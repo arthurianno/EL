@@ -132,6 +132,7 @@ class LanguageSelectionPm @Inject constructor(
                 } else {
                     if (language == currentLanguage) {
                         Log.i(TAG, "continueAction: settings mode, language unchanged (${language.code}), syncing region/country and navigating back")
+                        OneSignalTags.apply(context)
                         return@flatMapCompletable updateLanguageOnBackend(language.code)
                             .andThen(Completable.fromAction { router.exit() })
                     }

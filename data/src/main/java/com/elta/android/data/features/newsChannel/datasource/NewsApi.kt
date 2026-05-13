@@ -9,7 +9,11 @@ interface NewsApi {
     suspend fun getNewsList(
         @Query("cursor") cursor: Long? = null,
         @Query("limit") limit: Int? = 10,
-        @Query("direction") direction: String? = "DESC"
+        @Query("direction") direction: String? = "DESC",
+        @Query("languageTag") languageTag: String,
+        @Query("platform") platform: String,
+        @Query("appVersion") appVersion: String,
+        @Query("countryCode") countryCode: String
     ): NewsListResponseDto
 
     @GET("api/news{id}")

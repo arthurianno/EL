@@ -61,7 +61,8 @@ fun InsulinMedicament.toDto(): InsulinMedicamentDto =
         id = id,
         name = name,
         insulinType = insulinType.toDto(),
-        deleted = deleted
+        deleted = deleted,
+        isOther = isOther
     )
 
 fun Medicament.toDto(): MedicamentDto =
@@ -118,7 +119,8 @@ fun InsulinMedicamentDto.toDomain(): InsulinMedicament =
         id = id,
         name = name,
         insulinType = insulinType.toDomain(),
-        deleted = deleted
+        deleted = deleted,
+        isOther = isOther
     )
 
 fun InsulinMedicamentDto.MedicamentInsulinTypeDto.toDomain(): MedicamentInsulinType =

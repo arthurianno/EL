@@ -19,6 +19,7 @@ internal fun SelectorOption?.toChooserInsulin(resources: ResourceProvider): Insu
             insulinCode = insulinMedicament.insulinType.code,
             insulinName = insulinMedicament.insulinType.getLocalizedName(resources),
             insulinId = insulinMedicament.insulinType.id,
+            isOther = insulinMedicament.isOther
         )
     } else null
 }

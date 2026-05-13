@@ -4,7 +4,8 @@ data class InsulinMedicamentDto(
     val id: Int,
     val name: String,
     val insulinType: MedicamentInsulinTypeDto,
-    val deleted: Boolean
+    val deleted: Boolean,
+    val isOther: Boolean = false
 ) {
     data class MedicamentInsulinTypeDto(
         val code: String,

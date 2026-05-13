@@ -7,5 +7,7 @@ import io.objectbox.annotation.Id
 data class InsulinTypeDbEntity(
     @Id(assignable = true) var id: Long,
     val code: String,
-    val name: String
+    val name: String,
+    val countryCode: String? = null,
+    val sortOrder: Int = 0
 )

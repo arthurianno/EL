@@ -16,6 +16,14 @@ class MockedReportsApi(
     override fun getReportToken(report: ReportNetworkRequest): Single<TokenDto> =
         Single.just(TokenDto("Test-token-bro"))
 
+    override fun getObservableReportToken(
+        observableId: String,
+        startPeriod: String,
+        endPeriod: String,
+        glucoseFormat: String,
+        languageTag: String
+    ): Single<TokenDto> = Single.just(TokenDto("Test-observable-token-bro"))
+
     override fun downloadGlycemicProfileReport(
         reportPeriodStart: String,
         reportPeriodEnd: String,

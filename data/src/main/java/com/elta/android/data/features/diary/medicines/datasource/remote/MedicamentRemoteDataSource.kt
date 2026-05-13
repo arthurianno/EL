@@ -1,42 +1,39 @@
 package com.elta.android.data.features.diary.medicines.datasource.remote
 
 import com.elta.android.common.utils.currentMillisUtc
+import com.elta.android.data.features.common.network.ApiCountryCodeResolver
 import com.elta.android.data.features.common.network.ApiLocaleResolver
 import com.elta.android.data.features.common.storage.SyncStorage
 import com.elta.android.data.features.diary.medicines.api.MedicinesApi
-import com.elta.android.data.features.diary.medicines.dto.MedicamentNetworkResponse
-import android.util.Log
 import io.reactivex.Single
-import java.util.Locale
 import javax.inject.Inject
 
 class MedicamentRemoteDataSource @Inject constructor(
     private val api: MedicinesApi,
-    private val syncStorage: SyncStorage
+    private val syncStorage: SyncStorage,
+    private val countryCodeResolver: ApiCountryCodeResolver
 ) : MedicamentRemoteSource {
 
-    override fun syncMedicaments(): Single<List<MedicamentNetworkResponse>> {
-        val touchedAfterMs = normalizeToMillis(syncStorage.lastMedicamentSync)
+    override fun syncMedicaments(): Single<MedicamentSyncResult> {
         val languageTag = ApiLocaleResolver.languageTag()
-        Log.i(
-            TAG,
-            "syncMedicaments: request /api/diary/medicaments " +
-                "touchedAfter=$touchedAfterMs " +
-                "languageTag=$languageTag " +
-                "locale=${Locale.getDefault().toLanguageTag()} " +
-                "country=${Locale.getDefault().country}"
-        )
+        val countryCode = countryCodeResolver.countryCode()
+        val touchedAfterMs = normalizeToMillis(
+            syncStorage.getLastMedicamentSync(countryCode, languageTag)
+        ) ?: DEFAULT_FIRST_SYNC_CURSOR
         return api.getMedicaments(
             touchedAfter = touchedAfterMs,
-            languageTag = languageTag
+            languageTag = languageTag,
+            countryCode = countryCode
         )
             .doOnSuccess { list ->
-                val preview = list.take(5).joinToString { it.name }
-                Log.i(TAG, "syncMedicaments: response size=${list.size} previewNames=$preview")
-                syncStorage.lastMedicamentSync = currentMillisUtc()
+                syncStorage.setLastMedicamentSync(countryCode, languageTag, currentMillisUtc())
             }
-            .doOnError { error ->
-                Log.e(TAG, "syncMedicaments: request failed", error)
+            .map { list ->
+                MedicamentSyncResult(
+                    medicaments = list,
+                    countryCode = countryCode,
+                    languageTag = languageTag
+                )
             }
     }
 
@@ -46,6 +43,6 @@ class MedicamentRemoteDataSource @Inject constructor(
     }
 
     private companion object {
-        const val TAG = "MedicamentApi"
+        const val DEFAULT_FIRST_SYNC_CURSOR = 0L
     }
 }
