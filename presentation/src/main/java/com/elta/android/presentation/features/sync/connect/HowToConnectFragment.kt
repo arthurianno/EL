@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
@@ -165,7 +166,10 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
             }
         }
         GetLocalProperties { dimens, _, colors, _, _ ->
-
+            AnimatedVisibility(
+                visible = state.isContentReady,
+                enter = fadeIn()
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -183,7 +187,9 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                         onClickAction = HowToConnectAction.OnConnectButtonClick
                     )
                 }
+            }
         }
+
     }
 
     @Composable
@@ -212,7 +218,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
         GetLocalProperties { _, _, _, _, types ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = viewModel.state.value.screenConfig?.title ?: stringResource(id = R.string.sync_how_to_connect_title),
+                    text = stringResource(id = R.string.sync_how_to_connect_title),
                     style = types.h1
                 )
                 HSpacerSmall()

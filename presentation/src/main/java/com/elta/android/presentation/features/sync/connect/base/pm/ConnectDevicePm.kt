@@ -583,14 +583,14 @@ abstract class ConnectDevicePm constructor(
         )
 
     private fun bindAnalytics() {
-        connectState.observable
-            .takeUntil { it == ViewState.SEARCH }
-            .timeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
-            .doOnError {
-                connectState.consumer.accept(ViewState.NOT_FOUND)
-            }
-            .subscribe()
-            .untilDestroy()
+//        connectState.observable
+//            .takeUntil { it == ViewState.SEARCH }
+//            .timeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
+//            .doOnError {
+//                connectState.consumer.accept(ViewState.NOT_FOUND)
+//            }
+//            .subscribe()
+//            .untilDestroy()
 
         connectState.observable
             .filter { it == ViewState.SYNC_COMPLETED }

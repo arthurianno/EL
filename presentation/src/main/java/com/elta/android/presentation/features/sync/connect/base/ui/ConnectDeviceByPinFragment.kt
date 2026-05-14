@@ -55,6 +55,9 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         RxPermissions(requireActivity())
     }
 
+    private var connectionStatusVisibility: Int? = null
+    private var syncStatusVisibility: Int? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -64,6 +67,19 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         with(binding.toolbar) {
             menuButtonView.hide()
         }
+        hideActivityStatusViews()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.root.post {
+            if (view != null) hideActivityStatusViews()
+        }
+    }
+
+    override fun onPause() {
+        restoreActivityStatusViews()
+        super.onPause()
     }
 
     override fun onBindPresentationModel(pm: T) {
@@ -218,6 +234,32 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         presentationModel.receivedLocationPermissionGrantedAction.consumer.accept(isGranted)
+    }
+
+    private fun hideActivityStatusViews() {
+        val connectionStatusView = requireActivity().findViewById<View>(R.id.connectionStatusView)
+        val syncStatusView = requireActivity().findViewById<View>(R.id.syncStatusView)
+
+        if (connectionStatusVisibility == null) {
+            connectionStatusVisibility = connectionStatusView?.visibility
+        }
+        if (syncStatusVisibility == null) {
+            syncStatusVisibility = syncStatusView?.visibility
+        }
+
+        connectionStatusView?.hide()
+        syncStatusView?.hide()
+    }
+
+    private fun restoreActivityStatusViews() {
+        val connectionStatusView = requireActivity().findViewById<View>(R.id.connectionStatusView)
+        val syncStatusView = requireActivity().findViewById<View>(R.id.syncStatusView)
+
+        connectionStatusVisibility?.let { connectionStatusView?.visibility = it }
+        syncStatusVisibility?.let { syncStatusView?.visibility = it }
+
+        connectionStatusVisibility = null
+        syncStatusVisibility = null
     }
 
     private fun ConnectDevicePm.ViewState.getId() =
