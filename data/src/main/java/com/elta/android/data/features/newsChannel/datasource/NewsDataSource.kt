@@ -8,6 +8,7 @@ import com.elta.android.domain.features.newsChannel.model.NewsFile
 import com.elta.android.domain.features.newsChannel.model.NewsImage
 import com.elta.android.domain.features.newsChannel.model.NewsListResponse
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import java.util.UUID
 import javax.inject.Inject
@@ -86,20 +87,27 @@ private fun NewsDto.toDomain(baseUrl: String): News {
     )
 }
 private fun String?.toEpochMilli(): Long {
-    if (this.isNullOrBlank()) {
+    val source = this?.trim()
+    if (source.isNullOrEmpty()) {
         return 0L // Или выбросить исключение, если это критично
     }
     return try {
         // Проверяем, является ли строка числом (Unix timestamp)
-        if (this.matches(Regex("\\d+\\.\\d+"))) {
-            val secondsPart = substringBefore(".").toLong()
-            val nanosPart = substringAfter(".", "0").padEnd(9, '0').toLong() / 1_000_000 // Наносекунды в миллисекунды
+        if (source.matches(Regex("\\d+\\.\\d+"))) {
+            val secondsPart = source.substringBefore(".").toLong()
+            val nanosPart = source.substringAfter(".", "0").padEnd(9, '0').toLong() / 1_000_000 // Наносекунды в миллисекунды
             secondsPart * 1000 + nanosPart
         } else {
-            // Предполагаем формат ISO-8601
-            LocalDateTime.parse(this).toInstant(ZoneOffset.UTC).toEpochMilli()
+            source.toIsoEpochMilli()
         }
     } catch (e: Exception) {
         0L // Или выбросить исключение, если это критично
     }
 }
+
+private fun String.toIsoEpochMilli(): Long =
+    try {
+        OffsetDateTime.parse(this).toInstant().toEpochMilli()
+    } catch (e: Exception) {
+        LocalDateTime.parse(this).toInstant(ZoneOffset.UTC).toEpochMilli()
+    }

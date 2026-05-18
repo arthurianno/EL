@@ -134,26 +134,30 @@ class EventsDataRepository @Inject constructor(
     override suspend fun addEventFromGlucometer(glucometerEvents: List<GlucometerEvent>) {
         val events = glucometerEvents.map { event ->
             val newEvent = eventsFromGlucometerMapper.mapFromObject(event)
-
-            // Проверяем, существует ли уже событие в базе
-            // Если да - сохраняем существующий meal tag (чтобы не перезаписывать ручные изменения)
             try {
                 val existingEventDto = cacheSource.getEventById(newEvent.id).await()
-                val existingMealTag = existingEventDto.data.mealTag
-                if (existingMealTag != null) {
-                    val existingEvent = existingEventDto.toDomain()
-                    Timber.d("📊 Preserving existing mealTag=${existingEvent.mealTag} for event ${newEvent.id}")
-                    newEvent.copy(mealTag = existingEvent.mealTag)
-                } else {
-                    newEvent
-                }
+                val existingEvent = existingEventDto.toDomain()
+                newEvent.copy(
+                    mealTag = existingEvent.mealTag ?: newEvent.mealTag,
+                    note = existingEvent.note,
+                    tagId = existingEvent.tagId,
+                    tag = existingEvent.tag,
+                    activityType = existingEvent.activityType,
+                    insulinMedicament = existingEvent.insulinMedicament,
+                    medicament = existingEvent.medicament,
+                    tabletsNumber = existingEvent.tabletsNumber,
+                    dishes = existingEvent.dishes,
+                    duration = existingEvent.duration,
+                    modificationTime = existingEvent.modificationTime,
+                    state = existingEvent.state
+                )
             } catch (e: Exception) {
-                // Событие не найдено - используем новое
                 newEvent
             }
         }
         addEventsSuspend(events)
     }
+
 
     override fun updateEvent(event: EventV2): Completable =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }
