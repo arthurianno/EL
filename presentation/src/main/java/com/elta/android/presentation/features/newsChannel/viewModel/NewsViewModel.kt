@@ -271,15 +271,14 @@ class NewsViewModel @Inject constructor(
                     reduceState { state.value.copy(connectState = ConnectState.Connect) }
                     val response = loadNewsMessages(cursor = cursor, limit = LIMIT, direction = "DESC")
                     Log.d("NewsViewModel", "Response: news=${response.news.size}, hasNextPage=${response.hasNextPage}, endCursor=${response.endCursor}")
+                    hasMoreMessages = response.hasNextPage
+                    currentCursor = response.endCursor
                     if (response.news.isNotEmpty()) {
                         val newMessages = response.news.toUi()  // Без .filter { !state.value.chat.messages.any { it.id == newMessage.id } }
                         allMessagesUi.addAll(newMessages)
-                        hasMoreMessages = response.hasNextPage
-                        currentCursor = response.endCursor
                         Log.d("NewsViewModel", "New messages added: ${newMessages.size}, hasMoreMessages=$hasMoreMessages, currentCursor=$currentCursor")
                     } else {
-                        hasMoreMessages = false
-                        Log.d("NewsViewModel", "No new messages, setting hasMoreMessages=false")
+                        Log.d("NewsViewModel", "No new messages in this page, hasMoreMessages=$hasMoreMessages, currentCursor=$currentCursor")
                     }
                 }
 
@@ -390,6 +389,15 @@ class NewsViewModel @Inject constructor(
                                 Toast.LENGTH_LONG
                             ).show()
                         }
+                    }
+                    return
+                }
+                if (isLoadingNextPage) {
+                    Log.d("NewsViewModel", "Swipe refresh skipped because loading is already in progress")
+                    viewModelScope.launch {
+                        reduceState { state.value.copy(isSwipeRefreshing = true) }
+                        delay(600)
+                        reduceState { state.value.copy(isSwipeRefreshing = false) }
                     }
                     return
                 }
