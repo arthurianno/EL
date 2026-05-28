@@ -81,7 +81,7 @@ class ChooserOptionsItemsBuilder @Inject constructor(
         val meta = source.meta as Tag
         return ChooserItem(
             id = source.id,
-            title = meta.name,
+            title = meta.toName(resourceProvider),
             iconId = meta.toIcon(),
             meta = meta
         )

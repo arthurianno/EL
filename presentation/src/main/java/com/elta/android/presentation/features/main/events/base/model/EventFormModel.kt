@@ -26,7 +26,7 @@ data class EventFormModel(
         get() = if (eventType !is EventType.Bread || inputValue == null) null else inputValue?.toStringFormat()
 
     val name: String?
-        get() = if (eventType == EventType.Medicaments) {
+        get() = if (eventType == EventType.Medicaments || eventType == EventType.Insulin) {
             if (additionalValue.isNullOrBlank()) null else additionalValue
         } else {
             inputValue?.toStringFormat()

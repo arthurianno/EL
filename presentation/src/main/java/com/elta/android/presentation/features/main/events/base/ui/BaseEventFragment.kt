@@ -7,6 +7,7 @@ import android.view.MotionEvent
 import android.view.View
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.MealTag
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
@@ -16,10 +17,13 @@ import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentEventFormBinding
+import com.elta.android.presentation.features.language.model.AppRegion
+import com.elta.android.presentation.features.language.model.isProductDatabaseSupported
 import com.elta.android.presentation.features.main.events.base.initializer.FormInitializer
 import com.elta.android.presentation.features.main.events.base.initializer.ManualGlucoseFormInitializer
 import com.elta.android.presentation.features.main.events.base.initializer.makeFormInitializer
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
+import com.elta.android.presentation.utils.LocaleHelper
 import com.elta.android.presentation.utils.OnApplyBottomWindowInsetsListener
 import com.elta.android.presentation.utils.WindowBottomInsetsForViewListenerFactory.instance
 import com.elta.android.presentation.utils.appbar.collapseProgress
@@ -37,6 +41,7 @@ import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.addTo
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.bindTo
@@ -87,6 +92,14 @@ abstract class BaseEventFragment<T : BaseEventPm> :
             }
         }
         initializer.init(view)
+
+        if (getEventType() is EventType.Bread) {
+            val regionCode = LocaleHelper.getRegion(requireContext())
+            val region = AppRegion.fromCode(regionCode)
+            if (!region.isProductDatabaseSupported) {
+                binding.formVariantSelectorView.hide()
+            }
+        }
     }
 
     override fun onBindPresentationModel(pm: T) {
@@ -234,7 +247,6 @@ abstract class BaseEventFragment<T : BaseEventPm> :
                             formVariantSelectorView.hint = medicament.name
                             formVariantSelectorView.iconText = medicament.name
 
-
                             if (medicament.isOther) {
                                 medicamentModel.otherName?.let { additionalInput.setText(it) }
                                 additionalInput.show()
@@ -249,8 +261,32 @@ abstract class BaseEventFragment<T : BaseEventPm> :
                         }
                     }
                 }
+                .addTo(compositeUnbind) // Используем addTo(compositeUnbind) для UI-слоя
+        }
+        else if (pm.eventTypeState.valueOrNull is EventType.Insulin) {
+            pm.formSelector.option.observable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { option ->
+                    val insulinMedicament = option.meta as? InsulinMedicament
+                    with(binding) {
+                        if (insulinMedicament != null) {
+                            if (insulinMedicament.isOther) {
+                                additionalInput.setHint(R.string.events_creation_hint_name_insulin)
+                                additionalInput.show()
+                            } else {
+                                additionalInput.setText("")
+                                additionalInput.hide()
+                            }
+                        } else {
+                            additionalInput.hide()
+                        }
+                    }
+                }
+                .addTo(compositeUnbind) // Используем addTo(compositeUnbind) для UI-слоя
         }
     }
+
+
 
     private fun observeFoodChanges(pm: T) {
         if (pm.eventTypeState.valueOrNull is EventType.Bread) {

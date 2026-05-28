@@ -267,6 +267,17 @@
     <string name="main_records_glucose_plasma">Уровень глюкозы в плазме крови</string>
     <string name="main_records_glucose_capillary">Уровень глюкозы в цельной капиллярной крови</string>
 
+    <!-- TAGS LOCALIZATION -->
+    <string name="tag_breakfast">Завтрак</string>
+    <string name="tag_lunch">Обед</string>
+    <string name="tag_snack">Перекус</string>
+    <string name="tag_dinner">Ужин</string>
+    <string name="tag_work">Работа</string>
+    <string name="tag_leisure">Отдых</string>
+    <string name="tag_training">Тренировка</string>
+    <string name="tag_night">Ночь</string>
+    <string name="tag_specialevent">Особое событие</string>
+
 
     <!-- EVENTS -->
     <string name="events_options_chooser_title_tags">Метка для группировки</string>
@@ -282,6 +293,7 @@
     <string name="events_creation_hint_tags">Метка для группировки</string>
     <string name="events_creation_hint_activities">Вид активности</string>
     <string name="events_creation_hint_insulin">Тип инсулина *</string>
+    <string name="events_creation_hint_name_insulin">Название инсулина <font color='#FF505D'>*</font></string>
     <string name="events_creation_hint_note">Добавить заметку</string>
     <string name="events_creation_save_button">Сохранить</string>
     <string name="events_creation_save_record_button">Сохранить запись</string>

@@ -11,6 +11,7 @@ import com.elta.android.presentation.databinding.FragmentAuthPasswordRecoveryBin
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
 import com.elta.android.presentation.utils.applyStatusBarInsetsPadding
 import com.elta.android.presentation.utils.error
+import com.elta.android.presentation.utils.isKeyboardOpen
 import com.jakewharton.rxbinding2.view.clicks
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
@@ -26,8 +27,26 @@ class AuthPasswordRecoveryFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.root.applyStatusBarInsetsPadding(applyNavigationBarInset = true)
+        binding.root.applyStatusBarInsetsPadding(
+            onApplyInsets = ::clearFocusesFromInputs,
+            applyNavigationBarInset = true,
+            applyImeInset = true
+        )
         binding.toolbar.homeButtonView.setImageResource(R.drawable.ic_dialog_close)
+    }
+
+
+
+    private fun clearFocusesFromInputs(view: View) {
+        if (!requireActivity().isKeyboardOpen(view)) {
+            binding.emailInputView.clearFocus()
+
+        }else {
+            binding.scrollView4.postDelayed({
+                binding.scrollView4.fullScroll(View.FOCUS_DOWN)
+            }, 150)
+        }
+
     }
 
     override fun onBindPresentationModel(pm: AuthPasswordRecoveryPm) {

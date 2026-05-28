@@ -37,3 +37,9 @@ enum class AppRegion(
     }
 }
 
+val AppRegion.isProductDatabaseSupported: Boolean
+    get() = this == AppRegion.RUSSIA ||
+            this == AppRegion.KAZAKHSTAN ||
+            this == AppRegion.UZBEKISTAN ||
+            this == AppRegion.BELARUS
+

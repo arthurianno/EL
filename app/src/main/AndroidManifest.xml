@@ -121,7 +121,7 @@
         </receiver>
 
         <!-- Glucose Widget Small -->
-        <receiver
+        <!-- <receiver
             android:name=".presentation.features.glucose.widget.ui.GlucoseSmallAppWidgetReceiver"
             android:exported="true"
             tools:ignore="Instantiatable"
@@ -133,10 +133,10 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/glucose_widget_small_info" />
-        </receiver>
+        </receiver> -->
 
         <!-- Glucose Widget Medium -->
-        <receiver
+        <!-- <receiver
             android:name=".presentation.features.glucose.widget.ui.GlucoseMediumAppWidgetReceiver"
             android:exported="true"
             tools:ignore="Instantiatable"
@@ -148,10 +148,10 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/glucose_widget_medium_info" />
-        </receiver>
+        </receiver> -->
 
         <!-- Glucose Widget Large -->
-        <receiver
+        <!-- <receiver
             android:name=".presentation.features.glucose.widget.ui.GlucoseLargeAppWidgetReceiver"
             android:exported="true"
             tools:ignore="Instantiatable"
@@ -163,10 +163,10 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/glucose_widget_large_info" />
-        </receiver>
+        </receiver> -->
 
         <!-- Glucose Widget Boot Receiver -->
-        <receiver
+        <!-- <receiver
             android:name=".presentation.features.glucose.widget.receiver.GlucoseWidgetBootReceiver"
             android:exported="true"
             android:directBootAware="true"
@@ -176,7 +176,7 @@
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
-        </receiver>
+        </receiver> -->
 
         <!-- Huawei App ID -->
         <meta-data

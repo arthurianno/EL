@@ -44,19 +44,23 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> :
             continueButtonView.setText(continueButtonText)
             authTitleView.setText(authTitleText)
             authSubtitleView.setText(authSubtitleText)
-//            scrollView.setOnTouchListener { view, event ->
-//                requireActivity().lostFocusOnClickOutside<MaterialEditText>(event, binding.root)
-//            }
-//            frameView.setOnTouchListener { view, event ->
-//                requireActivity().lostFocusOnClickOutside<MaterialEditText>(event, binding.root)
-//            }
         }
     }
 
     private fun clearFocusesFromInputs(view: View) {
         if (!requireActivity().isKeyboardOpen(view)) {
+            // Код для случая, когда клавиатура ЗАКРЫЛАСЬ:
             binding.emailInputView.clearFocus()
             binding.passwordInputView.clearFocus()
+        } else {
+            // НОВЫЙ КОД для случая, когда клавиатура ОТКРЫЛАСЬ:
+            binding.scrollView.postDelayed({
+                // Вариант А: Скролл до самого низа (чтобы увидеть пароль и чекбокс)
+                binding.scrollView.fullScroll(View.FOCUS_DOWN)
+
+                // Вариант Б (альтернатива): Точный скролл к верхней границе пароля
+                // binding.scrollView.smoothScrollTo(0, binding.passwordFrameLayout.top)
+            }, 150) // Небольшая задержка, чтобы клавиатура успела выехать
         }
     }
 

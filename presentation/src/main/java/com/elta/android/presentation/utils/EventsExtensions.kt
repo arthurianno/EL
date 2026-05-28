@@ -77,7 +77,18 @@ fun Tag?.toIcon(): Int =
 fun Tag?.toName(resources: ResourceProvider): String =
     when (this) {
         null -> resources.getString(R.string.tag_name_no_tag)
-        else -> name
+        else -> {
+            val resId = try {
+                image.toNameRes()
+            } catch (e: Exception) {
+                0
+            }
+            if (resId != 0) {
+                resources.getString(resId)
+            } else {
+                name // Фоллбек на имя с сервера (русское)
+            }
+        }
     }
 
 @DrawableRes
@@ -93,6 +104,21 @@ fun TagImage.toIcon(): Int =
         TagImage.NIGHT -> R.drawable.ic_tag_night
         TagImage.SPECIALEVENT -> R.drawable.ic_tag_specialevent
     }
+
+fun TagImage.toNameRes(): Int =
+    when (this) {
+        TagImage.BREAKFAST -> R.string.tag_breakfast
+        TagImage.LUNCH -> R.string.tag_lunch
+        TagImage.SNACK -> R.string.tag_snack
+        TagImage.DINNER -> R.string.tag_dinner
+        TagImage.WORK -> R.string.tag_work
+        TagImage.LEISURE -> R.string.tag_leisure
+        TagImage.TRAINING -> R.string.tag_training
+        TagImage.NIGHT -> R.string.tag_night
+        TagImage.SPECIALEVENT -> R.string.tag_specialevent
+    }
+
+
 
 @StringRes
 fun ActivityType.toName(): Int =

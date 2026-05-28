@@ -42,9 +42,10 @@ fun EventV2.getFormInputText(): String? =
 
 fun EventV2.getFormAdditionalText(): String? =
     when (type) {
-        EventType.Medicaments -> name
+        EventType.Medicaments, EventType.Insulin -> name
         else -> null
     }
+
 
 fun EventV2.getTag(res: ResourceProvider): SelectorOption? {
     if (tag == null) return null

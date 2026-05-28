@@ -131,7 +131,7 @@ class ProfileSettingsItemsBuilder @Inject constructor(
                         icon = R.drawable.ic_app_info,
                         title = resources.getString(
                             R.string.profile_app_version,
-                            BuildConfig.APP_VERSION
+                            BuildConfig.CLEAN_VERSION
                         ),
                         type = ProfileSettingsItem.Type.APP_VERSION
                     )

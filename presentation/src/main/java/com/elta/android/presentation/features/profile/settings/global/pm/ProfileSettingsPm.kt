@@ -188,6 +188,7 @@ class ProfileSettingsPm @Inject constructor(
                     Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
                     Type.EMIAS_ACCOUNT -> handleEmiasStatus()
                     Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
+
                     Type.LANGUAGE -> {
                         if (BuildConfig.SHOW_LANGUAGE_SELECTION) {
                             router.navigateTo(Screens.LanguageSelection(isFirstLaunch = false))
@@ -197,7 +198,6 @@ class ProfileSettingsPm @Inject constructor(
                     Type.DELETE_PROFILE -> deleteProfile()
                     Type.TOKEN -> copyToken()
                     Type.BIRTH_DATE, Type.BIRTH_DATE_PLACEHOLDER -> showDataPicker()
-
                     Type.APP_VERSION, Type.EMAIL -> {}
                 }
             }

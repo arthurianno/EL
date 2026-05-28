@@ -156,7 +156,8 @@ class EventCreationPm @Inject constructor(
 
             EventType.Insulin -> {
                 eventFormModel.meta != selectorInsulinState.valueOrNull?.meta ||
-                        eventFormModel.pickerValue != ZERO_PICKER_VALUE
+                        eventFormModel.pickerValue != ZERO_PICKER_VALUE ||
+                        !eventFormModel.additionalValue.isNullOrEmpty()
             }
 
             EventType.Medicaments -> {

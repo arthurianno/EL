@@ -16,7 +16,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         vectorDrawables.useSupportLibrary = true
-        buildConfigField("boolean", "SHOW_LANGUAGE_SELECTION", "false")
+        buildConfigField("boolean", "SHOW_LANGUAGE_SELECTION", "true")
     }
 
     compileOptions {
@@ -51,7 +51,7 @@ android {
             buildConfigField("String", "BUILD_TYPE", "\"${version.buildType}\"")
             buildConfigField("String", "HOTFIX_VERSION", "\"${version.hotfixVersion}\"")
             // Fix 6: explicit false so intent is clear and searching the codebase is unambiguous.
-            buildConfigField("boolean", "SHOW_LANGUAGE_SELECTION", "false")
+            buildConfigField("boolean", "SHOW_LANGUAGE_SELECTION", "true")
         }
         debug {
             val debugVersionName = "\"${version.versionName}-debug(${version.buildNumber})\""
@@ -74,7 +74,7 @@ android {
             buildConfigField("String", "BUILD_TYPE", "\"${version.buildType}\"")
             buildConfigField("String", "HOTFIX_VERSION", "\"${version.hotfixVersion}\"")
             // Fix 6: explicit false so intent is clear and searching the codebase is unambiguous.
-            buildConfigField("boolean", "SHOW_LANGUAGE_SELECTION", "false")
+            buildConfigField("boolean", "SHOW_LANGUAGE_SELECTION", "true")
         }
     }
     namespace = "com.elta.android.presentation"

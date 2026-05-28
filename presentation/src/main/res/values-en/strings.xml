@@ -139,6 +139,17 @@
     <string name="event_type_insulin">Insulin</string>
     <string name="event_type_medicaments">Medications</string>
 
+    <!-- TAGS LOCALIZATION -->
+    <string name="tag_breakfast">Breakfast</string>
+    <string name="tag_lunch">Lunch</string>
+    <string name="tag_snack">Snack</string>
+    <string name="tag_dinner">Dinner</string>
+    <string name="tag_work">Work</string>
+    <string name="tag_leisure">Leisure</string>
+    <string name="tag_training">Training</string>
+    <string name="tag_night">Night</string>
+    <string name="tag_specialevent">Special Event</string>
+
     <!-- INSULIN TYPES -->
     <string name="insulin_type_short_ultrashort">Short-acting</string>
     <string name="insulin_type_prolong">Long-acting</string>

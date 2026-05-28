@@ -73,7 +73,12 @@ class MedicamentDataRepository @Inject constructor(
         val countryCode = countryCodeResolver.countryCode()
         val languageTag = ApiLocaleResolver.languageTag()
         return medicamentCacheSource.getMedicaments(countryCode, languageTag)
-            .map { it.toDomain() }
+            .map { list ->
+                list.toDomain().sortedWith(
+                    compareBy<Medicament> { it.isOther }
+                        .thenBy { it.name.lowercase() }
+                )
+            }
             .flowOn(dispatcher)
     }
 

@@ -39,15 +39,11 @@ class LanguageSelectionFragment :
         arguments?.getBoolean(EXTRA_IS_FIRST_LAUNCH, false) == true
     }
 
-    /** Список регионов, отображаемых на данном экране */
     private val regions: List<AppRegion> by lazy {
         if (isFirstLaunch) AppRegion.firstLaunchRegions() else AppRegion.settingsRegions()
     }
 
-    /** Флаг, подавляющий срабатывание onItemSelected при программной установке выбора */
     private var suppressSpinnerCallback = false
-
-    /** Игнорируем первый auto-callback Spinner после установки adapter */
     private var ignoreInitialSpinnerSelection = true
 
     override fun onAttach(context: Context) {
