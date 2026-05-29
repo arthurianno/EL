@@ -55,12 +55,9 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> :
         } else {
             // НОВЫЙ КОД для случая, когда клавиатура ОТКРЫЛАСЬ:
             binding.scrollView.postDelayed({
-                // Вариант А: Скролл до самого низа (чтобы увидеть пароль и чекбокс)
-                binding.scrollView.fullScroll(View.FOCUS_DOWN)
-
-                // Вариант Б (альтернатива): Точный скролл к верхней границе пароля
-                // binding.scrollView.smoothScrollTo(0, binding.passwordFrameLayout.top)
-            }, 150) // Небольшая задержка, чтобы клавиатура успела выехать
+                // Вместо кражи фокуса через fullScroll, скроллим безопасно:
+                binding.scrollView.smoothScrollTo(0, binding.passwordFrameLayout.top)
+            }, 150)
         }
     }
 

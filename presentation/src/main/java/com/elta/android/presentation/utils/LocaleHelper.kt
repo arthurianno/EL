@@ -17,7 +17,7 @@ object LocaleHelper {
     private const val LANGUAGE_RU = "ru"
     private const val LANGUAGE_EN = "en"
     private const val DEFAULT_REGION = "RU"
-    private const val TAG = "LangFlow"
+    private const val TAG = "≠"
 
     fun setLocale(context: Context, languageCode: String): Context {
         val normalizedLanguageCode = resolveLanguageForBuild(languageCode)
@@ -125,9 +125,31 @@ object LocaleHelper {
 
     fun getRegion(context: Context): String {
         val prefs = context.getSharedPreferences(PREF_LANGUAGE, Context.MODE_PRIVATE)
-        val saved = prefs.getString(KEY_REGION, DEFAULT_REGION) ?: DEFAULT_REGION
-        Log.i(TAG, "LocaleHelper.getRegion(saved=$saved)")
-        return saved
+        val saved = prefs.getString(KEY_REGION, null)
+        if (saved != null) {
+            Log.i(TAG, "LocaleHelper.getRegion(saved=$saved)")
+            return saved
+        }
+
+        // Берем код региона из оригинальной конфигурации системы Android
+        val systemCountry = getSystemCountry().takeIf { it.isNotEmpty() } ?: DEFAULT_REGION
+        Log.i(TAG, "LocaleHelper.getRegion(systemCountry=$systemCountry)")
+        return systemCountry
+    }
+
+    private fun getSystemCountry(): String {
+        val systemLocale = runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                android.content.res.Resources.getSystem().configuration.locales[0]
+            } else {
+                @Suppress("DEPRECATION")
+                android.content.res.Resources.getSystem().configuration.locale
+            }
+        }.getOrNull()
+
+        val country = systemLocale?.country?.uppercase(Locale.ROOT) ?: ""
+        Log.i(TAG, "LocaleHelper.getSystemCountry(raw=${systemLocale?.country}, resolved=$country)")
+        return country
     }
 
     // Fix 4: updateAppResourcesIfAvailable is called ONCE after configuration is fully set up,
@@ -177,7 +199,7 @@ object LocaleHelper {
         resources.updateConfiguration(configuration, resources.displayMetrics)
     }
 
-    // Fix 3: side-effect extracted from getLanguage() into this method, called explicitly in onAttach().
+    // Fix 3: side effect extracted from getLanguage() into this method, called explicitly in onAttach().
     private fun ensureLanguageConsistency(context: Context) {
         if (!BuildConfig.SHOW_LANGUAGE_SELECTION) {
             val prefs = context.getSharedPreferences(PREF_LANGUAGE, Context.MODE_PRIVATE)
@@ -190,7 +212,7 @@ object LocaleHelper {
     }
 
     fun onAttach(context: Context): Context {
-        ensureLanguageConsistency(context) // Fix 3: side-effect here, not inside getLanguage()
+        ensureLanguageConsistency(context) // Fix 3: side effect here, not inside getLanguage()
         val lang = getLanguage(context)
         Log.i(TAG, "LocaleHelper.onAttach(lang=$lang)")
         return updateResources(context, lang)
