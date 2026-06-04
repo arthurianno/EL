@@ -151,6 +151,7 @@
     <string name="tag_specialevent">Special Event</string>
 
     <!-- INSULIN TYPES -->
+    <string name="insulin_type_all">All</string>
     <string name="insulin_type_short_ultrashort">Short-acting</string>
     <string name="insulin_type_prolong">Long-acting</string>
     <string name="insulin_type_mixed">Mixed</string>
@@ -165,6 +166,7 @@
     <string name="event_type_insulin_pattern">%s U</string>
     <string name="event_type_insulin_medicament">\u0020(%s)</string>
     <string name="event_type_medicament_pattern">%s tabs/ml</string>
+    <string name="medicament_measure_suffix">\u0020tabs/ml</string>
     <string name="event_type_weight_pattern">%s kg</string>
     <string name="event_type_activity_pattern_full">%1$s h %2$s min</string>
     <string name="event_type_activity_pattern_short">%1$s min</string>

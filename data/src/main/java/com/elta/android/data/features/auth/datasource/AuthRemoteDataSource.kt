@@ -12,6 +12,7 @@ import com.elta.android.data.features.auth.model.ResetPasswordNetworkRequest
 import com.elta.android.data.features.auth.model.TokenNetworkRequest
 import com.elta.android.data.features.auth.model.TokenOwnerNetworkResponse
 import com.elta.android.data.features.auth.model.TokensNetworkResponse
+import com.elta.android.data.features.common.network.ApiLocaleResolver
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
@@ -46,7 +47,12 @@ class AuthRemoteDataSource @Inject constructor(
         api.sendConfirmationLink()
 
     override fun sendResetPasswordLink(email: String): Completable =
-        api.sendPasswordResetLink(ResetPasswordLinkNetworkRequest(email))
+        api.sendPasswordResetLink(
+            ResetPasswordLinkNetworkRequest(
+                email = email,
+                languageTag = ApiLocaleResolver.languageTag()
+            )
+        )
 
     override fun resetPassword(token: String, newPassword: String): Completable =
         api.resetPassword(ResetPasswordNetworkRequest(token, newPassword))

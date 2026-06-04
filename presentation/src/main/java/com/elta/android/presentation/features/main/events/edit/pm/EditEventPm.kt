@@ -21,7 +21,6 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
-import com.elta.android.presentation.features.main.events.base.initializer.MEDICAMENT_MEASURE_SUFFIX
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.base.model.MedicamentModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
@@ -94,7 +93,7 @@ class EditEventPm @Inject constructor(
                 this.eventType = eventType
                 this.pickerValue = pickerValue
                 this.inputValue =
-                    inputValue.removeSuffix(MEDICAMENT_MEASURE_SUFFIX).toDoubleFormat()
+                    inputValue.removeSuffix(medicamentMeasureSuffix).toDoubleFormat()
                 this.additionalValue = additionalValue
                 this.tag = tag.meta as? Tag
                 this.isDateChanged = this.date.isDateChanged(date)

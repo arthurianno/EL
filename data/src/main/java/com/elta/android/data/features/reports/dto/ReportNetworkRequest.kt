@@ -6,5 +6,6 @@ data class ReportNetworkRequest(
     @SerializedName("startPeriod") val startDate: String,
     @SerializedName("endPeriod") val endDate: String,
     @SerializedName("glucose_format") val glucoseFormat: String,
-    @SerializedName("languageTag") val languageTag: String
+    @SerializedName("languageTag") val languageTag: String,
+    @SerializedName("locale") val locale: String
 )

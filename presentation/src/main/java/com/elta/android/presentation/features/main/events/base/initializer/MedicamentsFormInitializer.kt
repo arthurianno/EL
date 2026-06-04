@@ -39,9 +39,12 @@ object MedicamentsFormInitializer : FormInitializer() {
         )
         formVariantSelectorView.hint = spannable
 
+        val suffix = resources.getString(R.string.medicament_measure_suffix)
+        val format = "[099]{,}[0]$suffix"
+        val affineFormat = "[099]$suffix"
         val mask = MaskedTextChangedListener(
-            primaryFormat = FORMAT,
-            affineFormats = listOf(AFFINE_FORMAT),
+            primaryFormat = format,
+            affineFormats = listOf(affineFormat),
             field = formInputView,
             autocomplete = false
         )
@@ -57,7 +60,3 @@ object MedicamentsFormInitializer : FormInitializer() {
     }
 
 }
-
-const val MEDICAMENT_MEASURE_SUFFIX = " табл/мл"
-private const val FORMAT = "[099]{,}[0]$MEDICAMENT_MEASURE_SUFFIX"
-private const val AFFINE_FORMAT = "[099]$MEDICAMENT_MEASURE_SUFFIX"

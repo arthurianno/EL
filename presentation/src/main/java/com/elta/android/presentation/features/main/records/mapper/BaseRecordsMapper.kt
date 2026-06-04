@@ -14,6 +14,7 @@ import com.elta.android.presentation.utils.toEventDescriptionText
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toIconWithBg
 import com.elta.android.presentation.utils.toName
+import com.elta.android.presentation.features.main.events.extensions.getLocalizedName
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
 import java.util.UUID
@@ -146,7 +147,7 @@ open class BaseRecordsMapper(
 
     private fun EventV2.toTitle(): String =
         when (type) {
-            EventType.Insulin -> insulinMedicament?.insulinType?.name.orEmpty()
+            EventType.Insulin -> insulinMedicament?.insulinType?.getLocalizedName(resources).orEmpty()
             EventType.Activity -> activityType?.let { resources.getString(it.toName()) }
                 ?: resources.getString(R.string.event_type_activity_no_name)
 

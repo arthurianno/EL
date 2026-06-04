@@ -21,7 +21,6 @@ import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventPara
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.features.main.events.base.initializer.MEDICAMENT_MEASURE_SUFFIX
 import com.elta.android.presentation.features.main.events.base.initializer.WeightFormInitializer
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.base.model.MedicamentModel
@@ -123,7 +122,7 @@ class EventCreationPm @Inject constructor(
                 this.eventType = eventType
                 this.pickerValue = pickerValue
                 this.inputValue =
-                    inputValue.removeSuffix(MEDICAMENT_MEASURE_SUFFIX).toDoubleFormat()
+                    inputValue.removeSuffix(medicamentMeasureSuffix).toDoubleFormat()
                 this.additionalValue = additionalValue
                 this.tag = tag.meta as? Tag
                 this.isDateChanged = this.date.isDateChanged(date)

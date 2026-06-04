@@ -77,7 +77,8 @@ class ReportsRemoteDataSource @Inject constructor(
                 startDate = startDate,
                 endDate = endDate,
                 glucoseFormat = glucoseFormat,
-                languageTag = languageTag
+                languageTag = languageTag,
+                locale = languageTag
             )
         ).flatMap { tokenDto ->
             reportsApi.downloadReport(tokenDto.token)

@@ -27,7 +27,6 @@ import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.calcutator.mappers.ZERO_COUNT_DOUBLE
-import com.elta.android.presentation.features.main.events.base.initializer.MEDICAMENT_MEASURE_SUFFIX
 import com.elta.android.presentation.features.main.events.base.mapper.toChooserInsulin
 import com.elta.android.presentation.features.main.events.base.mapper.toChooserMedicament
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
@@ -93,6 +92,8 @@ abstract class BaseEventPm(
     private val calculatorFlowState = state<CalculatorFlow>()
     protected val formPickerValue = state<Double>()
     protected val selectedDateState = state(ZonedDateTime.now())
+    protected val medicamentMeasureSuffix: String
+        get() = resources.getString(R.string.medicament_measure_suffix)
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
     private val breadUnitsChangeNotifyDialogData: DialogData by lazy {
         Dialogs.ChangeBreadUnitsData(resources)
@@ -393,8 +394,8 @@ abstract class BaseEventPm(
                 val textInField = formInput.text.valueOrNull.orEmpty()
 
                 val text = when {
-                    focus && textInField.isNotBlank() -> textInField.removeSuffix(MEDICAMENT_MEASURE_SUFFIX)
-                    !textInField.contains(MEDICAMENT_MEASURE_SUFFIX) -> textInField + MEDICAMENT_MEASURE_SUFFIX
+                    focus && textInField.isNotBlank() -> textInField.removeSuffix(medicamentMeasureSuffix)
+                    !textInField.contains(medicamentMeasureSuffix) -> textInField + medicamentMeasureSuffix
                     else -> textInField
                 }
                 formInput.text.consumer.accept(text)
