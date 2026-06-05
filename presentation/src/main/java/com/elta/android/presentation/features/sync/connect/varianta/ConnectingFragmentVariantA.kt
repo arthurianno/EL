@@ -196,6 +196,7 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
                 VSpacerSmall()
                 Text(
                     text = stringResource(id = R.string.sync_state_subtitle_sync_completed),
+                    style = types.body1,
                     color = colors.shadeBlack0
                 )
                 VSpacerSmall()
@@ -225,6 +226,7 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
                 VSpacerSmall()
                 Text(
                     text = stringResource(id = R.string.sync_connected_text, glucometerName),
+                    style = types.body1,
                     color = colors.shadeBlack0
                 )
                 VSpacerSmall()
@@ -244,6 +246,7 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
                 VSpacerSmall()
                 Text(
                     text = stringResource(id = R.string.sync_connection_error_text),
+                    style = types.body1,
                     color = colors.shadeBlack0
                 )
                 VSpacerSmall()
@@ -266,6 +269,7 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
                 VSpacerSmall()
                 Text(
                     text = stringResource(id = R.string.sync_connection_error_text),
+                    style = types.body1,
                     color = colors.shadeBlack0
                 )
                 VSpacerSmall()
@@ -288,6 +292,7 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
                 VSpacerSmall()
                 Text(
                     text = stringResource(id = R.string.profile_device_search_not_found_connect_title),
+                    style = types.body1,
                     color = colors.shadeBlack0
                 )
                 VSpacer(height = dimens.halfMediumDim)
@@ -325,6 +330,7 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
                 VSpacerSmall()
                 Text(
                     text = stringResource(id = R.string.sync_connection_screen_text),
+                    style = types.body1,
                     color = colors.shadeBlack0
                 )
             }

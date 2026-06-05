@@ -84,14 +84,6 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
                         state.value.screenConfig?.title
                             ?: stringResource(id = R.string.sync_connect_start_title)
                     )
-
-//                    // ВЫПАДАЮЩИЙ СПИСОК ЗДЕСЬ
-//                    Box(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = dimens.contentPadding)
-//                            .padding(vertical = dimens.smallDim)
-//                    ) {
 //                        OutlinedButton(
 //                            onClick = { expanded = true },
 //                            modifier = Modifier.fillMaxWidth(),
@@ -141,9 +133,10 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
 
     @Composable
     private fun Body(body : String) {
-        GetLocalProperties { dimens, _, colors, _, _ ->
+        GetLocalProperties { dimens, _, colors, _, types ->
             Text(
                 text = body,
+                style = types.body1,
                 color = colors.shadeBlack0,
                 modifier = Modifier.padding(horizontal = dimens.contentPadding)
             )

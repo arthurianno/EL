@@ -15,15 +15,17 @@ internal fun TextNumericItem(
     @StringRes number: Int,
     @StringRes text: Int
 ) {
-    GetLocalProperties { _, _, colors, _, _ ->
+    GetLocalProperties { _, _, colors, _, types ->
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(id = number),
+                style = types.body1,
                 color = colors.shadeBlack0
             )
             HSpacerVerySmall()
             Text(
                 text = stringResource(id = text),
+                style = types.body1,
                 color = colors.shadeBlack0,
             )
         }
