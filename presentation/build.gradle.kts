@@ -122,6 +122,7 @@ dependencies {
     implementation(Dependencies.Jetpack.Compose.viewModel)
 
     implementation(Dependencies.Jetpack.core)
+    implementation(Dependencies.Jetpack.splashScreen)
     implementation(Dependencies.Jetpack.fragment)
     implementation(Dependencies.Google.materialDesign)
     implementation(Dependencies.Google.Services.fitness)

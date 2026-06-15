@@ -40,3 +40,12 @@ detekt {
     config = files("${project.projectDir}/detekt-config/config.yml")
     baseline = file("${project.projectDir}/detekt-config/baseline.xml")
 }
+
+subprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
+}
+

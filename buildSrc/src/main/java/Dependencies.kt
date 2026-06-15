@@ -92,6 +92,7 @@ object Dependencies {
                 const val bomManifest = "androidx.compose.ui:ui-test-manifest"
             }
         }
+        const val splashScreen = "androidx.core:core-splashscreen:1.0.1"
     }
 
     object Utils {

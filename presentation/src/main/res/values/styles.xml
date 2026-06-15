@@ -167,10 +167,11 @@
     </style>
 
 
-<!--    <style name="SplashTheme" parent="AppTheme">-->
-<!--        <item name="android:windowBackground">@drawable/splash_background</item>-->
-<!--        <item name="android:windowNoTitle">true</item>-->
-<!--        <item name="android:windowFullscreen">false</item>-->
-<!--    </style>-->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/colorPrimary</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenAnimationDuration">200</item>
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
+    </style>
 
 </resources>

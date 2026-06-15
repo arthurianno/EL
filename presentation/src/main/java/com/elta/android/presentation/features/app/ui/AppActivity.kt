@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
@@ -54,18 +55,17 @@ class AppActivity : BaseActivity<AppPm>() {
     private val connectionStatusView by lazy {
         findViewById<TwoStateStatusView>(R.id.connectionStatusView)
     }
-    private val splashOverlay by lazy {
-        findViewById<FrameLayout>(R.id.splashOverlay)
-    }
+    private var isAppReady = false
     private var isOneSignalPermissionSynced = false
 
     private val rxPermissions by lazy { RxPermissions(this) }
     private val splashFallbackRunnable = Runnable {
         Log.w(TAG, "splashFallbackRunnable fired after timeout")
-        hideSplashOverlay("fallback_timeout")
+        isAppReady = true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         Log.i(
             TAG,
             "AppActivity.onCreate(savedInstanceState=${savedInstanceState != null}, localeDefault=${Locale.getDefault().language}, appLanguage=${LocaleHelper.getLanguage(this)})"
@@ -75,8 +75,11 @@ class AppActivity : BaseActivity<AppPm>() {
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
             View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR  // тёмные иконки nav bar на светлой теме
-        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
+
+        splashScreen.setKeepOnScreenCondition {
+            !isAppReady
+        }
 
         if (openDebugHowToConnectIfRequested(intent)) return
 
@@ -92,10 +95,10 @@ class AppActivity : BaseActivity<AppPm>() {
 
         if (savedInstanceState != null) {
             Log.i(TAG, "AppActivity.onCreate: restored activity, hide splash immediately")
-            hideSplashOverlay("restored_activity")
+            isAppReady = true
         } else {
             Log.i(TAG, "AppActivity.onCreate: scheduling splash fallback 12000ms")
-            splashOverlay.postDelayed(splashFallbackRunnable, 12_000L)
+            window.decorView.postDelayed(splashFallbackRunnable, 12_000L)
         }
 
         // fixme Variant A : improved_enabling_location
@@ -155,13 +158,13 @@ class AppActivity : BaseActivity<AppPm>() {
         }
         pm.imagesLoadedCommand.bindTo {
             Log.i(TAG, "AppActivity: imagesLoadedCommand received")
-            hideSplashOverlay("images_loaded_command")
+            isAppReady = true
         }
     }
 
     override fun onDestroy() {
         Log.i(TAG, "AppActivity.onDestroy: remove splash fallback callback")
-        splashOverlay.removeCallbacks(splashFallbackRunnable)
+        window.decorView.removeCallbacks(splashFallbackRunnable)
         super.onDestroy()
     }
 
@@ -189,7 +192,7 @@ class AppActivity : BaseActivity<AppPm>() {
             Screens.HowToConnectScreenVariantA(isOnBoarding = false)
         }
         router.newRootScreen(screen)
-        hideSplashOverlay("debug_how_to_connect")
+        isAppReady = true
         return true
     }
 
@@ -212,24 +215,5 @@ class AppActivity : BaseActivity<AppPm>() {
         }
     }
 
-    private fun hideSplashOverlay(reason: String) {
-        Log.i(
-            TAG,
-            "hideSplashOverlay(reason=$reason, isVisible=${splashOverlay.visibility == View.VISIBLE}, alpha=${splashOverlay.alpha})"
-        )
-        splashOverlay.removeCallbacks(splashFallbackRunnable)
-        if (splashOverlay.visibility != View.VISIBLE) {
-            Log.i(TAG, "hideSplashOverlay: already hidden, skip")
-            return
-        }
 
-        splashOverlay.animate()
-            .alpha(0f)
-            .setDuration(250)
-            .withEndAction {
-                splashOverlay.visibility = View.GONE
-                Log.i(TAG, "hideSplashOverlay: animation complete, splash hidden")
-            }
-            .start()
-    }
 }
