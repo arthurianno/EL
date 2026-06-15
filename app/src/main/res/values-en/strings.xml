@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crypto_key_alias">elta-secure-key</string>
+    <string name="glucose_widget_label">Glucose</string>
+    <string name="glucose_widget_small_label">Glucose · Small</string>
+    <string name="glucose_widget_medium_label">Glucose · Medium</string>
+    <string name="glucose_widget_large_label">Glucose · Large</string>
+    <string name="glucose_widget_description">Displays glucose levels, bread units, and reminders on the home screen</string>
+</resources>

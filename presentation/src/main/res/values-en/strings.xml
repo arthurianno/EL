@@ -261,6 +261,7 @@
     <string name="events_creation_hint_tags">Grouping Label</string>
     <string name="events_creation_hint_activities">Type of Activity</string>
     <string name="events_creation_hint_insulin">Insulin Type *</string>
+    <string name="events_creation_hint_name_insulin">Insulin name <font color='#FF505D'>*</font></string>
     <string name="events_creation_hint_note">Add a Note</string>
     <string name="events_creation_save_button">Save</string>
     <string name="events_creation_save_record_button">Save Entry</string>
