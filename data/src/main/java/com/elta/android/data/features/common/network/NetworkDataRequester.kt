@@ -6,32 +6,37 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
-import okhttp3.logging.HttpLoggingInterceptor
-import okio.IOException
+import java.io.IOException
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class NetworkDataRequester @Inject constructor(
-    private val httpLoggingInterceptor: HttpLoggingInterceptor
+    private val okHttpClient: OkHttpClient
 ) : NetworkRequester {
     override suspend fun request(url: String): ResponseBody {
         return suspendCoroutine { continuation ->
-            val client = OkHttpClient.Builder()
-                .addInterceptor(httpLoggingInterceptor)
-                .build()
             val request = Request.Builder()
                 .url(url)
                 .build()
 
-            client.newCall(request).enqueue(object : Callback {
+            okHttpClient.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     continuation.resumeWithException(e)
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    continuation.resume(response.body)
+                    if (response.isSuccessful) {
+                        val body = response.body
+                        if (body != null) {
+                            continuation.resume(body)
+                        } else {
+                            continuation.resumeWithException(IOException("Response body is null"))
+                        }
+                    } else {
+                        continuation.resumeWithException(IOException("Server returned error code: ${response.code}"))
+                    }
                 }
             })
         }

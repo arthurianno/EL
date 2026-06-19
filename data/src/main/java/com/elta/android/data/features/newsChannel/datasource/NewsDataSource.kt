@@ -67,6 +67,11 @@ private fun NewsListResponseDto.toDomain(baseUrl: String): NewsListResponse {
         endCursor = endCursor
     )
 }
+private fun buildAbsoluteUrl(baseUrl: String, uri: String): String {
+    if (uri.startsWith("http")) return uri
+    return baseUrl.removeSuffix("/") + "/" + uri.removePrefix("/")
+}
+
 private fun NewsDto.toDomain(baseUrl: String): News {
     return News(
         id = id,
@@ -74,14 +79,26 @@ private fun NewsDto.toDomain(baseUrl: String): News {
         content = content,
         createdDateTime = createdDateTime.toEpochMilli(),
         modifiedDateTime = modifiedDateTime?.toEpochMilli(),
-        file = fileName?.let {
+        file = attachmentMetaData?.let { meta ->
+            val fullFileUrl = meta.fileUri?.let { uri ->
+                buildAbsoluteUrl(baseUrl, uri)
+            } ?: buildAbsoluteUrl(baseUrl, "api/news/$id/file")
+            NewsFile(
+                name = meta.fileName,
+                url = fullFileUrl,
+                size = meta.fileSize
+            )
+        } ?: fileName?.let {
             NewsFile(
                 name = it,
-                url = "$baseUrl/api/news/$id/file",
+                url = buildAbsoluteUrl(baseUrl, "api/news/$id/file"),
                 size = fileSize ?: 0
             )
         },
-        image = imageData?.let { NewsImage(url = null, data = it) },
+        image = imageUri?.let { uri ->
+            val fullImageUrl = buildAbsoluteUrl(baseUrl, uri)
+            NewsImage(url = fullImageUrl, data = null)
+        } ?: imageData?.let { NewsImage(url = null, data = it) },
         orderNumber = orderNumber ?: 0L,
         state = state.toString()
     )

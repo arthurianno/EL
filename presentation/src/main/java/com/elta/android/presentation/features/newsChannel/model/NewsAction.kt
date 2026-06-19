@@ -19,8 +19,8 @@ sealed class NewsAction : Action {
 
     data class CopyMessageClick(val message: MessageUiEntity) : NewsAction()
 
-    data class DownloadImage(val imageData: String?) : NewsAction() // Изменено
-    data class ShareImage(val imageData: String?) : NewsAction() // Изменено
+    data class DownloadImage(val imageData: String?, val imageUrl: String?) : NewsAction()
+    data class ShareImage(val imageData: String?, val imageUrl: String?) : NewsAction()
 
     data object OnDismissContextMenu : NewsAction()
 

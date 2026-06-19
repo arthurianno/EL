@@ -5,7 +5,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface NewsApi {
-    @GET("api/news")
+    @GET("api/news/v2")
     suspend fun getNewsList(
         @Query("cursor") cursor: Long? = null,
         @Query("limit") limit: Int? = 10,

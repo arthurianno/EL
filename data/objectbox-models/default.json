@@ -1218,7 +1218,7 @@
     },
     {
       "id": "34:7570676786948297390",
-      "lastPropertyId": "15:1875540802972689990",
+      "lastPropertyId": "16:7729523787488362281",
       "name": "NewsEntity",
       "properties": [
         {
@@ -1286,6 +1286,11 @@
           "id": "15:1875540802972689990",
           "name": "cachedDateTime",
           "type": 6
+        },
+        {
+          "id": "16:7729523787488362281",
+          "name": "imageUrl",
+          "type": 9
         }
       ],
       "relations": []

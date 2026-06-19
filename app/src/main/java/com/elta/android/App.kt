@@ -25,8 +25,11 @@ import com.onesignal.notifications.INotificationClickEvent
 import com.onesignal.notifications.INotificationClickListener
 import com.onesignal.notifications.INotificationLifecycleListener
 import com.onesignal.notifications.INotificationWillDisplayEvent
+import coil.ImageLoader
+import coil.ImageLoaderFactory
 import com.yandex.mapkit.MapKitFactory
 import dagger.android.AndroidInjector
+import okhttp3.OkHttpClient
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import dagger.android.HasBroadcastReceiverInjector
@@ -42,7 +45,16 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, HasServiceInjector,
-    GlucoseWidgetDependencies {
+    GlucoseWidgetDependencies, ImageLoaderFactory {
+
+    @Inject
+    lateinit var okHttpClient: OkHttpClient
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .okHttpClient(if (::okHttpClient.isInitialized) okHttpClient else OkHttpClient())
+            .build()
+    }
 
     @Inject
     lateinit var dispatchingActivityInjector: DispatchingAndroidInjector<Activity>

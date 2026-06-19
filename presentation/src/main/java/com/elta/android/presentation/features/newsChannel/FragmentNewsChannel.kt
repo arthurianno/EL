@@ -205,11 +205,11 @@ class FragmentNewsChannel : BaseComposeFragment<NewsViewModel>() {
                 Log.d("FragmentNewsChannel", "Swipe refresh")
                 viewModel sendAction NewsAction.OnSwipeRefresh
             },
-            onDownloadClick = { imageData ->
-                viewModel sendAction NewsAction.DownloadImage(imageData)
+            onDownloadClick = { imageData, imageUrl ->
+                viewModel sendAction NewsAction.DownloadImage(imageData, imageUrl)
             },
-            onShareClick = { imageData ->
-                viewModel sendAction NewsAction.ShareImage(imageData)
+            onShareClick = { imageData, imageUrl ->
+                viewModel sendAction NewsAction.ShareImage(imageData, imageUrl)
             },
             onScrollToTop = {
                 Log.d("FragmentNewsChannel", "Scroll to top clicked")

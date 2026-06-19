@@ -22,6 +22,7 @@ data class NewsEntity(
     val fileUrl: String?,
     val fileSize: Long,
     val imageData: String?,
+    val imageUrl: String? = null,
     val orderNumber: Long, // Новое поле
     val state: String, // Новое поле
     val cachedDateTime: Long = System.currentTimeMillis()
@@ -34,7 +35,8 @@ data class NewsEntity(
             createdDateTime = createdDateTime,
             modifiedDateTime = modifiedDateTime,
             file = fileName?.let { NewsFile(name = it, url = fileUrl, size = fileSize) },
-            image = imageData?.let { NewsImage(url = null, data = it) },
+            image = imageUrl?.let { NewsImage(url = it, data = null) }
+                ?: imageData?.let { NewsImage(url = null, data = it) },
             orderNumber = orderNumber,
             state = state
         )
@@ -52,6 +54,7 @@ data class NewsEntity(
                 fileUrl = news.file?.url,
                 fileSize = news.file?.size ?: 0,
                 imageData = news.image?.data,
+                imageUrl = news.image?.url,
                 orderNumber = news.orderNumber,
                 state = news.state,
                 cachedDateTime = System.currentTimeMillis()

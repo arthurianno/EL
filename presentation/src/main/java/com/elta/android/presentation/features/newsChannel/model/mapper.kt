@@ -60,7 +60,7 @@ private fun News.toUi(): MessageUiEntity {
             DocumentUiEntity(
                 fileName = "image_${id}.png",
                 fileType = MessageType.Image,
-                url = null,
+                url = it.url,
                 base64Data = it.data,
                 size = null,
                 isPortrait = imageDimensions?.let { (width, height) ->

@@ -8,15 +8,23 @@ data class NewsListResponseDto(
     @SerializedName("endCursor") val endCursor: Long?
 )
 // DTO для отдельной новости
+data class AttachmentMetaDataDto(
+    @SerializedName("fileName") val fileName: String,
+    @SerializedName("fileSize") val fileSize: Long,
+    @SerializedName("fileUri") val fileUri: String?
+)
+
 data class NewsDto(
     @SerializedName("id") val id: UUID,
     @SerializedName("title") val title: String?,
     @SerializedName("content") val content: String?,
     @SerializedName("createdDateTime") val createdDateTime: String,
     @SerializedName("modifiedDateTime") val modifiedDateTime: String?,
-    @SerializedName("fileName") val fileName: String?,
-    @SerializedName("fileSize") val fileSize: Long?,
-    @SerializedName("imageData") val imageData: String?,
+    @SerializedName("attachmentMetaData") val attachmentMetaData: AttachmentMetaDataDto?,
+    @SerializedName("imageUri") val imageUri: String?,
     @SerializedName("orderNumber") val orderNumber: Long?,
-    @SerializedName("state") val state: String?
+    @SerializedName("state") val state: String?,
+    @SerializedName("fileName") val fileName: String? = null,
+    @SerializedName("fileSize") val fileSize: Long? = null,
+    @SerializedName("imageData") val imageData: String? = null
 )

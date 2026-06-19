@@ -180,6 +180,7 @@ dependencies {
     implementation(Dependencies.Webim.core)
     implementation(Dependencies.OneSignal.core) // OneSignal уже есть
     implementation ("com.huawei.hms:push:6.3.0.304") // Новая строка
+    implementation(Dependencies.Coil.core)
 
     testBaseDependencies()
 }

@@ -117,7 +117,8 @@ class NewsViewModel @Inject constructor(
             isLoadingNextMessagesPage = false,
             previewState = PreviewStateNews(
                 isPhotoPreview = false,
-                imageData = null
+                imageData = null,
+                imageUrl = null
             ),
             isSwipeRefreshing = false
         )
@@ -353,6 +354,7 @@ class NewsViewModel @Inject constructor(
                         state.value.copy(
                             previewState = state.value.previewState.copy(
                                 imageData = action.message.image.base64Data,
+                                imageUrl = action.message.image.url,
                                 isPhotoPreview = true,
                             )
                         )
@@ -362,6 +364,7 @@ class NewsViewModel @Inject constructor(
                         state.value.copy(
                             previewState = state.value.previewState.copy(
                                 imageData = action.message.document.base64Data,
+                                imageUrl = action.message.document.url,
                                 isPhotoPreview = true,
                             )
                         )
@@ -447,8 +450,8 @@ class NewsViewModel @Inject constructor(
             }
 
             is NewsAction.VerifyFile -> handleFileState(action.message)
-            is NewsAction.DownloadImage -> handleDownloadImage(action.imageData)
-            is NewsAction.ShareImage -> handleShareImage(action.imageData)
+            is NewsAction.DownloadImage -> handleDownloadImage(action.imageData, action.imageUrl)
+            is NewsAction.ShareImage -> handleShareImage(action.imageData, action.imageUrl)
             is NewsAction.LoadNextPage -> {
                 if (hasMoreMessages && !isLoadingNextPage) {
                     Log.d("NewsViewModel", "Loading next page with cursor=$currentCursor")
@@ -461,12 +464,12 @@ class NewsViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalEncodingApi::class)
-    private fun handleDownloadImage(imageData: String?) {
+    private fun handleDownloadImage(imageData: String?, imageUrl: String?) {
         launch {
             try {
-                Log.d("NewsViewModel", "Начало скачивания: imageData=$imageData")
-                if (imageData == null) {
-                    Log.e("NewsViewModel", "No valid image data for download")
+                Log.d("NewsViewModel", "Начало скачивания: imageData=$imageData, imageUrl=$imageUrl")
+                if (imageData == null && imageUrl == null) {
+                    Log.e("NewsViewModel", "No valid image data or url for download")
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             context,
@@ -477,16 +480,19 @@ class NewsViewModel @Inject constructor(
                     return@launch
                 }
 
-                // Декодируем Base64
-                val imageBytes = Base64.decode(imageData)
-                Log.d("NewsViewModel", "Decoded bytes length: ${imageBytes.size}")
-
-                // Сохраняем в кэш
                 val fileName = "downloaded_image_${System.currentTimeMillis()}.jpg"
-                val downloadedUri = mediaRepository.saveImageToCache(imageBytes, fileName)
+                val downloadedUri = if (imageData != null) {
+                    // Декодируем Base64
+                    val imageBytes = Base64.decode(imageData)
+                    Log.d("NewsViewModel", "Decoded bytes length: ${imageBytes.size}")
+                    mediaRepository.saveImageToCache(imageBytes, fileName)
+                } else {
+                    // Скачиваем по URL
+                    downloadFile(imageUrl!!, fileName)
+                }
 
                 if (downloadedUri != null) {
-                    Log.d("NewsViewModel", "Изображение успешно сохранено: $downloadedUri")
+                    Log.d("NewsViewModel", "Изображение успешно сохранено/скачано: $downloadedUri")
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "Изображение успешно скачано", Toast.LENGTH_SHORT)
                             .show()
@@ -497,12 +503,13 @@ class NewsViewModel @Inject constructor(
                         state.value.copy(
                             previewState = state.value.previewState.copy(
                                 isPhotoPreview = false,
-                                imageData = null
+                                imageData = null,
+                                imageUrl = null
                             )
                         )
                     }
                 } else {
-                    Log.e("NewsViewModel", "Failed to save image to cache")
+                    Log.e("NewsViewModel", "Failed to save image to cache or download")
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             context,
@@ -525,12 +532,12 @@ class NewsViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalEncodingApi::class)
-    private fun handleShareImage(imageData: String?) {
+    private fun handleShareImage(imageData: String?, imageUrl: String?) {
         launch {
             try {
-                Log.d("NewsViewModel", "Начало шаринга: imageData=$imageData")
-                if (imageData == null) {
-                    Log.e("NewsViewModel", "No valid image data for share")
+                Log.d("NewsViewModel", "Начало шаринга: imageData=$imageData, imageUrl=$imageUrl")
+                if (imageData == null && imageUrl == null) {
+                    Log.e("NewsViewModel", "No valid image data or url for share")
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             context,
@@ -541,14 +548,19 @@ class NewsViewModel @Inject constructor(
                     return@launch
                 }
 
-                // Декодируем Base64
-                val imageBytes = Base64.decode(imageData)
-                Log.d("NewsViewModel", "Decoded bytes length: ${imageBytes.size}")
-
-                // Сохраняем в кэш
                 val fileName = "shared_image_${System.currentTimeMillis()}.jpg"
-                val file = File(context.cacheDir, fileName)
-                FileOutputStream(file).use { it.write(imageBytes) }
+                val file = if (imageData != null) {
+                    // Декодируем Base64 в кэш-директорию
+                    val imageBytes = Base64.decode(imageData)
+                    Log.d("NewsViewModel", "Decoded bytes length: ${imageBytes.size}")
+                    val cacheFile = File(context.cacheDir, fileName)
+                    FileOutputStream(cacheFile).use { it.write(imageBytes) }
+                    cacheFile
+                } else {
+                    // Скачиваем по URL в Document directory
+                    downloadFile(imageUrl!!, fileName)
+                    File(context.getExternalFilesDir(null), fileName)
+                }
 
                 // Проверяем существование файла
                 Log.d("NewsViewModel", "File path: ${file.absolutePath}, exists: ${file.exists()}")
@@ -560,7 +572,7 @@ class NewsViewModel @Inject constructor(
                     return@launch
                 }
 
-                Log.d("NewsViewModel", "Authorit being used: ${context.packageName}.fileprovider")
+                Log.d("NewsViewModel", "Authority being used: com.elta.android.fileprovider")
                 Log.d("NewsViewModel", "File path: ${file.absolutePath}, exists: ${file.exists()}, length: ${file.length()}")
                 // Получаем Uri через FileProvider
                 val shareUri = FileProvider.getUriForFile(
@@ -582,7 +594,8 @@ class NewsViewModel @Inject constructor(
                     state.value.copy(
                         previewState = state.value.previewState.copy(
                             isPhotoPreview = false,
-                            imageData = null
+                            imageData = null,
+                            imageUrl = null
                         )
                     )
                 }

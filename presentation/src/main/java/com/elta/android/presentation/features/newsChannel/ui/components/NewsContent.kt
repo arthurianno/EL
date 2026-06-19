@@ -78,8 +78,8 @@ fun NewsContent(
     onDismissClick: () -> Unit = {},
     onSwipeRefresh: () -> Unit = {},
     onDownIconClick: () -> Unit = {},
-    onDownloadClick: (String?) -> Unit = { _ -> },
-    onShareClick: (String?) -> Unit = { _ -> },
+    onDownloadClick: (String?, String?) -> Unit = { _, _ -> },
+    onShareClick: (String?, String?) -> Unit = { _, _ -> },
     onScrollToTop: () -> Unit = {},
     onLoadNextPage: () -> Unit = {}
 ) {
@@ -131,9 +131,10 @@ fun NewsContent(
                 ) {
                      FullScreenImagePreview(
                          imageData = state.previewState.imageData,
+                         imageUrl = state.previewState.imageUrl,
                          onBackClick = onPictureArrowBackClick,
-                         onDownloadClick = { onDownloadClick(state.previewState.imageData) },
-                         onShareClick ={ onShareClick(state.previewState.imageData) }
+                         onDownloadClick = { onDownloadClick(state.previewState.imageData, state.previewState.imageUrl) },
+                         onShareClick = { onShareClick(state.previewState.imageData, state.previewState.imageUrl) }
                      )
                 }
                 AnimatedVisibility(
@@ -157,6 +158,7 @@ fun NewsContent(
 @Composable
 fun FullScreenImagePreview(
     imageData: String?,
+    imageUrl: String?,
     onBackClick: () -> Unit,
     onDownloadClick: () -> Unit,
     onShareClick: () -> Unit
@@ -165,11 +167,11 @@ fun FullScreenImagePreview(
         val context = LocalContext.current
         val processedImageData = remember(imageData) { decodeImageData(imageData) }
         // Запоминаем ImageRequest, чтобы он не пересоздавался при рекомпозиции
-        val imageRequest = remember(processedImageData) {
-            createImageRequest(context, processedImageData)
+        val imageRequest = remember(processedImageData, imageUrl) {
+            createImageRequest(context, processedImageData ?: imageUrl)
         }
 
-        Log.d("FullScreenImagePreview", "Loading image data: imageData=$imageData")
+        Log.d("FullScreenImagePreview", "Loading image data: imageData=$imageData, imageUrl=$imageUrl")
 
         Box(
             modifier = Modifier
@@ -179,6 +181,7 @@ fun FullScreenImagePreview(
             ImageContent(
                 imageRequest = imageRequest,
                 processedImageData = processedImageData,
+                imageUrl = imageUrl,
                 colors = colors.black
             )
 
@@ -201,16 +204,17 @@ fun FullScreenImagePreview(
 private fun ImageContent(
     imageRequest: ImageRequest,
     processedImageData: ByteArray?,
+    imageUrl: String?,
     colors: Color
 ) {
-    if (processedImageData == null) {
+    if (processedImageData == null && imageUrl == null) {
         Image(
             painter = ColorPainter(colors),
             contentDescription = stringResource(R.string.content_description_clear_button),
             contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxSize()
         )
-        Log.e("FullScreenImagePreview", "No valid image data provided")
+        Log.e("FullScreenImagePreview", "No valid image data or url provided")
     } else {
         AsyncImage(
             model = imageRequest, // Используем запомненный ImageRequest
@@ -240,10 +244,10 @@ private fun decodeImageData(imageData: String?): ByteArray? {
 
 private fun createImageRequest(
     context: Context,
-    imageData: ByteArray?
+    data: Any?
 ): ImageRequest {
     return ImageRequest.Builder(context)
-        .data(imageData)
+        .data(data)
         .crossfade(true)
         .allowHardware(true)
         .memoryCachePolicy(CachePolicy.ENABLED)
@@ -283,7 +287,7 @@ private fun ImagePreviewControlPanel(
         )
 
         ControlButton(
-            iconRes = R.drawable.ic_arrow_download,
+            iconRes = R.drawable.ic_download_normal,
             contentDescriptionRes = R.string.firmware_title_downloading,
             colors = colors,
             onClick = onDownloadClick,
@@ -291,7 +295,7 @@ private fun ImagePreviewControlPanel(
         )
 
         ControlButton(
-            iconRes = R.drawable.ic_img_share_bulb,
+            iconRes = R.drawable.ic_share_normal,
             contentDescriptionRes = R.string.event_share_dialog_title,
             colors = colors,
             onClick = onShareClick,

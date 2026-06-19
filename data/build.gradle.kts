@@ -32,7 +32,7 @@ android {
             buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
         }
         all {
-            buildConfigField("String", "VERSION_NAME", "\"${version}\"")
+            buildConfigField("String", "VERSION_NAME", "\"${version.versionName}\"")
         }
     }
     namespace = "com.elta.android.data"
@@ -109,4 +109,5 @@ dependencies {
     implementation(Dependencies.Jetpack.Paging.rxPaging)
 
     testBaseDependencies()
+    testImplementation(Dependencies.Test.mockito)
 }
