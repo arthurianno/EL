@@ -168,8 +168,8 @@
 
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/colorPrimary</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenBackground">@color/splash_blue</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo_white</item>
         <item name="windowSplashScreenAnimationDuration">200</item>
         <item name="postSplashScreenTheme">@style/AppTheme</item>
     </style>

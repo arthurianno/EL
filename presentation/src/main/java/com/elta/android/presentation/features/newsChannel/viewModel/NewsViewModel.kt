@@ -559,7 +559,7 @@ class NewsViewModel @Inject constructor(
                 } else {
                     // Скачиваем по URL в Document directory
                     downloadFile(imageUrl!!, fileName)
-                    File(context.getExternalFilesDir(null), fileName)
+                    File(File(context.filesDir, "documentDirectory"), fileName)
                 }
 
                 // Проверяем существование файла

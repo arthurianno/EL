@@ -46,10 +46,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="84dp"
             android:paddingHorizontal="6dp"
+            android:gravity="center"
+            android:textAlignment="center"
             android:text="@string/language_selection_intro"
             android:textColor="@color/shade_black1"
-            app:layout_constraintEnd_toEndOf="@id/contentEndGuideline"
-            app:layout_constraintStart_toStartOf="@id/contentStartGuideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Заголовок "Язык интерфейса" / "Выберите язык..." -->
@@ -57,13 +59,15 @@
             android:id="@+id/titleView"
             style="@style/Headline1"
             android:layout_width="0dp"
+            android:gravity="center"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
             android:paddingHorizontal="6dp"
             android:text="@string/language_selection_title"
             android:textColor="@color/black"
-            app:layout_constraintEnd_toEndOf="@id/contentEndGuideline"
-            app:layout_constraintStart_toStartOf="@id/contentStartGuideline"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/greetingView" />
 
         <!-- Описание секции языка (только в режиме настроек) -->
@@ -71,14 +75,16 @@
             android:id="@+id/languageSubtitleView"
             style="@style/Body2"
             android:layout_width="0dp"
+            android:gravity="center"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:paddingHorizontal="6dp"
             android:text="@string/language_settings_subtitle"
             android:textColor="@color/shade_black1"
             android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="@id/contentEndGuideline"
-            app:layout_constraintStart_toStartOf="@id/contentStartGuideline"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/titleView"
             tools:visibility="visible" />
 

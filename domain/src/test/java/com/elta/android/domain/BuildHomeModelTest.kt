@@ -3,6 +3,7 @@ package com.elta.android.domain
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.factory.TagTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.home.interactor.buildHomeModel
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelDirection
@@ -15,7 +16,7 @@ class BuildHomeModelTest {
 
     @Test
     fun buildHomeModel_OneGlucoseEvent_HasGlucoseEvent() {
-        val event = EventTestFactory.create(type = EventType.Glucose)
+        val event = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL))
         val model =
             buildHomeModel(
                 listOf(event),
@@ -35,7 +36,7 @@ class BuildHomeModelTest {
 
     @Test
     fun buildHomeModel_OneGlucoseEvent_DirectionNull() {
-        val event = EventTestFactory.create(type = EventType.Glucose)
+        val event = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL))
         val model =
             buildHomeModel(
                 listOf(event),
@@ -99,7 +100,7 @@ class BuildHomeModelTest {
     @Test
     fun buildHomeModel_ThreeEvents_HasAllLastEvents() {
         val event1 = EventTestFactory.create(type = EventType.Bread(CalculatorFlow.BREAD_UNITS))
-        val event2 = EventTestFactory.create(type = EventType.Glucose)
+        val event2 = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL))
         val event3 = EventTestFactory.create(type = EventType.Insulin)
         val model = buildHomeModel(
             arrayListOf(event1, event2, event3),
@@ -124,9 +125,9 @@ class BuildHomeModelTest {
 
     @Test
     fun buildHomeModel_TwoGlucoseEvents_DirectionUp() {
-        val event1 = EventTestFactory.create(type = EventType.Glucose, value = 4.0)
+        val event1 = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), value = 4.0)
         Thread.sleep(50)
-        val event2 = EventTestFactory.create(type = EventType.Glucose, value = 5.0)
+        val event2 = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), value = 5.0)
         val model = buildHomeModel(
             arrayListOf(event1, event2),
             emptyList(),
@@ -149,9 +150,9 @@ class BuildHomeModelTest {
 
     @Test
     fun buildHomeModel_TwoGlucoseEvents_DirectionDown() {
-        val event1 = EventTestFactory.create(type = EventType.Glucose, value = 4.0)
+        val event1 = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), value = 4.0)
         Thread.sleep(50)
-        val event2 = EventTestFactory.create(type = EventType.Glucose, value = 3.0)
+        val event2 = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), value = 3.0)
         val model = buildHomeModel(
             arrayListOf(event1, event2),
             emptyList(),
@@ -175,9 +176,9 @@ class BuildHomeModelTest {
 
     @Test
     fun buildHomeModel_TwoGlucoseEvents_DirectionStable() {
-        val event1 = EventTestFactory.create(type = EventType.Glucose, value = 4.0)
+        val event1 = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), value = 4.0)
         Thread.sleep(50)
-        val event2 = EventTestFactory.create(type = EventType.Glucose, value = 4.0)
+        val event2 = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), value = 4.0)
         val model = buildHomeModel(
             arrayListOf(event1, event2),
             emptyList(),
@@ -202,12 +203,12 @@ class BuildHomeModelTest {
     @Test
     fun buildHomeModel_TwoEvents_OneTag_SortedCorrect() {
         val tagId1 = TagTestFactory.nextId
-        val event1 = EventTestFactory.create(type = EventType.Glucose, tagId = tagId1)
+        val event1 = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), tagId = tagId1)
         val tag1 = TagTestFactory.create(tagId1)
 
         Thread.sleep(50)
 
-        val event2 = EventTestFactory.create(type = EventType.Glucose)
+        val event2 = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL))
         val model = buildHomeModel(
             arrayListOf(event1, event2).shuffled(),
             arrayListOf(tag1),

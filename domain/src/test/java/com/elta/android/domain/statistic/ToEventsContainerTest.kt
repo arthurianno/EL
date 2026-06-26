@@ -2,6 +2,7 @@ package com.elta.android.domain.statistic
 
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.statistics.interactor.toEventsContainer
 import org.junit.Test
 import org.threeten.bp.LocalTime
@@ -11,8 +12,8 @@ class ToEventsContainerTest {
 
     @Test
     fun splitByType_2_types_2_eventsPerType_correct() {
-        val firstType = EventType.ACTIVITY
-        val secondType = EventType.INSULIN
+        val firstType = EventType.Activity
+        val secondType = EventType.Insulin
         val events = arrayListOf(
             EventTestFactory.create(type = firstType),
             EventTestFactory.create(type = secondType),
@@ -39,8 +40,8 @@ class ToEventsContainerTest {
         val firstDay = ZonedDateTime.now().with(LocalTime.of(12, 0, 0))
         val secondDay = firstDay.minusDays(2)
 
-        val firstType = EventType.ACTIVITY
-        val secondType = EventType.BREAD
+        val firstType = EventType.Activity
+        val secondType = EventType.Bread(CalculatorFlow.BREAD_UNITS)
 
         val events = arrayListOf(
             EventTestFactory.create(type = firstType, date = firstDay.plusMinutes(2)),

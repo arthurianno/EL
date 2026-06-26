@@ -233,15 +233,19 @@ private fun ModifiedCard(
                 }
 
                 Log.d("ImageDebug", "Loading image data: $imageData, Width: ${imageDoc.width}, Height: ${imageDoc.height}")
+                val hasDimensions = imageDoc.width != null && imageDoc.width > 0 && imageDoc.height != null
                 AsyncImage(
                     model = imageRequest,
-                    contentScale = ContentScale.Fit,
+                    contentScale = ContentScale.FillWidth,
                     contentDescription = null,
                     placeholder = ColorPainter(colors.shadeBlack3),
                     error = ColorPainter(colors.shadeBlack3),
                     modifier = Modifier
                         .width(computedSize.first)
-                        .height(computedSize.second)
+                        .then(
+                            if (hasDimensions) Modifier.height(computedSize.second)
+                            else Modifier.defaultMinSize(minHeight = 150.dp)
+                        )
                         .clip(imageShape)
                         .clickable { onMessageClick(message) }
                 )

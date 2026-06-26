@@ -2,6 +2,8 @@ package com.elta.android.domain.statistic
 
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.medicines.model.InsulinMedicamentStatistic
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.interactor.buildActivityStatisticModel
@@ -25,10 +27,10 @@ class PeriodStatisticInteractorTest {
     @Test
     fun buildActivityStatisticModel_correct() {
         val events = arrayListOf(
-            EventTestFactory.create(type = EventType.ACTIVITY, duration = 100),
-            EventTestFactory.create(type = EventType.ACTIVITY, duration = 0),
-            EventTestFactory.create(type = EventType.ACTIVITY, duration = 100),
-            EventTestFactory.create(type = EventType.ACTIVITY, duration = 100)
+            EventTestFactory.create(type = EventType.Activity, duration = 100),
+            EventTestFactory.create(type = EventType.Activity, duration = 0),
+            EventTestFactory.create(type = EventType.Activity, duration = 100),
+            EventTestFactory.create(type = EventType.Activity, duration = 100)
         )
 
         val expected = ActivityStatisticModel(eventsCount = 4, averageDuration = 75L)
@@ -41,8 +43,8 @@ class PeriodStatisticInteractorTest {
     @Test
     fun buildBreadStatisticModelByPeriod_correct() {
         val events = arrayListOf(
-            EventTestFactory.create(type = EventType.BREAD, value = 1.1),
-            EventTestFactory.create(type = EventType.BREAD, value = 10.0)
+            EventTestFactory.create(type = EventType.Bread(CalculatorFlow.BREAD_UNITS), value = 1.1),
+            EventTestFactory.create(type = EventType.Bread(CalculatorFlow.BREAD_UNITS), value = 10.0)
         )
 
         val expected = BreadStatisticModelByPeriod(averageLevel = 11.1)
@@ -57,36 +59,36 @@ class PeriodStatisticInteractorTest {
         val events = arrayListOf(
             // first day
             EventTestFactory.create(
-                type = EventType.BREAD,
+                type = EventType.Bread(CalculatorFlow.BREAD_UNITS),
                 date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)),
                 value = 2.0
             ),
             EventTestFactory.create(
-                type = EventType.BREAD,
+                type = EventType.Bread(CalculatorFlow.BREAD_UNITS),
                 date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)),
                 value = 0.0
             ),
 
             // second day
             EventTestFactory.create(
-                type = EventType.BREAD,
+                type = EventType.Bread(CalculatorFlow.BREAD_UNITS),
                 date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)).plusDays(1),
                 value = 0.0
             ),
             EventTestFactory.create(
-                type = EventType.BREAD,
+                type = EventType.Bread(CalculatorFlow.BREAD_UNITS),
                 date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)).plusDays(1),
                 value = 0.0
             ),
 
             // third day
             EventTestFactory.create(
-                type = EventType.BREAD,
+                type = EventType.Bread(CalculatorFlow.BREAD_UNITS),
                 date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)).plusDays(2),
                 value = 4.0
             ),
             EventTestFactory.create(
-                type = EventType.BREAD,
+                type = EventType.Bread(CalculatorFlow.BREAD_UNITS),
                 date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)).plusDays(2),
                 value = 6.0
             )
@@ -103,37 +105,37 @@ class PeriodStatisticInteractorTest {
     fun buildInsulinStatisticModelByPeriod_correct() {
         val events = arrayListOf(
             EventTestFactory.create(
-                type = EventType.INSULIN,
+                type = EventType.Insulin,
                 value = 10.0
             ),
             EventTestFactory.create(
-                type = EventType.INSULIN,
+                type = EventType.Insulin,
                 value = 0.0
             ),
             EventTestFactory.create(
-                type = EventType.INSULIN,
+                type = EventType.Insulin,
                 value = 10.0
             ),
 
             EventTestFactory.create(
-                type = EventType.INSULIN,
+                type = EventType.Insulin,
                 value = 10.0
             ),
             EventTestFactory.create(
-                type = EventType.INSULIN,
+                type = EventType.Insulin,
                 value = 10.0
             ),
             EventTestFactory.create(
-                type = EventType.INSULIN,
+                type = EventType.Insulin,
                 value = 10.0
             ),
             EventTestFactory.create(
-                type = EventType.INSULIN,
+                type = EventType.Insulin,
                 value = 0.0
             ),
 
             EventTestFactory.create(
-                type = EventType.INSULIN,
+                type = EventType.Insulin,
                 value = 10.0
             )
         )
@@ -162,11 +164,11 @@ class PeriodStatisticInteractorTest {
         val settings = GlucoseLevelSettings()
 
         val events = arrayListOf(
-            EventTestFactory.create(type = EventType.GLUCOSE, value = 100.0),
-            EventTestFactory.create(type = EventType.GLUCOSE, value = 20.0),
-            EventTestFactory.create(type = EventType.GLUCOSE, value = 10.0),
-            EventTestFactory.create(type = EventType.GLUCOSE, value = 5.0),
-            EventTestFactory.create(type = EventType.GLUCOSE, value = 2.0)
+            EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), value = 100.0),
+            EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), value = 20.0),
+            EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), value = 10.0),
+            EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), value = 5.0),
+            EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL), value = 2.0)
         )
 
         val expected = GlucoseStatisticModel(
