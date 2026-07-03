@@ -22,6 +22,8 @@ import org.threeten.bp.LocalDate
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+import com.elta.android.domain.features.reports.model.ReportType
+
 private const val FORMAT = "d LLLL"
 
 class ReportPeriodChooserPm @Inject constructor(
@@ -30,9 +32,9 @@ class ReportPeriodChooserPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val mainAction = action<Unit>()
+    val mainAction = action<ReportType>()
     val closeDialogCommand = command<Unit>(bufferSize = 1)
-    val selectDateAction = action<LocalDate>()
+    val selectRangeAction = action<Range>()
     val selectedRangeState = state(buildRange())
     val titleState = state<String>()
 
@@ -66,17 +68,16 @@ class ReportPeriodChooserPm @Inject constructor(
     }
 
     private fun observeActions() {
-        selectDateAction.observable
-            .map(::buildRange)
+        selectRangeAction.observable
             .subscribe(selectedRangeState.consumer)
             .untilDestroy()
         mainAction.observable
             .doOnEach {
                 appMetricTracker.trackEvent(AppMetricEvent.TapUploadingAReport)
             }
-            .map(::createGetReportParams)
-            .flatMapSingle {
-                getReportUseCase.execute(it)
+            .map { type -> createGetReportParams(type) }
+            .flatMapSingle { params ->
+                getReportUseCase.execute(params)
                     .bindProgress()
                     .doOnError(::handleError)
                     .doOnSuccess(::handleReport)
@@ -89,8 +90,8 @@ class ReportPeriodChooserPm @Inject constructor(
     private fun formatRange(range: Range): String =
         "${range.start.toStringWithFormat(FORMAT)} - ${range.end.toStringWithFormat(FORMAT)}"
 
-    private fun createGetReportParams(i: Unit) =
-        GetReportUseCase.Params(selectedRangeState.value)
+    private fun createGetReportParams(type: ReportType) =
+        GetReportUseCase.Params(selectedRangeState.value, type)
 
     private fun handleReport(uri: Uri) {
         bus.event(Events.ReportLoadedEvent(uri))

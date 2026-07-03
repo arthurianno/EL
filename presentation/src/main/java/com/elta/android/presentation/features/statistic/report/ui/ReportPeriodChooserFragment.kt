@@ -116,14 +116,32 @@ class ReportPeriodChooserFragment :
                 )
             )
             addDecorators(decorators)
-            setOnDateChangedListener { _, day, _ ->
-                presentationModel.selectDateAction.consumer.accept(day.date)
+            setOnDateChangedListener { _, day, selected ->
+                if (selected) {
+                    presentationModel.selectRangeAction.consumer.accept(
+                        com.elta.android.domain.features.reports.model.Range(day.date, day.date)
+                    )
+                }
             }
             setOnRangeSelectedListener { _, dates ->
                 decorators.forEach {
                     it.updateDates(dates)
                 }
                 invalidateDecorators()
+                if (dates.isNotEmpty()) {
+                    val start = dates.first().date
+                    val end = dates.last().date
+                    val daysBetween = org.threeten.bp.temporal.ChronoUnit.DAYS.between(start, end)
+                    if (daysBetween > 365) {
+                        showToast("Максимальный период отчета - 365 дней")
+                        val currentRange = presentationModel.selectedRangeState.value
+                        binding.calendarView.selectRange(CalendarDay.from(currentRange.start), CalendarDay.from(currentRange.end))
+                    } else {
+                        presentationModel.selectRangeAction.consumer.accept(
+                            com.elta.android.domain.features.reports.model.Range(start, end)
+                        )
+                    }
+                }
             }
         }
     }
@@ -132,13 +150,50 @@ class ReportPeriodChooserFragment :
         bindProgressDialog(pm)
         pm.showSnackBarCommand.bindTo { showToast(getString(R.string.statistic_error)) }
         binding.dialogCloseButtonView.clicks().subscribe { dialog?.dismiss() }
-        binding.dialogActionButtonView.clicks().bindTo(pm.mainAction)
+        binding.dialogActionButtonView.clicks().subscribe {
+            showReportTypeDropdown(pm)
+        }
         pm.closeDialogCommand.bindTo { dialog?.dismiss() }
         pm.selectedRangeState.bindTo {
             binding.calendarView.selectRange(CalendarDay.from(it.start), CalendarDay.from(it.end))
         }
         pm.titleState.bindTo(binding.dateView.text())
         pm.progressState.bindTo(setLoadingState())
+    }
+
+    private fun showReportTypeDropdown(pm: ReportPeriodChooserPm) {
+        val context = requireContext()
+        val popupWindow = androidx.appcompat.widget.ListPopupWindow(context)
+        
+        val items = listOf(
+            DropdownItem(
+                title = "PDF-отчет",
+                subtitle = "Подробная статистика по показателям",
+                iconRes = R.drawable.ic_file,
+                iconColor = android.graphics.Color.parseColor("#E53935")
+            ),
+            DropdownItem(
+                title = "XLSX-отчет",
+                subtitle = "Таблица всех событий для экспорта",
+                iconRes = R.drawable.ic_list,
+                iconColor = android.graphics.Color.parseColor("#2E7D32")
+            )
+        )
+        
+        val adapter = ReportTypeDropdownAdapter(context, items)
+        popupWindow.setAdapter(adapter)
+        popupWindow.anchorView = binding.dialogActionButtonView
+        popupWindow.setWidth(binding.dialogActionButtonView.width)
+        popupWindow.isModal = true
+        popupWindow.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.bg_dialog_rounded))
+        
+        popupWindow.setOnItemClickListener { _, _, position, _ ->
+            val type = if (position == 0) com.elta.android.domain.features.reports.model.ReportType.PDF else com.elta.android.domain.features.reports.model.ReportType.XLSX
+            pm.mainAction.consumer.accept(type)
+            popupWindow.dismiss()
+        }
+        
+        popupWindow.show()
     }
 
     private fun setLoadingState() = Consumer<Boolean> { isLoading ->

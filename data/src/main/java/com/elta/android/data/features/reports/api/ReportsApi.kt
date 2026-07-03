@@ -34,6 +34,16 @@ interface ReportsApi {
         @Query("timezoneOffset") timezoneOffset: String
     ): Single<ResponseBody>
 
+    @GET("api/reports/v2/glycemic-profile/xlsx")
+    fun downloadGlycemicProfileXlsxReport(
+        @Query("reportPeriodStart") reportPeriodStart: String,
+        @Query("reportPeriodEnd") reportPeriodEnd: String,
+        @Query("glucoseFormat") glucoseFormat: String,
+        @Query("glucoseUnit") glucoseUnit: String,
+        @Query("locale") locale: String,
+        @Query("timezoneOffset") timezoneOffset: String
+    ): Single<ResponseBody>
+
     @GET("api/reports/v1/analytics")
     fun downloadReport(@Query("token") token: String): Single<ResponseBody>
 }

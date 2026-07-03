@@ -27,8 +27,8 @@ class ReportFileManager @Inject constructor(
         }
     }
 
-    fun saveReport(name: String, body: ResponseBody): Uri {
-        val file = File(reportsDir, getFileName(name))
+    fun saveReport(name: String, extension: String, body: ResponseBody): Uri {
+        val file = File(reportsDir, "$name.$extension")
 
         var inputStream: InputStream? = null
         var outputStream: OutputStream? = null

@@ -34,6 +34,16 @@ class MockedReportsApi(
     ): Single<ResponseBody> =
         loadReport()
 
+    override fun downloadGlycemicProfileXlsxReport(
+        reportPeriodStart: String,
+        reportPeriodEnd: String,
+        glucoseFormat: String,
+        glucoseUnit: String,
+        locale: String,
+        timezoneOffset: String
+    ): Single<ResponseBody> =
+        loadReport()
+
     override fun downloadReport(token: String): Single<ResponseBody> =
         loadReport()
 

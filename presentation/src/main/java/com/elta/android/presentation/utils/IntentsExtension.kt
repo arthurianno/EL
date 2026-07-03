@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.webkit.MimeTypeMap
 import com.elta.android.domain.common.model.MimeType
 import com.elta.android.presentation.R
 import com.nullgr.core.intents.launch
@@ -24,9 +25,12 @@ fun shareIntent(uri: Uri, title: String): Intent =
     )
 
 fun pdfActionIntent(uri: Uri, context: Context): Intent {
+    val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+    val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "application/octet-stream"
+
     var intent = Intent(Intent.ACTION_VIEW).apply {
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        type = MimeType.DocumentPdf.mimeName
+        type = mimeType
         data = uri
     }
     var title = context.getString(R.string.statistic_view_pdf_dialog_title)
@@ -34,7 +38,7 @@ fun pdfActionIntent(uri: Uri, context: Context): Intent {
         intent = Intent(Intent.ACTION_SEND).apply {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             putExtra(Intent.EXTRA_STREAM, uri)
-            type = MimeType.DocumentPdf.mimeName
+            type = mimeType
         }
         title = context.getString(R.string.statistic_share_pdf_dialog_title)
     }

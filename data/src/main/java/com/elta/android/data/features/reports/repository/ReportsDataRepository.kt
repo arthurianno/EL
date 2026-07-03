@@ -13,19 +13,22 @@ import com.elta.android.domain.features.user.repository.ProfileRepository
 import io.reactivex.Single
 import javax.inject.Inject
 
+import com.elta.android.domain.features.reports.model.ReportType
+
 class ReportsDataRepository @Inject constructor(
     private val context: Context,
     private val remoteDataSource: ReportsDataSource,
     private val profileRepository: ProfileRepository
 ) : ReportsRepository {
 
-    override fun getReport(range: Range): Single<Uri> =
+    override fun getReport(range: Range, reportType: ReportType): Single<Uri> =
         profileRepository.getProfile()
             .flatMap { profile ->
                 remoteDataSource.downloadReport(
                     startDate = range.start,
                     endDate = range.end,
                     glucoseFormat = profile.glucoseFormat,
+                    reportType = reportType,
                     fileName = buildFileName(profile, range)
                 )
             }

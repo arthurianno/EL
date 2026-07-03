@@ -5,6 +5,7 @@ import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.data.features.common.network.ApiLocaleResolver
 import com.elta.android.data.features.reports.api.ReportsApi
 import com.elta.android.data.features.reports.dto.ReportNetworkRequest
+import com.elta.android.domain.features.reports.model.ReportType
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
@@ -20,6 +21,7 @@ class ReportsRemoteDataSource @Inject constructor(
         startDate: LocalDate,
         endDate: LocalDate,
         glucoseFormat: GlucoseFormat,
+        reportType: ReportType,
         fileName: String
     ): Single<Uri> {
         val start = startDate.toStringWithFormat(DATE_PATTERN)
@@ -33,6 +35,7 @@ class ReportsRemoteDataSource @Inject constructor(
             glucoseFormat = glucoseFormat.name,
             locale = locale,
             timezoneOffset = timezoneOffset,
+            reportType = reportType,
             fileName = fileName
         ).onErrorResumeNext { error ->
             if (error is HttpException && error.code() in FALLBACK_HTTP_CODES) {
@@ -40,6 +43,7 @@ class ReportsRemoteDataSource @Inject constructor(
                     startDate = start,
                     endDate = end,
                     glucoseFormat = glucoseFormat.name,
+                    reportType = reportType,
                     fileName = fileName
                 )
             } else {
@@ -54,21 +58,35 @@ class ReportsRemoteDataSource @Inject constructor(
         glucoseFormat: String,
         locale: String,
         timezoneOffset: String,
+        reportType: ReportType,
         fileName: String
-    ): Single<Uri> =
-        reportsApi.downloadGlycemicProfileReport(
-            reportPeriodStart = startDate,
-            reportPeriodEnd = endDate,
-            glucoseFormat = glucoseFormat,
-            glucoseUnit = GLUCOSE_UNIT_MMOL_L,
-            locale = locale,
-            timezoneOffset = timezoneOffset
-        ).map { fileManager.saveReport(fileName, it) }
+    ): Single<Uri> {
+        val requestSingle = when (reportType) {
+            ReportType.PDF -> reportsApi.downloadGlycemicProfileReport(
+                reportPeriodStart = startDate,
+                reportPeriodEnd = endDate,
+                glucoseFormat = glucoseFormat,
+                glucoseUnit = GLUCOSE_UNIT_MMOL_L,
+                locale = locale,
+                timezoneOffset = timezoneOffset
+            )
+            ReportType.XLSX -> reportsApi.downloadGlycemicProfileXlsxReport(
+                reportPeriodStart = startDate,
+                reportPeriodEnd = endDate,
+                glucoseFormat = glucoseFormat,
+                glucoseUnit = GLUCOSE_UNIT_MMOL_L,
+                locale = locale,
+                timezoneOffset = timezoneOffset
+            )
+        }
+        return requestSingle.map { fileManager.saveReport(fileName, reportType.name.lowercase(), it) }
+    }
 
     private fun downloadReportV1(
         startDate: String,
         endDate: String,
         glucoseFormat: String,
+        reportType: ReportType,
         fileName: String
     ): Single<Uri> {
         val languageTag = ApiLocaleResolver.languageTag()
@@ -82,7 +100,7 @@ class ReportsRemoteDataSource @Inject constructor(
             )
         ).flatMap { tokenDto ->
             reportsApi.downloadReport(tokenDto.token)
-        }.map { fileManager.saveReport(fileName, it) }
+        }.map { fileManager.saveReport(fileName, reportType.name.lowercase(), it) }
     }
 
     companion object {
