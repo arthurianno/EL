@@ -8,5 +8,5 @@ class ReleaseTree(
     private val enableLog: Boolean
 ) : BaseTree(logsFile) {
     override fun isLoggable(tag: String?, priority: Int): Boolean =
-        enableLog || priority == Log.INFO || priority == Log.ERROR
+        enableLog || priority >= Log.INFO
 }
