@@ -53,6 +53,9 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
             onOptionClick = { option ->
                 viewModel sendAction ConsultantAction.OptionClick(option)
             },
+            onSendTextClick = { text ->
+                viewModel sendAction ConsultantAction.SendTextClick(text)
+            },
             onTopBarBackClick = {
                 viewModel.backClick()
             },

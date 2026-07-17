@@ -8,4 +8,5 @@ sealed class ConsultantAction : Action {
     data object BackClick : ConsultantAction()
     data object ResetClick : ConsultantAction()
     data class CopyMessageClick(val text: String) : ConsultantAction()
+    data class SendTextClick(val text: String) : ConsultantAction()
 }

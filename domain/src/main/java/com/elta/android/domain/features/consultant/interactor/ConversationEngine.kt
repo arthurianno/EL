@@ -17,6 +17,12 @@ class ConversationEngine {
 
     fun getHistory(): List<BotNode> = historyStack.toList()
 
+    fun restoreState(currentNode: BotNode, history: List<BotNode>) {
+        this.historyStack.clear()
+        this.historyStack.addAll(history)
+        this.currentNode = currentNode
+    }
+
     suspend fun selectOption(option: BotOption, getNodeById: suspend (String) -> BotNode?): BotNode? {
         val current = currentNode ?: return null
         val nextNode = getNodeById(option.nextNodeId) ?: return null

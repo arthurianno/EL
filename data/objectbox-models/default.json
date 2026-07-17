@@ -1294,9 +1294,77 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "35:6689452188859658347",
+      "lastPropertyId": "6:5436551028364239808",
+      "name": "ChatMessageDbEntity",
+      "properties": [
+        {
+          "id": "1:5838235408785812388",
+          "name": "objectBoxId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5741445792888242542",
+          "name": "id",
+          "type": 9
+        },
+        {
+          "id": "3:6953185826714093544",
+          "name": "text",
+          "type": 9
+        },
+        {
+          "id": "4:8226796751212008798",
+          "name": "sender",
+          "type": 9
+        },
+        {
+          "id": "5:5451520532270869447",
+          "name": "timestamp",
+          "type": 6
+        },
+        {
+          "id": "6:5436551028364239808",
+          "name": "status",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "36:7149352231257541943",
+      "lastPropertyId": "4:970764974578680551",
+      "name": "UserStateDbEntity",
+      "properties": [
+        {
+          "id": "1:9082664420501469975",
+          "name": "objectBoxId",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:2626376923342469647",
+          "name": "currentScenarioId",
+          "type": 9
+        },
+        {
+          "id": "3:5622802051056775934",
+          "name": "currentNodeId",
+          "type": 9
+        },
+        {
+          "id": "4:970764974578680551",
+          "name": "historyStackCsv",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "34:7570676786948297390",
+  "lastEntityId": "36:7149352231257541943",
   "lastIndexId": "6:8670197050320643670",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",

@@ -8,6 +8,7 @@ import com.elta.android.domain.features.consultant.model.BotOption
 import com.elta.android.domain.features.consultant.model.ChatMessage
 import com.elta.android.domain.features.consultant.model.MessageSender
 import com.elta.android.domain.features.consultant.model.MessageStatus
+import com.elta.android.domain.features.consultant.model.UserState
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
 import com.elta.android.presentation.R
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
@@ -19,6 +20,7 @@ import com.elta.android.presentation.features.consultant.model.ConsultantAction
 import com.elta.android.presentation.features.consultant.model.ConsultantViewState
 import com.elta.android.presentation.features.consultant.model.ScrollToDown
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 class ConsultantViewModel @Inject constructor(
@@ -40,25 +42,59 @@ class ConsultantViewModel @Inject constructor(
 
     init {
         appMetricTracker.trackEvent(AppMetricEvent.TapOnlineConsultant)
-        startConversation()
+        observeMessages()
+        restoreOrCreateConversation()
     }
 
-    private fun startConversation() {
+    private fun observeMessages() {
+        launch {
+            botRepository.getMessagesFlow().collect { messages ->
+                reduceState {
+                    state.value.copy(
+                        chatMessages = messages
+                    )
+                }
+                sendEvent(ScrollToDown)
+            }
+        }
+    }
+
+    private fun restoreOrCreateConversation() {
+        launch {
+            val savedState = botRepository.getBotState()
+            val rootNode = botRepository.getRootNode()
+
+            val savedNodeId = savedState.currentNodeId
+            if (savedNodeId != null) {
+                val currentNode = botRepository.getNodeById(savedNodeId) ?: rootNode
+                val historyNodes = savedState.historyStack.mapNotNull { botRepository.getNodeById(it) }
+                
+                conversationEngine.restoreState(currentNode, historyNodes)
+
+                reduceState {
+                    state.value.copy(
+                        currentOptions = currentNode.options,
+                        canGoBack = conversationEngine.canGoBack()
+                    )
+                }
+            } else {
+                resetConversation()
+            }
+        }
+    }
+
+    private fun resetConversation() {
         launch {
             val rootNode = botRepository.getRootNode()
             conversationEngine.reset(rootNode)
-            
-            // Сбрасываем стейт и показываем приветствие
-            reduceState {
-                createInitState()
-            }
+            botRepository.clearHistory()
+            botRepository.clearBotState()
             
             showBotNodeMessage(rootNode, initialDelay = true)
         }
     }
 
     private suspend fun showBotNodeMessage(node: BotNode, initialDelay: Boolean) {
-        // Устанавливаем статус печатания
         reduceState {
             state.value.copy(
                 isBotTyping = true,
@@ -70,7 +106,6 @@ class ConsultantViewModel @Inject constructor(
         if (initialDelay) {
             delay(800)
         } else {
-            // Вычисляем задержку на основе длины текста (например, 10 мс за символ, но не меньше 500 мс и не больше 1500 мс)
             val typingDuration = (node.text.length * 10L).coerceIn(500L, 1500L)
             delay(typingDuration)
         }
@@ -80,9 +115,17 @@ class ConsultantViewModel @Inject constructor(
             sender = MessageSender.BOT
         )
 
+        botRepository.saveMessage(botMessage)
+        botRepository.saveBotState(
+            UserState(
+                currentScenarioId = "local_faq",
+                currentNodeId = node.id,
+                historyStack = conversationEngine.getHistory().map { it.id }
+            )
+        )
+
         reduceState {
             state.value.copy(
-                chatMessages = state.value.chatMessages + botMessage,
                 currentOptions = node.options,
                 isBotTyping = false,
                 canGoBack = conversationEngine.canGoBack()
@@ -96,28 +139,91 @@ class ConsultantViewModel @Inject constructor(
         when (action) {
             is ConsultantAction.OptionClick -> handleOptionClick(action.option)
             is ConsultantAction.BackClick -> handleBackClick()
-            is ConsultantAction.ResetClick -> startConversation()
+            is ConsultantAction.ResetClick -> resetConversation()
             is ConsultantAction.CopyMessageClick -> handleCopyMessage(action.text)
+            is ConsultantAction.SendTextClick -> handleSendTextClick(action.text)
+        }
+    }
+
+    private fun handleSendTextClick(text: String) {
+        if (text.isBlank()) return
+        launch {
+            val userMessage = ChatMessage(
+                text = text,
+                sender = MessageSender.USER
+            )
+            botRepository.saveMessage(userMessage)
+
+            reduceState {
+                state.value.copy(
+                    currentOptions = emptyList()
+                )
+            }
+            sendEvent(ScrollToDown)
+
+            reduceState {
+                state.value.copy(isBotTyping = true)
+            }
+            sendEvent(ScrollToDown)
+
+            delay(1000)
+
+            val matchedNode = botRepository.searchNodeByText(text)
+
+            if (matchedNode != null) {
+                conversationEngine.reset(matchedNode)
+                showBotNodeMessage(matchedNode, initialDelay = false)
+            } else {
+                val isEn = context.resources.configuration.locale.language == "en"
+                val fallbackText = if (isEn) {
+                    "Sorry, I couldn't find an answer to your question. Please try asking differently."
+                } else {
+                    "К сожалению, я не смог подобрать решение. Попробуйте сформулировать вопрос иначе."
+                }
+
+                val botMessage = ChatMessage(
+                    text = fallbackText,
+                    sender = MessageSender.BOT
+                )
+                botRepository.saveMessage(botMessage)
+
+                botRepository.saveBotState(
+                    UserState(
+                        currentScenarioId = "local_faq",
+                        currentNodeId = null,
+                        historyStack = emptyList()
+                    )
+                )
+
+                reduceState {
+                    state.value.copy(
+                        currentOptions = listOf(
+                            BotOption(context.getString(R.string.consultant_to_start), "root")
+                        ),
+                        isBotTyping = false,
+                        canGoBack = conversationEngine.canGoBack()
+                    )
+                }
+                sendEvent(ScrollToDown)
+            }
         }
     }
 
     private fun handleOptionClick(option: BotOption) {
         launch {
-            // Добавляем сообщение пользователя на экран
             val userMessage = ChatMessage(
                 text = option.text,
                 sender = MessageSender.USER
             )
+            botRepository.saveMessage(userMessage)
 
             reduceState {
                 state.value.copy(
-                    chatMessages = state.value.chatMessages + userMessage,
-                    currentOptions = emptyList() // Временно гасим кнопочки
+                    currentOptions = emptyList()
                 )
             }
             sendEvent(ScrollToDown)
 
-            // Запрашиваем следующий узел
             val nextNode = conversationEngine.selectOption(option) { nodeId ->
                 botRepository.getNodeById(nodeId)
             }
@@ -125,7 +231,6 @@ class ConsultantViewModel @Inject constructor(
             if (nextNode != null) {
                 showBotNodeMessage(nextNode, initialDelay = false)
             } else {
-                // Если узел не найден, завершаем или откатываем
                 reduceState {
                     state.value.copy(
                         currentOptions = listOf(BotOption(context.getString(R.string.consultant_to_start), "root"))
@@ -141,17 +246,24 @@ class ConsultantViewModel @Inject constructor(
         launch {
             val previousNode = conversationEngine.goBack() ?: return@launch
             
-            // Удаляем из списка сообщений последнее сообщение пользователя и последний ответ бота
+            botRepository.saveBotState(
+                UserState(
+                    currentScenarioId = "local_faq",
+                    currentNodeId = previousNode.id,
+                    historyStack = conversationEngine.getHistory().map { it.id }
+                )
+            )
+
             val currentList = state.value.chatMessages
-            val updatedList = if (currentList.size >= 2) {
-                currentList.dropLast(2)
-            } else {
-                emptyList()
+            botRepository.clearHistory()
+            if (currentList.size >= 2) {
+                currentList.dropLast(2).forEach {
+                    botRepository.saveMessage(it)
+                }
             }
 
             reduceState {
                 state.value.copy(
-                    chatMessages = updatedList,
                     currentOptions = previousNode.options,
                     canGoBack = conversationEngine.canGoBack()
                 )
