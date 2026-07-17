@@ -837,6 +837,9 @@
     <string name="consultant_push_file_message">Operator sent a file</string>
     <string name="consultant_push_rate_operator">Rate the operator\'s work</string>
     <string name="consultant_push_operator_joined">Operator has taken the chat for processing</string>
+    <string name="consultant_virtual_assistant">Virtual Assistant</string>
+    <string name="consultant_reset">Reset</string>
+    <string name="consultant_to_start">To start</string>
     <string name="content_description_bluetooth_icon">Bluetooth icon</string>
     <string name="content_description_close_button">Close button</string>
     <string name="content_description_clear_button">Clear button</string>

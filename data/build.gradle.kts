@@ -103,8 +103,6 @@ dependencies {
 
     implementation(Dependencies.Utils.essentials)
 
-    implementation(Dependencies.Webim.core)
-
     implementation(Dependencies.Jetpack.Paging.pagingRuntime)
     implementation(Dependencies.Jetpack.Paging.rxPaging)
 

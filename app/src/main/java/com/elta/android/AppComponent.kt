@@ -26,7 +26,6 @@ import com.elta.android.data.di.RoomModule
 import com.elta.android.data.di.ServiceModule
 import com.elta.android.data.di.StorageModule
 import com.elta.android.data.di.TokenModule
-import com.elta.android.data.di.WebimModule
 import com.elta.android.injector.MessagingServiceBuilder
 import com.elta.android.presentation.di.ActivityBuilder
 import com.elta.android.presentation.di.AnalyticModule
@@ -66,7 +65,6 @@ import javax.inject.Singleton
         GlucometerImplModule::class,
         LocalSyncModule::class,
         FatSecretModule::class,
-        WebimModule::class,
         ServiceModule::class,
         ClipboardModule::class,
         NetworkRequesterModule::class,

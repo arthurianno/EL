@@ -1,0 +1,291 @@
+{
+  "rootNodeId": "root",
+  "nodes": [
+    {
+      "id": "root",
+      "text": "Hello! I am your virtual assistant. Select the topic you are having difficulty with, and I will help you figure it out:",
+      "options": [
+        {
+          "text": "Glucometer issues",
+          "nextNodeId": "glucometer_issues"
+        },
+        {
+          "text": "Data transfer",
+          "nextNodeId": "data_transfer"
+        },
+        {
+          "text": "App issues",
+          "nextNodeId": "app_issues"
+        },
+        {
+          "text": "Contact support",
+          "nextNodeId": "support_contacts"
+        }
+      ]
+    },
+    {
+      "id": "glucometer_issues",
+      "text": "What exactly is the problem with the glucometer?",
+      "options": [
+        {
+          "text": "Error E1",
+          "nextNodeId": "error_e1"
+        },
+        {
+          "text": "Error E2",
+          "nextNodeId": "error_e2"
+        },
+        {
+          "text": "Error E3",
+          "nextNodeId": "error_e3"
+        },
+        {
+          "text": "No Bluetooth connection",
+          "nextNodeId": "bluetooth_no_connection"
+        },
+        {
+          "text": "Inaccurate result",
+          "nextNodeId": "inaccurate_result"
+        },
+        {
+          "text": "Return to main menu",
+          "nextNodeId": "root"
+        }
+      ]
+    },
+    {
+      "id": "error_e1",
+      "text": "Error E1 means calibration failure or test strip issues.\n\nSolution:\n1. Turn off the glucometer.\n2. Insert a new test strip as far as it goes.\n3. Make sure the code on the screen matches the code on the test strip vial.\n\nDid this solution help you?",
+      "options": [
+        {
+          "text": "Yes, thank you!",
+          "nextNodeId": "success_exit"
+        },
+        {
+          "text": "No, I need help",
+          "nextNodeId": "support_contacts"
+        },
+        {
+          "text": "Back",
+          "nextNodeId": "glucometer_issues"
+        }
+      ]
+    },
+    {
+      "id": "error_e2",
+      "text": "Error E2 means that the test strip has already been used or has been out of the vial for too long.\n\nSolution:\n1. Remove the strip.\n2. Take a new strip from the vial and immediately close the cap tightly.\n3. Insert the new strip into the device and apply a drop of blood.\n\nDid this solution help you?",
+      "options": [
+        {
+          "text": "Yes, thank you!",
+          "nextNodeId": "success_exit"
+        },
+        {
+          "text": "No, I need help",
+          "nextNodeId": "support_contacts"
+        },
+        {
+          "text": "Back",
+          "nextNodeId": "glucometer_issues"
+        }
+      ]
+    },
+    {
+      "id": "error_e3",
+      "text": "Error E3 indicates a temperature issue. The device is in an environment that is too cold or too hot.\n\nSolution:\nThe glucometer operates at temperatures from +10°C to +40°C. Move the device to a room with room temperature, wait 20-30 minutes, and repeat the measurement.",
+      "options": [
+        {
+          "text": "Yes, thank you!",
+          "nextNodeId": "success_exit"
+        },
+        {
+          "text": "Back",
+          "nextNodeId": "glucometer_issues"
+        }
+      ]
+    },
+    {
+      "id": "bluetooth_no_connection",
+      "text": "If the glucometer does not connect via Bluetooth:\n\n1. Make sure Bluetooth and location services are enabled on your phone (this is an Android requirement for BLE).\n2. Turn Bluetooth off and on again.\n3. Restart the glucometer and the app.\n4. Try pairing again through the 'Devices' section in the app.",
+      "options": [
+        {
+          "text": "Tried, it helped!",
+          "nextNodeId": "success_exit"
+        },
+        {
+          "text": "Didn't help",
+          "nextNodeId": "support_contacts"
+        },
+        {
+          "text": "Back",
+          "nextNodeId": "glucometer_issues"
+        }
+      ]
+    },
+    {
+      "id": "inaccurate_result",
+      "text": "If the results seem inaccurate, pay attention to the following test rules:\n\n1. Wash your hands thoroughly with soap and wipe them dry. Residual moisture or cream on the skin can distort the result.\n2. Do not use alcohol to disinfect your finger immediately before the puncture, or let it evaporate completely.\n3. The first drop of blood may contain interstitial fluid. It is recommended to wipe it off with a dry tissue and use the second drop for measurement.\n4. Make sure the test strips have not expired.",
+      "options": [
+        {
+          "text": "Thanks, I'll keep it in mind",
+          "nextNodeId": "success_exit"
+        },
+        {
+          "text": "Back",
+          "nextNodeId": "glucometer_issues"
+        }
+      ]
+    },
+    {
+      "id": "data_transfer",
+      "text": "Select a topic related to data transfer:",
+      "options": [
+        {
+          "text": "How to set up auto-export",
+          "nextNodeId": "auto_export_info"
+        },
+        {
+          "text": "Data is not syncing",
+          "nextNodeId": "sync_failure_info"
+        },
+        {
+          "text": "Integration with EMIAS",
+          "nextNodeId": "emias_integration_info"
+        },
+        {
+          "text": "Return to main menu",
+          "nextNodeId": "root"
+        }
+      ]
+    },
+    {
+      "id": "auto_export_info",
+      "text": "To set up auto-export of reports:\n\n1. Go to 'Profile' -> 'Report Settings'.\n2. Select the desired format (PDF or Excel).\n3. Specify the sending interval and your e-mail.\nAfter that, reports will be sent to the specified e-mail automatically.",
+      "options": [
+        {
+          "text": "Understood",
+          "nextNodeId": "success_exit"
+        },
+        {
+          "text": "Back",
+          "nextNodeId": "data_transfer"
+        }
+      ]
+    },
+    {
+      "id": "sync_failure_info",
+      "text": "If data is not syncing with the server:\n\n1. Check your Internet connection.\n2. Make sure you are logged into your profile.\n3. Try pulling down the diary screen (Pull-to-refresh) to force sync.",
+      "options": [
+        {
+          "text": "Tried, it helped",
+          "nextNodeId": "success_exit"
+        },
+        {
+          "text": "Didn't help",
+          "nextNodeId": "support_contacts"
+        },
+        {
+          "text": "Back",
+          "nextNodeId": "data_transfer"
+        }
+      ]
+    },
+    {
+      "id": "emias_integration_info",
+      "text": "Integration with EMIAS allows you to automatically send measurement results to your treating physician.\n\nConnection:\n1. In the app, go to 'Profile' -> 'Services' -> 'EMIAS'.\n2. Click the 'Connect' button.\n3. You will be redirected to the mos.ru portal for authorization and confirmation of access.",
+      "options": [
+        {
+          "text": "Great",
+          "nextNodeId": "success_exit"
+        },
+        {
+          "text": "Back",
+          "nextNodeId": "data_transfer"
+        }
+      ]
+    },
+    {
+      "id": "app_issues",
+      "text": "What malfunctions in the app have you noticed?",
+      "options": [
+        {
+          "text": "The app crashes or freezes",
+          "nextNodeId": "app_crash_info"
+        },
+        {
+          "text": "Notifications do not arrive",
+          "nextNodeId": "app_notifications_info"
+        },
+        {
+          "text": "How to change target ranges",
+          "nextNodeId": "target_ranges_info"
+        },
+        {
+          "text": "Return to main menu",
+          "nextNodeId": "root"
+        }
+      ]
+    },
+    {
+      "id": "app_crash_info",
+      "text": "If the app is unstable:\n\n1. Try clearing the app cache through your phone's system settings (Settings -> Apps -> Satellite -> Storage/Cache -> Clear cache).\n2. Make sure the latest version of the app is installed from Google Play / RuStore.\n3. Restart your phone.",
+      "options": [
+        {
+          "text": "Tried it",
+          "nextNodeId": "success_exit"
+        },
+        {
+          "text": "Back",
+          "nextNodeId": "app_issues"
+        }
+      ]
+    },
+    {
+      "id": "app_notifications_info",
+      "text": "If measurement reminders do not arrive:\n\n1. Go to phone settings -> Apps -> Satellite -> Notifications. Make sure the 'Allow notifications' switch is turned on.\n2. Inside our app, open 'Profile' -> 'Reminders' and check the measurement schedule.\n3. Add the app to your phone's power saving mode exclusions so that the system doesn't close it in the background.",
+      "options": [
+        {
+          "text": "Understood",
+          "nextNodeId": "success_exit"
+        },
+        {
+          "text": "Back",
+          "nextNodeId": "app_issues"
+        }
+      ]
+    },
+    {
+      "id": "target_ranges_info",
+      "text": "You can change target glucose ranges in the section:\n'Profile' -> 'Target values'.\n\nThere you can configure individual normal glucose limits before and after meals, agreed with your doctor.",
+      "options": [
+        {
+          "text": "Understood",
+          "nextNodeId": "success_exit"
+        },
+        {
+          "text": "Back",
+          "nextNodeId": "app_issues"
+        }
+      ]
+    },
+    {
+      "id": "support_contacts",
+      "text": "You can contact our support team directly:\n\n📞 Hotline phone:\n8 (800) 250-17-50\n(free within RF)\n\n✉️ Email: info@eltaltd.ru\n\nOur specialists are available from 9:00 to 18:00 Moscow time.",
+      "options": [
+        {
+          "text": "To start",
+          "nextNodeId": "root"
+        }
+      ]
+    },
+    {
+      "id": "success_exit",
+      "text": "Glad I could help! If you have any other questions, I am always ready to answer.",
+      "options": [
+        {
+          "text": "To start",
+          "nextNodeId": "root"
+        }
+      ]
+    }
+  ]
+}

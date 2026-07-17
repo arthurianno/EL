@@ -954,6 +954,9 @@
     <string name="consultant_push_file_message">Оператор прислал файл</string>
     <string name="consultant_push_rate_operator">Оцените работу оператора</string>
     <string name="consultant_push_operator_joined">Оператор взял чат в обработку</string>
+    <string name="consultant_virtual_assistant">Виртуальный ассистент</string>
+    <string name="consultant_reset">Сброс</string>
+    <string name="consultant_to_start">В начало</string>
 
     <!-- Content Descriptions -->
     <string name="content_description_bluetooth_icon">значок блютуза</string>

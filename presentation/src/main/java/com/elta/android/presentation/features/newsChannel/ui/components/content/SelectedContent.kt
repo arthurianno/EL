@@ -25,7 +25,6 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.widgets.HSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerHalfMedium
 import com.elta.android.presentation.features.consultant.model.ConnectState
-import com.elta.android.presentation.features.consultant.ui.components.chat.Message
 import com.elta.android.presentation.features.newsChannel.model.ContextMenuUiEntityNews
 import com.elta.android.presentation.features.newsChannel.model.MessageUiEntity
 import com.elta.android.presentation.theme.GetLocalProperties

@@ -96,8 +96,8 @@ class ErrorInterceptor @Inject constructor(
         return response
     }
 
-    private fun getErrorBody(body: ResponseBody): ErrorBody? = runCatching {
-        Gson().fromJson(body.string(), ErrorBody::class.java)
+    private fun getErrorBody(body: ResponseBody?): ErrorBody? = runCatching {
+        body?.let { Gson().fromJson(it.string(), ErrorBody::class.java) }
     }.getOrNull()
 
     private fun getStringByCode(code: Int): String {

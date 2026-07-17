@@ -367,11 +367,6 @@ object Dependencies {
         const val jetpackCompose = "org.kodein.di:kodein-di-framework-compose:$versionCompose"
     }
 
-    object Webim {
-        private const val version = "3.42.1"
-
-        const val core = "ru.webim.sdk:webimclientsdkandroid:$version"
-    }
 
     object IIOT {
         private const val jacsonVersion = "2.16.0"

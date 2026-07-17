@@ -177,7 +177,6 @@ dependencies {
     implementation(platform(Dependencies.Google.FireBase.bom))
     implementation(Dependencies.Google.FireBase.messagingBom)
     implementation(Dependencies.Google.guavaConflictLost)
-    implementation(Dependencies.Webim.core)
     implementation(Dependencies.OneSignal.core) // OneSignal уже есть
     implementation ("com.huawei.hms:push:6.3.0.304") // Новая строка
     implementation(Dependencies.Coil.core)
