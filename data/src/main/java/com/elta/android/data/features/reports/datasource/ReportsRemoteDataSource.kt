@@ -26,31 +26,16 @@ class ReportsRemoteDataSource @Inject constructor(
     ): Single<Uri> {
         val start = startDate.toStringWithFormat(DATE_PATTERN)
         val end = endDate.toStringWithFormat(DATE_PATTERN)
-        val locale = ApiLocaleResolver.reportLocale()
-        val timezoneOffset = ApiLocaleResolver.timezoneOffset()
 
-        return downloadReportV2(
+        return downloadReportV1(
             startDate = start,
             endDate = end,
             glucoseFormat = glucoseFormat.name,
-            locale = locale,
-            timezoneOffset = timezoneOffset,
             reportType = reportType,
             fileName = fileName
-        ).onErrorResumeNext { error ->
-            if (error is HttpException && error.code() in FALLBACK_HTTP_CODES) {
-                downloadReportV1(
-                    startDate = start,
-                    endDate = end,
-                    glucoseFormat = glucoseFormat.name,
-                    reportType = reportType,
-                    fileName = fileName
-                )
-            } else {
-                Single.error(error)
-            }
-        }
+        )
     }
+
 
     private fun downloadReportV2(
         startDate: String,
