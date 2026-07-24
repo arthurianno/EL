@@ -18,12 +18,12 @@ class SupportItemsBuilder @Inject constructor(
     fun buildItems(glucometerVersion: String): List<ListItem> {
         val items = mutableListOf<ListItem>(
             SupportHeaderItem(text = resourceProvider.getString(R.string.profile_support_actions_header)),
-            SupportActionItem(
+            /*SupportActionItem(
                 icon = R.drawable.ic_chat,
                 title = resourceProvider.getString(R.string.profile_support_consultant),
                 subTitle = resourceProvider.getString(R.string.profile_support_email_description),
                 action = SupportAction.ConsultantAction
-            ),
+            ),*/
             SupportActionItem(
                 icon = R.drawable.ic_support_call,
                 title = resourceProvider.getString(R.string.profile_support_phone_number),

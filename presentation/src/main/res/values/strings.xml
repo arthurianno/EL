@@ -764,7 +764,7 @@
     <string name="statistic_daily_glucose_title">Мои показатели</string>
 
     <string name="statistic_report_title">Выгрузка отчета</string>
-    <string name="statistic_report_sub_title">Диапазон данных 365 дней</string>
+    <string name="statistic_report_sub_title">Максимальный диапазон данных 365 дней</string>
     <string name="statistic_report_description">Выберите дату начала диапазона для\nгенерации данных в отчете</string>
     <string name="statistic_report_action_button">Подтвердить и выгрузить</string>
     <string name="statistic_menu_button">Выгрузить отчет</string>
