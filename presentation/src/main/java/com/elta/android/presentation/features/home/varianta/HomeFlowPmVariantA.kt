@@ -2,7 +2,11 @@ package com.elta.android.presentation.features.home.pm
 
 import android.util.Log
 import com.elta.android.presentation.utils.OneSignalTags
+import com.elta.android.common.errors.GlucometerDeviceHardwareError
+import com.elta.android.common.errors.GlucometerTestConfig
+
 import com.elta.android.common.errors.BluetoothNotEnabledErrorVariantA
+
 import com.elta.android.common.errors.BluetoothScannerError
 import com.elta.android.common.errors.CommandError
 import com.elta.android.common.errors.GlucometerConnectionException
@@ -119,6 +123,12 @@ class HomeFlowPmVariantA @Inject constructor(
     val manualSyncErrorAction = action<Unit>()
     val closeBottomSheetErrorAction = action<Unit>()
     val closeManualSyncErrorBottomSheetCommand = command<Unit>()
+
+    val deviceHardwareErrorBottomSheetCommand = command<Unit>()
+    val closeHardwareErrorBottomSheetCommand = command<Unit>()
+    val closeHardwareErrorBottomSheetAction = action<Unit>()
+    val hardwareErrorSupportAction = action<Unit>()
+
 
     val btControl = bluetoothControl2VariantA()
 
@@ -310,7 +320,9 @@ class HomeFlowPmVariantA @Inject constructor(
 
                     META_SYNC -> {
                         Completable.fromCallable {
-                            if (isFirstSync.valueOrNull == true) {
+                            if (GlucometerTestConfig.MOCK_HARDWARE_ERROR) {
+                                deviceHardwareErrorBottomSheetCommand.consumer.accept(Unit)
+                            } else if (isFirstSync.valueOrNull == true) {
                                 showHelpBottomSheetCommand.consumer.accept(Unit)
                             } else {
                                 appMetric.trackEvent(AppMetricEvent.SynchronizationDeviceClick)
@@ -318,6 +330,7 @@ class HomeFlowPmVariantA @Inject constructor(
                             }
                         }
                     }
+
 
                     else -> Completable.complete()
                 }
@@ -371,6 +384,16 @@ class HomeFlowPmVariantA @Inject constructor(
         closeBottomSheetErrorAction.observable
             .subscribe(closeManualSyncErrorBottomSheetCommand.consumer)
             .untilDestroy()
+
+        hardwareErrorSupportAction.observable
+            .doOnNext { closeHardwareErrorBottomSheetCommand.consumer.accept(Unit) }
+            .subscribe { router.navigateTo(Screens.Feedback) }
+            .untilDestroy()
+
+        closeHardwareErrorBottomSheetAction.observable
+            .subscribe(closeHardwareErrorBottomSheetCommand.consumer)
+            .untilDestroy()
+
 
         Observable.merge(
             manualSyncErrorAction.observable,
@@ -692,18 +715,27 @@ class HomeFlowPmVariantA @Inject constructor(
                 manualSyncErrorBottomSheetCommand.accept(Unit)
             }
 
-            is GlucometerSyncError -> {
-                val manualSyncError = if (error.cause is TimeoutException) {
-                    appMetric.trackEvent(AppMetricEvent.SnackSynchronization(SnackStatusParam.DEVICE_NOT_FOUND))
-                    ManualSyncErrorVariantA.NotFound
+            is GlucometerDeviceHardwareError -> {
+                deviceHardwareErrorBottomSheetCommand.accept(Unit)
+            }
+
+            is GlucometerSyncError, is CommandError, is GlucometerConnectionException -> {
+                if (error.cause is GlucometerDeviceHardwareError) {
+                    deviceHardwareErrorBottomSheetCommand.accept(Unit)
                 } else {
-                    ManualSyncErrorVariantA.ErrorSync
+                    val manualSyncError = if (error.cause is TimeoutException) {
+                        appMetric.trackEvent(AppMetricEvent.SnackSynchronization(SnackStatusParam.DEVICE_NOT_FOUND))
+                        ManualSyncErrorVariantA.NotFound
+                    } else {
+                        ManualSyncErrorVariantA.ErrorSync
+                    }
+                    this.manualSyncError.accept(manualSyncError)
+                    manualSyncErrorBottomSheetCommand.accept(Unit)
                 }
-                this.manualSyncError.accept(manualSyncError)
-                manualSyncErrorBottomSheetCommand.accept(Unit)
             }
 
             else -> handleError(error)
+
         }
     }
 

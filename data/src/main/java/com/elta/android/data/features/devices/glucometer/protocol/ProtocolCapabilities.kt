@@ -5,13 +5,15 @@ import com.elta.android.data.features.devices.dto.VersionDto
 internal data class ProtocolCapabilities(
     val supportsGetMem: Boolean,
     val supportsGetZone: Boolean,
-    val supportsSetZone: Boolean
+    val supportsSetZone: Boolean,
+    val supportsGetError: Boolean
 ) {
     companion object {
         val Legacy = ProtocolCapabilities(
             supportsGetMem = false,
             supportsGetZone = false,
-            supportsSetZone = false
+            supportsSetZone = false,
+            supportsGetError = false
         )
     }
 }
@@ -31,13 +33,15 @@ internal object ProtocolCapabilitiesResolver {
             ProtocolCapabilities(
                 supportsGetMem = true,
                 supportsGetZone = true,
-                supportsSetZone = true
+                supportsSetZone = true,
+                supportsGetError = true
             )
         } else {
             ProtocolCapabilities.Legacy
         }
     }
 }
+
 
 private enum class ProtocolModel {
     SatelliteOnline,

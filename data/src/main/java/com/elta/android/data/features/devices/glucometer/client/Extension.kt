@@ -49,6 +49,13 @@ internal fun String.extractZoneOffsetSeconds(): Int {
     return match.groupValues[1].toLong(HEX_RADIX).toInt()
 }
 
+internal fun String.extractErrorWord(): Long {
+    val match = checkNotNull(ERROR_REGEX.find(this)) {
+        "Invalid error payload: $this"
+    }
+    return match.groupValues[1].toLong(HEX_RADIX)
+}
+
 internal fun Int.toZoneHexString(): String = toUInt().toString(HEX_RADIX).uppercase().padStart(8, '0')
 
 private val VERSION_REGEX = Regex("""hw:([^\s]+)\s+sw:([^\s]+)""", RegexOption.IGNORE_CASE)
@@ -56,3 +63,5 @@ private val BATTERY_REGEX =
     Regex("""b(\d)(?:\.)?t(\d{1,3})""", RegexOption.IGNORE_CASE)
 private val SERIAL_REGEX = Regex("""ser\.([A-Za-z0-9]{11})$""", RegexOption.IGNORE_CASE)
 private val ZONE_REGEX = Regex("""zone\.([0-9A-Fa-f]{8})$""")
+private val ERROR_REGEX = Regex("""error\.([0-9A-Fa-f]{8})$""", RegexOption.IGNORE_CASE)
+

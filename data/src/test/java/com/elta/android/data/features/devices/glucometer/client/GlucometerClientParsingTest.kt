@@ -31,4 +31,19 @@ class GlucometerClientParsingTest {
         val serial = "ser.D2204001234".extractSerial()
         assertEquals("D2204001234", serial)
     }
+
+    @Test
+    fun `extractErrorWord parses zero error word`() {
+        val errorWord = "error.00000000".extractErrorWord()
+        assertEquals(0L, errorWord)
+    }
+
+    @Test
+    fun `extractErrorWord parses non-zero error word`() {
+        val errorWord = "error.00000001".extractErrorWord()
+        assertEquals(1L, errorWord)
+        val errorWordBit3 = "error.00000008".extractErrorWord()
+        assertEquals(8L, errorWordBit3)
+    }
 }
+

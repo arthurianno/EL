@@ -427,6 +427,10 @@
     <string name="sync_connection_permission_not_granted_description">Для поиска устройства и успешной синхронизации приложению необходимы определенные разрешения (Bluetooth, поиск устройств поблизости, определение местоположения). Пожалуйста, перейдите в настройки и предоставьте доступ</string>
     <string name="sync_connection_permission_not_granted_button">Перейти в настройки</string>
     <string name="sync_connection_error_text">Проверьте, что глюкометр готов/доступен для подключения. Если подключиться так и не удается, повторите попытку позднее.</string>
+    <string name="sync_device_hardware_error_title">Ошибка устройства</string>
+    <string name="sync_device_hardware_error_subtitle">Ваше устройство не исправно, обратитесь в службу заботы и сервиса для его замены</string>
+    <string name="sync_device_hardware_error_button">Написать в поддержку</string>
+
     <string name="sync_connection_scanner_sheet_info_text">Расположите DMC-код внутри выделенной области сверху</string>
     <string name="sync_connection_scanner_sheet_error_title">Ошибка чтения</string>
     <string name="sync_connection_scanner_sheet_error_text">Наведите камеру на DMC-код ещё раз</string>

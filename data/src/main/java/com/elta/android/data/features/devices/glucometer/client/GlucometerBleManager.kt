@@ -116,6 +116,10 @@ class GlucometerBleManager @Inject constructor(
     override suspend fun getSerialNumber(): String =
         startCommand(Commands.Serial).extractSerial()
 
+    override suspend fun getError(): Long =
+        startCommand(Commands.GetError).extractErrorWord()
+
+
     override suspend fun readEvent(index: Int): String =
         startCommand(Commands.ReadEvent(index))
 

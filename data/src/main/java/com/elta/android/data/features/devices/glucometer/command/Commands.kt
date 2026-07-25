@@ -40,6 +40,8 @@ sealed class Commands(val command: String) {
 
     data object Serial : Commands(command = "serial")
 
+    data object GetError : Commands(command = "geterror")
+
     data class SendFirmwareChunk(val chunk: FirmwareChunk) : Commands(command = "")
 
     data object Reset : Commands(command = "reset") //TODO: delete?

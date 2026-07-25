@@ -32,3 +32,10 @@ object CommandStillWritingError : RuntimeException()
 class GlucometerSyncError(exception: Throwable) : RuntimeException(exception)
 object GlucometerOfflineError : RuntimeException()
 object GlucometerAlreadyConnectedError : RuntimeException()
+object GlucometerDeviceHardwareError : RuntimeException()
+
+object GlucometerTestConfig {
+    var MOCK_HARDWARE_ERROR: Boolean = true
+}
+
+

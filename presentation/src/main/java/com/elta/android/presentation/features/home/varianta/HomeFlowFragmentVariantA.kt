@@ -175,6 +175,23 @@ class HomeFlowFragmentVariantA :
             binding.homeActionView.isVisible = true
         }
 
+        with(binding.deviceHardwareErrorBottomSheetView) {
+            findViewById<TextView>(R.id.supportButtonView).clicks().bindTo(pm.hardwareErrorSupportAction)
+            findViewById<AppCompatImageView>(R.id.dialogCloseButtonView).clicks()
+                .bindTo(pm.closeHardwareErrorBottomSheetAction)
+        }
+        binding.deviceHardwareErrorBottomSheetView.visibilityChanges().subscribe {
+            binding.homeActionView.isVisible = !it
+        }.addTo(compositeDestroy)
+
+        pm.deviceHardwareErrorBottomSheetCommand.bindTo {
+            binding.homeActionView.hide()
+            binding.deviceHardwareErrorBottomSheetView.show()
+        }
+        pm.closeHardwareErrorBottomSheetCommand.bindTo {
+            binding.deviceHardwareErrorBottomSheetView.hide()
+            binding.homeActionView.isVisible = true
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -184,9 +201,14 @@ class HomeFlowFragmentVariantA :
                 ?.findViewById<com.elta.android.presentation.widgets.bottom_sheet.BottomSheetView>(R.id.homeBottomSheetView)
                 ?.handleBack()
                 ?: false
-            if (!handled) router.exit()
+            val handledError = if (!handled) {
+                view?.findViewById<com.elta.android.presentation.widgets.bottom_sheet.BottomSheetView>(R.id.deviceHardwareErrorBottomSheetView)
+                    ?.handleBack() ?: false
+            } else true
+            if (!handled && !handledError) router.exit()
         }
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         presentationModel.btControl.resolveResults(requestCode, resultCode)

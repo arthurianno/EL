@@ -4,7 +4,9 @@ import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.os.Build
+import com.elta.android.common.errors.GlucometerDeviceHardwareError
 import com.elta.android.common.errors.GlucometerConnectionException
+
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerNotConnectedException
 import com.elta.android.common.errors.GlucometerNotFoundInDfuMode
@@ -152,7 +154,22 @@ class GlucometerClientImpl @Inject constructor(
                 "Device versions received:\n hardware: ${version.hardware}, software: ${version.software}"
             )
             val capabilities = ProtocolCapabilitiesResolver.resolve(version, getConnectedDeviceName())
+            if (capabilities.supportsGetError || GlucometerDebugConfig.MOCK_HARDWARE_ERROR) {
+                runCatching {
+                    val errorWord = if (GlucometerDebugConfig.MOCK_HARDWARE_ERROR) 0x00000001L else getError()
+                    crashlyticsReport.log("Device error word received: $errorWord")
+                    if ((errorWord and HARDWARE_ERROR_MASK) != 0L) {
+                        crashlyticsReport.log("Device hardware error detected! errorWord: $errorWord")
+                        throw GlucometerDeviceHardwareError
+                    }
+                }.onFailure {
+                    if (it is GlucometerDeviceHardwareError) throw it
+                    crashlyticsReport.log("Unable to get device error word: ${it.message.orEmpty()}")
+                }
+            }
+
             if (capabilities.supportsSetZone) {
+
                 val currentOffsetSeconds = ZonedDateTime.now().offset.totalSeconds
                 runCatching {
                     updateZoneOffset(currentOffsetSeconds)
@@ -180,7 +197,9 @@ class GlucometerClientImpl @Inject constructor(
     }
 
     override suspend fun connectDevice(address: String, pin: String) {
+        if (GlucometerDebugConfig.MOCK_HARDWARE_ERROR) throw GlucometerDeviceHardwareError
         crashlyticsReport.log("Connection operations started with device ${address.hideMac()}")
+
         crashlyticsReport.log("Environment scanning started")
         val scanResult = scan(address, filters)
         lastConnectedDeviceName = scanResult.device.name ?: scanResult.scanRecord?.deviceName
@@ -225,7 +244,9 @@ class GlucometerClientImpl @Inject constructor(
         lastSyncEvent: String?,
         onCommandSuccess: () -> Unit
     ): List<String> {
+        if (GlucometerDebugConfig.MOCK_HARDWARE_ERROR) throw GlucometerDeviceHardwareError
         crashlyticsReport.log("The operation to obtain measurements from the device has begun")
+
         with(glucometerBleManager) {
             checkIsConnected(address)
             val version = getVersion()
@@ -504,7 +525,25 @@ private val MEM_IDENTITY_REGEX =
 
 private object UnknownGetMemCommandException : Exception("getmem command is not supported")
 
+private const val HARDWARE_ERROR_MASK = 0x7FL
+
+object GlucometerDebugConfig {
+    /**
+     * Флаг для симуляции аппаратной ошибки глюкометра (Таблица №3).
+     */
+    var MOCK_HARDWARE_ERROR: Boolean
+        get() = com.elta.android.common.errors.GlucometerTestConfig.MOCK_HARDWARE_ERROR
+        set(value) {
+            com.elta.android.common.errors.GlucometerTestConfig.MOCK_HARDWARE_ERROR = value
+        }
+}
+
+
+
+
 private data class MeasurementIdentity(
     val epochSeconds: Long,
     val glucoseX10: Int
 )
+
+
