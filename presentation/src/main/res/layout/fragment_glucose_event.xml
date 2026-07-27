@@ -83,7 +83,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:alpha="0.6"
-                        android:maxLines="1" />
+                        android:maxLines="2" />
 
                 </LinearLayout>
             </LinearLayout>

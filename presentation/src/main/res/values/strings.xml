@@ -430,6 +430,10 @@
     <string name="sync_device_hardware_error_title">Ошибка устройства</string>
     <string name="sync_device_hardware_error_subtitle">Ваше устройство не исправно, обратитесь в службу заботы и сервиса для его замены</string>
     <string name="sync_device_hardware_error_button">Написать в поддержку</string>
+    <string name="sync_device_invalid_time_title">Ошибка устройства</string>
+    <string name="sync_device_invalid_time_subtitle">Дата и время сохраненных измерений уровня глюкозы могут быть неверными в связи с неактуальными данными, сохраненными в устройстве. Текущая синхронизация обновила дату и время в устройстве.</string>
+    <string name="sync_device_invalid_time_button">Продолжить</string>
+    <string name="event_invalid_time_warning">Невалидная дата измерения уровня глюкозы!</string>
 
     <string name="sync_connection_scanner_sheet_info_text">Расположите DMC-код внутри выделенной области сверху</string>
     <string name="sync_connection_scanner_sheet_error_title">Ошибка чтения</string>

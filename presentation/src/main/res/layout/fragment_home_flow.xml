@@ -83,4 +83,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:bottom_sheet_layout="@layout/layout_device_hardware_error_bottom_sheet" />
+
+    <com.elta.android.presentation.widgets.bottom_sheet.BottomSheetView
+        android:id="@+id/deviceInvalidTimeBottomSheetView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:bottom_sheet_layout="@layout/layout_device_invalid_time_bottom_sheet" />
 </FrameLayout>

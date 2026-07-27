@@ -35,7 +35,7 @@ object GlucometerAlreadyConnectedError : RuntimeException()
 object GlucometerDeviceHardwareError : RuntimeException()
 
 object GlucometerTestConfig {
-    var MOCK_HARDWARE_ERROR: Boolean = true
+    var MOCK_HARDWARE_ERROR: Boolean = false
 }
 
 

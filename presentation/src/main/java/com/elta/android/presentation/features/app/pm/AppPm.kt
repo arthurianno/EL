@@ -530,7 +530,8 @@ class AppPm @Inject constructor(
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
 
-                    Events.Sync.Glucometer.Nothing -> {
+                    Events.Sync.Glucometer.Nothing,
+                    Events.Sync.Glucometer.InvalidTime -> {
                         setStatusVisibility(Visibility.Hide)
                     }
                 }

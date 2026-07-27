@@ -10,5 +10,6 @@ data class GlucometerEvent(
     val value: Double?,
     val glucometerSerialNumber: String?,
     val originalResponse: String,
-    val mealTag: MealTag? = null
+    val mealTag: MealTag? = null,
+    val isTimeInvalid: Boolean = false
 )

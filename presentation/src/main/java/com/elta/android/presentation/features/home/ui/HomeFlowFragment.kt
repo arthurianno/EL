@@ -229,6 +229,24 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
             binding.deviceHardwareErrorBottomSheetView.hide()
             binding.homeActionView.isVisible = true
         }
+
+        with(binding.deviceInvalidTimeBottomSheetView) {
+            findViewById<TextView>(R.id.continueButtonView).clicks().bindTo(pm.continueInvalidTimeAction)
+            findViewById<AppCompatImageView>(R.id.dialogCloseButtonView).clicks()
+                .bindTo(pm.closeInvalidTimeBottomSheetAction)
+        }
+        binding.deviceInvalidTimeBottomSheetView.visibilityChanges().subscribe {
+            binding.homeActionView.isVisible = !it
+        }.addTo(compositeDestroy)
+
+        pm.deviceInvalidTimeBottomSheetCommand.bindTo {
+            binding.homeActionView.hide()
+            binding.deviceInvalidTimeBottomSheetView.show()
+        }
+        pm.closeInvalidTimeBottomSheetCommand.bindTo {
+            binding.deviceInvalidTimeBottomSheetView.hide()
+            binding.homeActionView.isVisible = true
+        }
     }
 
 

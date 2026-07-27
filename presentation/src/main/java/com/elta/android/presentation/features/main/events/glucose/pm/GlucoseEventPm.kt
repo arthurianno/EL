@@ -211,12 +211,16 @@ class GlucoseEventPm @Inject constructor(
 
     private fun bindEvent(event: EventV2) {
         glucoseValueState.consumer.accept(NumberFormatter.format(event.glucoseValue(glucoseFormatState.value)))
-        glucoseInfoState.consumer.accept(
-            resources.getString(
-                R.string.event_form_glucose_info_mask_title,
-                event.getFormattedTemperature()
-            )
+        val baseInfo = resources.getString(
+            R.string.event_form_glucose_info_mask_title,
+            event.getFormattedTemperature()
         )
+        val infoText = if (event.isTimeInvalid) {
+            "$baseInfo\n${resources.getString(R.string.event_invalid_time_warning)}"
+        } else {
+            baseInfo
+        }
+        glucoseInfoState.consumer.accept(infoText)
         event.getTag(resources)?.let { tagSelector.option.consumer.accept(it) }
         selectedDateState.consumer.accept(event.additionTime)
         glucoseLevelBackgroundState.consumer.accept(

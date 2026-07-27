@@ -131,6 +131,11 @@ class HomeFlowPm @Inject constructor(
     val closeHardwareErrorBottomSheetAction = action<Unit>()
     val hardwareErrorSupportAction = action<Unit>()
 
+    val deviceInvalidTimeBottomSheetCommand = command<Unit>()
+    val closeInvalidTimeBottomSheetCommand = command<Unit>()
+    val closeInvalidTimeBottomSheetAction = action<Unit>()
+    val continueInvalidTimeAction = action<Unit>()
+
 
 
     val btControl = bluetoothControl2()
@@ -405,6 +410,13 @@ class HomeFlowPm @Inject constructor(
 
         closeHardwareErrorBottomSheetAction.observable
             .subscribe(closeHardwareErrorBottomSheetCommand.consumer)
+            .untilDestroy()
+
+        Observable.merge(
+            closeInvalidTimeBottomSheetAction.observable,
+            continueInvalidTimeAction.observable
+        )
+            .subscribe(closeInvalidTimeBottomSheetCommand.consumer)
             .untilDestroy()
 
 

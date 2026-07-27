@@ -129,6 +129,11 @@ class HomeFlowPmVariantA @Inject constructor(
     val closeHardwareErrorBottomSheetAction = action<Unit>()
     val hardwareErrorSupportAction = action<Unit>()
 
+    val deviceInvalidTimeBottomSheetCommand = command<Unit>()
+    val closeInvalidTimeBottomSheetCommand = command<Unit>()
+    val closeInvalidTimeBottomSheetAction = action<Unit>()
+    val continueInvalidTimeAction = action<Unit>()
+
 
     val btControl = bluetoothControl2VariantA()
 

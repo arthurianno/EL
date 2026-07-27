@@ -67,6 +67,19 @@ class DefaultGlucometerEventBuilderTest {
         assertEquals(10.0, event.value ?: -1.0, 0.0)
         assertEquals(MealTag.AFTERMEAL, event.mealTag)
     }
+
+    @Test
+    fun `buildFrom parses mem event with invalid time status flag`() {
+        val event = builder.buildFrom(
+            userId = "user",
+            glucometerId = "device",
+            response = "mem.690B559E00080064",
+            glucometerSerialNumber = "D2204001234",
+            glucometerName = "SatelliteVoice0001"
+        )
+
+        assertEquals(true, event.isTimeInvalid)
+    }
 }
 
 private class FakeGenerator : GlucometerEventIdGenerator {

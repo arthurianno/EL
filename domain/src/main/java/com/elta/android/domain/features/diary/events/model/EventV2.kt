@@ -27,5 +27,6 @@ data class EventV2(
     val type: EventType,
     val state: State,
     val glucometerSerialNumber: String?,
-    val dishes: List<Dish>
+    val dishes: List<Dish>,
+    val isTimeInvalid: Boolean = false
 )
