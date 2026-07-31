@@ -381,8 +381,8 @@ abstract class ConnectDevicePm constructor(
             .flatMap { params ->
                 syncWithGlucometer.execute(params)
                     .bindProgress(syncProgressState.consumer)
-                    .doOnNext { events ->
-                        if (events > 0) bus.event(Events.EventsChanged(true))
+                    .doOnNext { result ->
+                        if (result.count > 0) bus.event(Events.EventsChanged(true))
                     }
                     .doOnComplete { connectState.consumer.accept(ViewState.SYNC_COMPLETED) }
                     .doOnError(::handleError)

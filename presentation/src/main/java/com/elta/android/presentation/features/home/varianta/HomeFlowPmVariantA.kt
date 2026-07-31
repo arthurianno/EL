@@ -618,7 +618,7 @@ class HomeFlowPmVariantA @Inject constructor(
                 }
             }
 
-    private fun syncWithGlucometer(isAuto: Boolean): Observable<Int> =
+    private fun syncWithGlucometer(isAuto: Boolean): Observable<com.elta.android.domain.features.devices.model.GlucometerSyncResult> =
         syncWithGlucometerUseCase.execute(SyncWithGlucometerUseCaseVariantA.Params())
             .concatWith(
                 if (!isAuto) syncGlucometers.execute() else Completable.complete()
@@ -627,11 +627,14 @@ class HomeFlowPmVariantA @Inject constructor(
             .doOnSubscribe {
                 bus.event(Events.Sync.Glucometer.Started)
             }
-            .doOnNext { events ->
+            .doOnNext { result ->
                 appMetric.trackEvent(AppMetricEvent.SnackProcessing)
-                if (events > 0) {
+                if (result.count > 0) {
                     appMetric.trackEvent(AppMetricEvent.ReceivedMeasurementsSugar)
                     bus.event(Events.EventsChanged(true))
+                    if (result.hasInvalidTime) {
+                        deviceInvalidTimeBottomSheetCommand.accept(Unit)
+                    }
                     bus.event(Events.Sync.Glucometer.Success)
                 } else bus.event(Events.Sync.Glucometer.NoNewEvents)
             }
@@ -650,7 +653,7 @@ class HomeFlowPmVariantA @Inject constructor(
     private fun observableSyncError(
         error: Throwable,
         isAuto: Boolean
-    ): ObservableSource<out Int> = when (error) {
+    ): ObservableSource<out com.elta.android.domain.features.devices.model.GlucometerSyncResult> = when (error) {
         is BluetoothNotEnabledErrorVariantA -> {
             appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
             bluetoothEnableAndRepeat(isAuto)

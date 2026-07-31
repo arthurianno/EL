@@ -23,6 +23,8 @@ import kotlinx.coroutines.rx2.rxObservable
 import javax.inject.Inject
 import kotlin.coroutines.EmptyCoroutineContext
 
+import com.elta.android.domain.features.devices.model.GlucometerSyncResult
+
 // fixme Variant A : improved_enabling_location
 class SyncWithGlucometerUseCaseVariantA @Inject constructor(
     private val deviceRepository: DeviceRepository,
@@ -33,9 +35,9 @@ class SyncWithGlucometerUseCaseVariantA @Inject constructor(
     private val eventsRepository: EventsRepository,
     private val crashlyticsReport: CrashlyticsReport,
     schedulers: SchedulersFacade
-) : ObservableWithTimerUseCase<Int, SyncWithGlucometerUseCaseVariantA.Params>(schedulers, crashlyticsReport) {
+) : ObservableWithTimerUseCase<GlucometerSyncResult, SyncWithGlucometerUseCaseVariantA.Params>(schedulers, crashlyticsReport) {
 
-    override fun buildUseCaseObservable(params: Params?): Observable<Int> {
+    override fun buildUseCaseObservable(params: Params?): Observable<GlucometerSyncResult> {
         return rxObservable(EmptyCoroutineContext + Dispatchers.Unconfined) {
             crashlyticsReport.log("The synchronization procedure has begun with the device ${params?.device?.address?.hideMac()}")
             crashlyticsReport.log("Receiving data for the main device")
@@ -72,7 +74,7 @@ class SyncWithGlucometerUseCaseVariantA @Inject constructor(
     }
 
     private suspend fun syncWithDevice(
-        scope: ProducerScope<Int>,
+        scope: ProducerScope<GlucometerSyncResult>,
         deviceAddress: String,
         userEmail: String,
         lastSyncEvent: String?,
@@ -118,7 +120,8 @@ class SyncWithGlucometerUseCaseVariantA @Inject constructor(
                 resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
             }
 
-            scope.channel.send(measurements.size)
+            val hasInvalidTime = events.any { it.isTimeInvalid }
+            scope.channel.send(GlucometerSyncResult(count = measurements.size, hasInvalidTime = hasInvalidTime))
         } finally {
             crashlyticsReport.log("The procedure for disconnecting the connection and stopping the timers has begun")
             deviceRepository.disconnect()
