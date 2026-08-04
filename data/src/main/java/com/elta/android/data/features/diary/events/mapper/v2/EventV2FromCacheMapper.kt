@@ -34,7 +34,9 @@ class EventV2FromCacheMapper @Inject constructor() : Mapper<EventV2CachedDto, Ev
                     glucometerSerialNumber = glucometerSerialNumber,
                     products = productsList,
                     productsCount = productsList.countOrZero(),
-                    inputType = source.glucoseInputType
+                    inputType = source.glucoseInputType,
+                    isTimeInvalid = source.isTimeInvalid,
+                    isTemperatureInvalid = source.isTemperatureInvalid
                 ),
                 additionTime = additionTimeString,
                 tagId = tagId,

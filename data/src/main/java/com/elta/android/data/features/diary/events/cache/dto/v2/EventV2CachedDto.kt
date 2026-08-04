@@ -40,5 +40,7 @@ data class EventV2CachedDto(
     val tabletsNumber: Double?,
 
     val state: String,
-    val glucometerSerialNumber: String?
+    val glucometerSerialNumber: String?,
+    val isTimeInvalid: Boolean = false,
+    val isTemperatureInvalid: Boolean = false
 )

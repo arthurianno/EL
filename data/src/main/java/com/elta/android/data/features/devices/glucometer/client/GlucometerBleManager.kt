@@ -15,6 +15,7 @@ import no.nordicsemi.android.ble.BleManager
 import no.nordicsemi.android.ble.PhyRequest
 import no.nordicsemi.android.ble.ktx.suspend
 import org.threeten.bp.ZoneId
+import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
 import java.nio.charset.Charset
 import java.util.UUID
@@ -92,7 +93,7 @@ class GlucometerBleManager @Inject constructor(
 
     override suspend fun getDate(): ZonedDateTime {
         val dateTime = startCommand(Commands.GetDate)
-        return ZonedDateTime.of(dateTime.extractDate(), ZoneId.systemDefault())
+        return ZonedDateTime.of(dateTime.extractDate(), ZoneOffset.UTC)
     }
 
     override suspend fun getZoneOffsetSeconds(): Int =

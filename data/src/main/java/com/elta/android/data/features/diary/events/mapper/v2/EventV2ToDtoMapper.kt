@@ -49,7 +49,9 @@ class EventV2ToDtoMapper @Inject constructor() : Mapper<EventV2, EventV2Dto> {
                     glucometerSerialNumber = glucometerSerialNumber,
                     products = dishes.toNetwork(eventType),
                     productsCount = if (eventType == EventTypeDto.BREAD) dishes.countOrZero() else null,
-                    inputType = glucoseInputType?.toDto()
+                    inputType = glucoseInputType?.toDto(),
+                    isTimeInvalid = isTimeInvalid,
+                    isTemperatureInvalid = isTemperatureInvalid
                 )
             )
         }

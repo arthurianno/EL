@@ -72,7 +72,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="start"
-        app:constraint_referenced_ids="record_count_view,record_date_view" />
+        app:constraint_referenced_ids="record_count_view,record_date_view,record_invalid_badge_view" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/record_invalid_badge_view"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginEnd="4dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/record_count_view"
+        app:layout_constraintEnd_toStartOf="@id/record_count_view"
+        app:layout_constraintTop_toTopOf="@id/record_count_view"
+        app:srcCompat="@drawable/ic_red_alert"
+        tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/record_count_view"

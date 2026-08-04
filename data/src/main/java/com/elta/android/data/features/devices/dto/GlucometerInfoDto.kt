@@ -21,5 +21,6 @@ data class GlucometerInfoDto(
     val batteryLevel: Int? = null,
     val version: VersionDto? = null,
     val lastSyncedEvent: String? = null,
-    val glucometerSerialNumber: String? = null
+    val glucometerSerialNumber: String? = null,
+    val isTimeOutOfSync: Boolean = false
 )

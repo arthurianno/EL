@@ -220,7 +220,9 @@ class EditEventPm @Inject constructor(
                 type = checkNotNull(form.eventType),
                 dishes = dishes.value,
                 glucoseInputType = GlucoseInputType.MANUAL.takeIf { eventTypeState.value is EventType.Glucose },
-                mealTag = form.mealTag.takeIf { eventTypeState.value is EventType.Glucose && it != MealTag.NOT_SELECTED }
+                mealTag = form.mealTag.takeIf { eventTypeState.value is EventType.Glucose && it != MealTag.NOT_SELECTED },
+                modificationTime = System.currentTimeMillis(),
+                isTimeInvalid = false
             )
         )
     }

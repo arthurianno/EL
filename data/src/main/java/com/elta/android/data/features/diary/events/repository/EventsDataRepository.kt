@@ -134,6 +134,7 @@ class EventsDataRepository @Inject constructor(
     override suspend fun addEventFromGlucometer(glucometerEvents: List<GlucometerEvent>) {
         val events = glucometerEvents.map { event ->
             val newEvent = eventsFromGlucometerMapper.mapFromObject(event)
+            Timber.d("⏰ addEventFromGlucometer mapped event: id=${newEvent.id}, isTimeInvalid=${newEvent.isTimeInvalid}")
             try {
                 val existingEventDto = cacheSource.getEventById(newEvent.id).await()
                 val existingEvent = existingEventDto.toDomain()
@@ -149,7 +150,8 @@ class EventsDataRepository @Inject constructor(
                     dishes = existingEvent.dishes,
                     duration = existingEvent.duration,
                     modificationTime = existingEvent.modificationTime,
-                    state = existingEvent.state
+                    state = existingEvent.state,
+                    isTimeInvalid = if (existingEvent.modificationTime != null) existingEvent.isTimeInvalid else (newEvent.isTimeInvalid || existingEvent.isTimeInvalid)
                 )
             } catch (e: Exception) {
                 newEvent

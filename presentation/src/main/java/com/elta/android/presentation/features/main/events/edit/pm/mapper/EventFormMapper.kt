@@ -24,7 +24,7 @@ fun EventV2.getPickerValues(): Pair<Int, Int>? =
 fun EventV2.getValue(): Double = value ?: 0.0
 
 fun EventV2.getFormattedTemperature(): String =
-    temperature?.let { NumberFormatter.format(it) } ?: "-"
+    if (temperature == null || temperature == 0.0) "-" else NumberFormatter.format(temperature!!)
 
 fun EventV2.getFormInputText(): String? =
     when (type) {
