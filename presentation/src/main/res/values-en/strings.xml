@@ -681,6 +681,11 @@
     <string name="statistic_share_pdf_dialog_title">Share via</string>
     <string name="statistic_view_pdf_dialog_title">Open with</string>
     <string name="statistic_error">Cannot export report without an Internet connection</string>
+
+    <string name="report_type_pdf_title">PDF Report</string>
+    <string name="report_type_pdf_subtitle">Detailed statistics on indicators</string>
+    <string name="report_type_xlsx_title">XLSX Report</string>
+    <string name="report_type_xlsx_subtitle">Table of all events for export</string>
     <string name="statistic_error_date">Невозможно выгрузить статистику без Интернет-соединения</string>
     <string name="feedback_title">Leave Feedback</string>
     <string name="feedback_input_name_hint">Your Name *</string>

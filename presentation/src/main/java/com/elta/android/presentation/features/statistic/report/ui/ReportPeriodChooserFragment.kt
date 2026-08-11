@@ -36,6 +36,8 @@ class ReportPeriodChooserFragment :
     override val screenLayout: Int = R.layout.fragment_statistic_report_period_chooser
     override val classToken: Class<ReportPeriodChooserPm> = ReportPeriodChooserPm::class.java
 
+    private val rangeDecorators = mutableListOf<com.elta.android.presentation.widgets.simple_date_picker.BaseRangeDecorator>()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(binding.calendarView.state().edit()) {
@@ -47,6 +49,10 @@ class ReportPeriodChooserFragment :
         val blueLight = ContextCompat.getColor(view.context, R.color.shade_blue3_20)
 
         val inset = view.resources.getDimensionPixelSize(R.dimen.calendar_day_padding)
+
+        val singleDaySelected = { dates: List<CalendarDay>, day: CalendarDay ->
+            dates.size == 1 && day.isBoundary(dates)
+        }
 
         val firstInRangeNotLastInRow = { dates: List<CalendarDay>, day: CalendarDay ->
             dates.size > 1 && day.isFirstIn(dates) && !day.isLastInRow()
@@ -79,33 +85,40 @@ class ReportPeriodChooserFragment :
         val firstOrLastInRange =
             { dates: List<CalendarDay>, day: CalendarDay -> day.isBoundary(dates) }
 
-        val decorators = arrayListOf(
-            RangeDecorator(
-                drawable(R.drawable.bg_calendar_date_blue_layer, inset),
-                firstInRangeNotLastInRow
-            ),
-            RangeDecorator(
-                drawable(R.drawable.bg_calendar_date_blue, inset),
-                firstInRangeLastInRow
-            ),
-            RangeDecorator(
-                drawable(R.drawable.bg_calendar_date_black_layer, inset),
-                lastInRangeNotFirstInRow
-            ),
-            RangeDecorator(
-                drawable(R.drawable.bg_calendar_date_black, inset),
-                lastInRangeFirstInRow
-            ),
-            RangeDecorator(
-                drawable(R.drawable.bg_calendar_date_blue_alpha_left, inset),
-                notBoundaryFirstInRow
-            ),
-            RangeDecorator(
-                drawable(R.drawable.bg_calendar_date_blue_alpha_right, inset),
-                notBoundaryLastInRow
-            ),
-            RangeDecorator(drawable(ColorDrawable(blueLight), inset), otherDays),
-            RangeSpanDecorator(ForegroundColorSpan(white), firstOrLastInRange)
+        rangeDecorators.clear()
+        rangeDecorators.addAll(
+            listOf(
+                RangeDecorator(
+                    drawable(R.drawable.bg_calendar_date_black, inset),
+                    singleDaySelected
+                ),
+                RangeDecorator(
+                    drawable(R.drawable.bg_calendar_date_blue_layer, inset),
+                    firstInRangeNotLastInRow
+                ),
+                RangeDecorator(
+                    drawable(R.drawable.bg_calendar_date_blue, inset),
+                    firstInRangeLastInRow
+                ),
+                RangeDecorator(
+                    drawable(R.drawable.bg_calendar_date_black_layer, inset),
+                    lastInRangeNotFirstInRow
+                ),
+                RangeDecorator(
+                    drawable(R.drawable.bg_calendar_date_black, inset),
+                    lastInRangeFirstInRow
+                ),
+                RangeDecorator(
+                    drawable(R.drawable.bg_calendar_date_blue_alpha_left, inset),
+                    notBoundaryFirstInRow
+                ),
+                RangeDecorator(
+                    drawable(R.drawable.bg_calendar_date_blue_alpha_right, inset),
+                    notBoundaryLastInRow
+                ),
+                RangeDecorator(drawable(ColorDrawable(blueLight), inset), otherDays),
+                RangeSpanDecorator(ForegroundColorSpan(white), firstOrLastInRange)
+            )
         )
 
         binding.calendarView.apply {
@@ -115,16 +128,21 @@ class ReportPeriodChooserFragment :
                     drawable(R.drawable.selector_calendar_date, inset)
                 )
             )
-            addDecorators(decorators)
+            addDecorators(rangeDecorators)
             setOnDateChangedListener { _, day, selected ->
                 if (selected) {
+                    val dates = listOf(day)
+                    rangeDecorators.forEach {
+                        it.updateDates(dates)
+                    }
+                    invalidateDecorators()
                     presentationModel.selectRangeAction.consumer.accept(
                         com.elta.android.domain.features.reports.model.Range(day.date, day.date)
                     )
                 }
             }
             setOnRangeSelectedListener { _, dates ->
-                decorators.forEach {
+                rangeDecorators.forEach {
                     it.updateDates(dates)
                 }
                 invalidateDecorators()
@@ -154,8 +172,21 @@ class ReportPeriodChooserFragment :
             showReportTypeDropdown(pm)
         }
         pm.closeDialogCommand.bindTo { dialog?.dismiss() }
-        pm.selectedRangeState.bindTo {
-            binding.calendarView.selectRange(CalendarDay.from(it.start), CalendarDay.from(it.end))
+        pm.selectedRangeState.bindTo { range ->
+            val startDay = CalendarDay.from(range.start)
+            val endDay = CalendarDay.from(range.end)
+            val dates = mutableListOf<CalendarDay>()
+            var current = range.start
+            while (!current.isAfter(range.end)) {
+                dates.add(CalendarDay.from(current))
+                current = current.plusDays(1)
+            }
+            // Update decorators so single-date or range is highlighted on dialog open/bind
+            binding.calendarView.post {
+                rangeDecorators.forEach { it.updateDates(dates) }
+                binding.calendarView.invalidateDecorators()
+            }
+            binding.calendarView.selectRange(startDay, endDay)
         }
         pm.titleState.bindTo(binding.dateView.text())
         pm.progressState.bindTo(setLoadingState())
@@ -167,14 +198,14 @@ class ReportPeriodChooserFragment :
         
         val items = listOf(
             DropdownItem(
-                title = "PDF-отчет",
-                subtitle = "Подробная статистика по показателям",
+                title = getString(R.string.report_type_pdf_title),
+                subtitle = getString(R.string.report_type_pdf_subtitle),
                 iconRes = R.drawable.ic_file,
                 iconColor = android.graphics.Color.parseColor("#E53935")
             ),
             DropdownItem(
-                title = "XLSX-отчет",
-                subtitle = "Таблица всех событий для экспорта",
+                title = getString(R.string.report_type_xlsx_title),
+                subtitle = getString(R.string.report_type_xlsx_subtitle),
                 iconRes = R.drawable.ic_list,
                 iconColor = android.graphics.Color.parseColor("#2E7D32")
             )

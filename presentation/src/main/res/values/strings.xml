@@ -780,6 +780,11 @@
     <string name="statistic_view_pdf_dialog_title">Открыть с помощью</string>
     <string name="statistic_error">Невозможно выгрузить отчет без Интернет-соединения</string>
 
+    <string name="report_type_pdf_title">PDF-отчет</string>
+    <string name="report_type_pdf_subtitle">Подробная статистика по показателям</string>
+    <string name="report_type_xlsx_title">XLSX-отчет</string>
+    <string name="report_type_xlsx_subtitle">Таблица всех событий для экспорта</string>
+
     <!--FEEDBACK-->
     <string name="feedback_title">Оставить отзыв</string>
     <string name="feedback_input_name_hint">Ваше имя *</string>

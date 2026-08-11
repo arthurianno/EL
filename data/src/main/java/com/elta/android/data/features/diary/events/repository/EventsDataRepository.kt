@@ -139,6 +139,7 @@ class EventsDataRepository @Inject constructor(
                 val existingEventDto = cacheSource.getEventById(newEvent.id).await()
                 val existingEvent = existingEventDto.toDomain()
                 newEvent.copy(
+                    additionTime = existingEvent.additionTime,
                     mealTag = existingEvent.mealTag ?: newEvent.mealTag,
                     note = existingEvent.note,
                     tagId = existingEvent.tagId,
