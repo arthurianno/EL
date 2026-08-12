@@ -75,6 +75,10 @@ class AppActivity : BaseActivity<AppPm>() {
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
             View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR  // тёмные иконки nav bar на светлой теме
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
         super.onCreate(savedInstanceState)
 
         splashScreen.setKeepOnScreenCondition {
@@ -83,15 +87,10 @@ class AppActivity : BaseActivity<AppPm>() {
 
         if (openDebugHowToConnectIfRequested(intent)) return
 
-        if (LocaleHelper.consumePendingGreetingAfterLanguageSelection(this)) {
-            Log.i(TAG, "AppActivity.onCreate: pending Greeting consumed, routing to GreetingFlow")
-            router.newRootFlow(Screens.GreetingFlow)
-        }
-
-        if (LocaleHelper.consumePendingHomeAfterLanguageChange(this)) {
-            Log.i(TAG, "AppActivity.onCreate: pending Home consumed, routing to HomeFlow")
+        if (savedInstanceState == null) {
             router.newRootScreen(Screens.HomeFlow)
         }
+
 
         if (savedInstanceState != null) {
             Log.i(TAG, "AppActivity.onCreate: restored activity, hide splash immediately")
@@ -155,9 +154,10 @@ class AppActivity : BaseActivity<AppPm>() {
 
     override fun onBindPresentationModel(pm: AppPm) {
         super.onBindPresentationModel(pm)
-        pm.networkStateCommand.bindTo(connectionStatusView.changeState())
-        pm.syncStatusVisibility.bindTo(statusView.visibleChanges())
-        pm.syncStatusState.bindTo(statusView.statusChanges())
+        // Bottom status banner disabled per user request (status is displayed in dialog on clicking ring gauge button)
+        statusView.visibility = android.view.View.GONE
+        connectionStatusView.visibility = android.view.View.GONE
+
         pm.showOptionalUpdateDialogCommand.bindTo {
             supportFragmentManager.showDialog(OptionalUpdateDialogFragment.newInstance())
         }

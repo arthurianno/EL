@@ -1,56 +1,46 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.holder
 
-import androidx.annotation.StringRes
-import com.elta.android.domain.features.diary.home.model.CalculatorFlow
-import com.elta.android.domain.features.user.model.GlucoseFormat
-import com.elta.android.presentation.R
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
 import com.elta.android.presentation.databinding.ItemRecordsHeaderBinding
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
-import com.nullgr.core.ui.extensions.toggleView
+import com.elta.android.presentation.features.main.records.ui.compose.GlucoseDashboardScreen
+import com.elta.android.presentation.features.main.records.ui.compose.GlucoseState
+import com.nullgr.core.rx.RxBus
 
 class ItemRecordsHeaderViewHolder(
-    private val binding: ItemRecordsHeaderBinding
+    private val binding: ItemRecordsHeaderBinding,
+    private val bus: RxBus
 ) : BaseListItemViewHolder<RecordsHeaderItem>(binding.root) {
 
-    override fun bind(item: RecordsHeaderItem) {
-        bindGlucose(item)
-        bindBread(item)
-        bindInsulin(item)
+    init {
+        binding.composeHeaderView.setViewCompositionStrategy(
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+        )
     }
 
-    private fun bindGlucose(item: RecordsHeaderItem) {
-        with(binding) {
-            glucoseEmptyValueView.toggleView(item.glucoseLevel == null)
-            glucoseValueContainerView.toggleView(item.glucoseLevel != null)
+    override fun bind(item: RecordsHeaderItem) {
+        val rawGlucose = item.glucoseLevel?.format() ?: "4,1"
+        val numericValue = rawGlucose.replace(",", ".").toFloatOrNull() ?: 4.1f
 
-            item.glucoseLevel?.let { glucoseLevelValueView.text = it.format() }
+        val glucoseState = when {
+            numericValue < 3.9f -> GlucoseState.LOW
+            numericValue > 10.0f -> GlucoseState.HIGH
+            else -> GlucoseState.NORMAL
+        }
 
-            glucoseLevelDirectionView.toggleView(item.glucoseLevelIndex != null)
-            item.glucoseLevelIndex?.let { glucoseLevelChangeIndexView.text = it.format() }
-            item.glucoseLevelIndexIcon?.let { glucoseLevelChangeIndexIconView.setImageResource(it) }
-            glucoseLevelTitleView.setText(
-                when (item.glucoseFormat) {
-                    GlucoseFormat.CAPILLARY -> R.string.main_records_glucose_capillary
-                    GlucoseFormat.PLASMA -> R.string.main_records_glucose_plasma
-                }
+        binding.composeHeaderView.setContent {
+            GlucoseDashboardScreen(
+                bus = bus,
+                glucoseValue = rawGlucose,
+                deltaText = item.glucoseLevelIndex?.format() ?: "▼2,4",
+                initialGlucoseState = glucoseState,
+                breadUnitsText = item.breadLevel?.let { "$it XE" } ?: "0,9 Ед.",
+                insulinText = item.insulinLevel?.let { "$it ед" } ?: "0,1 ХЕ",
+                dailyGlucoseModel = item.dailyGlucoseModel,
+                allDayEvents = item.allEvents
             )
-            root.background = item.background
         }
     }
-
-    private fun bindBread(item: RecordsHeaderItem) {
-        binding.breadUnitsLabelView.toggleView(item.calculatorFlow == CalculatorFlow.BREAD_UNITS)
-        binding.breadValueView.text =
-            item.breadLevel formatAsValueOrEmpty R.string.main_records_mask_value_he
-    }
-
-    private fun bindInsulin(item: RecordsHeaderItem) {
-        binding.insulinValueView.text =
-            item.insulinLevel formatAsValueOrEmpty R.string.main_records_mask_value
-    }
-
-    private infix fun String?.formatAsValueOrEmpty(@StringRes itemId: Int): String =
-        this?.let { binding.root.context.getString(itemId, it) }
-            ?: binding.root.context.getString(R.string.main_records_empty_value)
 }
+

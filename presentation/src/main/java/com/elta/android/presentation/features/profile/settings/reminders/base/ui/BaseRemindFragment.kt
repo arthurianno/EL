@@ -22,15 +22,33 @@ import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.bindTo
 import org.threeten.bp.ZonedDateTime
 
+import com.elta.android.presentation.utils.OnApplyBottomWindowInsetsListener
+import com.elta.android.presentation.utils.WindowBottomInsetsForViewListenerFactory.instance
+import com.elta.android.presentation.utils.applyWindowBottomInsetsListener
+import com.elta.android.presentation.utils.removeWindowBottomInsetsListener
+
 abstract class BaseRemindFragment<T : BaseRemindPm> :
     BaseFragment<T, FragmentReminderFormBinding>(FragmentReminderFormBinding::inflate) {
 
     override val screenLayout: Int = R.layout.fragment_reminder_form
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
+    private lateinit var insetsListener: OnApplyBottomWindowInsetsListener
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        insetsListener = instance(binding.formSaveButtonView)
         binding.toolbar.homeButtonView.setImageResource(R.drawable.ic_dialog_close)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        view?.applyWindowBottomInsetsListener(insetsListener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        view?.removeWindowBottomInsetsListener(insetsListener)
     }
 
     override fun onBindPresentationModel(pm: T) {

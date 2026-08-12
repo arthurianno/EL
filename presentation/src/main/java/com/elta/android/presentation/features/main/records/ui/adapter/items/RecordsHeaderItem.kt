@@ -1,7 +1,9 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.items
 
 import android.graphics.drawable.Drawable
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
+import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.nullgr.core.adapter.items.ListItem
 
@@ -13,7 +15,9 @@ data class RecordsHeaderItem(
     val breadLevel: String?,
     val insulinLevel: String?,
     val glucoseFormat: GlucoseFormat,
-    val calculatorFlow: CalculatorFlow
+    val calculatorFlow: CalculatorFlow,
+    val dailyGlucoseModel: DailyGlucoseModel? = null,
+    val allEvents: List<EventV2> = emptyList()
 ) : ListItem {
 
     override fun getChangePayload(other: ListItem): Any {

@@ -98,11 +98,11 @@ inline fun View.applyWindowBottomInsetsListener(listener: OnApplyWindowInsetsLis
 }
 
 inline fun View.removeWindowBottomInsetsListener(listener: OnApplyWindowInsetsListener) {
-    ViewCompat.setOnApplyWindowInsetsListener(this, listener)
+    ViewCompat.setOnApplyWindowInsetsListener(this, null)
 }
 
 object WindowBottomInsetsForViewListenerFactory {
-    fun instance(vararg views: View, callback: (Int) -> Unit) =
+    fun instance(vararg views: View, callback: (Int) -> Unit = {}) =
         OnApplyBottomWindowInsetsListener(views.toList(), callback)
 }
 
@@ -115,18 +115,26 @@ class OnApplyBottomWindowInsetsListener(
         val offset = getBottomOffset(insets)
         views.forEach { applyBottomOffsetToView(it, offset) }
         callback(offset)
-        return insets.consumeSystemWindowInsets()
+        return insets
     }
 
-    private fun getBottomOffset(insets: WindowInsetsCompat): Int =
-        when {
+    private fun getBottomOffset(insets: WindowInsetsCompat): Int {
+        val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+        val ime = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+        val rawBottom = Math.max(systemBars, Math.max(navBars, ime))
+        if (rawBottom > 0) return rawBottom
+
+        return when {
             insets.systemWindowInsetBottom < insets.stableInsetBottom -> insets.systemWindowInsetBottom
-            else -> insets.systemWindowInsetBottom - insets.stableInsetBottom
+            else -> insets.systemWindowInsetBottom
         }
+    }
 
     private fun applyBottomOffsetToView(view: View, offset: Int) {
-        val params = view.layoutParams as ViewGroup.MarginLayoutParams
+        val params = view.layoutParams as? ViewGroup.MarginLayoutParams ?: return
         params.bottomMargin = offset
+        view.layoutParams = params
     }
 }
 

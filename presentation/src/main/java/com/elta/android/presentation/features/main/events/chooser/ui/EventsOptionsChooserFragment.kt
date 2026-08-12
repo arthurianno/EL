@@ -13,8 +13,12 @@ import com.elta.android.presentation.databinding.FragmentEventsOptionsChooserBin
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.EventOptionsChooseAdapter
+import com.elta.android.presentation.utils.OnApplyBottomWindowInsetsListener
+import com.elta.android.presentation.utils.WindowBottomInsetsForViewListenerFactory.instance
+import com.elta.android.presentation.utils.applyWindowBottomInsetsListener
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.bundle
+import com.elta.android.presentation.utils.removeWindowBottomInsetsListener
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
@@ -37,6 +41,8 @@ class EventsOptionsChooserFragment :
     override val statusBarConfigProvider: StatusBarConfigProvider =
         TransparentLightStatusBarConfigProvider
 
+    private lateinit var insetsListener: OnApplyBottomWindowInsetsListener
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.getParcelable<ChooserConfiguration>(EXTRA_CHOOSER_DATA)?.let {
@@ -46,11 +52,22 @@ class EventsOptionsChooserFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        insetsListener = instance(binding.confirmButtonView)
         with(binding.toolbar) {
             toolbarView.applyWindowInsetsForChildrenView()
             toolbarTitleView.setTextColor(Color.WHITE)
             homeButtonView.setColorFilter(Color.WHITE)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        view?.applyWindowBottomInsetsListener(insetsListener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        view?.removeWindowBottomInsetsListener(insetsListener)
     }
 
     override fun onBindPresentationModel(pm: EventsOptionsChooserPm) {

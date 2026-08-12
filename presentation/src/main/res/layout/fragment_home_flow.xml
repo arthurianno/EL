@@ -15,12 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="@color/white"
         android:orientation="vertical">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/bg_home_bottom_bar_shadow" />
 
         <com.elta.android.presentation.widgets.BottomNavigationView
             android:id="@+id/homeBottomNavigationView"

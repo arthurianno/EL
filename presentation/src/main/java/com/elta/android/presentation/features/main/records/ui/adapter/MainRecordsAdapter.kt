@@ -35,7 +35,8 @@ class MainRecordsAdapter @Inject constructor(
             )
 
             RecordsHeaderItem::class.hashCode() -> ItemRecordsHeaderViewHolder(
-                ItemRecordsHeaderBinding.inflate(inflater, parent, false)
+                ItemRecordsHeaderBinding.inflate(inflater, parent, false),
+                bus
             )
             RecordsDailyGlucoseItem::class.hashCode() -> ItemRecordsDailyGlucoseVieHolder(
                 ItemRecordsDailyGlucoseBinding.inflate(inflater, parent, false)

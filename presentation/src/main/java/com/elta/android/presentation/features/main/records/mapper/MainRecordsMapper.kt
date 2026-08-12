@@ -20,17 +20,8 @@ class MainRecordsMapper @Inject constructor(
 ) : BaseRecordsMapper(resources), Mapper<HomeModel, List<ListItem>> {
 
     override fun mapFromObject(source: HomeModel): List<ListItem> =
-        arrayListOf<ListItem>().apply {
-            if (source.hasEvents) {
-                add(source.header())
-            }
-            if (source.dailyGlucoseModel.hasEvents) {
-                add(source.dailyChart())
-            }
-            addAll(source.eventsBlocks.flatMapIndexed { index, event ->
-                event.ungroup(index == 0, source.calculatorFlow)
-            })
-        }
+        listOf(source.header())
+
 
     private fun HomeModel.dailyChart(): RecordsDailyGlucoseItem {
         val lastEventTime =
@@ -48,13 +39,15 @@ class MainRecordsMapper @Inject constructor(
             glucoseLevelIndex = glucoseLevelDifference.format(),
             glucoseLevelIndexIcon = this.glucoseLevelDirection?.icon(),
             breadLevel = eventsBlocks
-                .flatMap { it.events }  // Все события из всех блоков
-                .filter { it.type is EventType.Bread }  // Только "Еда"
-                .sumOf { it.value ?: 0.0 }  // Сумма value (ХЕ)
-                .format(),  // Форматирование
-            insulinLevel = lastInsulinEvent?.value.format(),  // Если для инсулина тоже нужна сумма — аналогично измени
+                .flatMap { it.events }
+                .filter { it.type is EventType.Bread }
+                .sumOf { it.value ?: 0.0 }
+                .format(),
+            insulinLevel = lastInsulinEvent?.value.format(),
             glucoseFormat = glucoseFormat,
-            calculatorFlow = calculatorFlow
+            calculatorFlow = calculatorFlow,
+            dailyGlucoseModel = dailyGlucoseModel,
+            allEvents = eventsBlocks.flatMap { it.events }
         )
 
     private fun GlucoseLevelDirection.icon(): Int? =

@@ -9,6 +9,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import android.widget.FrameLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -68,6 +71,7 @@ class HomeFlowFragmentVariantA :
             ?.getInt(KEY_SELECTED_MENU_ID)
             ?.passTo(presentationModel.menuItemRestoredAction)
         initBottomSheetItemsView()
+        setupBottomNavigationInsets()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -236,4 +240,57 @@ class HomeFlowFragmentVariantA :
                 .buttons(dc, data)
                 .build()
         }
+
+    private fun setupBottomNavigationInsets() {
+        val syncStatusView = requireActivity().findViewById<View>(R.id.syncStatusView)
+        syncStatusView?.let { view ->
+            ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+                val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                v.setPadding(
+                    v.paddingLeft,
+                    v.paddingTop,
+                    v.paddingRight,
+                    navigationBarsInsets.bottom
+                )
+                insets
+            }
+        }
+        val connectionStatusView = requireActivity().findViewById<View>(R.id.connectionStatusView)
+        connectionStatusView?.let { view ->
+            ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+                val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                v.setPadding(
+                    v.paddingLeft,
+                    v.paddingTop,
+                    v.paddingRight,
+                    navigationBarsInsets.bottom
+                )
+                insets
+            }
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomContainer) { v, insets ->
+            val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            v.setPadding(
+                v.paddingLeft,
+                v.paddingTop,
+                v.paddingRight,
+                navigationBarsInsets.bottom
+            )
+
+            val initialPlusMargin = (16 * resources.displayMetrics.density).toInt()
+            (binding.homeActionView.layoutParams as? FrameLayout.LayoutParams)?.let { actionParams ->
+                actionParams.bottomMargin = initialPlusMargin + navigationBarsInsets.bottom
+                binding.homeActionView.layoutParams = actionParams
+            }
+
+            val initialPulseMargin = (-31 * resources.displayMetrics.density).toInt()
+            (binding.homePulseView.layoutParams as? FrameLayout.LayoutParams)?.let { pulseParams ->
+                pulseParams.bottomMargin = initialPulseMargin + navigationBarsInsets.bottom
+                binding.homePulseView.layoutParams = pulseParams
+            }
+
+            insets
+        }
+    }
 }

@@ -305,6 +305,30 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
                 insets
             }
         }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomContainer) { v, insets ->
+            val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            v.setPadding(
+                v.paddingLeft,
+                v.paddingTop,
+                v.paddingRight,
+                navigationBarsInsets.bottom
+            )
+
+            val initialPlusMargin = (16 * resources.displayMetrics.density).toInt()
+            (binding.homeActionView.layoutParams as? FrameLayout.LayoutParams)?.let { actionParams ->
+                actionParams.bottomMargin = initialPlusMargin + navigationBarsInsets.bottom
+                binding.homeActionView.layoutParams = actionParams
+            }
+
+            val initialPulseMargin = (-31 * resources.displayMetrics.density).toInt()
+            (binding.homePulseView.layoutParams as? FrameLayout.LayoutParams)?.let { pulseParams ->
+                pulseParams.bottomMargin = initialPulseMargin + navigationBarsInsets.bottom
+                binding.homePulseView.layoutParams = pulseParams
+            }
+
+            insets
+        }
     }
 
 

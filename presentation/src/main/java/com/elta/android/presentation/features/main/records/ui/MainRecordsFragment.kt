@@ -44,7 +44,7 @@ class MainRecordsFragment :
     override val statusBarConfigProvider: StatusBarConfigProvider =
         MainScreenTransparentStatusBarConfigProvider
 
-    override val backgroundColor: Int = R.color.pale_gray
+    override val backgroundColor: Int = R.color.white
     private val secondaryProvider: StatusBarConfigProvider = MainScreenLightStatusBarConfigProvider
     private val bottomSheetState = BehaviorRelay.createDefault(false)
     private val headerState = BehaviorRelay.createDefault(true)
