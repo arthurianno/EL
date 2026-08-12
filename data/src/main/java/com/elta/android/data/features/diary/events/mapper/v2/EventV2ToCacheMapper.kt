@@ -31,7 +31,7 @@ class EventV2ToCacheMapper @Inject constructor(
                 false
             }
 
-            val isTimeInvalidValue = if (isRemoteModification) {
+            val isTimeInvalidValue = if (modificationTime != null || isRemoteModification) {
                 data.isTimeInvalid
             } else {
                 data.isTimeInvalid || (existingLocal?.isTimeInvalid == true)

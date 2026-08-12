@@ -47,6 +47,7 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.features.sync.control.bluetoothControl
+import com.elta.android.presentation.features.sync.control.checkSelfPermissionByName
 import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindProgress
 import io.reactivex.Observable
@@ -227,7 +228,10 @@ abstract class ConnectDevicePm constructor(
             btControl.bluetoothEnabledAction.observable,
             btControl.locationEnabledAction.observable
         )
-            .doOnNext { startScanAction.consumer.accept(Unit) }
+            .doOnNext {
+                locationNecessaryState.consumer.accept(true)
+                startScanAction.consumer.accept(Unit)
+            }
             .subscribe()
             .untilDestroy()
 
@@ -254,8 +258,10 @@ abstract class ConnectDevicePm constructor(
             is GlucometerAlreadyConnectedError ->
                 showDeviceAlreadyConnectedDialog()
 
-            is LocationNotEnabledError ->
+            is LocationNotEnabledError -> {
+                locationNecessaryState.consumer.accept(true)
                 btControl.requestEnableLocationCommand.consumer.accept(Unit)
+            }
 
             is CommandError, is BluetoothScannerError -> {
                 connectState.consumer.accept(ViewState.SYNC_ERROR)
@@ -356,6 +362,11 @@ abstract class ConnectDevicePm constructor(
 
     private fun bindStartScanAction() {
         startScanAction.observable
+            .doOnNext {
+                if (androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    locationNecessaryState.consumer.accept(true)
+                }
+            }
             .map { FindGlucometersUseCase.Params(isLocationNeeded = locationNecessaryState.value) }
             .flatMap {
                 findGlucometers.execute(it)
