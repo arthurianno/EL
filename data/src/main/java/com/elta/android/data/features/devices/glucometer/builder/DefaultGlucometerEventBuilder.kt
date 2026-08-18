@@ -24,9 +24,12 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         glucometerId: String,
         response: String,
         glucometerSerialNumber: String?,
-        @Suppress("UNUSED_PARAMETER") glucometerName: String?
+        glucometerName: String?
     ): GlucometerEvent {
-        val parsedMeasurement = parseMeasurement(response)
+        val parsedMeasurement = parseMeasurement(
+            response = response,
+            supportsMealTags = glucometerName.supportsMealTags()
+        )
 
         return GlucometerEvent(
             id = generator.generate(userId, glucometerId, parsedMeasurement.idToken),
@@ -42,26 +45,31 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
     }
 
     override fun getDate(response: String): Date {
-        val mills = parseMeasurement(response).date?.toInstant()?.toEpochMilli() ?: 0L
+        val mills = parseMeasurement(
+            response = response,
+            supportsMealTags = false
+        ).date?.toInstant()?.toEpochMilli() ?: 0L
         return Date(mills)
     }
 
     override fun getValue(response: String): Double {
-        return parseMeasurement(response).value ?: 0.0
+        return parseMeasurement(response, supportsMealTags = false).value ?: 0.0
     }
 
-    private fun parseMeasurement(response: String): ParsedMeasurement {
+    private fun parseMeasurement(response: String, supportsMealTags: Boolean): ParsedMeasurement {
         val normalizedResponse = response.trim()
         return when {
-            RD_EVENT_REGEX.matches(normalizedResponse) -> parseRdMeasurement(normalizedResponse)
-            MEM_EVENT_REGEX.matches(normalizedResponse) -> parseMemMeasurement(normalizedResponse)
+            RD_EVENT_REGEX.matches(normalizedResponse) ->
+                parseRdMeasurement(normalizedResponse, supportsMealTags)
+            MEM_EVENT_REGEX.matches(normalizedResponse) ->
+                parseMemMeasurement(normalizedResponse, supportsMealTags)
             normalizedResponse.equals(MEM_EMPTY_EVENT, ignoreCase = true) ->
                 throw IllegalArgumentException("Measurement payload is empty: $response")
             else -> throw IllegalArgumentException("Unsupported measurement format: $response")
         }
     }
 
-    private fun parseRdMeasurement(response: String): ParsedMeasurement {
+    private fun parseRdMeasurement(response: String, supportsMealTags: Boolean): ParsedMeasurement {
         val match = checkNotNull(RD_EVENT_REGEX.matchEntire(response)) {
             "Invalid rd payload: $response"
         }
@@ -78,12 +86,12 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
             date = actualDate,
             temperature = extractTemperature(rawTemperature),
             value = extractValue(rawValue),
-            mealTag = extractMealTag(rawTemperature),
+            mealTag = extractMealTag(rawTemperature).takeIf { supportsMealTags },
             isTimeInvalid = isInvalid
         )
     }
 
-    private fun parseMemMeasurement(response: String): ParsedMeasurement {
+    private fun parseMemMeasurement(response: String, supportsMealTags: Boolean): ParsedMeasurement {
         val match = checkNotNull(MEM_EVENT_REGEX.matchEntire(response)) {
             "Invalid mem payload: $response"
         }
@@ -105,7 +113,11 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
             date = actualDate,
             temperature = null,
             value = glucoseValue,
-            mealTag = if (statusWord and MEM_AFTER_MEAL_BIT_MASK != 0) MealTag.AFTERMEAL else MealTag.BEFOREMEAL,
+            mealTag = if (supportsMealTags) {
+                if (statusWord and MEM_AFTER_MEAL_BIT_MASK != 0) MealTag.AFTERMEAL else MealTag.BEFOREMEAL
+            } else {
+                null
+            },
             isTimeInvalid = isInvalid,
             isTemperatureInvalid = isTempInvalid
         )
@@ -174,3 +186,8 @@ private val AFTER_MEAL_TEMPERATURE_RANGE = 600..850
 private val RD_EVENT_REGEX = Regex("^rd(\\d{12})(\\d{3})(\\d{3})$", RegexOption.IGNORE_CASE)
 private val MEM_EVENT_REGEX =
     Regex("^mem\\.([0-9A-F]{8})([0-9A-F]{4})([0-9A-F]{4})$", RegexOption.IGNORE_CASE)
+
+private fun String?.supportsMealTags(): Boolean =
+    this?.startsWith(SATELLITE_VOICE_PREFIX, ignoreCase = true) == true
+
+private const val SATELLITE_VOICE_PREFIX = "SatelliteVoice"

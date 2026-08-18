@@ -13,7 +13,7 @@ class DefaultGlucometerEventBuilderTest {
     private val builder = TestableDefaultGlucometerEventBuilder(generator = FakeGenerator())
 
     @Test
-    fun `buildFrom parses rd before meal event`() {
+    fun `buildFrom does not preselect meal tag for rd event from non voice glucometer`() {
         val event = builder.buildFrom(
             userId = "user",
             glucometerId = "device",
@@ -24,7 +24,7 @@ class DefaultGlucometerEventBuilderTest {
 
         assertEquals(24.5, event.temperature ?: -1.0, 0.0)
         assertEquals(4.4, event.value ?: -1.0, 0.0)
-        assertEquals(MealTag.BEFOREMEAL, event.mealTag)
+        assertNull(event.mealTag)
     }
 
     @Test
@@ -81,6 +81,21 @@ class DefaultGlucometerEventBuilderTest {
         assertNull(event.temperature)
         assertEquals(10.0, event.value ?: -1.0, 0.0)
         assertEquals(MealTag.BEFOREMEAL, event.mealTag)
+    }
+
+    @Test
+    fun `buildFrom does not preselect meal tag for mem event from non voice glucometer`() {
+        val event = builder.buildFrom(
+            userId = "user",
+            glucometerId = "device",
+            response = "mem.690B559E00000064",
+            glucometerSerialNumber = "D2204001234",
+            glucometerName = "SatelliteExpress0001"
+        )
+
+        assertNull(event.temperature)
+        assertEquals(10.0, event.value ?: -1.0, 0.0)
+        assertNull(event.mealTag)
     }
 
     @Test

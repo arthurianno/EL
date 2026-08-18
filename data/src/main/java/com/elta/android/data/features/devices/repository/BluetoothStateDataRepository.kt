@@ -36,8 +36,6 @@ class BluetoothStateDataRepository @Inject constructor(
     }
 
     override fun isLocationPermissionGranted(): Boolean {
-        if (!isLegacyBleLocationRequired) return true
-
         val granted = checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
         crashlyticsReport.log("Permission fine location granted: $granted")
         return granted
@@ -53,15 +51,10 @@ class BluetoothStateDataRepository @Inject constructor(
     }
 
     override fun isLocationEnabled(): Boolean {
-        if (!isLegacyBleLocationRequired) return true
-
         val enabled = LocationManagerCompat.isLocationEnabled(locationManager)
         crashlyticsReport.log("Location is enabled: $enabled")
         return enabled
     }
-
-    private val isLegacyBleLocationRequired: Boolean
-        get() = Build.VERSION.SDK_INT < Build.VERSION_CODES.S
 
     private fun checkPermission(permissionName: String): Boolean =
         context.checkSelfPermission(permissionName) == PackageManager.PERMISSION_GRANTED

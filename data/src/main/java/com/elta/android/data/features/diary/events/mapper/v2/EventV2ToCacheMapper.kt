@@ -22,19 +22,15 @@ class EventV2ToCacheMapper @Inject constructor(
             val existingLocal = cacheInstance.get(CommonConditions.ById(cachedId))
                 ?: (cacheInstance as? DbEventsV2Cache)?.getBySecondaryId(id)
 
-            val serverModTime = modificationTime?.let { if (it < 10000000000L) it * 1000 else it }
+            val incomingModTime = modificationTime?.let { if (it < 10000000000L) it * 1000 else it }
             val localModTime = existingLocal?.modificationTime?.let { if (it < 10000000000L) it * 1000 else it }
             
-            val isRemoteModification = if (serverModTime != null && localModTime != null) {
-                kotlin.math.abs(serverModTime - localModTime) > 5000
-            } else {
-                false
-            }
-
-            val isTimeInvalidValue = if (modificationTime != null || isRemoteModification) {
-                data.isTimeInvalid
-            } else {
-                data.isTimeInvalid || (existingLocal?.isTimeInvalid == true)
+            val isTimeInvalidValue = when {
+                existingLocal == null -> data.isTimeInvalid
+                incomingModTime == null -> data.isTimeInvalid || existingLocal.isTimeInvalid
+                localModTime == null -> data.isTimeInvalid
+                incomingModTime > localModTime + MODIFICATION_TIME_TOLERANCE_MILLIS -> data.isTimeInvalid
+                else -> data.isTimeInvalid && existingLocal.isTimeInvalid
             }
 
             EventV2CachedDto(
@@ -65,3 +61,5 @@ class EventV2ToCacheMapper @Inject constructor(
             )
         }
 }
+
+private const val MODIFICATION_TIME_TOLERANCE_MILLIS = 5000L

@@ -47,7 +47,6 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.features.sync.control.bluetoothControl
-import com.elta.android.presentation.features.sync.control.checkSelfPermissionByName
 import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindProgress
 import io.reactivex.Observable
