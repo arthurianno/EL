@@ -70,8 +70,8 @@ fun GlucoseRingGauge(
                 // Top-Left State Pill Badge ("Норма", "Высокая", "Низкая")
                 val stateText = when (state) {
                     GlucoseState.NORMAL -> "Норма"
-                    GlucoseState.HIGH -> "Высокая"
-                    GlucoseState.LOW -> "Низкая"
+                    GlucoseState.HIGH -> "Высокий"
+                    GlucoseState.LOW -> "Низкий"
                 }
                 Box(
                     modifier = Modifier
@@ -100,9 +100,9 @@ fun GlucoseRingGauge(
                     val centerY = size.height / 2f
                     val radius = diameter / 2f
 
-                    val tirValue = tirPercentage.replace("%", "").trim().toFloatOrNull() ?: 49f
+                    val tirValue = tirPercentage.replace("%", "").trim().toFloatOrNull() ?: 0f
                     val maxSweep = 260f
-                    val progressSweep = (maxSweep * (tirValue / 100f)).coerceIn(4f, maxSweep)
+                    val progressSweep = (maxSweep * (tirValue / 100f)).coerceIn(0f, maxSweep)
 
                     // Thin outer background ring contour around the central disc
                     drawCircle(
@@ -113,15 +113,17 @@ fun GlucoseRingGauge(
                     )
 
                     // Thick highlighted progress arc for TIR (starts at top 12 o'clock, goes clockwise)
-                    drawArc(
-                        color = Color.White,
-                        startAngle = -90f,
-                        sweepAngle = progressSweep,
-                        useCenter = false,
-                        topLeft = topLeft,
-                        size = Size(diameter, diameter),
-                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                    )
+                    if (progressSweep > 0f) {
+                        drawArc(
+                            color = Color.White,
+                            startAngle = -90f,
+                            sweepAngle = progressSweep,
+                            useCenter = false,
+                            topLeft = topLeft,
+                            size = Size(diameter, diameter),
+                            style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                        )
+                    }
 
                     // Diagonal Callout Line starting from bottom-left of thin ring (135°) pointing to TIR text
                     val calloutAngleRad = Math.toRadians(135.0)

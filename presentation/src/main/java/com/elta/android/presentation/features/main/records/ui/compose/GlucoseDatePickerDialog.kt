@@ -3,9 +3,11 @@ package com.elta.android.presentation.features.main.records.ui.compose
 import android.graphics.drawable.ColorDrawable
 import android.view.ViewGroup
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,11 +17,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -38,7 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -68,9 +67,15 @@ private val GENITIVE_MONTHS_RU = listOf(
     "июля", "августа", "сентября", "октября", "ноября", "декабря"
 )
 
+private val CalendarBackground = Color(0xFF1FBFD2)
+private val CalendarTextPrimary = Color(0xFF3D4556)
+private val CalendarTextSecondary = Color(0xFF878B93)
+private val CalendarBorder = Color(0xFFA4A4A4)
+
 @Composable
 fun GlucoseDatePickerDialog(
     initialDate: String = "28 июля 2026",
+    dayStatuses: Map<LocalDate, DayGlycemicStatus> = emptyMap(),
     onDismissRequest: () -> Unit = {},
     onDateSelected: (String) -> Unit = {}
 ) {
@@ -80,7 +85,7 @@ fun GlucoseDatePickerDialog(
     var selectedDate by remember { mutableStateOf(parsedDate) }
     var currentYearMonth by remember { mutableStateOf(YearMonth.from(parsedDate)) }
 
-    val daysInGrid = remember(currentYearMonth) {
+    val daysInGrid = remember(currentYearMonth, dayStatuses) {
         val daysList = mutableListOf<CalendarDay>()
         val firstDayOfWeek = currentYearMonth.atDay(1).dayOfWeek.value // 1 = Mon ... 7 = Sun
         val leadingEmptyCount = firstDayOfWeek - 1
@@ -91,13 +96,11 @@ fun GlucoseDatePickerDialog(
 
         val totalDays = currentYearMonth.lengthOfMonth()
         for (day in 1..totalDays) {
-            val mockStatus = when (day % 4) {
-                1 -> DayGlycemicStatus.NORM
-                2 -> DayGlycemicStatus.HIGH
-                3 -> DayGlycemicStatus.LOW
-                else -> DayGlycemicStatus.NONE
-            }
-            daysList.add(CalendarDay(day, isCurrentMonth = true, status = mockStatus))
+            val date = currentYearMonth.atDay(day)
+            daysList.add(CalendarDay(day, isCurrentMonth = true, status = dayStatuses[date] ?: DayGlycemicStatus.NONE))
+        }
+        while (daysList.size % 7 != 0) {
+            daysList.add(CalendarDay(0, isCurrentMonth = false))
         }
         daysList
     }
@@ -118,46 +121,76 @@ fun GlucoseDatePickerDialog(
             }
         }
 
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-                .rotateLandscape()
-                .padding(horizontal = 32.dp, vertical = 20.dp),
-            contentAlignment = Alignment.Center
+                .background(CalendarBackground)
+                .systemBarsPadding()
+                .padding(top = 18.dp),
+            contentAlignment = Alignment.TopCenter
         ) {
-            Box(
+            val contentWidth = maxWidth.coerceAtMost(737.dp)
+            val cardHeight = maxHeight.coerceAtMost(318.dp)
+
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(Color.White)
-                    .padding(24.dp)
+                    .width(contentWidth)
+                    .height(22.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .clickable { onDismissRequest() }
+                        .padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Left Column: Instructions and Selection Display
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_arrow_left),
+                        contentDescription = "Back",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Назад",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .padding(top = 29.dp)
+                    .width(contentWidth)
+                    .height(cardHeight)
+                    .clip(RoundedCornerShape(13.dp))
+                    .border(1.dp, CalendarBorder, RoundedCornerShape(13.dp))
+                    .background(Color.White)
+                    .padding(start = 40.dp, top = 24.dp, end = 22.dp, bottom = 28.dp)
+            ) {
+                Row(modifier = Modifier.fillMaxSize()) {
                     Column(
                         modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .padding(end = 24.dp),
+                            .width(296.dp)
+                            .fillMaxHeight(),
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
                             Text(
                                 text = "Выберите дату",
                                 fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF17191F)
+                                fontWeight = FontWeight.SemiBold,
+                                color = CalendarTextPrimary
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = "и мы покажем вам\nподробную статистику дня",
-                                fontSize = 14.sp,
-                                color = Color(0xFF878B93),
-                                lineHeight = 20.sp
+                                fontSize = 16.sp,
+                                color = CalendarTextSecondary,
+                                lineHeight = 18.sp
                             )
                         }
 
@@ -165,154 +198,151 @@ fun GlucoseDatePickerDialog(
                             Text(
                                 text = "Выбранная дата",
                                 fontSize = 12.sp,
-                                color = Color(0xFF878B93)
+                                color = Color(0xFFBBBFCA)
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = selectedDateFormatted,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF5C3882),
-                                textDecoration = TextDecoration.Underline
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = CalendarTextPrimary
                             )
                         }
                     }
 
-                    // Vertical Divider Line
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
                             .width(1.dp)
-                            .background(Color(0xFFEAEAEA))
+                            .background(Color(0xFFE1E4E8))
                     )
 
-                    // Right Column: Calendar Grid
                     Column(
                         modifier = Modifier
-                            .weight(1.4f)
+                            .padding(start = 42.dp)
+                            .width(333.dp)
                             .fillMaxHeight()
-                            .padding(start = 24.dp)
                     ) {
-                        // Month Header & Navigation Row
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(28.dp)
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                IconButton(
-                                    onClick = {
-                                        currentYearMonth = currentYearMonth.minusMonths(1)
-                                    },
-                                    modifier = Modifier.size(28.dp)
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_arrow_left),
-                                        contentDescription = "Previous Month",
-                                        tint = Color(0xFF878B93)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Text(
-                                    text = currentMonthTitle,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF17191F)
+                            IconButton(
+                                onClick = { currentYearMonth = currentYearMonth.minusMonths(1) },
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .size(24.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_arrow_left),
+                                    contentDescription = "Previous Month",
+                                    tint = CalendarTextSecondary,
+                                    modifier = Modifier.size(18.dp)
                                 )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                IconButton(
-                                    onClick = {
-                                        currentYearMonth = currentYearMonth.plusMonths(1)
-                                    },
-                                    modifier = Modifier.size(28.dp)
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_arrow_left),
-                                        contentDescription = "Next Month",
-                                        tint = Color(0xFF878B93),
-                                        modifier = Modifier.rotate(180f)
-                                    )
-                                }
+                            }
+
+                            Text(
+                                text = currentMonthTitle,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = CalendarTextPrimary,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+
+                            IconButton(
+                                onClick = { currentYearMonth = currentYearMonth.plusMonths(1) },
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(end = 42.dp)
+                                    .size(24.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_arrow_left),
+                                    contentDescription = "Next Month",
+                                    tint = CalendarTextSecondary,
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .rotate(180f)
+                                )
                             }
 
                             IconButton(
                                 onClick = onDismissRequest,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .size(24.dp)
                             ) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.btn_close),
                                     contentDescription = "Close",
-                                    tint = Color(0xFF878B93)
+                                    tint = CalendarTextSecondary,
+                                    modifier = Modifier.size(18.dp)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
 
-                        // Weekday labels (Пн, Вт, Ср, Чт, Пт, Сб, Вс)
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            val weekdays = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
-                            weekdays.forEach { dayName ->
-                                Box(
-                                    modifier = Modifier.weight(1f),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = dayName,
-                                        fontSize = 12.sp,
-                                        color = Color(0xFFB0B3BA),
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                }
+                            listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс").forEach { weekday ->
+                                Text(
+                                    text = weekday,
+                                    fontSize = 12.sp,
+                                    color = Color(0xFFBBBFCA),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.width(44.dp)
+                                )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                        // Days Grid (7 columns)
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(7),
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            items(daysInGrid) { day ->
-                                if (!day.isCurrentMonth) {
-                                    Box(modifier = Modifier.size(36.dp))
-                                } else {
-                                    val isSelected = currentYearMonth == YearMonth.from(selectedDate) && day.dayNumber == selectedDate.dayOfMonth
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            daysInGrid.chunked(7).forEach { week ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    week.forEach { day ->
+                                        if (!day.isCurrentMonth) {
+                                            Spacer(modifier = Modifier.width(44.dp).height(36.dp))
+                                        } else {
+                                            val date = currentYearMonth.atDay(day.dayNumber)
+                                            val isSelected = date == selectedDate
+                                            val (bgColor, textColor) = when {
+                                                isSelected -> CalendarTextPrimary to Color.White
+                                                day.status == DayGlycemicStatus.NORM -> Color(0xFFDDF6F1) to CalendarTextPrimary
+                                                day.status == DayGlycemicStatus.HIGH -> Color(0xFFFFF0D8) to CalendarTextPrimary
+                                                day.status == DayGlycemicStatus.LOW -> Color(0xFFFDE1DC) to CalendarTextPrimary
+                                                else -> Color.Transparent to CalendarTextPrimary
+                                            }
 
-                                    val (bgColor, textColor) = when {
-                                        isSelected -> Color(0xFF363E4E) to Color.White
-                                        day.status == DayGlycemicStatus.NORM -> Color(0xFFE1F5EC) to Color(0xFF17191F)
-                                        day.status == DayGlycemicStatus.HIGH -> Color(0xFFFFF3E0) to Color(0xFF17191F)
-                                        day.status == DayGlycemicStatus.LOW -> Color(0xFFFDE8E8) to Color(0xFF17191F)
-                                        else -> Color.Transparent to Color(0xFF17191F)
-                                    }
-
-                                    Box(
-                                        modifier = Modifier
-                                            .size(36.dp)
-                                            .clip(CircleShape)
-                                            .background(bgColor)
-                                            .clickable {
-                                                val newDate = currentYearMonth.atDay(day.dayNumber)
-                                                selectedDate = newDate
-                                                val dateStr = "${newDate.dayOfMonth} ${GENITIVE_MONTHS_RU[newDate.monthValue - 1]} ${newDate.year}"
-                                                onDateSelected(dateStr)
-                                                onDismissRequest()
-                                            },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = day.dayNumber.toString(),
-                                            fontSize = 13.sp,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                            color = textColor
-                                        )
+                                            Box(
+                                                modifier = Modifier
+                                                    .width(44.dp)
+                                                    .height(36.dp)
+                                                    .clip(RoundedCornerShape(10.dp))
+                                                    .background(bgColor)
+                                                    .clickable {
+                                                        selectedDate = date
+                                                        val dateString = "${date.dayOfMonth} ${GENITIVE_MONTHS_RU[date.monthValue - 1]} ${date.year}"
+                                                        onDateSelected(dateString)
+                                                        onDismissRequest()
+                                                    },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = day.dayNumber.toString(),
+                                                    fontSize = 12.sp,
+                                                    fontWeight = FontWeight.Medium,
+                                                    color = textColor
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }

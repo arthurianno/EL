@@ -40,9 +40,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun GlucoseDashboardScreen(
     bus: RxBus? = null,
-    glucoseValue: String = "4,1",
-    deltaText: String = "▼2,4",
-    tirPercentage: String = "49%",
+    glucoseValue: String = "—",
+    deltaText: String = "—",
+    tirPercentage: String = "—",
     syncTimeText: String = "5 часов назад",
     breadUnitsText: String = "0,9 Ед.",
     insulinText: String = "0,1 ХЕ",
@@ -206,11 +206,7 @@ fun GlucoseDashboardScreen(
 
                     // Central Circular Ring Gauge Widget
                     GlucoseRingGauge(
-                        glucoseValue = when (currentState) {
-                            GlucoseState.NORMAL -> "4,1"
-                            GlucoseState.HIGH -> "10,8"
-                            GlucoseState.LOW -> "2,5"
-                        },
+                        glucoseValue = glucoseValue,
                         glucoseUnit = "ммоль/л",
                         deltaText = deltaText,
                         tirPercentage = tirPercentage,
@@ -252,7 +248,7 @@ fun GlucoseDashboardScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(80.dp)) // Bottom Nav Bar offset
+
         }
 
         if (isDetailedChartVisible) {

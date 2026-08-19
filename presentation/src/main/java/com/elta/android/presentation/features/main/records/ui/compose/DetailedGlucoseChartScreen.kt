@@ -5,26 +5,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import android.app.Activity
@@ -33,7 +27,6 @@ import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
 import android.graphics.drawable.ColorDrawable
 import android.view.ViewGroup
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.compose.runtime.SideEffect
@@ -41,11 +34,11 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,6 +57,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
@@ -103,25 +97,15 @@ data class DetailedActivityEntry(
     val durationMins: Long
 )
 
-fun Modifier.rotateLandscape(): Modifier = layout { measurable, constraints ->
-    val placeable = measurable.measure(
-        constraints.copy(
-            minWidth = constraints.minHeight,
-            maxWidth = constraints.maxHeight,
-            minHeight = constraints.minWidth,
-            maxHeight = constraints.maxWidth
-        )
-    )
-    layout(placeable.height, placeable.width) {
-        placeable.placeWithLayer(
-            x = (placeable.height - placeable.width) / 2,
-            y = (placeable.width - placeable.height) / 2,
-            layerBlock = {
-                rotationZ = 90f
-            }
-        )
-    }
-}
+private val DetailedChartBackground = Color(0xFF1FBFD2)
+private val DetailedChartCardBorder = Color(0xFFA4A4A4)
+private val DetailedChartTextPrimary = Color(0xFF3D4556)
+private val DetailedChartTextSecondary = Color(0xFF878B93)
+private val DetailedLowColor = Color(0xFFD93B17)
+private val DetailedNormalColor = Color(0xFF29AF99)
+private val DetailedHighColor = Color(0xFFEE9C17)
+private const val DETAILED_GRAPH_START_MINUTES = 2 * 60
+private const val DETAILED_GRAPH_END_MINUTES = 14 * 60
 
 fun getTodayFormattedDate(): String {
     val now = org.threeten.bp.LocalDate.now()
@@ -152,12 +136,23 @@ fun getTimeOfDayFraction(timeLabel: String): Float {
 fun DetailedGlucoseChartScreen(
     onBackClick: () -> Unit = {},
     initialDate: String = getTodayFormattedDate(),
-    glucosePoints: List<DetailedGlucosePoint> = remember { defaultDetailedGlucosePoints() },
-    insulinEntries: List<DetailedInsulinEntry> = remember { defaultDetailedInsulinEntries() },
-    foodEntries: List<DetailedFoodEntry> = remember { defaultDetailedFoodEntries() },
+    glucosePoints: List<DetailedGlucosePoint> = emptyList(),
+    insulinEntries: List<DetailedInsulinEntry> = emptyList(),
+    foodEntries: List<DetailedFoodEntry> = emptyList(),
     activityEntries: List<DetailedActivityEntry> = emptyList()
 ) {
-    var selectedDate by remember { mutableStateOf(initialDate) }
+    val activity = LocalContext.current.findActivity()
+    DisposableEffect(activity) {
+        val previousOrientation = activity?.requestedOrientation
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        onDispose {
+            if (previousOrientation != null) {
+                activity.requestedOrientation = previousOrientation
+            }
+        }
+    }
+
+    var selectedDate by rememberSaveable { mutableStateOf(initialDate) }
     var isDatePickerVisible by remember { mutableStateOf(false) }
 
     // Layer toggles
@@ -166,6 +161,38 @@ fun DetailedGlucoseChartScreen(
     var isActivityLayerVisible by remember { mutableStateOf(true) }
 
     var selectedPointIndex by remember { mutableStateOf<Int?>(null) }
+
+    val totalPoints = glucosePoints.size
+    val hasData = totalPoints >= 2
+    val averageValue = if (hasData) glucosePoints.map { it.value }.average().toFloat() else 0f
+    val averageValueText = if (hasData) {
+        String.format(java.util.Locale.US, "%.1f", averageValue).replace('.', ',')
+    } else {
+        "-"
+    }
+    val normalCount = glucosePoints.count { it.value in 3.91f..9.99f }
+    val highCount = glucosePoints.count { it.value >= 10.0f }
+    val lowCount = glucosePoints.count { it.value <= 3.9f }
+    val normalPercent = if (totalPoints > 0) normalCount * 100 / totalPoints else 0
+    val highPercent = if (totalPoints > 0) highCount * 100 / totalPoints else 0
+    val lowPercent = if (totalPoints > 0) lowCount * 100 / totalPoints else 0
+    val sdValue = if (hasData) {
+        val variance = glucosePoints.map { point ->
+            val diff = point.value - averageValue
+            diff * diff
+        }.average()
+        Math.sqrt(variance).toFloat()
+    } else {
+        0f
+    }
+    val cvText = if (hasData && averageValue > 0f) "${Math.round(sdValue / averageValue * 100)}%" else "-"
+    val sdText = if (hasData) String.format(java.util.Locale.US, "%.1f", sdValue).replace('.', ',') else "-"
+    val gmiText = if (hasData) {
+        val gmi = 12.71f + 0.091f * (averageValue * 18.0182f)
+        "${String.format(java.util.Locale.US, "%.1f", gmi).replace('.', ',')}%"
+    } else {
+        "-"
+    }
 
     Dialog(
         onDismissRequest = onBackClick,
@@ -182,803 +209,673 @@ fun DetailedGlucoseChartScreen(
             }
         }
 
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF34B0D5))
-                .systemBarsPadding()
-                .rotateLandscape()
-                .padding(12.dp)
+                .background(DetailedChartBackground)
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-            // Top Navigation & Back Header
-            Row(
+            val contentWidth = maxWidth.coerceAtMost(737.dp)
+            val isVeryShort = maxHeight < 360.dp
+            val chartCardHeight = if (isVeryShort) 220.dp else 234.dp
+            val bottomCardHeight = if (isVeryShort) 74.dp else 82.dp
+
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .systemBarsPadding()
+                    .padding(top = if (isVeryShort) 12.dp else 18.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable { onBackClick() }
-                        .padding(vertical = 4.dp, horizontal = 8.dp),
+                        .width(contentWidth)
+                        .height(22.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow_left),
-                        contentDescription = "Back",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "Назад",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-            }
-
-            // Main Detailed Graph Card Container
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color.White)
-                    .padding(16.dp)
-            ) {
-                Row(modifier = Modifier.fillMaxSize()) {
-                    Column(
+                    Row(
                         modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(6.dp))
+                            .clickable { onBackClick() }
+                            .padding(horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Header Row inside Card (Date, Count, Legend)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_arrow_left),
+                            contentDescription = "Back",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Назад",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.White
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(7.dp))
+
+                Box(
+                    modifier = Modifier
+                        .width(contentWidth)
+                        .height(chartCardHeight)
+                        .clip(RoundedCornerShape(13.dp))
+                        .border(1.dp, DetailedChartCardBorder, RoundedCornerShape(13.dp))
+                        .background(Color.White)
+                        .padding(start = 20.dp, top = 16.dp, end = 12.dp, bottom = 10.dp)
+                ) {
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
                         ) {
-                            // Date Picker Trigger
                             Row(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .clickable { isDatePickerVisible = true }
-                                    .padding(vertical = 4.dp, horizontal = 4.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = selectedDate,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF17191F)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_arrow_left),
-                                    contentDescription = "Select Date",
-                                    tint = Color(0xFF17191F),
+                                Row(
                                     modifier = Modifier
-                                        .height(18.dp)
-                                        .rotate(90f)
-                                )
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .clickable { isDatePickerVisible = true }
+                                        .padding(vertical = 2.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = selectedDate,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = DetailedChartTextPrimary
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_arrow_left),
+                                        contentDescription = "Select Date",
+                                        tint = DetailedChartTextPrimary,
+                                        modifier = Modifier
+                                            .size(14.dp)
+                                            .rotate(270f)
+                                    )
+                                }
+
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "Количество измерений:",
+                                        fontSize = 12.sp,
+                                        color = DetailedChartTextSecondary
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = totalPoints.toString(),
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = DetailedChartTextPrimary.copy(alpha = 0.9f)
+                                    )
+                                    Spacer(modifier = Modifier.width(24.dp))
+                                    LegendDotItem(color = DetailedLowColor, label = "Низкий")
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    LegendDotItem(color = DetailedNormalColor, label = "Норма")
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    LegendDotItem(color = DetailedHighColor, label = "Высокий")
+                                }
                             }
 
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = "Количество измерений: ${glucosePoints.size}",
-                                    fontSize = 13.sp,
-                                    color = Color(0xFF878B93)
-                                )
+                            Spacer(modifier = Modifier.height(8.dp))
 
-                                Spacer(modifier = Modifier.width(20.dp))
-
-                                // Legend Items
-                                LegendDotItem(color = Color(0xFFF85F73), label = "Низкий")
-                                Spacer(modifier = Modifier.width(12.dp))
-                                LegendDotItem(color = Color(0xFF3BB2B8), label = "Норма")
-                                Spacer(modifier = Modifier.width(12.dp))
-                                LegendDotItem(color = Color(0xFFFFB74D), label = "Высокий")
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Interactive Chart Canvas Box with Horizontal Scroll
-                        val horizontalScrollState = rememberScrollState()
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        ) {
-                            Row(modifier = Modifier.fillMaxSize()) {
-                                // Y-Axis Fixed Labels (0, 4, 8, 12, 16)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            ) {
                                 Column(
                                     modifier = Modifier
+                                        .width(22.dp)
                                         .fillMaxHeight()
-                                        .padding(end = 8.dp, bottom = 24.dp),
+                                        .padding(bottom = 20.dp),
                                     verticalArrangement = Arrangement.SpaceBetween,
-                                    horizontalAlignment = Alignment.End
+                                    horizontalAlignment = Alignment.Start
                                 ) {
-                                    listOf("16", "12", "8", "4", "0").forEach { yVal ->
+                                    listOf("16", "12", "8", "4", "0").forEach { yValue ->
                                         Text(
-                                            text = yVal,
+                                            text = yValue,
                                             fontSize = 12.sp,
-                                            color = Color(0xFF878B93),
+                                            color = DetailedChartTextSecondary,
                                             fontWeight = FontWeight.Medium
                                         )
                                     }
                                 }
 
-                                // Scrollable Canvas Graph
-                                Box(
+                                BoxWithConstraints(
                                     modifier = Modifier
                                         .weight(1f)
                                         .fillMaxHeight()
-                                        .horizontalScroll(horizontalScrollState)
                                 ) {
-                                    val contentWidthDp = 800.dp
+                                    val graphWidth = maxWidth
+                                    val maxPoint = glucosePoints.maxByOrNull { it.value }
+                                    val minPoint = glucosePoints.minByOrNull { it.value }
+                                    val maxPointIndex = maxPoint?.let { glucosePoints.indexOf(it) } ?: -1
+                                    val minPointIndex = minPoint?.let { glucosePoints.indexOf(it) } ?: -1
 
-                                    Box(
+                                    Canvas(
                                         modifier = Modifier
-                                            .width(contentWidthDp)
-                                            .fillMaxHeight()
-                                    ) {
-                                        Canvas(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .pointerInput(Unit) {
-                                                    detectTapGestures { offset ->
-                                                        if (glucosePoints.isNotEmpty()) {
-                                                            val closestIdx = glucosePoints.indices.minByOrNull { idx ->
-                                                                val ptX = getTimeOfDayFraction(glucosePoints[idx].timeLabel) * size.width
-                                                                Math.abs(ptX - offset.x)
-                                                            } ?: 0
-                                                            selectedPointIndex = closestIdx
+                                            .fillMaxSize()
+                                            .pointerInput(glucosePoints) {
+                                                detectTapGestures { offset ->
+                                                    if (glucosePoints.isNotEmpty()) {
+                                                        selectedPointIndex = glucosePoints.indices.minByOrNull { index ->
+                                                            val pointX = detailedGraphFraction(glucosePoints[index].timeLabel) * size.width
+                                                            kotlin.math.abs(pointX - offset.x)
                                                         }
                                                     }
                                                 }
-                                        ) {
-                                            val width = size.width
-                                            val height = size.height
-                                            val paddingBottom = 24.dp.toPx()
-                                            val chartHeight = height - paddingBottom
-                                            val maxVal = 16f
+                                            }
+                                    ) {
+                                        val chartHeight = size.height - 20.dp.toPx()
+                                        val dash = PathEffect.dashPathEffect(floatArrayOf(7f, 7f), 0f)
+                                        listOf(16f, 12f, 8f, 4f, 0f).forEachIndexed { index, _ ->
+                                            val y = index.toFloat() / 4f * chartHeight
+                                            drawLine(
+                                                color = Color(0xFFE1E4E8),
+                                                start = Offset(0f, y),
+                                                end = Offset(size.width, y),
+                                                pathEffect = dash,
+                                                strokeWidth = 1.dp.toPx()
+                                            )
+                                        }
 
-                                            // Draw Horizontal Grid Lines
-                                            val yLevels = listOf(16f, 12f, 8f, 4f, 0f)
-                                            val dashEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-                                            yLevels.forEachIndexed { index, _ ->
-                                                val y = (index.toFloat() / (yLevels.size - 1)) * chartHeight
+                                        if (isFoodLayerVisible) {
+                                            foodEntries.forEach { food ->
+                                                val x = detailedGraphFraction(food.timeLabel) * size.width
+                                                val barWidth = 18.dp.toPx()
+                                                val barHeight = chartHeight * food.heightRatio
+                                                drawRoundRect(
+                                                    color = Color(0xFFFF8058).copy(alpha = 0.18f),
+                                                    topLeft = Offset(x - barWidth / 2f, chartHeight - barHeight),
+                                                    size = Size(barWidth, barHeight),
+                                                    cornerRadius = CornerRadius(3.dp.toPx(), 3.dp.toPx())
+                                                )
+                                            }
+                                        }
+
+                                        if (isInsulinLayerVisible) {
+                                            insulinEntries.forEach { insulin ->
+                                                val x = detailedGraphFraction(insulin.timeLabel) * size.width
+                                                val barWidth = 18.dp.toPx()
+                                                val barHeight = chartHeight * insulin.heightRatio
+                                                drawRoundRect(
+                                                    color = Color(0xFF38B7E1).copy(alpha = 0.18f),
+                                                    topLeft = Offset(x - barWidth / 2f, chartHeight - barHeight),
+                                                    size = Size(barWidth, barHeight),
+                                                    cornerRadius = CornerRadius(3.dp.toPx(), 3.dp.toPx())
+                                                )
+                                            }
+                                        }
+
+                                        val linePoints = glucosePoints.map { point ->
+                                            Offset(
+                                                x = detailedGraphFraction(point.timeLabel) * size.width,
+                                                y = chartHeight - (point.value / 16f).coerceIn(0f, 1f) * chartHeight
+                                            )
+                                        }
+
+                                        if (linePoints.size > 1) {
+                                            for (index in 0 until linePoints.lastIndex) {
+                                                val start = linePoints[index]
+                                                val end = linePoints[index + 1]
+                                                val value = glucosePoints[index].value
+                                                val path = Path().apply {
+                                                    moveTo(start.x, start.y)
+                                                    cubicTo(
+                                                        start.x + (end.x - start.x) / 2f,
+                                                        start.y,
+                                                        start.x + (end.x - start.x) / 2f,
+                                                        end.y,
+                                                        end.x,
+                                                        end.y
+                                                    )
+                                                }
+                                                drawPath(
+                                                    path = path,
+                                                    color = detailedPointColor(value),
+                                                    style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
+                                                )
+                                            }
+                                        }
+
+                                        linePoints.forEachIndexed { index, point ->
+                                            val isSelected = selectedPointIndex == index
+                                            drawCircle(
+                                                color = Color.White,
+                                                radius = if (isSelected) 8.dp.toPx() else 4.2.dp.toPx(),
+                                                center = point
+                                            )
+                                            drawCircle(
+                                                color = detailedPointColor(glucosePoints[index].value),
+                                                radius = if (isSelected) 4.5.dp.toPx() else 3.dp.toPx(),
+                                                center = point
+                                            )
+                                        }
+
+                                        selectedPointIndex?.let { index ->
+                                            linePoints.getOrNull(index)?.let { point ->
                                                 drawLine(
-                                                    color = Color(0xFFE5E7EB),
-                                                    start = Offset(0f, y),
-                                                    end = Offset(width, y),
-                                                    pathEffect = dashEffect,
+                                                    color = DetailedChartTextSecondary.copy(alpha = 0.7f),
+                                                    start = Offset(point.x, 0f),
+                                                    end = Offset(point.x, chartHeight),
+                                                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 5f), 0f),
                                                     strokeWidth = 1.dp.toPx()
                                                 )
+                                                drawCircle(
+                                                    color = DetailedChartTextPrimary,
+                                                    radius = 7.dp.toPx(),
+                                                    center = point,
+                                                    style = Stroke(width = 1.5.dp.toPx())
+                                                )
                                             }
+                                        }
 
-                                            // Calculate Point Coordinates based on Time of Day (00:00 - 23:59)
-                                            val linePoints = glucosePoints.map { pt ->
-                                                val fraction = getTimeOfDayFraction(pt.timeLabel)
-                                                val x = fraction * width
-                                                val y = chartHeight - (pt.value / maxVal).coerceIn(0f, 1f) * chartHeight
-                                                Offset(x, y)
-                                            }
-
-                                            // 1. Render Food Bars Overlay (if enabled)
-                                            if (isFoodLayerVisible) {
-                                                foodEntries.forEach { food ->
-                                                    val ptX = getTimeOfDayFraction(food.timeLabel) * width
-                                                    val barWidth = 24.dp.toPx()
-                                                    val barHeight = chartHeight * food.heightRatio
-                                                    val barTop = chartHeight - barHeight
-
-                                                    drawRoundRect(
-                                                        color = Color(0xFFFFB74D).copy(alpha = 0.65f),
-                                                        topLeft = Offset(ptX - barWidth / 2, barTop),
-                                                        size = Size(barWidth, barHeight),
-                                                        cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
-                                                    )
-                                                }
-                                            }
-
-                                            // 2. Render Insulin Bars Overlay (if enabled)
-                                            if (isInsulinLayerVisible) {
-                                                insulinEntries.forEach { ins ->
-                                                    val ptX = getTimeOfDayFraction(ins.timeLabel) * width
-                                                    val barWidth = 20.dp.toPx()
-                                                    val barHeight = chartHeight * ins.heightRatio
-                                                    val barTop = chartHeight - barHeight
-
-                                                    drawRoundRect(
-                                                        color = Color(0xFF29B6F6).copy(alpha = 0.75f),
-                                                        topLeft = Offset(ptX - barWidth / 2, barTop),
-                                                        size = Size(barWidth, barHeight),
-                                                        cornerRadius = CornerRadius(6.dp.toPx(), 6.dp.toPx())
-                                                    )
-                                                }
-                                            }
-
-                                            // 3. Render Main Glucose Curve Line & Measurement Dots
-                                            if (linePoints.isNotEmpty()) {
-                                                if (linePoints.size > 1) {
-                                                    for (i in 0 until linePoints.size - 1) {
-                                                        val p1 = linePoints[i]
-                                                        val p2 = linePoints[i + 1]
-                                                        val val1 = glucosePoints[i].value
-
-                                                        val segmentColor = when {
-                                                            val1 >= 10.0f -> Color(0xFFFFB74D)
-                                                            val1 <= 3.9f -> Color(0xFFF85F73)
-                                                            else -> Color(0xFF3BB2B8)
-                                                        }
-
-                                                        val segmentPath = Path().apply {
-                                                            moveTo(p1.x, p1.y)
-                                                            val controlPoint1 = Offset(p1.x + (p2.x - p1.x) / 2, p1.y)
-                                                            val controlPoint2 = Offset(p1.x + (p2.x - p1.x) / 2, p2.y)
-                                                            cubicTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, p2.x, p2.y)
-                                                        }
-
-                                                        drawPath(
-                                                            path = segmentPath,
-                                                            color = segmentColor,
-                                                            style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
-                                                        )
-                                                    }
-                                                }
-
-                                                // Draw visible data dots for ALL points
-                                                linePoints.forEachIndexed { idx, point ->
-                                                    val value = glucosePoints[idx].value
-                                                    val isSelected = selectedPointIndex == idx
-                                                    val dotColor = when {
-                                                        value >= 10f -> Color(0xFFFFB74D)
-                                                        value <= 3.9f -> Color(0xFFF85F73)
-                                                        else -> Color(0xFF3BB2B8)
-                                                    }
-
-                                                    val outerRadius = if (isSelected) 8.dp.toPx() else 5.dp.toPx()
-                                                    val innerRadius = if (isSelected) 5.dp.toPx() else 3.5.dp.toPx()
-
-                                                    drawCircle(
-                                                        color = Color.White,
-                                                        radius = outerRadius,
-                                                        center = point
-                                                    )
-                                                    drawCircle(
-                                                        color = dotColor,
-                                                        radius = innerRadius,
-                                                        center = point
-                                                    )
-                                                }
-                                            }
-
-                                            // 4. Render Hypoglycemia (Low Glucose) Period Lines on X-Axis
-                                            val lowRanges = mutableListOf<Pair<String, String>>()
-                                            var rangeStart: String? = null
-                                            var rangeEnd: String? = null
-                                            glucosePoints.forEach { pt ->
-                                                if (pt.value <= 3.9f) {
-                                                    if (rangeStart == null) rangeStart = pt.timeLabel
-                                                    rangeEnd = pt.timeLabel
-                                                } else {
-                                                    if (rangeStart != null && rangeEnd != null) {
-                                                        lowRanges.add(rangeStart!! to rangeEnd!!)
-                                                        rangeStart = null
-                                                        rangeEnd = null
-                                                    }
-                                                }
-                                            }
-                                            if (rangeStart != null && rangeEnd != null) {
-                                                lowRanges.add(rangeStart!! to rangeEnd!!)
-                                            }
-
-                                            val hypoY = chartHeight + 2.dp.toPx()
-                                            lowRanges.forEach { (startTime, endTime) ->
-                                                val startX = getTimeOfDayFraction(startTime) * width
-                                                val endX = getTimeOfDayFraction(endTime) * width
-                                                val actualStartX = if (startX == endX) (startX - 12.dp.toPx()).coerceAtLeast(0f) else startX
-                                                val actualEndX = if (startX == endX) (startX + 12.dp.toPx()).coerceAtMost(width) else endX
-
+                                        if (isActivityLayerVisible) {
+                                            activityEntries.forEach { activityEntry ->
+                                                val start = detailedGraphFraction(activityEntry.startTimeLabel) * size.width
+                                                val end = detailedGraphFraction(activityEntry.endTimeLabel) * size.width
                                                 drawLine(
-                                                    color = Color(0xFFF85F73),
-                                                    start = Offset(actualStartX, hypoY),
-                                                    end = Offset(actualEndX, hypoY),
-                                                    strokeWidth = 4.dp.toPx(),
+                                                    color = Color(0xFF6078EA),
+                                                    start = Offset(start, chartHeight + 4.dp.toPx()),
+                                                    end = Offset(end.coerceAtLeast(start + 18.dp.toPx()), chartHeight + 4.dp.toPx()),
+                                                    strokeWidth = 3.dp.toPx(),
                                                     cap = StrokeCap.Round
-                                                )
-                                            }
-
-                                            // 5. Render Activity Line on X-Axis (only from real activity entries)
-                                            if (isActivityLayerVisible && activityEntries.isNotEmpty()) {
-                                                val activityY = chartHeight + 2.dp.toPx()
-                                                activityEntries.forEach { act ->
-                                                    val startX = getTimeOfDayFraction(act.startTimeLabel) * width
-                                                    val endX = getTimeOfDayFraction(act.endTimeLabel) * width
-                                                    val actualStartX = if (startX == endX) (startX - 12.dp.toPx()).coerceAtLeast(0f) else startX
-                                                    val actualEndX = if (startX == endX) (startX + 12.dp.toPx()).coerceAtMost(width) else endX
-
-                                                    drawLine(
-                                                        color = Color(0xFF5C6BC0),
-                                                        start = Offset(actualStartX, activityY),
-                                                        end = Offset(actualEndX, activityY),
-                                                        strokeWidth = 4.dp.toPx(),
-                                                        cap = StrokeCap.Round
-                                                    )
-                                                }
-                                            }
-
-                                            // 6. Render Vertical Cursor Line & Selected Point Ring
-                                            selectedPointIndex?.let { selIdx ->
-                                                if (selIdx in linePoints.indices) {
-                                                    val selectedPt = linePoints[selIdx]
-
-                                                    drawLine(
-                                                        color = Color(0xFF6B7280),
-                                                        start = Offset(selectedPt.x, 0f),
-                                                        end = Offset(selectedPt.x, chartHeight),
-                                                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 6f), 0f),
-                                                        strokeWidth = 1.5.dp.toPx()
-                                                    )
-
-                                                    drawCircle(
-                                                        color = Color(0xFF374151),
-                                                        radius = 9.dp.toPx(),
-                                                        center = selectedPt,
-                                                        style = Stroke(width = 2.dp.toPx())
-                                                    )
-                                                    drawCircle(
-                                                        color = Color.White,
-                                                        radius = 7.dp.toPx(),
-                                                        center = selectedPt
-                                                    )
-                                                    val selVal = glucosePoints[selIdx].value
-                                                    val dotColor = when {
-                                                        selVal >= 10f -> Color(0xFFFFB74D)
-                                                        selVal <= 3.9f -> Color(0xFFF85F73)
-                                                        else -> Color(0xFF3BB2B8)
-                                                    }
-                                                    drawCircle(
-                                                        color = dotColor,
-                                                        radius = 4.dp.toPx(),
-                                                        center = selectedPt
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        // Dynamic Peak Glucose (Max / Min) Badges
-                                        if (glucosePoints.isNotEmpty()) {
-                                            val maxPtIdx = glucosePoints.indexOfFirst { it.isMax }
-                                            if (maxPtIdx != -1) {
-                                                val maxVal = glucosePoints[maxPtIdx].value
-                                                val xOffset = (getTimeOfDayFraction(glucosePoints[maxPtIdx].timeLabel) * 800).dp
-                                                PeakBadgeOverlay(
-                                                    text = "max ${String.format(java.util.Locale.US, "%.1f", maxVal).replace('.', ',')}",
-                                                    bgColor = Color(0xFFFF9800),
-                                                    modifier = Modifier.padding(start = xOffset, top = 10.dp)
-                                                )
-                                            }
-
-                                            val minPtIdx = glucosePoints.indexOfFirst { it.isMin }
-                                            if (minPtIdx != -1) {
-                                                val minVal = glucosePoints[minPtIdx].value
-                                                val xOffset = (getTimeOfDayFraction(glucosePoints[minPtIdx].timeLabel) * 800).dp
-                                                PeakBadgeOverlay(
-                                                    text = "min ${String.format(java.util.Locale.US, "%.1f", minVal).replace('.', ',')}",
-                                                    bgColor = Color(0xFFFF5252),
-                                                    modifier = Modifier.padding(start = xOffset, top = 135.dp)
-                                                )
-                                            }
-                                        }
-
-                                        // Dynamic Food Badges
-                                        if (isFoodLayerVisible && foodEntries.isNotEmpty() && glucosePoints.isNotEmpty()) {
-                                            foodEntries.forEach { food ->
-                                                val xOffset = (getTimeOfDayFraction(food.timeLabel) * 800).dp
-                                                PeakBadgeOverlay(
-                                                    text = food.breadUnits,
-                                                    bgColor = Color(0xFFFF7043),
-                                                    modifier = Modifier.padding(start = xOffset, top = 60.dp)
-                                                )
-                                            }
-                                        }
-
-                                        // Dynamic Insulin Badges
-                                        if (isInsulinLayerVisible && insulinEntries.isNotEmpty() && glucosePoints.isNotEmpty()) {
-                                            insulinEntries.forEach { ins ->
-                                                val xOffset = (getTimeOfDayFraction(ins.timeLabel) * 800).dp
-                                                PeakBadgeOverlay(
-                                                    text = ins.units,
-                                                    bgColor = Color(0xFF29B6F6),
-                                                    modifier = Modifier.padding(start = xOffset, top = 35.dp)
-                                                )
-                                            }
-                                        }
-
-                                        // X-Axis 24-Hour Time Scale Row (Fixed Labels: 00:00, 02:00, 04:00... 22:00)
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .align(Alignment.BottomStart)
-                                                .padding(top = 4.dp),
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            val timelineLabels = listOf(
-                                                "00:00", "02:00", "04:00", "06:00", "08:00", "10:00",
-                                                "12:00", "14:00", "16:00", "18:00", "20:00", "22:00"
-                                            )
-                                            timelineLabels.forEach { label ->
-                                                Text(
-                                                    text = label,
-                                                    fontSize = 11.sp,
-                                                    color = Color(0xFF878B93),
-                                                    fontWeight = FontWeight.Medium
                                                 )
                                             }
                                         }
                                     }
+
+                                    if (glucosePoints.isEmpty()) {
+                                        Text(
+                                            text = "Нет измерений за выбранный день",
+                                            fontSize = 13.sp,
+                                            color = DetailedChartTextSecondary,
+                                            modifier = Modifier.align(Alignment.Center)
+                                        )
+                                    }
+
+                                    if (maxPointIndex >= 0) {
+                                        val fraction = detailedGraphFraction(glucosePoints[maxPointIndex].timeLabel)
+                                        PeakBadgeOverlay(
+                                            text = "max ${String.format(java.util.Locale.US, "%.1f", glucosePoints[maxPointIndex].value).replace('.', ',')}",
+                                            bgColor = DetailedHighColor,
+                                            modifier = Modifier.padding(
+                                                start = (graphWidth * fraction - 34.dp).coerceIn(0.dp, (graphWidth - 70.dp).coerceAtLeast(0.dp)),
+                                                top = 8.dp
+                                            )
+                                        )
+                                    }
+
+                                    if (minPointIndex >= 0 && minPointIndex != maxPointIndex) {
+                                        val fraction = detailedGraphFraction(glucosePoints[minPointIndex].timeLabel)
+                                        PeakBadgeOverlay(
+                                            text = "min ${String.format(java.util.Locale.US, "%.1f", glucosePoints[minPointIndex].value).replace('.', ',')}",
+                                            bgColor = DetailedLowColor,
+                                            modifier = Modifier.padding(
+                                                start = (graphWidth * fraction - 34.dp).coerceIn(0.dp, (graphWidth - 70.dp).coerceAtLeast(0.dp)),
+                                                top = 112.dp
+                                            )
+                                        )
+                                    }
                                 }
                             }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 22.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                listOf("02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00").forEach { label ->
+                                    Text(
+                                        text = label,
+                                        fontSize = 12.sp,
+                                        color = DetailedChartTextSecondary,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(3.dp))
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 22.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "17.08.2025",
+                                    fontSize = 11.sp,
+                                    color = DetailedChartTextSecondary,
+                                    modifier = Modifier.width(84.dp)
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(3.dp)
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(Color(0xFFD9D9D9).copy(alpha = 0.57f))
+                                        .border(1.dp, DetailedChartTextSecondary.copy(alpha = 0.7f), RoundedCornerShape(6.dp))
+                                )
+                                Text(
+                                    text = "17.08.2026",
+                                    fontSize = 11.sp,
+                                    color = DetailedChartTextSecondary,
+                                    textAlign = TextAlign.End,
+                                    modifier = Modifier.width(84.dp)
+                                )
+                            }
                         }
-                    }
 
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    // Right Side Vertical Toggle Bar Column
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(vertical = 12.dp),
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        LayerToggleButton(
-                            iconRes = R.drawable.ic_save_edit,
-                            isActive = isInsulinLayerVisible,
-                            activeBgColor = Color(0xFFE1F5FE),
-                            onClick = { isInsulinLayerVisible = !isInsulinLayerVisible }
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        LayerToggleButton(
-                            iconRes = R.drawable.ic_verify_dish,
-                            isActive = isFoodLayerVisible,
-                            activeBgColor = Color(0xFFFFF3E0),
-                            onClick = { isFoodLayerVisible = !isFoodLayerVisible }
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        LayerToggleButton(
-                            iconRes = R.drawable.ic_list,
-                            isActive = isActivityLayerVisible,
-                            activeBgColor = Color(0xFFEDE7F6),
-                            onClick = { isActivityLayerVisible = !isActivityLayerVisible }
-                        )
+                        Column {
+                            Spacer(modifier = Modifier.height(50.dp))
+                            LayerToggleButton(
+                                iconRes = R.drawable.ic_save_edit,
+                                isActive = isInsulinLayerVisible,
+                                activeBgColor = Color(0xFFE0F6FF),
+                                activeTint = Color(0xFF38B7E1),
+                                onClick = { isInsulinLayerVisible = !isInsulinLayerVisible }
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            LayerToggleButton(
+                                iconRes = R.drawable.ic_verify_dish,
+                                isActive = isFoodLayerVisible,
+                                activeBgColor = Color(0xFFFFE7DF),
+                                activeTint = Color(0xFFFF8058),
+                                onClick = { isFoodLayerVisible = !isFoodLayerVisible }
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            LayerToggleButton(
+                                iconRes = R.drawable.ic_list,
+                                isActive = isActivityLayerVisible,
+                                activeBgColor = Color(0xFFE7EAFF),
+                                activeTint = Color(0xFF6078EA),
+                                onClick = { isActivityLayerVisible = !isActivityLayerVisible }
+                            )
+                        }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-            // Bottom Clinical Statistics / Selected Event Card
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color.White)
-                    .padding(horizontal = 20.dp, vertical = 12.dp)
-            ) {
-                val selectedPt = selectedPointIndex?.let { glucosePoints.getOrNull(it) }
+                Box(
+                    modifier = Modifier
+                        .width(contentWidth)
+                        .height(bottomCardHeight)
+                        .clip(RoundedCornerShape(13.dp))
+                        .border(1.dp, DetailedChartCardBorder, RoundedCornerShape(13.dp))
+                        .background(Color.White)
+                        .padding(horizontal = 30.dp, vertical = if (isVeryShort) 10.dp else 14.dp)
+                ) {
+                    val selectedPoint = selectedPointIndex?.let { glucosePoints.getOrNull(it) }
 
-                if (selectedPt != null) {
-                    // --- Selected Event Details View (Picture 1) ---
-                    val glucoseColor = when {
-                        selectedPt.value >= 10.0f -> Color(0xFFFFB74D)
-                        selectedPt.value <= 3.9f -> Color(0xFFF85F73)
-                        else -> Color(0xFF3BB2B8)
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // 1. Время события
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = "Время события",
-                                fontSize = 11.sp,
-                                color = Color(0xFF878B93)
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = selectedPt.timeLabel,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF17191F)
-                            )
-                        }
-
-                        // Vertical Divider
-                        Box(modifier = Modifier.height(36.dp).width(1.dp).background(Color(0xFFE5E7EB)))
-
-                        // 2. Уровень глюкозы
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = String.format(java.util.Locale.US, "%.1f", selectedPt.value).replace('.', ','),
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = glucoseColor
-                            )
-                            Text(
-                                text = "ммоль/л",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = glucoseColor
-                            )
-                        }
-
-                        // Vertical Divider
-                        Box(modifier = Modifier.height(36.dp).width(1.dp).background(Color(0xFFE5E7EB)))
-
-                        // 3. Тренд
-                        val trendIcon = when {
-                            selectedPt.trendValue.startsWith("+") -> "↗"
-                            selectedPt.trendValue.startsWith("-") -> "↘"
-                            else -> "→"
-                        }
-                        val trendColor = when {
-                            selectedPt.trendValue.startsWith("+") -> Color(0xFFFFB74D)
-                            selectedPt.trendValue.startsWith("-") -> Color(0xFFF85F73)
-                            else -> Color(0xFF3BB2B8)
-                        }
-
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = "Тренд",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF878B93)
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = "$trendIcon ${selectedPt.trendText}",
-                                fontSize = 10.sp,
-                                color = Color(0xFF17191F)
-                            )
-                            Text(
-                                text = selectedPt.trendValue,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = trendColor
-                            )
-                        }
-
-                        // Vertical Divider
-                        Box(modifier = Modifier.height(36.dp).width(1.dp).background(Color(0xFFE5E7EB)))
-
-                        // 4. Еда
-                        val hasFood = selectedPt.foodUnits != null
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_verify_dish),
-                                contentDescription = "Food",
-                                tint = if (hasFood) Color(0xFFFF7043) else Color(0xFFB0B3BA),
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Column {
+                    if (selectedPoint != null) {
+                        SelectedPointSummaryRow(selectedPoint)
+                    } else {
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(
+                                modifier = Modifier.width(98.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
                                 Text(
-                                    text = selectedPt.foodTimeAgo ?: "нет данных",
-                                    fontSize = 10.sp,
-                                    color = Color(0xFF878B93)
-                                )
-                                Text(
-                                    text = selectedPt.foodUnits ?: "—",
+                                    text = "События дня",
                                     fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (hasFood) Color(0xFF17191F) else Color(0xFF878B93)
+                                    color = DetailedChartTextSecondary
+                                )
+                                Text(
+                                    text = selectedDate,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = DetailedChartTextPrimary,
+                                    textAlign = TextAlign.Center
                                 )
                             }
-                        }
 
-                        // Vertical Divider
-                        Box(modifier = Modifier.height(36.dp).width(1.dp).background(Color(0xFFE5E7EB)))
+                            DetailedVerticalDivider()
 
-                        // 5. Инсулин
-                        val hasInsulin = selectedPt.insulinUnits != null
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_save_edit),
-                                contentDescription = "Insulin",
-                                tint = if (hasInsulin) Color(0xFF29B6F6) else Color(0xFFB0B3BA),
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Column {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    text = selectedPt.insulinTimeAgo ?: "нет данных",
-                                    fontSize = 10.sp,
-                                    color = Color(0xFF878B93)
+                                    text = averageValueText,
+                                    fontSize = 36.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = DetailedHighColor,
+                                    letterSpacing = 0.sp
                                 )
                                 Text(
-                                    text = selectedPt.insulinUnits ?: "—",
+                                    text = "ммоль/л",
                                     fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (hasInsulin) Color(0xFF17191F) else Color(0xFF878B93)
+                                    color = DetailedHighColor,
+                                    lineHeight = 12.sp
                                 )
-                            }
-                        }
-
-                        // Vertical Divider
-                        Box(modifier = Modifier.height(36.dp).width(1.dp).background(Color(0xFFE5E7EB)))
-
-                        // 6. Активность
-                        val hasActivity = selectedPt.activityDuration != null
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_list),
-                                contentDescription = "Activity",
-                                tint = if (hasActivity) Color(0xFF5C6BC0) else Color(0xFFB0B3BA),
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Column {
                                 Text(
-                                    text = selectedPt.activityTimeAgo ?: "нет данных",
+                                    text = "средний за день",
                                     fontSize = 10.sp,
-                                    color = Color(0xFF878B93)
-                                )
-                                Text(
-                                    text = selectedPt.activityDuration ?: "—",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (hasActivity) Color(0xFF17191F) else Color(0xFF878B93)
+                                    color = DetailedChartTextSecondary,
+                                    lineHeight = 12.sp
                                 )
                             }
-                        }
-                    }
-                } else {
-                    // --- Daily Summary View (Picture 2) ---
-                    val hasData = glucosePoints.isNotEmpty()
-                    val totalPoints = glucosePoints.size
 
-                    val avgVal = if (hasData) glucosePoints.map { it.value }.average().toFloat() else 0f
-                    val avgValStr = if (hasData) String.format(java.util.Locale.US, "%.1f", avgVal).replace('.', ',') else "—"
+                            DetailedVerticalDivider()
 
-                    val normCount = glucosePoints.count { it.value in 3.91f..9.99f }
-                    val highCount = glucosePoints.count { it.value >= 10.0f }
-                    val lowCount = glucosePoints.count { it.value <= 3.9f }
-
-                    val normPct = if (totalPoints > 0) (normCount * 100) / totalPoints else 0
-                    val highPct = if (totalPoints > 0) (highCount * 100) / totalPoints else 0
-                    val lowPct = if (totalPoints > 0) (lowCount * 100) / totalPoints else 0
-
-                    fun formatDurationMins(mins: Int): String {
-                        val h = mins / 60
-                        val m = mins % 60
-                        return when {
-                            h > 0 && m > 0 -> "${h}ч ${m}м"
-                            h > 0 -> "${h}ч"
-                            else -> "${m}м"
-                        }
-                    }
-
-                    val normMins = if (totalPoints > 0) (normPct * 24 * 60) / 100 else 0
-                    val highMins = if (totalPoints > 0) (highPct * 24 * 60) / 100 else 0
-                    val lowMins = if (totalPoints > 0) (lowPct * 24 * 60) / 100 else 0
-
-                    val normTimeStr = if (hasData) formatDurationMins(normMins) else "—"
-                    val highTimeStr = if (hasData) formatDurationMins(highMins) else "—"
-                    val lowTimeStr = if (hasData) formatDurationMins(lowMins) else "—"
-
-                    val sdVal = if (hasData && totalPoints > 1) {
-                        val variance = glucosePoints.map { (it.value - avgVal).let { d -> d * d } }.average()
-                        Math.sqrt(variance).toFloat()
-                    } else 0f
-
-                    val cvVal = if (hasData && avgVal > 0f) (sdVal / avgVal) * 100f else 0f
-                    val gmiVal = if (hasData) 12.71f + (0.091f * (avgVal * 18.0182f)) else 0f
-
-                    val sdStr = if (hasData && totalPoints > 1) String.format(java.util.Locale.US, "%.1f", sdVal).replace('.', ',') else "—"
-                    val cvStr = if (hasData && avgVal > 0f) "${Math.round(cvVal)}%" else "—"
-                    val gmiStr = if (hasData) "${String.format(java.util.Locale.US, "%.1f", gmiVal).replace('.', ',')}%" else "—"
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // 1. Events Date Header
-                        Column {
-                            Text(
-                                text = "События дня",
-                                fontSize = 12.sp,
-                                color = Color(0xFF878B93)
-                            )
-                            Text(
-                                text = selectedDate,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF17191F)
-                            )
-                        }
-
-                        // Vertical Divider
-                        Box(modifier = Modifier.height(36.dp).width(1.dp).background(Color(0xFFE5E7EB)))
-
-                        // 2. Average Daily Glucose
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Row(verticalAlignment = Alignment.Bottom) {
-                                Text(
-                                    text = avgValStr,
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFF9800)
-                                )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                TirStatItem(color = DetailedNormalColor, percent = if (hasData) "$normalPercent%" else "-", label = if (hasData) percentToDuration(normalPercent) else "-")
+                                Spacer(modifier = Modifier.width(14.dp))
+                                TirStatItem(color = DetailedHighColor, percent = if (hasData) "$highPercent%" else "-", label = if (hasData) percentToDuration(highPercent) else "-")
+                                Spacer(modifier = Modifier.width(14.dp))
+                                TirStatItem(color = DetailedLowColor, percent = if (hasData) "$lowPercent%" else "-", label = if (hasData) percentToDuration(lowPercent) else "-")
                             }
-                            Text(
-                                text = "ммоль/л",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFF9800)
-                            )
-                            Text(
-                                text = "средний за день",
-                                fontSize = 10.sp,
-                                color = Color(0xFF878B93)
-                            )
-                        }
 
-                        // Vertical Divider
-                        Box(modifier = Modifier.height(36.dp).width(1.dp).background(Color(0xFFE5E7EB)))
+                            DetailedVerticalDivider()
 
-                        // 3. Time in Range (TIR) Breakdown
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            TirStatItem(color = Color(0xFF3BB2B8), percent = if (hasData) "$normPct%" else "—", label = normTimeStr)
-                            Spacer(modifier = Modifier.width(16.dp))
-                            TirStatItem(color = Color(0xFFFFB74D), percent = if (hasData) "$highPct%" else "—", label = highTimeStr)
-                            Spacer(modifier = Modifier.width(16.dp))
-                            TirStatItem(color = Color(0xFFF85F73), percent = if (hasData) "$lowPct%" else "—", label = lowTimeStr)
-                        }
-
-                        // Vertical Divider
-                        Box(modifier = Modifier.height(36.dp).width(1.dp).background(Color(0xFFE5E7EB)))
-
-                        // 4. Clinical Indicators (CV, SD, GMI)
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            IndicatorStatItem(name = "CV", value = cvStr)
-                            Spacer(modifier = Modifier.width(16.dp))
-                            IndicatorStatItem(name = "SD", value = sdStr)
-                            Spacer(modifier = Modifier.width(16.dp))
-                            IndicatorStatItem(name = "GMI", value = gmiStr)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                IndicatorStatItem(name = "CV", value = cvText)
+                                Spacer(modifier = Modifier.width(18.dp))
+                                IndicatorStatItem(name = "SD", value = sdText)
+                                Spacer(modifier = Modifier.width(18.dp))
+                                IndicatorStatItem(name = "GMI", value = gmiText)
+                            }
                         }
                     }
                 }
             }
         }
+
+        if (isDatePickerVisible) {
+            GlucoseDatePickerDialog(
+                initialDate = selectedDate,
+                onDismissRequest = { isDatePickerVisible = false },
+                onDateSelected = { date ->
+                    selectedDate = date
+                    isDatePickerVisible = false
+                }
+            )
+        }
     }
 }
 
-    // Custom Date Selection Calendar Dialog
-    if (isDatePickerVisible) {
-        GlucoseDatePickerDialog(
-            initialDate = selectedDate,
-            onDismissRequest = { isDatePickerVisible = false },
-            onDateSelected = { dateStr ->
-                selectedDate = dateStr
-            }
+private fun detailedGraphFraction(timeLabel: String): Float {
+    val minutes = timeLabelToMinutes(timeLabel)
+    return ((minutes - DETAILED_GRAPH_START_MINUTES).toFloat() /
+        (DETAILED_GRAPH_END_MINUTES - DETAILED_GRAPH_START_MINUTES)).coerceIn(0f, 1f)
+}
+
+private fun timeLabelToMinutes(timeLabel: String): Int {
+    val parts = timeLabel.trim().split(":")
+    val hours = parts.getOrNull(0)?.toIntOrNull() ?: 0
+    val minutes = parts.getOrNull(1)?.toIntOrNull() ?: 0
+    return (hours * 60 + minutes).coerceIn(0, 24 * 60)
+}
+
+private fun detailedPointColor(value: Float): Color = when {
+    value >= 10f -> DetailedHighColor
+    value <= 3.9f -> DetailedLowColor
+    else -> DetailedNormalColor
+}
+
+private fun percentToDuration(percent: Int): String {
+    val totalMinutes = percent * 24 * 60 / 100
+    val hours = totalMinutes / 60
+    val minutes = totalMinutes % 60
+    return when {
+        hours > 0 && minutes > 0 -> "${hours}ч ${minutes}м"
+        hours > 0 -> "${hours}ч"
+        else -> "${minutes}м"
+    }
+}
+
+@Composable
+private fun SelectedPointSummaryRow(point: DetailedGlucosePoint) {
+    val glucoseColor = detailedPointColor(point.value)
+    val trendIcon = when {
+        point.trendValue.startsWith("+") -> "↗"
+        point.trendValue.startsWith("-") -> "↘"
+        else -> "→"
+    }
+    val trendColor = when {
+        point.trendValue.startsWith("+") -> DetailedHighColor
+        point.trendValue.startsWith("-") -> DetailedLowColor
+        else -> DetailedNormalColor
+    }
+
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = point.timeLabel,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = DetailedChartTextPrimary,
+            modifier = Modifier.width(98.dp),
+            textAlign = TextAlign.Center
+        )
+
+        DetailedVerticalDivider()
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = String.format(java.util.Locale.US, "%.1f", point.value).replace('.', ','),
+                fontSize = 36.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = glucoseColor,
+                letterSpacing = 0.sp
+            )
+            Text(
+                text = "ммоль/л",
+                fontSize = 12.sp,
+                color = glucoseColor,
+                lineHeight = 12.sp
+            )
+        }
+
+        DetailedVerticalDivider()
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Тренд",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = DetailedChartTextPrimary
+            )
+            Text(
+                text = "$trendIcon ${point.trendText}",
+                fontSize = 12.sp,
+                color = DetailedChartTextPrimary,
+                lineHeight = 14.sp
+            )
+            Text(
+                text = point.trendValue,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = trendColor,
+                lineHeight = 18.sp
+            )
+        }
+
+        DetailedVerticalDivider()
+        EventInfoItem(
+            iconRes = R.drawable.ic_verify_dish,
+            activeColor = Color(0xFFFF8058),
+            timeAgo = point.foodTimeAgo,
+            value = point.foodUnits
+        )
+        DetailedVerticalDivider()
+        EventInfoItem(
+            iconRes = R.drawable.ic_save_edit,
+            activeColor = Color(0xFF38B7E1),
+            timeAgo = point.insulinTimeAgo,
+            value = point.insulinUnits
+        )
+        DetailedVerticalDivider()
+        EventInfoItem(
+            iconRes = R.drawable.ic_list,
+            activeColor = Color(0xFF6078EA),
+            timeAgo = point.activityTimeAgo,
+            value = point.activityDuration
         )
     }
+}
+
+@Composable
+private fun EventInfoItem(
+    iconRes: Int,
+    activeColor: Color,
+    timeAgo: String?,
+    value: String?
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            painter = painterResource(id = iconRes),
+            contentDescription = null,
+            tint = if (value != null) activeColor else Color(0xFFBBBFCA),
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Column {
+            Text(
+                text = timeAgo ?: "-",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = DetailedChartTextPrimary,
+                lineHeight = 13.sp
+            )
+            Text(
+                text = if (timeAgo != null) "назад" else "",
+                fontSize = 10.sp,
+                color = DetailedChartTextPrimary,
+                lineHeight = 12.sp
+            )
+            Text(
+                text = value ?: "-",
+                fontSize = 11.sp,
+                color = DetailedChartTextPrimary,
+                lineHeight = 14.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun DetailedVerticalDivider() {
+    Box(
+        modifier = Modifier
+            .height(48.dp)
+            .width(1.dp)
+            .background(Color(0xFFE1E4E8))
+    )
 }
 
 @Composable
@@ -986,7 +883,7 @@ private fun LegendDotItem(color: Color, label: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
-                .size(8.dp)
+                .size(7.dp)
                 .clip(CircleShape)
                 .background(color)
         )
@@ -994,7 +891,7 @@ private fun LegendDotItem(color: Color, label: String) {
         Text(
             text = label,
             fontSize = 12.sp,
-            color = Color(0xFF878B93)
+            color = DetailedChartTextSecondary
         )
     }
 }
@@ -1007,7 +904,7 @@ private fun PeakBadgeOverlay(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(4.dp))
             .background(bgColor)
             .padding(horizontal = 6.dp, vertical = 2.dp),
         contentAlignment = Alignment.Center
@@ -1026,11 +923,12 @@ private fun LayerToggleButton(
     iconRes: Int,
     isActive: Boolean,
     activeBgColor: Color,
+    activeTint: Color,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
-            .size(38.dp)
+            .size(32.dp)
             .clip(CircleShape)
             .background(if (isActive) activeBgColor else Color(0xFFF3F4F6))
             .clickable { onClick() },
@@ -1039,8 +937,8 @@ private fun LayerToggleButton(
         Icon(
             painter = painterResource(id = iconRes),
             contentDescription = "Toggle Layer",
-            tint = if (isActive) Color(0xFF17191F) else Color(0xFFB0B3BA),
-            modifier = Modifier.size(20.dp)
+            tint = if (isActive) activeTint else Color(0xFFB0B3BA),
+            modifier = Modifier.size(18.dp)
         )
     }
 }
@@ -1059,20 +957,21 @@ private fun TirStatItem(color: Color, percent: String, label: String) {
             Text(
                 text = "TIR",
                 fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF17191F)
+                color = DetailedChartTextPrimary
             )
         }
         Text(
             text = percent,
-            fontSize = 16.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF17191F)
+            color = DetailedChartTextPrimary.copy(alpha = 0.9f),
+            lineHeight = 20.sp
         )
         Text(
             text = label,
             fontSize = 10.sp,
-            color = Color(0xFF878B93)
+            color = DetailedChartTextSecondary,
+            lineHeight = 12.sp
         )
     }
 }
@@ -1082,16 +981,16 @@ private fun IndicatorStatItem(name: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = name,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF878B93)
+            fontSize = 12.sp,
+            color = DetailedChartTextPrimary
         )
         Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = value,
-            fontSize = 16.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF17191F)
+            color = DetailedChartTextPrimary.copy(alpha = 0.9f),
+            lineHeight = 20.sp
         )
     }
 }

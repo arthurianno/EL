@@ -61,16 +61,25 @@ fun GlucoseLineChartCard(
     val gridLineColor = if (isDarkTheme) Color.White.copy(alpha = 0.15f) else Color(0xFFE3E3E3)
     val axisLabelColor = if (isDarkTheme) Color.White.copy(alpha = 0.6f) else Color(0xFF878B93)
 
-    val (displayPoints, displayTimeLabels) = remember(points, activePeriod) {
+    val (filteredPoints, filteredTimeLabels) = remember(points, activePeriod) {
         filterPointsAndLabelsForPeriod(points, activePeriod)
     }
+    val displayPoints = filteredPoints
+    val displayTimeLabels = filteredTimeLabels
 
     Box(
         modifier = Modifier
+            .padding(14.dp)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+            .height(237.dp)
+            .clip(RoundedCornerShape(13.dp))
+            .border(
+                width = 1.dp,
+                color = if (isDarkTheme) GlucoseDashboardTheme.DarkCardBorder else Color(0xFFE3E3E3),
+                shape = RoundedCornerShape(13.dp)
+            )
             .background(cardBg)
-            .padding(16.dp)
+            .padding(start = 21.dp, top = 5.dp, end = 10.dp, bottom = 9.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Header Row: Date Dropdown & Time Filter Chips
@@ -89,8 +98,8 @@ fun GlucoseLineChartCard(
                 ) {
                     Text(
                         text = "Сегодня",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
                         color = cardTextColor
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -98,26 +107,28 @@ fun GlucoseLineChartCard(
                         painter = painterResource(id = R.drawable.ic_arrow_down),
                         contentDescription = "Select Date",
                         tint = cardTextColor,
-                        modifier = Modifier.height(20.dp)
+                        modifier = Modifier.height(16.dp)
                     )
                 }
 
                 // Time Filter Segmented Switcher
                 Row(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
+                        .height(28.dp)
+                        .clip(RoundedCornerShape(7.dp))
                         .border(
                             width = 1.dp,
                             color = if (isDarkTheme) Color.White.copy(alpha = 0.2f) else Color(0xFFBBBFCA),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(7.dp)
                         )
-                        .padding(2.dp)
+                        .padding(2.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     periods.forEach { period ->
                         val isSelected = period == activePeriod
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
+                                .clip(RoundedCornerShape(7.dp))
                                 .background(
                                     if (isSelected) {
                                         if (isDarkTheme) Color(0xFF4A5366) else Color(0xFF3D4556)
@@ -129,13 +140,13 @@ fun GlucoseLineChartCard(
                                     activePeriod = period
                                     onPeriodSelected(period)
                                 }
-                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                                .padding(horizontal = 9.dp, vertical = 1.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = period,
-                                fontSize = 12.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                fontSize = if (isSelected) 15.sp else 14.sp,
+                                fontWeight = FontWeight.SemiBold,
                                 color = if (isSelected) Color.White else axisLabelColor
                             )
                         }
@@ -143,13 +154,13 @@ fun GlucoseLineChartCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Graph Section with Y-Axis Scale on the Left + Canvas + X-Axis Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .weight(1f)
             ) {
                 // Y-Axis Scale Labels (16, 12, 8, 4, 0)
                 Column(
@@ -163,7 +174,7 @@ fun GlucoseLineChartCard(
                     listOf("16", "12", "8", "4", "0").forEach { yVal ->
                         Text(
                             text = yVal,
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
                             color = axisLabelColor,
                             fontWeight = FontWeight.Medium
                         )
@@ -194,6 +205,22 @@ fun GlucoseLineChartCard(
                         val chartWidth = width
                         val chartHeight = height - paddingBottom
 
+                        drawRect(
+                            color = Color(0xFFFF8058).copy(alpha = if (isDarkTheme) 0.04f else 0.08f),
+                            topLeft = Offset(0f, chartHeight * (1f - 4f / 16f)),
+                            size = androidx.compose.ui.geometry.Size(width, chartHeight * 4f / 16f)
+                        )
+                        drawRect(
+                            color = Color(0xFF3EC9A8).copy(alpha = if (isDarkTheme) 0.04f else 0.08f),
+                            topLeft = Offset(0f, chartHeight * (1f - 8f / 16f)),
+                            size = androidx.compose.ui.geometry.Size(width, chartHeight * 4f / 16f)
+                        )
+                        drawRect(
+                            color = Color(0xFFFFCC80).copy(alpha = if (isDarkTheme) 0.04f else 0.08f),
+                            topLeft = Offset(0f, 0f),
+                            size = androidx.compose.ui.geometry.Size(width, chartHeight * 4f / 16f)
+                        )
+
                         // Draw Horizontal Grid Lines
                         val yLevels = listOf(16f, 12f, 8f, 4f, 0f)
                         val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
@@ -213,8 +240,10 @@ fun GlucoseLineChartCard(
                         val maxVal = 16f
                         val path = Path()
                         val linePoints = displayPoints.mapIndexed { index, pt ->
-                            val divisor = (displayPoints.size - 1).coerceAtLeast(1)
-                            val x = (index.toFloat() / divisor) * chartWidth
+                            val endMinutes = displayPoints.maxOfOrNull { it.timeLabel.toMinutes() } ?: 0
+                            val startMinutes = endMinutes - periodToHours(activePeriod) * 60
+                            val x = ((pt.timeLabel.toMinutes() - startMinutes).toFloat() /
+                                (periodToHours(activePeriod) * 60)).coerceIn(0f, 1f) * chartWidth
                             val y = chartHeight - (pt.value / maxVal) * chartHeight
                             Offset(x, y)
                         }
@@ -250,7 +279,7 @@ fun GlucoseLineChartCard(
                             linePoints.forEachIndexed { idx, point ->
                                 val value = displayPoints[idx].value
                                 val dotColor = when {
-                                    value >= 12f -> GlucoseDashboardTheme.MaxBadgeColor
+                                    value >= 10f -> GlucoseDashboardTheme.MaxBadgeColor
                                     value <= 3.9f -> GlucoseDashboardTheme.MinBadgeColor
                                     else -> Color(0xFF3BB2B8)
                                 }
@@ -273,6 +302,15 @@ fun GlucoseLineChartCard(
                                 minOffset = linePoints[minIdx]
                             }
                         }
+                    }
+
+                    if (displayPoints.isEmpty()) {
+                        Text(
+                            text = "Нет измерений за выбранный период",
+                            fontSize = 13.sp,
+                            color = axisLabelColor,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
                     }
 
                     // Dynamic Max Peak Badge
@@ -311,7 +349,7 @@ fun GlucoseLineChartCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
             // X-Axis Time Labels Row
             Row(
@@ -323,7 +361,7 @@ fun GlucoseLineChartCard(
                 displayTimeLabels.forEach { label ->
                     Text(
                         text = label,
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         color = axisLabelColor,
                         fontWeight = FontWeight.Medium
                     )
@@ -337,58 +375,8 @@ private fun filterPointsAndLabelsForPeriod(
     rawPoints: List<GlucosePoint>,
     period: String
 ): Pair<List<GlucosePoint>, List<String>> {
-    val sample3h = listOf(
-        GlucosePoint("11:00", 7.8f),
-        GlucosePoint("11:30", 11.2f),
-        GlucosePoint("12:00", 9.4f),
-        GlucosePoint("12:45", 15.8f),
-        GlucosePoint("13:30", 5.4f),
-        GlucosePoint("14:00", 3.2f)
-    )
-    val sample3hLabels = listOf("11:00", "11:30", "12:00", "12:30", "13:00", "14:00")
-
-    val sample6h = listOf(
-        GlucosePoint("09:00", 4.2f),
-        GlucosePoint("09:30", 3.2f),
-        GlucosePoint("10:30", 14.5f),
-        GlucosePoint("11:45", 7.8f),
-        GlucosePoint("12:45", 15.8f),
-        GlucosePoint("13:30", 3.8f),
-        GlucosePoint("14:00", 1.7f)
-    )
-    val sample6hLabels = listOf("09:00", "10:00", "11:00", "12:00", "13:00", "14:00")
-
-    val sample12h = listOf(
-        GlucosePoint("02:00", 6.1f),
-        GlucosePoint("05:00", 5.4f),
-        GlucosePoint("07:30", 8.2f),
-        GlucosePoint("09:30", 3.2f),
-        GlucosePoint("10:30", 14.5f),
-        GlucosePoint("12:45", 15.8f),
-        GlucosePoint("14:00", 1.7f)
-    )
-    val sample12hLabels = listOf("02:00", "04:00", "06:00", "08:00", "10:00", "12:00", "14:00")
-
-    val sample24h = listOf(
-        GlucosePoint("00:00", 5.8f),
-        GlucosePoint("04:00", 6.2f),
-        GlucosePoint("08:00", 5.2f),
-        GlucosePoint("10:30", 14.5f),
-        GlucosePoint("12:45", 15.8f),
-        GlucosePoint("16:00", 6.5f),
-        GlucosePoint("20:00", 5.1f),
-        GlucosePoint("24:00", 4.8f)
-    )
-    val sample24hLabels = listOf("00:00", "04:00", "08:00", "12:00", "16:00", "20:00", "24:00")
-
     if (rawPoints.isEmpty()) {
-        return when (period) {
-            "3ч" -> Pair(sample3h, sample3hLabels)
-            "6ч" -> Pair(sample6h, sample6hLabels)
-            "12ч" -> Pair(sample12h, sample12hLabels)
-            "24ч" -> Pair(sample24h, sample24hLabels)
-            else -> Pair(sample6h, sample6hLabels)
-        }
+        return emptyList<GlucosePoint>() to emptyList()
     }
 
     val hours = when (period) {
@@ -399,28 +387,40 @@ private fun filterPointsAndLabelsForPeriod(
         else -> 6
     }
 
-    val countNeeded = when (hours) {
-        3 -> 4
-        6 -> 6
-        12 -> 8
-        else -> rawPoints.size
-    }
-
-    val filtered = if (rawPoints.size > countNeeded) {
-        rawPoints.takeLast(countNeeded)
-    } else {
-        rawPoints
-    }
-
-    val labels = when (hours) {
-        3 -> sample3hLabels
-        6 -> sample6hLabels
-        12 -> sample12hLabels
-        24 -> sample24hLabels
-        else -> sample6hLabels
-    }
+    val endMinutes = rawPoints.maxOf { it.timeLabel.toMinutes() }
+    val filtered = rawPoints.filter { it.timeLabel.toMinutes() >= endMinutes - hours * 60 }
+    val labels = buildTimelineLabels(endMinutes, hours, period)
 
     return Pair(filtered, labels)
+}
+
+private fun periodToHours(period: String): Int = when (period) {
+    "3ч" -> 3
+    "6ч" -> 6
+    "12ч" -> 12
+    "24ч" -> 24
+    else -> 6
+}
+
+private fun String.toMinutes(): Int {
+    val parts = split(":")
+    val hours = parts.getOrNull(0)?.toIntOrNull() ?: 0
+    val minutes = parts.getOrNull(1)?.toIntOrNull() ?: 0
+    return (hours * 60 + minutes).coerceIn(0, 24 * 60)
+}
+
+private fun buildTimelineLabels(endMinutes: Int, hours: Int, period: String): List<String> {
+    val endHour = endMinutes / 60
+    val step = when (period) {
+        "3ч", "6ч" -> 1
+        "12ч" -> 2
+        "24ч" -> 4
+        else -> 1
+    }
+    return (endHour - hours + step..endHour step step).map { hour ->
+        val normalizedHour = (hour % 24 + 24) % 24
+        String.format(Locale.US, "%02d:00", normalizedHour)
+    }
 }
 
 @Composable
@@ -431,15 +431,15 @@ private fun PeakBadge(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(4.dp))
             .background(bgColor)
             .padding(horizontal = 6.dp, vertical = 2.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
             color = Color.White
         )
     }

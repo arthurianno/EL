@@ -56,6 +56,7 @@
             android:name=".presentation.features.app.ui.AppActivity"
             android:theme="@style/Theme.App.Starting"
             android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
