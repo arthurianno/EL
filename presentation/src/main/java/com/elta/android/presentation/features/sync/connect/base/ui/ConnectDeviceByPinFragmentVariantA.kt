@@ -1,9 +1,11 @@
 package com.elta.android.presentation.features.sync.connect.base.ui
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +22,8 @@ import com.elta.android.presentation.databinding.FragmentSyncConnectBinding
 import com.elta.android.presentation.features.sync.connect.base.pm.ConnectDevicePmVariantA
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.DeviceAdapter
 import com.elta.android.presentation.features.sync.control.bindTo
+import com.elta.android.presentation.features.sync.control.checkBluetoothSelfPermission
+import com.elta.android.presentation.features.sync.control.checkSelfPermissionByName
 import com.elta.android.presentation.features.sync.control.resolveResults
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.utils.makeSnackBarWithAction
@@ -119,6 +123,39 @@ abstract class ConnectDeviceByPinFragmentVariantA<T : ConnectDevicePmVariantA> :
             }
         }
         pm.deviceAlreadyConnectedDialog.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.deviceNeedLocationDialog.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.checkBluetoothPermissionCommand.bindTo {
+            context?.checkBluetoothSelfPermission(
+                onRequestPermission = {
+                    bluetoothPermissionLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.BLUETOOTH_SCAN,
+                            Manifest.permission.BLUETOOTH_CONNECT
+                        )
+                    )
+                },
+                showPermissionRationale = {
+                    pm.showBluetoothPermissionRationaleAction.consumer.accept(Unit)
+                },
+                onGranted = {
+                    pm.onBluetoothPermissionGrantedAction.consumer.accept(Unit)
+                }
+            )
+        }
+        pm.checkLocationPermissionCommand.bindTo {
+            context?.checkSelfPermissionByName(
+                permissionName = Manifest.permission.ACCESS_FINE_LOCATION,
+                onRequestPermission = { permissionName ->
+                    locationPermissionLauncher.launch(permissionName)
+                },
+                showPermissionRationale = {
+                    pm.showLocationPermissionRationaleAction.consumer.accept(Unit)
+                },
+                onGranted = {
+                    pm.onLocationPermissionGrantedAction.consumer.accept(Unit)
+                }
+            )
+        }
     }
 
     private fun bindScreenConfigs(pm: T) {
@@ -178,6 +215,20 @@ abstract class ConnectDeviceByPinFragmentVariantA<T : ConnectDevicePmVariantA> :
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         presentationModel.btControl.resolveResults(requestCode, resultCode)
+    }
+
+    private val bluetoothPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionsMap ->
+        presentationModel.receivedBluetoothPermissionGrantedAction.consumer.accept(
+            permissionsMap.all { it.value }
+        )
+    }
+
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        presentationModel.receivedLocationPermissionGrantedAction.consumer.accept(isGranted)
     }
 
     private fun ConnectDevicePmVariantA.ViewState.getId() =
