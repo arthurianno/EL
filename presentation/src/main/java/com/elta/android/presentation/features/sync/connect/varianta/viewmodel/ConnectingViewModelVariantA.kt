@@ -2,6 +2,8 @@ package com.elta.android.presentation.features.sync.connect.viewmodel
 
 import android.os.Bundle
 import com.elta.android.common.errors.BluetoothNotEnabledErrorVariantA
+import com.elta.android.common.errors.LocationNotEnabledErrorVariantA
+import com.elta.android.common.errors.LocationPermissionNotGrantedErrorVariantA
 import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCaseVariantA
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCaseVariantA
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCaseVariantA
@@ -19,6 +21,7 @@ import com.elta.android.presentation.analytic.model.appmetric.params.Synchronize
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
+import com.elta.android.presentation.core.compose.common.PermissionEvent
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
@@ -170,7 +173,7 @@ class ConnectingViewModelVariantA @Inject constructor(
     private fun repeatConnectDevice(currentState: ConnectingViewStateVariantA) = run {
         connectDevice()
         currentState.copy(
-            requestBluetoothActivation = true,
+            requestBluetoothActivation = false,
             stageType = ConnectingStageType.Connecting
         )
     }
@@ -269,10 +272,18 @@ class ConnectingViewModelVariantA @Inject constructor(
     }
 
     private fun handleNotFoundError(error: Throwable) {
-        reduceState { state.value.copy(stageType = ConnectingStageType.DeviceNotFound) }
+        if (handleLocationError(error)) return
+
+        val newState = when (error) {
+            BluetoothNotEnabledErrorVariantA -> state.value.copy(requestBluetoothActivation = true)
+            else -> state.value.copy(stageType = ConnectingStageType.DeviceNotFound)
+        }
+        reduceState { newState }
     }
 
     private fun handleConnectError(error: Throwable) {
+        if (handleLocationError(error)) return
+
         val newState = when (error) {
             BluetoothNotEnabledErrorVariantA -> state.value.copy(requestBluetoothActivation = true)
             else -> state.value.copy(stageType = ConnectingStageType.ErrorConnect)
@@ -281,8 +292,37 @@ class ConnectingViewModelVariantA @Inject constructor(
     }
 
     private fun handleSyncError(error: Throwable) {
+        if (handleLocationError(error)) return
+
         reduceState { state.value.copy(stageType = ConnectingStageType.ErrorSync) }
     }
+
+    private fun handleLocationError(error: Throwable): Boolean =
+        when (error) {
+            LocationPermissionNotGrantedErrorVariantA -> {
+                reduceState {
+                    state.value.copy(
+                        stageType = ConnectingStageType.Connecting,
+                        requestBluetoothActivation = false
+                    )
+                }
+                sendEvent(PermissionEvent.RequestPermissions)
+                true
+            }
+
+            LocationNotEnabledErrorVariantA -> {
+                reduceState {
+                    state.value.copy(
+                        stageType = ConnectingStageType.Connecting,
+                        requestBluetoothActivation = false
+                    )
+                }
+                sendEvent(PermissionEvent.RequestEnableLocation)
+                true
+            }
+
+            else -> false
+        }
 
     private fun exitFromScreen() {
         connectJob?.cancel()

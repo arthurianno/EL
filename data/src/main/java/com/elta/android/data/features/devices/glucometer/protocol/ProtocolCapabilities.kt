@@ -89,7 +89,7 @@ private data class VersionNumber(
 private val VERSION_REGEX = Regex("""(\d+)\.(\d+)\.(\d+)""")
 
 private val ONLINE_MIN_VERSION = VersionNumber(4, 1, 7)
-private val EXPRESS_MIN_VERSION = VersionNumber(4, 5, 4)
+private val EXPRESS_MIN_VERSION = VersionNumber(2, 0, 0)
 private val VOICE_MIN_VERSION = VersionNumber(5, 0, 0)
 
 private const val SATELLITE_ONLINE_PREFIX = "SatelliteOnline"

@@ -137,10 +137,15 @@ class AppActivity : BaseActivity<AppPm>() {
     private fun syncOneSignalPermissionOnce() {
         if (isOneSignalPermissionSynced) return
 
+        if (OneSignal.Notifications.permission) {
+            isOneSignalPermissionSynced = true
+            return
+        }
+
+        isOneSignalPermissionSynced = true
         lifecycleScope.launch {
             runCatching {
-                val accepted = OneSignal.Notifications.requestPermission(true)
-                isOneSignalPermissionSynced = true
+                val accepted = OneSignal.Notifications.requestPermission(false)
                 Log.i("OneSignal", "Permission sync from AppActivity accepted=$accepted")
             }.onFailure {
                 Log.e("OneSignal", "Permission sync from AppActivity failed: ${it.message}")

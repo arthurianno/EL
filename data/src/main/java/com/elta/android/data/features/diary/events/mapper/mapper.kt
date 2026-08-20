@@ -102,7 +102,9 @@ fun EventV2Dto.toDomain(): EventV2 = EventV2(
     state = State.valueOf(state.name),
     glucometerSerialNumber = data.glucometerSerialNumber,
     dishes = data.products?.toDomain().orEmpty(),
-    glucoseInputType = data.inputType?.toDomain()
+    glucoseInputType = data.inputType?.toDomain(),
+    isTimeInvalid = data.isTimeInvalid,
+    isTemperatureInvalid = data.isTemperatureInvalid
 )
 
 fun MedicamentDto.toDomain(): Medicament =

@@ -909,7 +909,7 @@
     },
     {
       "id": "27:3900211914005807584",
-      "lastPropertyId": "22:185164373796252422",
+      "lastPropertyId": "23:1507175332592219719",
       "name": "EventV2CachedDto",
       "properties": [
         {
@@ -1022,6 +1022,11 @@
           "id": "22:185164373796252422",
           "name": "glucoseInputType",
           "type": 9
+        },
+        {
+          "id": "23:1507175332592219719",
+          "name": "isTimeInvalid",
+          "type": 1
         }
       ],
       "relations": []
@@ -1218,7 +1223,7 @@
     },
     {
       "id": "34:7570676786948297390",
-      "lastPropertyId": "15:1875540802972689990",
+      "lastPropertyId": "16:7729523787488362281",
       "name": "NewsEntity",
       "properties": [
         {
@@ -1286,6 +1291,11 @@
           "id": "15:1875540802972689990",
           "name": "cachedDateTime",
           "type": 6
+        },
+        {
+          "id": "16:7729523787488362281",
+          "name": "imageUrl",
+          "type": 9
         }
       ],
       "relations": []

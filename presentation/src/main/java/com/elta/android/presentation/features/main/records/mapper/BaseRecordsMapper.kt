@@ -62,7 +62,9 @@ open class BaseRecordsMapper(
             eventType = this.type,
             labelIcon = mealTag?.toIcon(),
             isVisible = isVisible,
-            groupId = groupId
+            groupId = groupId,
+            isInvalid = isTimeInvalid,
+            isTemperatureInvalid = isTemperatureInvalid
         )
 
     private fun EventV2.formatType() =

@@ -41,7 +41,8 @@ class EventV2FromGlucometerMapper @Inject constructor() : Mapper<GlucometerEvent
                 glucometerSerialNumber = glucometerSerialNumber,
                 dishes = emptyList(),
                 glucoseInputType = inputGlucose,
-                isTimeInvalid = isTimeInvalid
+                isTimeInvalid = isTimeInvalid,
+                isTemperatureInvalid = isTemperatureInvalid
             ).also {
                 Timber.d("📊 Created EventV2 with mealTag: ${it.mealTag}")
             }

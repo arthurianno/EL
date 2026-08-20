@@ -48,7 +48,9 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.Singles
 import kotlinx.coroutines.rx2.asObservable
+import timber.log.Timber
 import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
@@ -70,18 +72,22 @@ class GlucoseEventPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
     val glucoseValueState = state<String>()
-    val glucoseInfoState = state<String>()
+    val glucoseInfoState = state<CharSequence>()
     val glucoseFormatState = state(GlucoseFormat.CAPILLARY)
 
     val glucoseLevelBackgroundState = state<Int>()
     val tagSelector = formSelectorControl()
-    val dateSelector = formSelectorControl(false)
-    val timeSelector = formSelectorControl(false)
+    val dateSelector = formSelectorControl(true)
+    val timeSelector = formSelectorControl(true)
     val noteInput = inputControl()
 
     val mealSelector = state(MealTag.NOT_SELECTED)
     val mainActionTitleState = state<String>()
     val mainActionVisibilityState = state(false)
+
+    val showDatePickerDialog = command<ZonedDateTime>(bufferSize = 1)
+    val showTimePickerDialog = command<ZonedDateTime>(bufferSize = 1)
+    val dateTimeSelectedAction = action<ZonedDateTime>()
 
     val mainAction = action<Unit>()
     val backHandleAction = action<Unit>()
@@ -211,16 +217,36 @@ class GlucoseEventPm @Inject constructor(
 
     private fun bindEvent(event: EventV2) {
         glucoseValueState.consumer.accept(NumberFormatter.format(event.glucoseValue(glucoseFormatState.value)))
-        val baseInfo = resources.getString(
-            R.string.event_form_glucose_info_mask_title,
-            event.getFormattedTemperature()
-        )
-        val infoText = if (event.isTimeInvalid) {
-            "$baseInfo\n${resources.getString(R.string.event_invalid_time_warning)}"
+        
+        val temperatureValue = event.getFormattedTemperature()
+        val baseInfo = if (event.isTemperatureInvalid) {
+            "Внимание: измерение произведено вне рабочего диапазона температур (+15...+35 °С)"
         } else {
-            baseInfo
+            resources.getString(
+                R.string.event_form_glucose_info_mask_title,
+                temperatureValue
+            )
         }
-        glucoseInfoState.consumer.accept(infoText)
+        
+        val spannableBuilder = android.text.SpannableStringBuilder(baseInfo)
+        
+        if (event.isTemperatureInvalid) {
+            spannableBuilder.setSpan(
+                android.text.style.ForegroundColorSpan(
+                    services.resources.getColor(R.color.red)
+                ),
+                0,
+                baseInfo.length,
+                android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        
+        if (event.isTimeInvalid) {
+            spannableBuilder.append("\n\n${resources.getString(R.string.event_invalid_time_warning)}")
+        }
+        
+        Timber.d("⏰ GlucoseEventPm bindEvent: eventId=${event.id}, isTimeInvalid=${event.isTimeInvalid}")
+        glucoseInfoState.consumer.accept(spannableBuilder)
         event.getTag(resources)?.let { tagSelector.option.consumer.accept(it) }
         selectedDateState.consumer.accept(event.additionTime)
         glucoseLevelBackgroundState.consumer.accept(
@@ -264,14 +290,31 @@ class GlucoseEventPm @Inject constructor(
             .map { it.toEventDate(resources).toSimpleSelectorOption() }
             .subscribe(dateSelector.option.consumer)
             .untilDestroy()
+
+        dateSelector.clickAction.observable
+            .map { selectedDateState.value }
+            .subscribe(showDatePickerDialog.consumer)
+            .untilDestroy()
+
+        timeSelector.clickAction.observable
+            .map { selectedDateState.value }
+            .subscribe(showTimePickerDialog.consumer)
+            .untilDestroy()
+
+        dateTimeSelectedAction.observable
+            .subscribe(selectedDateState.consumer)
+            .untilDestroy()
     }
 
-    private fun checkIsChanged(eventFormModel: GlucoseFormModel): Boolean =
-        eventState.valueOrNull?.isGlucoseEventChanged(
+    private fun checkIsChanged(eventFormModel: GlucoseFormModel): Boolean {
+        val isInvalidTime = eventState.valueOrNull?.isTimeInvalid == true
+        val isChanged = eventState.valueOrNull?.isGlucoseEventChanged(
             tagId = eventFormModel.tag?.id,
             note = eventFormModel.noteValue,
             mealTag = eventFormModel.mealTag
         ) ?: false
+        return isInvalidTime || isChanged
+    }
 
     private fun isFormValid(eventFormModel: GlucoseFormModel): Boolean =
         GlucoseValidator.isValid(
@@ -359,10 +402,13 @@ class GlucoseEventPm @Inject constructor(
         val form = eventFormHolderState.value
         return UpdateEventUseCase.Params(
             event = eventState.value.copy(
+                additionTime = selectedDateState.value,
                 tagId = form.tag?.id,
                 tag = form.tag,
                 note = form.noteValue,
-                mealTag = form.mealTag
+                mealTag = form.mealTag,
+                modificationTime = System.currentTimeMillis(),
+                isTimeInvalid = false
             )
         )
     }

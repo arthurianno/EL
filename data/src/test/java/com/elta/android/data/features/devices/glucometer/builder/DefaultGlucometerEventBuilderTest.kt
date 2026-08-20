@@ -13,7 +13,7 @@ class DefaultGlucometerEventBuilderTest {
     private val builder = TestableDefaultGlucometerEventBuilder(generator = FakeGenerator())
 
     @Test
-    fun `buildFrom parses rd before meal event`() {
+    fun `buildFrom does not preselect meal tag for rd event from non voice glucometer`() {
         val event = builder.buildFrom(
             userId = "user",
             glucometerId = "device",
@@ -24,7 +24,7 @@ class DefaultGlucometerEventBuilderTest {
 
         assertEquals(24.5, event.temperature ?: -1.0, 0.0)
         assertEquals(4.4, event.value ?: -1.0, 0.0)
-        assertEquals(MealTag.BEFOREMEAL, event.mealTag)
+        assertNull(event.mealTag)
     }
 
     @Test
@@ -69,11 +69,69 @@ class DefaultGlucometerEventBuilderTest {
     }
 
     @Test
+    fun `buildFrom parses mem event without after meal status flag as before meal`() {
+        val event = builder.buildFrom(
+            userId = "user",
+            glucometerId = "device",
+            response = "mem.690B559E00000064",
+            glucometerSerialNumber = "D2204001234",
+            glucometerName = "SatelliteVoice0001"
+        )
+
+        assertNull(event.temperature)
+        assertEquals(10.0, event.value ?: -1.0, 0.0)
+        assertEquals(MealTag.BEFOREMEAL, event.mealTag)
+    }
+
+    @Test
+    fun `buildFrom does not preselect meal tag for mem event from non voice glucometer`() {
+        val event = builder.buildFrom(
+            userId = "user",
+            glucometerId = "device",
+            response = "mem.690B559E00000064",
+            glucometerSerialNumber = "D2204001234",
+            glucometerName = "SatelliteExpress0001"
+        )
+
+        assertNull(event.temperature)
+        assertEquals(10.0, event.value ?: -1.0, 0.0)
+        assertNull(event.mealTag)
+    }
+
+    @Test
     fun `buildFrom parses mem event with invalid time status flag`() {
         val event = builder.buildFrom(
             userId = "user",
             glucometerId = "device",
-            response = "mem.690B559E00080064",
+            response = "mem.690B559E00010064",
+            glucometerSerialNumber = "D2204001234",
+            glucometerName = "SatelliteVoice0001"
+        )
+
+        assertEquals(true, event.isTimeInvalid)
+    }
+
+    @Test
+    fun `buildFrom parses mem event with invalid temperature status flag`() {
+        val event = builder.buildFrom(
+            userId = "user",
+            glucometerId = "device",
+            response = "mem.690B559E00020064",
+            glucometerSerialNumber = "D2204001234",
+            glucometerName = "SatelliteVoice0001"
+        )
+
+        assertEquals(true, event.isTemperatureInvalid)
+    }
+
+    @Test
+    fun `buildFrom marks future date measurement as invalid`() {
+        val futureBuilder = DefaultGlucometerEventBuilder(generator = FakeGenerator())
+        val futureUnixHex = (ZonedDateTime.now(ZoneOffset.UTC).toEpochSecond() + 3600).toString(16).uppercase()
+        val event = futureBuilder.buildFrom(
+            userId = "user",
+            glucometerId = "device",
+            response = "mem.${futureUnixHex}00000064",
             glucometerSerialNumber = "D2204001234",
             glucometerName = "SatelliteVoice0001"
         )

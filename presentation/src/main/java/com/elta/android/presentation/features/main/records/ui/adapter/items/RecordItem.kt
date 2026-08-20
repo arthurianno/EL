@@ -15,7 +15,9 @@ data class RecordItem(
     val eventType: EventType,
     val labelIcon: Int? = null,
     override val isVisible: Boolean = true,
-    val groupId: String? = null
+    val groupId: String? = null,
+    val isInvalid: Boolean = false,
+    val isTemperatureInvalid: Boolean = false
 ) : HideableItem {
 
     override fun getUniqueProperty(): Any = id
@@ -29,6 +31,7 @@ data class RecordItem(
                 if (count != other.count) add(Payload.COUNT_CHANGED)
                 if (date != other.date) add(Payload.DATE_CHANGED)
                 if (showLabel != other.showLabel) add(Payload.LABEL_CHANGED)
+                if (isInvalid != other.isInvalid) add(Payload.INVALID_CHANGED)
             }
         }
         return super.getChangePayload(other)
@@ -40,6 +43,7 @@ data class RecordItem(
         TYPE_CHANGED,
         COUNT_CHANGED,
         DATE_CHANGED,
-        LABEL_CHANGED
+        LABEL_CHANGED,
+        INVALID_CHANGED
     }
 }

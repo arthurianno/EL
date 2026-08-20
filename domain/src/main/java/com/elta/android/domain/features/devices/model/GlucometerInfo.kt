@@ -22,5 +22,6 @@ data class GlucometerInfo(
     val softwareVersion: String? = null,
     val hardwareVersion: String? = null,
     val glucometerSerialNumber: String? = null,
-    val lastSyncEvent: String? = null
+    val lastSyncEvent: String? = null,
+    val isTimeOutOfSync: Boolean = false
 )

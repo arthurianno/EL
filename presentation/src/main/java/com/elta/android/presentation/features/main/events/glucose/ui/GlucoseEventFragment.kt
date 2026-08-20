@@ -23,6 +23,9 @@ import com.elta.android.presentation.utils.appbar.collapseProgress
 import com.elta.android.presentation.utils.applyWindowBottomInsetsListener
 import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.findAndClearFocus
+import com.elta.android.presentation.utils.showDatePickerDialog
+import com.elta.android.presentation.utils.showTimePickerDialog
+import org.threeten.bp.ZonedDateTime
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.removeWindowBottomInsetsListener
 import com.elta.android.presentation.utils.scrollToBottom
@@ -122,9 +125,22 @@ class GlucoseEventFragment :
             .subscribe(binding.formSaveButtonView.visibility())
 
         pm.tagSelector.bind(binding.formTagSelectorView, compositeUnbind)
+        binding.formDateSelectorView.isClickable = true
+        binding.formTimeSelectorView.isClickable = true
         pm.dateSelector.bind(binding.formDateSelectorView, compositeUnbind)
         pm.timeSelector.bind(binding.formTimeSelectorView, compositeUnbind)
         pm.noteInput.bindTo(binding.formNoteView)
+
+        pm.showDatePickerDialog.bindTo { originalDate: ZonedDateTime ->
+            activity.showDatePickerDialog(originalDate, maxDate = ZonedDateTime.now()) {
+                pm.dateTimeSelectedAction.consumer.accept(it)
+            }
+        }
+        pm.showTimePickerDialog.bindTo { originalDate: ZonedDateTime ->
+            activity.showTimePickerDialog(originalDate) {
+                pm.dateTimeSelectedAction.consumer.accept(it)
+            }
+        }
 
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }

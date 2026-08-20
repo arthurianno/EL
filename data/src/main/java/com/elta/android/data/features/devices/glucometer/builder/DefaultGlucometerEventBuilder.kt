@@ -24,9 +24,12 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         glucometerId: String,
         response: String,
         glucometerSerialNumber: String?,
-        @Suppress("UNUSED_PARAMETER") glucometerName: String?
+        glucometerName: String?
     ): GlucometerEvent {
-        val parsedMeasurement = parseMeasurement(response)
+        val parsedMeasurement = parseMeasurement(
+            response = response,
+            supportsMealTags = glucometerName.supportsMealTags()
+        )
 
         return GlucometerEvent(
             id = generator.generate(userId, glucometerId, parsedMeasurement.idToken),
@@ -36,31 +39,37 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
             glucometerSerialNumber = glucometerSerialNumber,
             originalResponse = response,
             mealTag = parsedMeasurement.mealTag,
-            isTimeInvalid = parsedMeasurement.isTimeInvalid
+            isTimeInvalid = parsedMeasurement.isTimeInvalid,
+            isTemperatureInvalid = parsedMeasurement.isTemperatureInvalid
         )
     }
 
     override fun getDate(response: String): Date {
-        val mills = parseMeasurement(response).date?.toInstant()?.toEpochMilli() ?: 0L
+        val mills = parseMeasurement(
+            response = response,
+            supportsMealTags = false
+        ).date?.toInstant()?.toEpochMilli() ?: 0L
         return Date(mills)
     }
 
     override fun getValue(response: String): Double {
-        return parseMeasurement(response).value ?: 0.0
+        return parseMeasurement(response, supportsMealTags = false).value ?: 0.0
     }
 
-    private fun parseMeasurement(response: String): ParsedMeasurement {
+    private fun parseMeasurement(response: String, supportsMealTags: Boolean): ParsedMeasurement {
         val normalizedResponse = response.trim()
         return when {
-            RD_EVENT_REGEX.matches(normalizedResponse) -> parseRdMeasurement(normalizedResponse)
-            MEM_EVENT_REGEX.matches(normalizedResponse) -> parseMemMeasurement(normalizedResponse)
+            RD_EVENT_REGEX.matches(normalizedResponse) ->
+                parseRdMeasurement(normalizedResponse, supportsMealTags)
+            MEM_EVENT_REGEX.matches(normalizedResponse) ->
+                parseMemMeasurement(normalizedResponse, supportsMealTags)
             normalizedResponse.equals(MEM_EMPTY_EVENT, ignoreCase = true) ->
                 throw IllegalArgumentException("Measurement payload is empty: $response")
             else -> throw IllegalArgumentException("Unsupported measurement format: $response")
         }
     }
 
-    private fun parseRdMeasurement(response: String): ParsedMeasurement {
+    private fun parseRdMeasurement(response: String, supportsMealTags: Boolean): ParsedMeasurement {
         val match = checkNotNull(RD_EVENT_REGEX.matchEntire(response)) {
             "Invalid rd payload: $response"
         }
@@ -69,19 +78,20 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         val rawTemperature = match.groupValues[2].toInt()
         val rawValue = match.groupValues[3].toInt()
         val date = extractDate(dateToken)
-        val isInvalid = date.year < MIN_VALID_YEAR
+        val isInvalid = isDateInvalid(date)
+        val actualDate = if (isInvalid) ZonedDateTime.now(ZoneOffset.UTC) else date
 
         return ParsedMeasurement(
             idToken = dateToken,
-            date = date,
+            date = actualDate,
             temperature = extractTemperature(rawTemperature),
             value = extractValue(rawValue),
-            mealTag = extractMealTag(rawTemperature),
+            mealTag = extractMealTag(rawTemperature).takeIf { supportsMealTags },
             isTimeInvalid = isInvalid
         )
     }
 
-    private fun parseMemMeasurement(response: String): ParsedMeasurement {
+    private fun parseMemMeasurement(response: String, supportsMealTags: Boolean): ParsedMeasurement {
         val match = checkNotNull(MEM_EVENT_REGEX.matchEntire(response)) {
             "Invalid mem payload: $response"
         }
@@ -93,16 +103,33 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         val statusWord = statusHex.toInt(HEX_RADIX)
         val glucoseValue = glucoseHex.toInt(HEX_RADIX).toDouble() / TEN_DIVISOR
         val date = ZonedDateTime.ofInstant(Instant.ofEpochSecond(unixSeconds), ZoneOffset.UTC)
-        val isInvalid = (statusWord and MEM_INVALID_TIME_BIT_MASK != 0) || date.year < MIN_VALID_YEAR
+        val isInvalid = isDateInvalid(date, statusWord)
+        val isTempInvalid = (statusWord and MEM_INVALID_TEMPERATURE_BIT_MASK) != 0
+        
+        val actualDate = if (isInvalid) ZonedDateTime.now(ZoneOffset.UTC) else date
 
         return ParsedMeasurement(
             idToken = "$unixHex$glucoseHex",
-            date = date,
+            date = actualDate,
             temperature = null,
             value = glucoseValue,
-            mealTag = if (statusWord and MEM_AFTER_MEAL_BIT_MASK != 0) MealTag.AFTERMEAL else null,
-            isTimeInvalid = isInvalid
+            mealTag = if (supportsMealTags) {
+                if (statusWord and MEM_AFTER_MEAL_BIT_MASK != 0) MealTag.AFTERMEAL else MealTag.BEFOREMEAL
+            } else {
+                null
+            },
+            isTimeInvalid = isInvalid,
+            isTemperatureInvalid = isTempInvalid
         )
+    }
+
+    protected open fun isDateInvalid(date: ZonedDateTime?, statusWord: Int = 0): Boolean {
+        if (date == null) return true
+        if (date.year < MIN_VALID_YEAR) return true
+        if ((statusWord and MEM_INVALID_TIME_BIT_MASK) != 0) return true
+        val now = ZonedDateTime.now(ZoneOffset.UTC)
+        if (date.isAfter(now.plusMinutes(FUTURE_TIME_TOLERANCE_MINUTES))) return true
+        return false
     }
 
     protected open fun extractDate(token: String): ZonedDateTime {
@@ -139,15 +166,18 @@ private data class ParsedMeasurement(
     val temperature: Double?,
     val value: Double?,
     val mealTag: MealTag?,
-    val isTimeInvalid: Boolean = false
+    val isTimeInvalid: Boolean = false,
+    val isTemperatureInvalid: Boolean = false
 )
 
 private const val HEX_RADIX = 16
 private const val TEN_DIVISOR = 10.0
 private const val AFTER_MEAL_TEMPERATURE_SHIFT = 500
 private const val MEM_AFTER_MEAL_BIT_MASK = 0x0004
-private const val MEM_INVALID_TIME_BIT_MASK = 0x0008
+private const val MEM_INVALID_TEMPERATURE_BIT_MASK = 0x0002
+private const val MEM_INVALID_TIME_BIT_MASK = 0x0001
 private const val MIN_VALID_YEAR = 2020
+private const val FUTURE_TIME_TOLERANCE_MINUTES = 1L
 private const val MEM_EMPTY_EVENT = "mem.empty"
 
 private val BEFORE_MEAL_TEMPERATURE_RANGE = 100..350
@@ -156,3 +186,8 @@ private val AFTER_MEAL_TEMPERATURE_RANGE = 600..850
 private val RD_EVENT_REGEX = Regex("^rd(\\d{12})(\\d{3})(\\d{3})$", RegexOption.IGNORE_CASE)
 private val MEM_EVENT_REGEX =
     Regex("^mem\\.([0-9A-F]{8})([0-9A-F]{4})([0-9A-F]{4})$", RegexOption.IGNORE_CASE)
+
+private fun String?.supportsMealTags(): Boolean =
+    this?.startsWith(SATELLITE_VOICE_PREFIX, ignoreCase = true) == true
+
+private const val SATELLITE_VOICE_PREFIX = "SatelliteVoice"

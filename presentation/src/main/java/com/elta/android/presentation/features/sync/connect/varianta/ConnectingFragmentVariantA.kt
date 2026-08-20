@@ -1,9 +1,12 @@
 package com.elta.android.presentation.features.sync.connect
 
+import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -27,6 +30,7 @@ import androidx.fragment.app.viewModels
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
+import com.elta.android.presentation.core.compose.common.PermissionEvent
 import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
@@ -43,6 +47,8 @@ import com.elta.android.presentation.features.sync.connect.widgets.AppTopBar
 import com.elta.android.presentation.features.sync.connect.widgets.HelpBottomSheetVariantA
 import com.elta.android.presentation.features.sync.connect.widgets.MainImage
 import com.elta.android.presentation.features.sync.connect.widgets.TextNumericItem
+import com.elta.android.presentation.features.sync.control.PermissionsControl
+import com.elta.android.presentation.features.sync.control.enableLocation
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
 
@@ -107,6 +113,8 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
             when (event) {
                 is ConnectMainEvent.ShowSheet -> sheetState.show()
                 is ConnectMainEvent.HideSheet -> sheetState.hide()
+                is PermissionEvent.RequestPermissions -> requestLocationPermission()
+                is PermissionEvent.RequestEnableLocation -> requestEnableLocation()
                 else -> Unit
             }
         }
@@ -352,6 +360,67 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
             else -> ConnectAction.ScannerError
         }
         viewModel sendAction connectAction
+    }
+
+    private val permissionsLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) {
+        if (isRequiredPermissionsGranted()) requestEnableLocation()
+        else viewModel sendAction ConnectAction.ScannerError
+    }
+
+    private fun requestLocationPermission() {
+        val permissions = buildList {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+                !isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)
+            ) {
+                add(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (!isPermissionGranted(Manifest.permission.BLUETOOTH_SCAN)) {
+                    add(Manifest.permission.BLUETOOTH_SCAN)
+                }
+                if (!isPermissionGranted(Manifest.permission.BLUETOOTH_CONNECT)) {
+                    add(Manifest.permission.BLUETOOTH_CONNECT)
+                }
+            }
+        }
+
+        if (permissions.isEmpty()) {
+            requestEnableLocation()
+        } else {
+            permissionsLauncher.launch(permissions.toTypedArray())
+        }
+    }
+
+    private fun isRequiredPermissionsGranted(): Boolean =
+        (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ||
+                isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) &&
+                (Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                        (
+                                isPermissionGranted(Manifest.permission.BLUETOOTH_SCAN) &&
+                                        isPermissionGranted(Manifest.permission.BLUETOOTH_CONNECT)
+                                ))
+
+    private fun isPermissionGranted(permission: String): Boolean =
+        requireContext().checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+
+    private fun requestEnableLocation() {
+        enableLocation(this) {
+            viewModel sendAction ConnectAction.RepeatSearch
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PermissionsControl.REQUEST_CODE_ENABLE_LOCATION) {
+            val action = if (resultCode == Activity.RESULT_OK) {
+                ConnectAction.RepeatSearch
+            } else {
+                ConnectAction.ScannerError
+            }
+            viewModel sendAction action
+        }
     }
 
 }

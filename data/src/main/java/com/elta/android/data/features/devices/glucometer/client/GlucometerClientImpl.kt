@@ -140,11 +140,24 @@ class GlucometerClientImpl @Inject constructor(
         with(glucometerBleManager) {
             checkIsConnected(address)
 
+            val initialDeviceDate = runCatching { getDate() }.getOrNull()
             val time = ZonedDateTime.now()
             crashlyticsReport.log("Update device time to $time")
             updateTime(time)
             val date = getDate()
             crashlyticsReport.log("Received device date and time = $date")
+            val isTimeOutOfSync = if (initialDeviceDate != null) {
+                val deltaSeconds = kotlin.math.abs(initialDeviceDate.toEpochSecond() - time.toEpochSecond())
+                Timber.d("⏰ Time sync check: initialDeviceDate=$initialDeviceDate, phoneTime=$time, deltaSeconds=$deltaSeconds, maxAllowed=$MAX_ALLOWED_TIME_DELTA_SECONDS")
+                deltaSeconds > MAX_ALLOWED_TIME_DELTA_SECONDS
+            } else {
+                Timber.d("⏰ Time sync check: initialDeviceDate is null")
+                false
+            }
+            Timber.d("⏰ Time sync result: isTimeOutOfSync=$isTimeOutOfSync")
+            if (isTimeOutOfSync) {
+                crashlyticsReport.log("Device time before sync differed from phone time by > $MAX_ALLOWED_TIME_DELTA_SECONDS seconds")
+            }
             val (battery, temperature) = getBatteryAndTemperature()
             crashlyticsReport.log(
                 "Device temperature and battery levels obtained:\n battery: $battery, temperature: $temperature"
@@ -191,7 +204,8 @@ class GlucometerClientImpl @Inject constructor(
                 temperature = temperature,
                 batteryLevel = battery,
                 version = version,
-                glucometerSerialNumber = serial
+                glucometerSerialNumber = serial,
+                isTimeOutOfSync = isTimeOutOfSync
             )
         }
     }
@@ -518,6 +532,7 @@ private const val MAC_TOKENS_COUNT = 6
 private const val MAC_TOKEN_LENGTH = 2
 private const val HEX_RADIX = 16
 private const val LAST_EVENT_TIME_TOLERANCE_SECONDS = 1L
+private const val MAX_ALLOWED_TIME_DELTA_SECONDS = 60L
 private val MAX_MAC_TOKEN = BigInteger("FF", HEX_RADIX)
 private val RD_IDENTITY_REGEX = Regex("^rd(\\d{12})(\\d{3})(\\d{3})$", RegexOption.IGNORE_CASE)
 private val MEM_IDENTITY_REGEX =

@@ -60,4 +60,9 @@ class DbEventsV2Cache @Inject constructor(
         box.query {
             equal(EventV2CachedDto_.id, id)
         }.count() > 0
+
+    fun getBySecondaryId(secondaryId: String): EventV2CachedDto? =
+        box.query {
+            equal(EventV2CachedDto_.secondaryId, secondaryId, CASE_INSENSITIVE)
+        }.findFirst()
 }

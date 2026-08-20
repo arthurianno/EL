@@ -22,5 +22,7 @@ data class EventDataV2Dto(
     @SerializedName("eventType") val type: EventTypeDto,
     @SerializedName("glucometerSerialNumber") val glucometerSerialNumber: String?,
     @SerializedName("products") val products: List<ProductResponse>?,
-    @SerializedName("productsCount") val productsCount: Long?
+    @SerializedName("productsCount") val productsCount: Long?,
+    @SerializedName("isTimeInvalid") val isTimeInvalid: Boolean = false,
+    @SerializedName("isTemperatureInvalid") val isTemperatureInvalid: Boolean = false
 )

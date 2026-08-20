@@ -34,7 +34,9 @@ data class EventDataV2RequestDto(
     @SerializedName("eventType") val type: EventTypeDto,
     @SerializedName("glucometerSerialNumber") val glucometerSerialNumber: String?,
     @SerializedName("products") val products: List<ProductResponse>?,
-    @SerializedName("productsCount") val productsCount: Long?
+    @SerializedName("productsCount") val productsCount: Long?,
+    @SerializedName("isTimeInvalid") val isTimeInvalid: Boolean = false,
+    @SerializedName("isTemperatureInvalid") val isTemperatureInvalid: Boolean = false
 )
 
 interface InsulinMedicamentRequestDto
@@ -75,7 +77,9 @@ private fun EventDataV2Dto.toRequestDto(): EventDataV2RequestDto =
         tabletsNumber = tabletsNumber,
         glucometerSerialNumber = glucometerSerialNumber,
         products = products,
-        productsCount = productsCount
+        productsCount = productsCount,
+        isTimeInvalid = isTimeInvalid,
+        isTemperatureInvalid = isTemperatureInvalid
     )
 
 private fun InsulinMedicamentDto.toRequestDto(customName: String?): InsulinMedicamentRequestDto =

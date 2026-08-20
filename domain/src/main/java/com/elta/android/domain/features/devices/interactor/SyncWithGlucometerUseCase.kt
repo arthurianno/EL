@@ -20,6 +20,9 @@ import io.reactivex.Observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.rx2.rxObservable
+import timber.log.Timber
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -105,13 +108,31 @@ class SyncWithGlucometerUseCase @Inject constructor(
 
             resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
             crashlyticsReport.log("Started saving device data to local storage")
-            val events = deviceRepository.buildEvents(
+            val rawEvents = deviceRepository.buildEvents(
                 deviceAddress,
                 userEmail,
                 glucometerInfo.glucometerSerialNumber,
                 measurements,
                 glucometerName
             )
+            Timber.d("⏰ SyncWithGlucometer: glucometerInfo.isTimeOutOfSync=${glucometerInfo.isTimeOutOfSync}, rawEvents.size=${rawEvents.size}")
+            var invalidIndex = 0L
+            val syncTime = ZonedDateTime.now(ZoneOffset.UTC)
+            val events = rawEvents.map { event ->
+                val isInvalid = event.isTimeInvalid || glucometerInfo.isTimeOutOfSync
+                if (isInvalid) {
+                    val adjustedDate = syncTime.minusMinutes(invalidIndex++)
+                    event.copy(
+                        date = adjustedDate,
+                        isTimeInvalid = true
+                    )
+                } else {
+                    event
+                }
+            }
+            events.forEach { event ->
+                Timber.d("⏰ SyncWithGlucometer event: id=${event.id}, date=${event.date}, isTimeInvalid=${event.isTimeInvalid}")
+            }
             deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
 
             resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
@@ -122,7 +143,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
             }
 
-            val hasInvalidTime = events.any { it.isTimeInvalid }
+            val hasInvalidTime = events.any { it.isTimeInvalid } || (measurements.isNotEmpty() && glucometerInfo.isTimeOutOfSync)
             scope.channel.send(GlucometerSyncResult(count = measurements.size, hasInvalidTime = hasInvalidTime))
         } finally {
             crashlyticsReport.log("The procedure for disconnecting the connection and stopping the timers has begun")
