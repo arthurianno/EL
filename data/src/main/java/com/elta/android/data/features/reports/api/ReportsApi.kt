@@ -6,6 +6,7 @@ import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -34,6 +35,7 @@ interface ReportsApi {
         @Query("timezoneOffset") timezoneOffset: String
     ): Single<ResponseBody>
 
+    @Headers("Accept: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     @GET("api/reports/v2/events")
     fun downloadGlycemicProfileXlsxReport(
         @Query("reportPeriodStart") reportPeriodStart: String,

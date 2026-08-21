@@ -145,10 +145,11 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
 
     @Composable
     private fun Title(title : String) {
-        GetLocalProperties { dimens, _, _, _, types ->
+        GetLocalProperties { dimens, _, colors, _, types ->
             Text(
                 text = title,
                 style = types.h1,
+                color = colors.blackBlue,
                 modifier = Modifier.padding(horizontal = dimens.contentPadding)
             )
         }

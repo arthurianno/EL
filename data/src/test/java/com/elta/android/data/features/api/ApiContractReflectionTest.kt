@@ -5,6 +5,8 @@ import com.elta.android.data.features.newsChannel.datasource.NewsApi
 import com.elta.android.data.features.reports.api.ReportsApi
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.Query
 import java.lang.reflect.Method
 
@@ -51,6 +53,30 @@ class ApiContractReflectionTest {
             method.queryNames().containsAll(
                 listOf("startPeriod", "endPeriod", "glucoseFormat", "languageTag")
             )
+        )
+    }
+
+    @Test
+    fun `xlsx report request uses v2 events endpoint with xlsx accept header and required query params`() {
+        val method = ReportsApi::class.java.methods.first { it.name == "downloadGlycemicProfileXlsxReport" }
+
+        assertTrue(method.getAnnotation(GET::class.java)?.value == "api/reports/v2/events")
+        assertTrue(
+            method.queryNames().containsAll(
+                listOf(
+                    "reportPeriodStart",
+                    "reportPeriodEnd",
+                    "glucoseFormat",
+                    "glucoseUnit",
+                    "locale",
+                    "timezoneOffset"
+                )
+            )
+        )
+        assertTrue(
+            method.getAnnotation(Headers::class.java)
+                ?.value
+                ?.contains("Accept: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") == true
         )
     }
 

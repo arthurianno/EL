@@ -16,6 +16,9 @@ class EventV2ToCacheMapper @Inject constructor(
 ) : Mapper<EventV2Dto, EventV2CachedDto> {
 
     override fun mapFromObject(source: EventV2Dto): EventV2CachedDto =
+        mapFromObject(source, preserveLocalInvalidTime = true)
+
+    fun mapFromObject(source: EventV2Dto, preserveLocalInvalidTime: Boolean): EventV2CachedDto =
         with(source) {
             val cachedId = id.hashCode().toLong()
             val cacheInstance = eventsCache.get()
@@ -24,24 +27,44 @@ class EventV2ToCacheMapper @Inject constructor(
 
             val incomingModTime = modificationTime?.let { if (it < 10000000000L) it * 1000 else it }
             val localModTime = existingLocal?.modificationTime?.let { if (it < 10000000000L) it * 1000 else it }
-            
+            val keepLocalInvalidTime =
+                preserveLocalInvalidTime &&
+                    existingLocal?.isTimeInvalid == true &&
+                    existingLocal.modificationTime == null
+
             val isTimeInvalidValue = when {
                 existingLocal == null -> data.isTimeInvalid
+                keepLocalInvalidTime -> true
                 incomingModTime == null -> data.isTimeInvalid || existingLocal.isTimeInvalid
                 localModTime == null -> data.isTimeInvalid
                 incomingModTime > localModTime + MODIFICATION_TIME_TOLERANCE_MILLIS -> data.isTimeInvalid
                 else -> data.isTimeInvalid && existingLocal.isTimeInvalid
+            }
+            val additionTimeValue = if (keepLocalInvalidTime) {
+                existingLocal.additionTime
+            } else {
+                additionTime.toAdditionMillis()
+            }
+            val additionTimeStringValue = if (keepLocalInvalidTime) {
+                existingLocal.additionTimeString
+            } else {
+                additionTime
+            }
+            val modificationTimeValue = if (keepLocalInvalidTime) {
+                existingLocal.modificationTime
+            } else {
+                modificationTime
             }
 
             EventV2CachedDto(
                 id = cachedId,
                 secondaryId = id,
                 type = data.type.name,
-                additionTime = additionTime.toAdditionMillis(),
-                additionTimeString = additionTime,
+                additionTime = additionTimeValue,
+                additionTimeString = additionTimeStringValue,
                 tagId = tagId,
                 note = note,
-                modificationTime = modificationTime,
+                modificationTime = modificationTimeValue,
                 value = data.value,
                 kind = data.kind,
                 name = data.name,

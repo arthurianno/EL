@@ -9,7 +9,6 @@ import com.elta.android.domain.features.reports.model.ReportType
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
-import retrofit2.HttpException
 import javax.inject.Inject
 
 class ReportsRemoteDataSource @Inject constructor(
@@ -27,13 +26,24 @@ class ReportsRemoteDataSource @Inject constructor(
         val start = startDate.toStringWithFormat(DATE_PATTERN)
         val end = endDate.toStringWithFormat(DATE_PATTERN)
 
-        return downloadReportV1(
-            startDate = start,
-            endDate = end,
-            glucoseFormat = glucoseFormat.name,
-            reportType = reportType,
-            fileName = fileName
-        )
+        return when (reportType) {
+            ReportType.PDF -> downloadReportV1(
+                startDate = start,
+                endDate = end,
+                glucoseFormat = glucoseFormat.name,
+                reportType = reportType,
+                fileName = fileName
+            )
+            ReportType.XLSX -> downloadReportV2(
+                startDate = start,
+                endDate = end,
+                glucoseFormat = glucoseFormat.name,
+                locale = ApiLocaleResolver.reportLocale(),
+                timezoneOffset = ApiLocaleResolver.timezoneOffset(),
+                reportType = reportType,
+                fileName = fileName
+            )
+        }
     }
 
 
@@ -91,6 +101,5 @@ class ReportsRemoteDataSource @Inject constructor(
     companion object {
         private const val DATE_PATTERN = "yyyyMMdd"
         private const val GLUCOSE_UNIT_MMOL_L = "MMOL_L"
-        private val FALLBACK_HTTP_CODES = setOf(404, 405)
     }
 }

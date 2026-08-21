@@ -165,7 +165,7 @@ class EventsDataRepository @Inject constructor(
     override fun updateEvent(event: EventV2): Completable =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }
             .flatMapCompletable {
-                cacheSource.updateEvents(it)
+                cacheSource.updateEventsFromLocalEdit(it)
                     .andThen(
                         remoteSource.updateEvents(it)
                             .onErrorResumeNext { th ->

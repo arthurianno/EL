@@ -8,6 +8,7 @@ import com.elta.android.data.features.diary.events.cache.dto.v2.EventV2CachedDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
+import com.elta.android.data.features.diary.events.mapper.v2.EventV2ToCacheMapper
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -15,7 +16,7 @@ import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
 class EventsCachedCacheDataSource @Inject constructor(
-    private val toCacheMapper: Mapper<EventV2Dto, EventV2CachedDto>,
+    private val toCacheMapper: EventV2ToCacheMapper,
     private val fromCacheMapper: Mapper<EventV2CachedDto, EventV2Dto>,
     private val cache: Cache<EventV2CachedDto>
 ) : EventsCacheDataSource {
@@ -66,6 +67,11 @@ class EventsCachedCacheDataSource @Inject constructor(
     override fun updateEvents(events: List<EventV2Dto>): Completable =
         Completable.fromCallable {
             cache.update(toCacheMapper.mapFromObjects(events))
+        }
+
+    override fun updateEventsFromLocalEdit(events: List<EventV2Dto>): Completable =
+        Completable.fromCallable {
+            cache.update(events.map { toCacheMapper.mapFromObject(it, preserveLocalInvalidTime = false) })
         }
 
     override fun deleteEvents(events: List<SimpleEventDto>): Completable =
