@@ -45,6 +45,7 @@
     <color name="shade_g_green2_a">#3ea48d</color>
     <color name="shade_g_green2_b">#3b919a</color>
     <color name="pale_gray">#f7f7f8</color>
+    <color name="pale_gray_2.0">#B8BEC9</color>
 
     <!-- TEXT COLORS -->
     <color name="color_text_primary">@color/black_blue</color>
@@ -141,7 +142,7 @@
 
     <!-- BOTTOM NAVIGATION -->
     <color name="color_bottom_menu_selected_state">@color/black_blue</color>
-    <color name="color_bottom_menu_normal_state">@color/shade_black2</color>
+    <color name="color_bottom_menu_normal_state">@color/pale_gray_2.0</color>
 
     <!-- BACKGROUND GRADIENT COLORS -->
     <color name="color_background_green_gradient_start">@color/g_green_a</color>

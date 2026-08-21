@@ -115,7 +115,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
             }
             .addTo(compositeDestroy)
         binding.homeBottomSheetView.visibilityChanges().subscribe { visible ->
-            binding.homeActionView.isSelected = visible
+            binding.homeActionView.isVisible = !visible
             bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
             .addTo(compositeDestroy)

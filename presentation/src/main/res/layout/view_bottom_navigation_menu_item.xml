@@ -11,9 +11,9 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/menuIconView"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginBottom="4dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginBottom="6dp"
         tools:src="@drawable/ic_menu_home" />
 
 

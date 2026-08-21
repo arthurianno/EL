@@ -42,6 +42,7 @@ fun GlucoseDashboardScreen(
     bus: RxBus? = null,
     glucoseValue: String = "—",
     deltaText: String = "—",
+    glucoseTrend: GlucoseTrend? = null,
     tirPercentage: String = "—",
     syncTimeText: String = "5 часов назад",
     breadUnitsText: String = "0,9 Ед.",
@@ -134,6 +135,7 @@ fun GlucoseDashboardScreen(
     }
 
     val screenBg = if (isDarkTheme) GlucoseDashboardTheme.DarkBackground else Color.White
+    val selectedTabTextColor = GlucoseDashboardTheme.getMainTextColor(currentState)
 
     Box(
         modifier = Modifier
@@ -181,7 +183,7 @@ fun GlucoseDashboardScreen(
                                             .weight(1f)
                                             .clip(RoundedCornerShape(20.dp))
                                             .background(
-                                                if (isSelected) Color.White.copy(alpha = 0.35f) else Color.Transparent
+                                                if (isSelected) Color.White.copy(alpha = 0.65f) else Color.Transparent
                                             )
                                             .clickable {
                                                 selectedCategoryTab = category
@@ -194,7 +196,7 @@ fun GlucoseDashboardScreen(
                                             text = category,
                                             fontSize = 14.sp,
                                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                            color = if (isSelected) Color.White else GlucoseDashboardTheme.TabUnselectedText
+                                            color = if (isSelected) selectedTabTextColor else GlucoseDashboardTheme.TabUnselectedText
                                         )
                                     }
                                 }
@@ -209,7 +211,8 @@ fun GlucoseDashboardScreen(
                         glucoseValue = glucoseValue,
                         glucoseUnit = "ммоль/л",
                         deltaText = deltaText,
-                        tirPercentage = tirPercentage,
+                        glucoseTrend = glucoseTrend,
+                        tirPercentage = "73%",
                         syncTimeText = syncTimeText,
                         breadUnitsText = breadUnitsText,
                         insulinText = insulinText,
@@ -275,7 +278,9 @@ fun GlucoseDashboardScreen(
                 glucosePoints = realPoints ?: emptyList(),
                 insulinEntries = realInsulin ?: emptyList(),
                 foodEntries = realFood ?: emptyList(),
-                activityEntries = realActivity ?: emptyList()
+                activityEntries = realActivity ?: emptyList(),
+                dailyGlucoseModel = dailyGlucoseModel,
+                allEvents = allDayEvents
             )
         }
     }

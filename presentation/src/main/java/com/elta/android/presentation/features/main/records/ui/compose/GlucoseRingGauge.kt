@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
@@ -33,11 +34,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
 
+data class GlucoseTrend(
+    val direction: GlucoseTrendDirection,
+    val valueText: String
+)
+
+enum class GlucoseTrendDirection {
+    UP,
+    DOWN,
+    STABLE
+}
+
 @Composable
 fun GlucoseRingGauge(
     glucoseValue: String,
     glucoseUnit: String = "ммоль/л",
-    deltaText: String = "▼2,4",
+    deltaText: String = "—",
+    glucoseTrend: GlucoseTrend? = null,
     tirPercentage: String = "49%",
     syncTimeText: String = "5 часов назад",
     breadUnitsText: String = "0,9 Ед.",
@@ -60,213 +73,198 @@ fun GlucoseRingGauge(
                 .padding(horizontal = 16.dp, vertical = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Upper Gauge & Indicators Container
+            // Gauge, callout line, and bottom indicators need one coordinate space.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
-                contentAlignment = Alignment.Center
+                    .height(272.dp)
             ) {
-                // Top-Left State Pill Badge ("Норма", "Высокая", "Низкая")
-                val stateText = when (state) {
-                    GlucoseState.NORMAL -> "Норма"
-                    GlucoseState.HIGH -> "Высокий"
-                    GlucoseState.LOW -> "Низкий"
-                }
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(start = 4.dp, top = 4.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Color.White.copy(alpha = 0.25f))
-                        .padding(horizontal = 14.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = stateText,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.White
+                Canvas(modifier = Modifier.matchParentSize()) {
+                    val ringCenter = Offset(size.width / 2f, 107.dp.toPx())
+                    val ringRadius = 90.dp.toPx()
+                    val startAngle = Math.toRadians(135.0)
+                    val lineStart = Offset(
+                        x = ringCenter.x + ringRadius * Math.cos(startAngle).toFloat(),
+                        y = ringCenter.y + ringRadius * Math.sin(startAngle).toFloat()
                     )
-                }
-
-                // Outer Canvas for Arc Gauge Ring & Callout Line
-                Canvas(
-                    modifier = Modifier.size(180.dp)
-                ) {
-                    val strokeWidth = 8.dp.toPx()
-                    val diameter = size.minDimension - strokeWidth
-                    val topLeft = Offset(strokeWidth / 2, strokeWidth / 2)
-                    val centerX = size.width / 2f
-                    val centerY = size.height / 2f
-                    val radius = diameter / 2f
-
-                    val tirValue = tirPercentage.replace("%", "").trim().toFloatOrNull() ?: 0f
-                    val maxSweep = 260f
-                    val progressSweep = (maxSweep * (tirValue / 100f)).coerceIn(0f, maxSweep)
-
-                    // Thin outer background ring contour around the central disc
-                    drawCircle(
-                        color = Color.White.copy(alpha = 0.35f),
-                        radius = radius,
-                        center = Offset(centerX, centerY),
-                        style = Stroke(width = 2.dp.toPx())
-                    )
-
-                    // Thick highlighted progress arc for TIR (starts at top 12 o'clock, goes clockwise)
-                    if (progressSweep > 0f) {
-                        drawArc(
-                            color = Color.White,
-                            startAngle = -90f,
-                            sweepAngle = progressSweep,
-                            useCenter = false,
-                            topLeft = topLeft,
-                            size = Size(diameter, diameter),
-                            style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                        )
-                    }
-
-                    // Diagonal Callout Line starting from bottom-left of thin ring (135°) pointing to TIR text
-                    val calloutAngleRad = Math.toRadians(135.0)
-                    val lineStartX = centerX + radius * Math.cos(calloutAngleRad).toFloat()
-                    val lineStartY = centerY + radius * Math.sin(calloutAngleRad).toFloat()
-                    val lineEnd = Offset(size.width * 0.04f, size.height * 0.87f)
+                    val lineEnd = Offset(56.dp.toPx(), 220.dp.toPx())
 
                     drawLine(
                         color = Color.White.copy(alpha = 0.7f),
-                        start = Offset(lineStartX, lineStartY),
+                        start = lineStart,
                         end = lineEnd,
                         strokeWidth = 1.5.dp.toPx()
                     )
                 }
 
-                // Central Disc
                 Box(
                     modifier = Modifier
-                        .size(130.dp)
-                        .shadow(12.dp, CircleShape)
-                        .clip(CircleShape)
-                        .background(Color.White),
+                        .fillMaxWidth()
+                        .height(214.dp)
+                        .align(Alignment.TopCenter),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    // Top-Left State Pill Badge ("Норма", "Высокая", "Низкая")
+                    val stateText = when (state) {
+                        GlucoseState.NORMAL -> "Норма"
+                        GlucoseState.HIGH -> "Высокий"
+                        GlucoseState.LOW -> "Низкий"
+                    }
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(start = 8.dp, top = 6.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Color.White.copy(alpha = 0.25f))
+                            .padding(horizontal = 14.dp, vertical = 6.dp)
                     ) {
                         Text(
-                            text = glucoseValue,
-                            fontSize = 40.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = mainColor,
-                            lineHeight = 42.sp
-                        )
-                        Text(
-                            text = glucoseUnit,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Gray
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = deltaText,
-                            fontSize = 12.sp,
+                            text = stateText,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.Gray
+                            color = Color.White
                         )
                     }
-                }
 
-                // TIR Widget (Bottom Left)
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = 4.dp, bottom = 8.dp),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text(
-                        text = "TIR",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White.copy(alpha = 0.9f)
-                    )
-                    Text(
-                        text = tirPercentage,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-
-                // Sync Refresh Button Widget (Right Side matching reference)
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 4.dp)
-                        .clickable { onSyncClick() },
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        contentAlignment = Alignment.TopEnd
+                    // Outer Canvas for Arc Gauge Ring
+                    Canvas(
+                        modifier = Modifier.size(190.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(Color.White.copy(alpha = 0.25f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_sync_refresh),
-                                contentDescription = "Sync",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
+                        val strokeWidth = 10.dp.toPx()
+                        val diameter = size.minDimension - strokeWidth
+                        val topLeft = Offset(strokeWidth / 2, strokeWidth / 2)
+                        val centerX = size.width / 2f
+                        val centerY = size.height / 2f
+                        val radius = diameter / 2f
+
+                        val tirValue = tirPercentage.replace("%", "").trim().toFloatOrNull() ?: 0f
+                        val maxSweep = 260f
+                        val progressSweep = (maxSweep * (tirValue / 100f)).coerceIn(0f, maxSweep)
+
+                        // Thin outer background ring contour around the central disc
+                        drawCircle(
+                            color = Color.White.copy(alpha = 0.35f),
+                            radius = radius,
+                            center = Offset(centerX, centerY),
+                            style = Stroke(width = 2.dp.toPx())
+                        )
+
+                        // Thick highlighted progress arc for TIR (starts at top 12 o'clock, goes clockwise)
+                        if (progressSweep > 0f) {
+                            drawArc(
+                                color = Color.White,
+                                startAngle = -90f,
+                                sweepAngle = progressSweep,
+                                useCenter = false,
+                                topLeft = topLeft,
+                                size = Size(diameter, diameter),
+                                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                             )
                         }
-                        // Info indicator dot on top right of sync circle
-                        Box(
-                            modifier = Modifier
-                                .size(14.dp)
-                                .clip(CircleShape)
-                                .background(Color.White.copy(alpha = 0.4f)),
-                            contentAlignment = Alignment.Center
+                    }
+
+                    // Central Disc
+                    Box(
+                        modifier = Modifier
+                            .size(136.dp)
+                            .shadow(12.dp, CircleShape)
+                            .clip(CircleShape)
+                            .background(Color.White),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "i",
-                                fontSize = 9.sp,
+                                text = glucoseValue,
+                                fontSize = 48.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = mainColor,
+                                lineHeight = 50.sp
+                            )
+                            Text(
+                                text = glucoseUnit,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Gray
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            GlucoseTrendValue(
+                                trend = glucoseTrend,
+                                fallbackText = deltaText
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = if (isSyncing) "Синхр..." else syncTimeText,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.White.copy(alpha = 0.95f)
+
+                    // Sync Refresh Button Widget (Right Side matching reference)
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 5.dp, bottom = 8.dp)
+                            .clickable { onSyncClick() },
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.TopEnd
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_refresh_2),
+                                contentDescription = "Sync",
+                                tint = Color.White,
+                                modifier = Modifier.size(54.dp)
+                            )
+                            // Info indicator dot on top right of sync arrows
+                            Box(
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.White.copy(alpha = 0.35f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "i",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White.copy(alpha = 0.95f)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = if (isSyncing) "Синхр..." else syncTimeText,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.White.copy(alpha = 0.95f)
+                        )
+                    }
+                }
+
+                // Indicator Pills Row: "TIR", "Хлебных ед." & "Инсулина"
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TirIndicator(
+                        tirPercentage = tirPercentage,
+                        modifier = Modifier.width(72.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IndicatorPill(
+                        title = "Хлебных ед.",
+                        value = breadUnitsText,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    IndicatorPill(
+                        title = "Инсулина",
+                        value = insulinText,
+                        modifier = Modifier.weight(1f)
                     )
                 }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Indicator Pills Row: "Хлебных ед." & "Инсулина"
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IndicatorPill(
-                    title = "Хлебных ед.",
-                    value = breadUnitsText,
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                IndicatorPill(
-                    title = "Инсулина",
-                    value = insulinText,
-                    modifier = Modifier.weight(1f)
-                )
             }
 
             // Dark Status Banner Pill (Only visible when isStatusVisible == true)
@@ -321,6 +319,78 @@ fun SyncStatusPillBanner(
                 maxLines = 1
             )
         }
+    }
+}
+
+@Composable
+private fun GlucoseTrendValue(
+    trend: GlucoseTrend?,
+    fallbackText: String
+) {
+    val trendColor = Color(0xFFBBBFCA)
+
+    if (trend == null) {
+        Text(
+            text = fallbackText,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = trendColor
+        )
+        return
+    }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (trend.direction != GlucoseTrendDirection.STABLE) {
+            Canvas(modifier = Modifier.size(width = 14.dp, height = 8.dp)) {
+                val path = Path().apply {
+                    if (trend.direction == GlucoseTrendDirection.DOWN) {
+                        moveTo(size.width / 2f, size.height)
+                        lineTo(size.width, 0f)
+                        lineTo(0f, 0f)
+                    } else {
+                        moveTo(size.width / 2f, 0f)
+                        lineTo(size.width, size.height)
+                        lineTo(0f, size.height)
+                    }
+                    close()
+                }
+                drawPath(path = path, color = trendColor)
+            }
+            Spacer(modifier = Modifier.width(4.dp))
+        }
+        Text(
+            text = trend.valueText,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = trendColor
+        )
+    }
+}
+
+@Composable
+private fun TirIndicator(
+    tirPercentage: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "TIR",
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White.copy(alpha = 0.9f)
+        )
+        Text(
+            text = tirPercentage,
+            fontSize = 32.sp,
+            lineHeight = 32.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
     }
 }
 

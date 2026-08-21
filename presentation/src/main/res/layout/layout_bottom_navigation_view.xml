@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="72dp"
         android:layout_gravity="bottom"
         android:background="@color/white"
         android:gravity="center"
@@ -21,7 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:bnm_icon="@drawable/ic_menu_home"
+            app:bnm_icon="@drawable/ic_menu_home_2"
             app:bnm_title="@string/bottom_navigation_menu_main_title" />
 
         <com.elta.android.presentation.widgets.BottomNavigationMenuItem
@@ -30,11 +30,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:bnm_icon="@drawable/ic_menu_note"
+            app:bnm_icon="@drawable/ic_menu_note_2"
             app:bnm_title="@string/bottom_navigation_menu_notes_title" />
 
         <Space
-            android:layout_width="80dp"
+            android:layout_width="96dp"
             android:layout_height="match_parent" />
 
         <com.elta.android.presentation.widgets.BottomNavigationMenuItem
@@ -43,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:bnm_icon="@drawable/ic_menu_stats"
+            app:bnm_icon="@drawable/ic_menu_stats_2"
             app:bnm_title="@string/bottom_navigation_menu_stats_title" />
 
         <com.elta.android.presentation.widgets.BottomNavigationMenuItem
@@ -52,7 +52,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:bnm_icon="@drawable/ic_menu_profile"
+            app:bnm_icon="@drawable/ic_menu_profile_2"
             app:bnm_title="@string/bottom_navigation_menu_profile_title" />
     </LinearLayout>
 

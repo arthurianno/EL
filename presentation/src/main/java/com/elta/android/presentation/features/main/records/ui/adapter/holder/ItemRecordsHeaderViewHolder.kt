@@ -6,8 +6,12 @@ import com.elta.android.presentation.databinding.ItemRecordsHeaderBinding
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
 import com.elta.android.presentation.features.main.records.ui.compose.GlucoseDashboardScreen
 import com.elta.android.presentation.features.main.records.ui.compose.GlucoseState
+import com.elta.android.presentation.features.main.records.ui.compose.GlucoseTrend
+import com.elta.android.presentation.features.main.records.ui.compose.GlucoseTrendDirection
 import com.nullgr.core.rx.RxBus
 import com.elta.android.domain.features.diary.events.model.glucoseValue
+import java.util.Locale
+import kotlin.math.abs
 
 class ItemRecordsHeaderViewHolder(
     private val binding: ItemRecordsHeaderBinding,
@@ -47,6 +51,7 @@ class ItemRecordsHeaderViewHolder(
                 bus = bus,
                 glucoseValue = rawGlucose,
                 deltaText = item.glucoseLevelIndex?.format()?.takeIf { it.isNotBlank() } ?: "—",
+                glucoseTrend = item.calculateGlucoseTrend(),
                 tirPercentage = tirPercentage,
                 initialGlucoseState = glucoseState,
                 breadUnitsText = item.breadLevel?.let { "$it XE" } ?: "—",
@@ -55,5 +60,25 @@ class ItemRecordsHeaderViewHolder(
                 allDayEvents = item.allEvents
             )
         }
+    }
+
+    private fun RecordsHeaderItem.calculateGlucoseTrend(): GlucoseTrend? {
+        val model = dailyGlucoseModel ?: return null
+        val glucoseEvents = model.glucoseEvents.sortedBy { it.additionTime }
+        if (glucoseEvents.size < 2) return null
+
+        val currentValue = glucoseEvents.last().glucoseValue(model.glucoseFormat)
+        val previousValue = glucoseEvents[glucoseEvents.lastIndex - 1].glucoseValue(model.glucoseFormat)
+        val diff = currentValue - previousValue
+        val direction = when {
+            diff > 0.0 -> GlucoseTrendDirection.UP
+            diff < 0.0 -> GlucoseTrendDirection.DOWN
+            else -> GlucoseTrendDirection.STABLE
+        }
+
+        return GlucoseTrend(
+            direction = direction,
+            valueText = String.format(Locale.US, "%.1f", abs(diff)).replace('.', ',')
+        )
     }
 }

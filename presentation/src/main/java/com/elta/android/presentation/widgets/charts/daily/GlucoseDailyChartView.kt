@@ -580,8 +580,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         private const val SELECTED_ITEM_STROKE_WIDTH = 2f // dp
         private const val SECTIONS_DIVIDER_WIDTH = 1f // dp
         private const val POINT_TITLE_TEXT_SIZE = 10f // sp
-        private const val POINT_TITLE_BACKGROUND_HEIGHT = 16f // dp
-        private const val POINT_TITLE_BACKGROUND_WIDTH = 48f // dp
+        private const val POINT_TITLE_BACKGROUND_HEIGHT = 20f // dp
+        private const val POINT_TITLE_BACKGROUND_WIDTH = 64f // dp
         private const val POINT_TITLE_BACKGROUND_CORNERS = 4f // dp
 
         private const val SELECTED_ITEM_LINE_WIDTH = 1.5f // dp

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -44,6 +45,8 @@ data class GlucosePoint(
     val timeLabel: String,
     val value: Float
 )
+
+private const val CHART_MAX_GLUCOSE_VALUE = 40f
 
 @Composable
 fun GlucoseLineChartCard(
@@ -79,7 +82,7 @@ fun GlucoseLineChartCard(
                 shape = RoundedCornerShape(13.dp)
             )
             .background(cardBg)
-            .padding(start = 21.dp, top = 5.dp, end = 10.dp, bottom = 9.dp)
+            .padding(start = 5.dp, top = 5.dp, end = 10.dp, bottom = 9.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Header Row: Date Dropdown & Time Filter Chips
@@ -162,7 +165,7 @@ fun GlucoseLineChartCard(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                // Y-Axis Scale Labels (16, 12, 8, 4, 0)
+                // Y-Axis Scale Labels
                 Column(
                     modifier = Modifier
                         .width(24.dp)
@@ -171,7 +174,7 @@ fun GlucoseLineChartCard(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.End
                 ) {
-                    listOf("16", "12", "8", "4", "0").forEach { yVal ->
+                    listOf("40", "30", "20", "10", "0").forEach { yVal ->
                         Text(
                             text = yVal,
                             fontSize = 12.sp,
@@ -203,26 +206,13 @@ fun GlucoseLineChartCard(
                         val height = size.height
                         val paddingBottom = 20.dp.toPx()
                         val chartWidth = width
+                        val chartRightInset = 24.dp.toPx()
+                        val usableChartWidth = chartWidth - chartRightInset
                         val chartHeight = height - paddingBottom
 
-                        drawRect(
-                            color = Color(0xFFFF8058).copy(alpha = if (isDarkTheme) 0.04f else 0.08f),
-                            topLeft = Offset(0f, chartHeight * (1f - 4f / 16f)),
-                            size = androidx.compose.ui.geometry.Size(width, chartHeight * 4f / 16f)
-                        )
-                        drawRect(
-                            color = Color(0xFF3EC9A8).copy(alpha = if (isDarkTheme) 0.04f else 0.08f),
-                            topLeft = Offset(0f, chartHeight * (1f - 8f / 16f)),
-                            size = androidx.compose.ui.geometry.Size(width, chartHeight * 4f / 16f)
-                        )
-                        drawRect(
-                            color = Color(0xFFFFCC80).copy(alpha = if (isDarkTheme) 0.04f else 0.08f),
-                            topLeft = Offset(0f, 0f),
-                            size = androidx.compose.ui.geometry.Size(width, chartHeight * 4f / 16f)
-                        )
 
                         // Draw Horizontal Grid Lines
-                        val yLevels = listOf(16f, 12f, 8f, 4f, 0f)
+                        val yLevels = listOf(40f, 30f, 20f, 10f, 0f)
                         val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
 
                         yLevels.forEachIndexed { index, _ ->
@@ -237,52 +227,56 @@ fun GlucoseLineChartCard(
                         }
 
                         // Draw Curve Path
-                        val maxVal = 16f
-                        val path = Path()
-                        val linePoints = displayPoints.mapIndexed { index, pt ->
-                            val endMinutes = displayPoints.maxOfOrNull { it.timeLabel.toMinutes() } ?: 0
+                        val maxVal = CHART_MAX_GLUCOSE_VALUE
+                        val linePoints = displayPoints.map { pt ->
+                            val latestPointMinutes = displayPoints.maxOfOrNull { it.timeLabel.toMinutes() } ?: 0
+                            val endMinutes = roundUpToHour(latestPointMinutes)
                             val startMinutes = endMinutes - periodToHours(activePeriod) * 60
                             val x = ((pt.timeLabel.toMinutes() - startMinutes).toFloat() /
-                                (periodToHours(activePeriod) * 60)).coerceIn(0f, 1f) * chartWidth
-                            val y = chartHeight - (pt.value / maxVal) * chartHeight
+                                (periodToHours(activePeriod) * 60)).coerceIn(0f, 1f) * usableChartWidth
+                            val pointRadius = 6.dp.toPx()
+                            val safeValue = pt.value.coerceIn(0f, maxVal)
+                            val y = (chartHeight - (safeValue / maxVal) * chartHeight)
+                                .coerceIn(pointRadius, chartHeight - pointRadius)
                             Offset(x, y)
                         }
 
                         if (linePoints.isNotEmpty()) {
-                            path.moveTo(linePoints.first().x, linePoints.first().y)
                             for (i in 0 until linePoints.size - 1) {
                                 val p1 = linePoints[i]
                                 val p2 = linePoints[i + 1]
                                 val controlPoint1 = Offset(p1.x + (p2.x - p1.x) / 2, p1.y)
                                 val controlPoint2 = Offset(p1.x + (p2.x - p1.x) / 2, p2.y)
-                                path.cubicTo(
-                                    controlPoint1.x, controlPoint1.y,
-                                    controlPoint2.x, controlPoint2.y,
-                                    p2.x, p2.y
+                                val segmentPath = Path().apply {
+                                    moveTo(p1.x, p1.y)
+                                    cubicTo(
+                                        controlPoint1.x, controlPoint1.y,
+                                        controlPoint2.x, controlPoint2.y,
+                                        p2.x, p2.y
+                                    )
+                                }
+                                val startValue = displayPoints[i].value
+                                val endValue = displayPoints[i + 1].value
+                                val segmentBrush = Brush.linearGradient(
+                                    colors = listOf(
+                                        glucoseLineColor(startValue),
+                                        glucoseLineColor((startValue + endValue) / 2f),
+                                        glucoseLineColor(endValue)
+                                    ),
+                                    start = p1,
+                                    end = p2
+                                )
+
+                                drawPath(
+                                    path = segmentPath,
+                                    brush = segmentBrush,
+                                    style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
                                 )
                             }
 
-                            val strokeGradient = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color(0xFFFFA726), // High glucose level (top): Amber/Orange
-                                    Color(0xFF3BB2B8), // Normal glucose level (middle): Green/Teal
-                                    Color(0xFFF85F73)  // Low glucose level (bottom): Red
-                                )
-                            )
-
-                            drawPath(
-                                path = path,
-                                brush = strokeGradient,
-                                style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
-                            )
-
                             linePoints.forEachIndexed { idx, point ->
                                 val value = displayPoints[idx].value
-                                val dotColor = when {
-                                    value >= 10f -> GlucoseDashboardTheme.MaxBadgeColor
-                                    value <= 3.9f -> GlucoseDashboardTheme.MinBadgeColor
-                                    else -> Color(0xFF3BB2B8)
-                                }
+                                val dotColor = glucoseLineColor(value)
                                 drawCircle(
                                     color = Color.White,
                                     radius = 6.dp.toPx(),
@@ -322,8 +316,9 @@ fun GlucoseLineChartCard(
                                 text = "max ${String.format(Locale.US, "%.1f", maxItem.value).replace('.', ',')}",
                                 bgColor = GlucoseDashboardTheme.MaxBadgeColor,
                                 modifier = Modifier.padding(
-                                    start = (xDp - 30.dp).coerceIn(4.dp, 240.dp),
-                                    top = (yDp - 26.dp).coerceIn(2.dp, 130.dp)
+                                    start = (xDp - 58.dp).coerceAtLeast(4.dp),
+                                    top = (if (yDp < 36.dp) yDp + 10.dp else yDp - 28.dp)
+                                        .coerceIn(2.dp, 130.dp)
                                 )
                             )
                         }
@@ -339,7 +334,7 @@ fun GlucoseLineChartCard(
                                     text = "min ${String.format(Locale.US, "%.1f", minItem.value).replace('.', ',')}",
                                     bgColor = GlucoseDashboardTheme.MinBadgeColor,
                                     modifier = Modifier.padding(
-                                        start = (xDp - 30.dp).coerceIn(4.dp, 240.dp),
+                                        start = (xDp - 58.dp).coerceAtLeast(4.dp),
                                         top = (yDp + 8.dp).coerceIn(2.dp, 145.dp)
                                     )
                                 )
@@ -355,7 +350,7 @@ fun GlucoseLineChartCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 32.dp),
+                    .padding(start = 5.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 displayTimeLabels.forEach { label ->
@@ -387,11 +382,16 @@ private fun filterPointsAndLabelsForPeriod(
         else -> 6
     }
 
-    val endMinutes = rawPoints.maxOf { it.timeLabel.toMinutes() }
+    val latestPointMinutes = rawPoints.maxOf { it.timeLabel.toMinutes() }
+    val endMinutes = roundUpToHour(latestPointMinutes)
     val filtered = rawPoints.filter { it.timeLabel.toMinutes() >= endMinutes - hours * 60 }
     val labels = buildTimelineLabels(endMinutes, hours, period)
 
     return Pair(filtered, labels)
+}
+
+private fun roundUpToHour(minutes: Int): Int {
+    return if (minutes % 60 == 0) minutes else ((minutes / 60) + 1) * 60
 }
 
 private fun periodToHours(period: String): Int = when (period) {
@@ -400,6 +400,12 @@ private fun periodToHours(period: String): Int = when (period) {
     "12ч" -> 12
     "24ч" -> 24
     else -> 6
+}
+
+private fun glucoseLineColor(value: Float): Color = when {
+    value <= 3.9f -> GlucoseDashboardTheme.MinBadgeColor
+    value >= 10f -> GlucoseDashboardTheme.MaxBadgeColor
+    else -> Color(0xFF40D39B)
 }
 
 private fun String.toMinutes(): Int {
@@ -431,6 +437,7 @@ private fun PeakBadge(
 ) {
     Box(
         modifier = modifier
+            .widthIn(min = 68.dp)
             .clip(RoundedCornerShape(4.dp))
             .background(bgColor)
             .padding(horizontal = 6.dp, vertical = 2.dp),
@@ -438,6 +445,8 @@ private fun PeakBadge(
     ) {
         Text(
             text = text,
+            maxLines = 1,
+            softWrap = false,
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
             color = Color.White
