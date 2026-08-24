@@ -14,6 +14,8 @@ import java.util.Locale
 
 object DetailedChartItemsBuilder {
 
+    private const val MAX_EVENT_CHART_VALUE = 150.0
+
     fun buildPoints(
         dailyGlucoseModel: DailyGlucoseModel,
         allDayEvents: List<EventV2> = emptyList()
@@ -98,7 +100,6 @@ object DetailedChartItemsBuilder {
     ): List<DetailedInsulinEntry> {
         if (glucosePoints.isEmpty()) return emptyList()
         val insulinEvents = allDayEvents.filter { it.type is EventType.Insulin && it.value != null }
-        val maxInsulin = insulinEvents.mapNotNull { it.value }.maxOrNull() ?: 1.0
 
         return insulinEvents.map { ins ->
             val timeStr = ins.additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME)
@@ -108,14 +109,17 @@ object DetailedChartItemsBuilder {
             } ?: 0
 
             val valStr = String.format(Locale.US, "%.1f Ед.", ins.value ?: 0.0)
-            val hRatio = ((ins.value ?: 0.0) / maxInsulin).coerceIn(0.2, 0.9).toFloat()
+            val hRatio = ((ins.value ?: 0.0) / MAX_EVENT_CHART_VALUE)
+                .coerceIn(0.0, 1.0)
+                .toFloat()
 
             DetailedInsulinEntry(
                 timeLabel = timeStr,
                 xIndex = closestIdx,
                 units = valStr,
                 heightRatio = hRatio,
-                date = ins.additionTime.toLocalDate()
+                date = ins.additionTime.toLocalDate(),
+                value = ins.value?.toFloat()
             )
         }
     }
@@ -126,7 +130,6 @@ object DetailedChartItemsBuilder {
     ): List<DetailedFoodEntry> {
         if (glucosePoints.isEmpty()) return emptyList()
         val foodEvents = allDayEvents.filter { it.type is EventType.Bread && it.value != null }
-        val maxFood = foodEvents.mapNotNull { it.value }.maxOrNull() ?: 1.0
 
         return foodEvents.map { food ->
             val timeStr = food.additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME)
@@ -136,14 +139,17 @@ object DetailedChartItemsBuilder {
             } ?: 0
 
             val valStr = String.format(Locale.US, "%.1f ХЕ", food.value ?: 0.0)
-            val hRatio = ((food.value ?: 0.0) / maxFood).coerceIn(0.2, 0.9).toFloat()
+            val hRatio = ((food.value ?: 0.0) / MAX_EVENT_CHART_VALUE)
+                .coerceIn(0.0, 1.0)
+                .toFloat()
 
             DetailedFoodEntry(
                 timeLabel = timeStr,
                 xIndex = closestIdx,
                 breadUnits = valStr,
                 heightRatio = hRatio,
-                date = food.additionTime.toLocalDate()
+                date = food.additionTime.toLocalDate(),
+                value = food.value?.toFloat()
             )
         }
     }
