@@ -2,11 +2,13 @@ package com.elta.android.presentation
 
 import android.net.Uri
 import com.elta.android.domain.features.diary.home.model.HomeModel
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.core.bus.Event
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingItem
+import org.threeten.bp.LocalDate
 
 sealed class Events : Event {
 
@@ -34,6 +36,12 @@ sealed class Events : Event {
     object PackageReplaced : Events()
     data class ReminderSpent(val reminder: Reminder) : Events()
     data class ReportLoadedEvent(val uri: Uri) : Events()
+    data class DetailedChartRangeRequested(val start: LocalDate, val end: LocalDate) : Events()
+    data class DetailedChartRangeLoaded(
+        val start: LocalDate,
+        val end: LocalDate,
+        val events: List<EventV2>
+    ) : Events()
     object EmailNotConfirmed : Events()
     object NetworkProblemTryLater : Events()
 

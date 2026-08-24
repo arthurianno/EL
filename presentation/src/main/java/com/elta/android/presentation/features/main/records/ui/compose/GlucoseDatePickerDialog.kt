@@ -71,19 +71,21 @@ private val CalendarBackground = Color(0xFF1FBFD2)
 private val CalendarTextPrimary = Color(0xFF3D4556)
 private val CalendarTextSecondary = Color(0xFF878B93)
 private val CalendarBorder = Color(0xFFA4A4A4)
+private const val MAX_SELECTED_DAYS = 14L
 
 @Composable
 fun GlucoseDatePickerDialog(
-    initialDate: String = "28 июля 2026",
+    initialStartDate: LocalDate = LocalDate.now(),
+    initialEndDate: LocalDate = initialStartDate,
     dayStatuses: Map<LocalDate, DayGlycemicStatus> = emptyMap(),
     onDismissRequest: () -> Unit = {},
-    onDateSelected: (String) -> Unit = {}
+    onDateRangeSelected: (LocalDate, LocalDate) -> Unit = { _, _ -> }
 ) {
-    // Parse initial date string or default to current date
-    val parsedDate = remember(initialDate) { parseInitialDate(initialDate) }
-
-    var selectedDate by remember { mutableStateOf(parsedDate) }
-    var currentYearMonth by remember { mutableStateOf(YearMonth.from(parsedDate)) }
+    var selectedStartDate by remember(initialStartDate, initialEndDate) { mutableStateOf(initialStartDate) }
+    var selectedEndDate by remember(initialStartDate, initialEndDate) { mutableStateOf(initialEndDate) }
+    var currentYearMonth by remember(initialStartDate) { mutableStateOf(YearMonth.from(initialStartDate)) }
+    var selectionError by remember { mutableStateOf<String?>(null) }
+    var hasSelectionStarted by remember(initialStartDate, initialEndDate) { mutableStateOf(false) }
 
     val daysInGrid = remember(currentYearMonth, dayStatuses) {
         val daysList = mutableListOf<CalendarDay>()
@@ -106,7 +108,7 @@ fun GlucoseDatePickerDialog(
     }
 
     val currentMonthTitle = "${MONTH_NAMES_RU[currentYearMonth.monthValue - 1]} ${currentYearMonth.year}"
-    val selectedDateFormatted = "${selectedDate.dayOfMonth} ${GENITIVE_MONTHS_RU[selectedDate.monthValue - 1]} ${selectedDate.year}"
+    val selectedDateFormatted = formatCalendarRange(selectedStartDate, selectedEndDate)
 
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -180,14 +182,14 @@ fun GlucoseDatePickerDialog(
                     ) {
                         Column {
                             Text(
-                                text = "Выберите дату",
+                                text = "Выберите период",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = CalendarTextPrimary
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "и мы покажем вам\nподробную статистику дня",
+                                text = "от одного до четырнадцати дней\nдля подробной статистики",
                                 fontSize = 16.sp,
                                 color = CalendarTextSecondary,
                                 lineHeight = 18.sp
@@ -196,7 +198,7 @@ fun GlucoseDatePickerDialog(
 
                         Column {
                             Text(
-                                text = "Выбранная дата",
+                                text = "Выбранный период",
                                 fontSize = 12.sp,
                                 color = Color(0xFFBBBFCA)
                             )
@@ -207,6 +209,32 @@ fun GlucoseDatePickerDialog(
                                 fontWeight = FontWeight.SemiBold,
                                 color = CalendarTextPrimary
                             )
+                            selectionError?.let { error ->
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = error,
+                                    fontSize = 11.sp,
+                                    color = Color(0xFFD93B17)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(CalendarTextPrimary)
+                                    .clickable {
+                                        onDateRangeSelected(selectedStartDate, selectedEndDate)
+                                    }
+                                    .padding(horizontal = 18.dp, vertical = 9.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Показать",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White
+                                )
+                            }
                         }
                     }
 
@@ -312,13 +340,16 @@ fun GlucoseDatePickerDialog(
                                             Spacer(modifier = Modifier.width(44.dp).height(36.dp))
                                         } else {
                                             val date = currentYearMonth.atDay(day.dayNumber)
-                                            val isSelected = date == selectedDate
+                                            val isBoundary = date == selectedStartDate || date == selectedEndDate
+                                            val isInSelectedRange = !date.isBefore(selectedStartDate) && !date.isAfter(selectedEndDate)
+                                            val isFuture = date.isAfter(LocalDate.now())
                                             val (bgColor, textColor) = when {
-                                                isSelected -> CalendarTextPrimary to Color.White
+                                                isBoundary -> CalendarTextPrimary to Color.White
+                                                isInSelectedRange -> Color(0xFFDDF6F1) to CalendarTextPrimary
                                                 day.status == DayGlycemicStatus.NORM -> Color(0xFFDDF6F1) to CalendarTextPrimary
                                                 day.status == DayGlycemicStatus.HIGH -> Color(0xFFFFF0D8) to CalendarTextPrimary
                                                 day.status == DayGlycemicStatus.LOW -> Color(0xFFFDE1DC) to CalendarTextPrimary
-                                                else -> Color.Transparent to CalendarTextPrimary
+                                                else -> Color.Transparent to if (isFuture) CalendarTextSecondary.copy(alpha = 0.5f) else CalendarTextPrimary
                                             }
 
                                             Box(
@@ -327,11 +358,34 @@ fun GlucoseDatePickerDialog(
                                                     .height(36.dp)
                                                     .clip(RoundedCornerShape(10.dp))
                                                     .background(bgColor)
-                                                    .clickable {
-                                                        selectedDate = date
-                                                        val dateString = "${date.dayOfMonth} ${GENITIVE_MONTHS_RU[date.monthValue - 1]} ${date.year}"
-                                                        onDateSelected(dateString)
-                                                        onDismissRequest()
+                                                    .clickable(enabled = !isFuture) {
+                                                        if (!hasSelectionStarted) {
+                                                            selectedStartDate = date
+                                                            selectedEndDate = date
+                                                            hasSelectionStarted = true
+                                                            selectionError = null
+                                                            return@clickable
+                                                        }
+                                                        val currentSelectionIsRange = selectedStartDate != selectedEndDate
+                                                        val nextStart = when {
+                                                            currentSelectionIsRange -> date
+                                                            date.isBefore(selectedStartDate) -> date
+                                                            else -> selectedStartDate
+                                                        }
+                                                        val nextEnd = when {
+                                                            currentSelectionIsRange -> date
+                                                            date.isBefore(selectedStartDate) -> selectedStartDate
+                                                            else -> date
+                                                        }
+                                                        val selectedDays = org.threeten.bp.temporal.ChronoUnit.DAYS
+                                                            .between(nextStart, nextEnd) + 1
+                                                        if (selectedDays > MAX_SELECTED_DAYS) {
+                                                            selectionError = "Можно выбрать не более 14 дней"
+                                                        } else {
+                                                            selectedStartDate = nextStart
+                                                            selectedEndDate = nextEnd
+                                                            selectionError = null
+                                                        }
                                                     },
                                                 contentAlignment = Alignment.Center
                                             ) {
@@ -354,19 +408,9 @@ fun GlucoseDatePickerDialog(
     }
 }
 
-private fun parseInitialDate(dateStr: String): LocalDate {
-    return try {
-        val parts = dateStr.trim().split(" ")
-        if (parts.size >= 3) {
-            val day = parts[0].toIntOrNull() ?: 28
-            val monthIdx = GENITIVE_MONTHS_RU.indexOfFirst { it.lowercase() == parts[1].lowercase() }
-            val month = if (monthIdx != -1) monthIdx + 1 else 7
-            val year = parts[2].toIntOrNull() ?: 2026
-            LocalDate.of(year, month, day)
-        } else {
-            LocalDate.now()
-        }
-    } catch (e: Exception) {
-        LocalDate.now()
-    }
+private fun formatCalendarRange(start: LocalDate, end: LocalDate): String {
+    fun format(date: LocalDate): String =
+        "${date.dayOfMonth} ${GENITIVE_MONTHS_RU[date.monthValue - 1]} ${date.year}"
+
+    return if (start == end) format(start) else "${format(start)} — ${format(end)}"
 }

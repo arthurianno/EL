@@ -77,6 +77,7 @@ import org.threeten.bp.LocalDate
 data class DetailedGlucosePoint(
     val timeLabel: String,
     val value: Float,
+    val date: LocalDate? = null,
     val isMin: Boolean = false,
     val isMax: Boolean = false,
     val trendText: String = "стабилен",
@@ -93,20 +94,24 @@ data class DetailedInsulinEntry(
     val timeLabel: String,
     val xIndex: Int,
     val units: String,
-    val heightRatio: Float
+    val heightRatio: Float,
+    val date: LocalDate? = null
 )
 
 data class DetailedFoodEntry(
     val timeLabel: String,
     val xIndex: Int,
     val breadUnits: String,
-    val heightRatio: Float
+    val heightRatio: Float,
+    val date: LocalDate? = null
 )
 
 data class DetailedActivityEntry(
     val startTimeLabel: String,
     val endTimeLabel: String,
-    val durationMins: Long
+    val durationMins: Long,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null
 )
 
 private val DetailedChartBackground = Color(0xFF1FBFD2)
@@ -116,9 +121,8 @@ private val DetailedChartTextSecondary = Color(0xFF878B93)
 private val DetailedLowColor = Color(0xFFD93B17)
 private val DetailedNormalColor = Color(0xFF29AF99)
 private val DetailedHighColor = Color(0xFFEE9C17)
-private const val DETAILED_GRAPH_START_MINUTES = 0
-private const val DETAILED_GRAPH_END_MINUTES = 24 * 60
 private const val DETAILED_GRAPH_HOUR_WIDTH_DP = 72
+private const val DETAILED_GRAPH_DAY_WIDTH_DP = 240
 private const val DETAILED_GRAPH_MAX_VALUE = 16f
 private const val DETAILED_BADGE_WIDTH_DP = 70
 private const val DETAILED_BADGE_HEIGHT_DP = 22
@@ -158,7 +162,8 @@ fun DetailedGlucoseChartScreen(
     foodEntries: List<DetailedFoodEntry> = emptyList(),
     activityEntries: List<DetailedActivityEntry> = emptyList(),
     dailyGlucoseModel: DailyGlucoseModel? = null,
-    allEvents: List<EventV2> = emptyList()
+    allEvents: List<EventV2> = emptyList(),
+    onDateRangeSelected: (LocalDate, LocalDate) -> Unit = { _, _ -> }
 ) {
     val activity = LocalContext.current.findActivity()
     DisposableEffect(activity) {
@@ -171,9 +176,18 @@ fun DetailedGlucoseChartScreen(
         }
     }
 
-    var selectedDate by rememberSaveable { mutableStateOf(initialDate) }
+    val initialLocalDate = remember(initialDate) { initialDate.toDetailedLocalDate() }
+    var selectedRangeStart by rememberSaveable { mutableStateOf(initialLocalDate.toString()) }
+    var selectedRangeEnd by rememberSaveable { mutableStateOf(initialLocalDate.toString()) }
     var isDatePickerVisible by remember { mutableStateOf(false) }
-    val selectedLocalDate = remember(selectedDate) { selectedDate.toDetailedLocalDate() }
+    val selectedStartDate = remember(selectedRangeStart) { LocalDate.parse(selectedRangeStart) }
+    val selectedEndDate = remember(selectedRangeEnd) { LocalDate.parse(selectedRangeEnd) }
+    val selectedRangeTitle = remember(selectedStartDate, selectedEndDate) {
+        formatDetailedDateRange(selectedStartDate, selectedEndDate)
+    }
+    val selectedDaysCount = remember(selectedStartDate, selectedEndDate) {
+        daysInDetailedRange(selectedStartDate, selectedEndDate)
+    }
 
     // Layer toggles
     var isInsulinLayerVisible by remember { mutableStateOf(true) }
@@ -183,52 +197,56 @@ fun DetailedGlucoseChartScreen(
     var selectedPointIndex by remember { mutableStateOf<Int?>(null) }
     val graphScrollState = rememberScrollState()
     val screenScrollState = rememberScrollState()
-    LaunchedEffect(selectedDate) {
+    LaunchedEffect(selectedStartDate, selectedEndDate) {
         graphScrollState.scrollTo(0)
+        selectedPointIndex = null
     }
 
-    val selectedDayEvents = remember(allEvents, selectedLocalDate) {
-        allEvents.filter { it.additionTime.toLocalDate() == selectedLocalDate }
+    val selectedRangeEvents = remember(allEvents, selectedStartDate, selectedEndDate) {
+        allEvents.filter { event ->
+            val date = event.additionTime.toLocalDate()
+            !date.isBefore(selectedStartDate) && !date.isAfter(selectedEndDate)
+        }
     }
-    val selectedDayModel = remember(dailyGlucoseModel, selectedDayEvents, selectedLocalDate) {
+    val selectedRangeModel = remember(dailyGlucoseModel, selectedRangeEvents) {
         dailyGlucoseModel?.let { model ->
             buildDailyGlucoseModel(
-                selectedDayEvents,
+                selectedRangeEvents,
                 model.glucoseLevelSettings,
                 model.glucoseFormat
             )
         }
     }
-    val isInitialSelectedDate = selectedDate == initialDate
-    val displayedPoints = remember(selectedDayModel, glucosePoints, isInitialSelectedDate) {
-        selectedDayModel?.let { model ->
-            DetailedChartItemsBuilder.buildPoints(model, selectedDayEvents)
+    val isInitialSingleDay = selectedStartDate == initialLocalDate && selectedEndDate == initialLocalDate
+    val displayedPoints = remember(selectedRangeModel, glucosePoints, isInitialSingleDay, selectedRangeEvents) {
+        selectedRangeModel?.let { model ->
+            DetailedChartItemsBuilder.buildPoints(model, selectedRangeEvents)
         }.orEmpty().ifEmpty {
-            if (isInitialSelectedDate) glucosePoints else emptyList()
+            if (isInitialSingleDay) glucosePoints else emptyList()
         }
     }
-    val displayedInsulinEntries = remember(displayedPoints, selectedDayEvents, insulinEntries, isInitialSelectedDate) {
-        if (selectedDayEvents.isNotEmpty()) {
-            DetailedChartItemsBuilder.buildInsulinEntries(displayedPoints, selectedDayEvents)
-        } else if (isInitialSelectedDate) {
+    val displayedInsulinEntries = remember(displayedPoints, selectedRangeEvents, insulinEntries, isInitialSingleDay) {
+        if (selectedRangeEvents.isNotEmpty()) {
+            DetailedChartItemsBuilder.buildInsulinEntries(displayedPoints, selectedRangeEvents)
+        } else if (isInitialSingleDay) {
             insulinEntries
         } else {
             emptyList()
         }
     }
-    val displayedFoodEntries = remember(displayedPoints, selectedDayEvents, foodEntries, isInitialSelectedDate) {
-        if (selectedDayEvents.isNotEmpty()) {
-            DetailedChartItemsBuilder.buildFoodEntries(displayedPoints, selectedDayEvents)
-        } else if (isInitialSelectedDate) {
+    val displayedFoodEntries = remember(displayedPoints, selectedRangeEvents, foodEntries, isInitialSingleDay) {
+        if (selectedRangeEvents.isNotEmpty()) {
+            DetailedChartItemsBuilder.buildFoodEntries(displayedPoints, selectedRangeEvents)
+        } else if (isInitialSingleDay) {
             foodEntries
         } else {
             emptyList()
         }
     }
-    val displayedActivityEntries = remember(selectedDayEvents, activityEntries, isInitialSelectedDate) {
-        if (selectedDayEvents.isNotEmpty()) {
-            DetailedChartItemsBuilder.buildActivityEntries(selectedDayEvents)
-        } else if (isInitialSelectedDate) {
+    val displayedActivityEntries = remember(selectedRangeEvents, activityEntries, isInitialSingleDay) {
+        if (selectedRangeEvents.isNotEmpty()) {
+            DetailedChartItemsBuilder.buildActivityEntries(selectedRangeEvents)
+        } else if (isInitialSingleDay) {
             activityEntries
         } else {
             emptyList()
@@ -305,12 +323,12 @@ fun DetailedGlucoseChartScreen(
                 .fillMaxSize()
                 .background(DetailedChartBackground)
         ) {
-            val contentWidth = maxWidth.coerceAtMost(737.dp)
+            val contentWidth = maxWidth
             val isVeryShort = maxHeight < 420.dp
             val chartCardHeight = if (isVeryShort) 164.dp else 234.dp
             val bottomCardHeight = if (isVeryShort) 94.dp else 98.dp
-            val graphContentWidth = (detailedGraphHours() * DETAILED_GRAPH_HOUR_WIDTH_DP).dp
-            val timeLabels = detailedTimeLabels()
+            val graphContentWidth = detailedGraphWidth(selectedDaysCount)
+            val timeLabels = detailedTimeLabels(selectedStartDate, selectedEndDate)
 
             Column(
                 modifier = Modifier
@@ -382,7 +400,7 @@ fun DetailedGlucoseChartScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = selectedDate,
+                                        text = selectedRangeTitle,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.SemiBold,
                                         color = DetailedChartTextPrimary
@@ -473,7 +491,12 @@ fun DetailedGlucoseChartScreen(
                                                     detectTapGestures { offset ->
                                                         if (displayedPoints.isNotEmpty()) {
                                                             selectedPointIndex = displayedPoints.indices.minByOrNull { index ->
-                                                                val pointX = detailedGraphFraction(displayedPoints[index].timeLabel) * size.width
+                                                                val pointX = detailedGraphFraction(
+                                                                    displayedPoints[index].date,
+                                                                    displayedPoints[index].timeLabel,
+                                                                    selectedStartDate,
+                                                                    selectedDaysCount
+                                                                ) * size.width
                                                                 kotlin.math.abs(pointX - offset.x)
                                                             }
                                                         }
@@ -496,7 +519,12 @@ fun DetailedGlucoseChartScreen(
 
                                             if (isFoodLayerVisible) {
                                                 displayedFoodEntries.forEach { food ->
-                                                    val x = detailedGraphFraction(food.timeLabel) * size.width
+                                                    val x = detailedGraphFraction(
+                                                        food.date,
+                                                        food.timeLabel,
+                                                        selectedStartDate,
+                                                        selectedDaysCount
+                                                    ) * size.width
                                                     val barWidth = 18.dp.toPx()
                                                     val barHeight = chartHeight * food.heightRatio
                                                     drawRoundRect(
@@ -510,7 +538,12 @@ fun DetailedGlucoseChartScreen(
 
                                             if (isInsulinLayerVisible) {
                                                 displayedInsulinEntries.forEach { insulin ->
-                                                    val x = detailedGraphFraction(insulin.timeLabel) * size.width
+                                                    val x = detailedGraphFraction(
+                                                        insulin.date,
+                                                        insulin.timeLabel,
+                                                        selectedStartDate,
+                                                        selectedDaysCount
+                                                    ) * size.width
                                                     val barWidth = 18.dp.toPx()
                                                     val barHeight = chartHeight * insulin.heightRatio
                                                     drawRoundRect(
@@ -525,7 +558,12 @@ fun DetailedGlucoseChartScreen(
                                             val linePoints = displayedPoints.map { point ->
                                                 val pointRadius = 8.dp.toPx()
                                                 Offset(
-                                                    x = detailedGraphFraction(point.timeLabel) * size.width,
+                                                    x = detailedGraphFraction(
+                                                        point.date,
+                                                        point.timeLabel,
+                                                        selectedStartDate,
+                                                        selectedDaysCount
+                                                    ) * size.width,
                                                     y = (chartHeight - (point.value / DETAILED_GRAPH_MAX_VALUE).coerceIn(0f, 1f) * chartHeight)
                                                         .coerceIn(pointRadius, chartHeight - pointRadius)
                                                 )
@@ -536,6 +574,11 @@ fun DetailedGlucoseChartScreen(
                                                     val start = linePoints[index]
                                                     val end = linePoints[index + 1]
                                                     val value = displayedPoints[index].value
+                                                    if (displayedPoints[index].date != null &&
+                                                        displayedPoints[index].date != displayedPoints[index + 1].date
+                                                    ) {
+                                                        continue
+                                                    }
                                                     val path = Path().apply {
                                                         moveTo(start.x, start.y)
                                                         cubicTo(
@@ -589,8 +632,18 @@ fun DetailedGlucoseChartScreen(
 
                                             if (isActivityLayerVisible) {
                                                 displayedActivityEntries.forEach { activityEntry ->
-                                                    val start = detailedGraphFraction(activityEntry.startTimeLabel) * size.width
-                                                    val end = detailedGraphFraction(activityEntry.endTimeLabel) * size.width
+                                                    val start = detailedGraphFraction(
+                                                        activityEntry.startDate,
+                                                        activityEntry.startTimeLabel,
+                                                        selectedStartDate,
+                                                        selectedDaysCount
+                                                    ) * size.width
+                                                    val end = detailedGraphFraction(
+                                                        activityEntry.endDate ?: activityEntry.startDate,
+                                                        activityEntry.endTimeLabel,
+                                                        selectedStartDate,
+                                                        selectedDaysCount
+                                                    ) * size.width
                                                     drawLine(
                                                         color = Color(0xFF6078EA),
                                                         start = Offset(start, chartHeight + 4.dp.toPx()),
@@ -604,7 +657,7 @@ fun DetailedGlucoseChartScreen(
 
                                         if (displayedPoints.isEmpty()) {
                                             Text(
-                                                text = "Нет измерений за выбранный день",
+                                                text = "Нет измерений за выбранный период",
                                                 fontSize = 13.sp,
                                                 color = DetailedChartTextSecondary,
                                                 modifier = Modifier.align(Alignment.Center)
@@ -612,7 +665,12 @@ fun DetailedGlucoseChartScreen(
                                         }
 
                                         if (maxPointIndex >= 0) {
-                                            val point = displayedPoints[maxPointIndex].toGraphOffset(graphWidth, maxHeight)
+                                            val point = displayedPoints[maxPointIndex].toGraphOffset(
+                                                graphWidth,
+                                                maxHeight,
+                                                selectedStartDate,
+                                                selectedDaysCount
+                                            )
                                             PeakBadgeOverlay(
                                                 text = "max ${String.format(java.util.Locale.US, "%.1f", displayedPoints[maxPointIndex].value).replace('.', ',')}",
                                                 bgColor = DetailedHighColor,
@@ -624,7 +682,12 @@ fun DetailedGlucoseChartScreen(
                                         }
 
                                         if (minPointIndex >= 0 && minPointIndex != maxPointIndex) {
-                                            val point = displayedPoints[minPointIndex].toGraphOffset(graphWidth, maxHeight)
+                                            val point = displayedPoints[minPointIndex].toGraphOffset(
+                                                graphWidth,
+                                                maxHeight,
+                                                selectedStartDate,
+                                                selectedDaysCount
+                                            )
                                             PeakBadgeOverlay(
                                                 text = "min ${String.format(java.util.Locale.US, "%.1f", displayedPoints[minPointIndex].value).replace('.', ',')}",
                                                 bgColor = DetailedLowColor,
@@ -718,12 +781,12 @@ fun DetailedGlucoseChartScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "События дня",
+                                    text = if (selectedDaysCount == 1) "События дня" else "События периода",
                                     fontSize = 12.sp,
                                     color = DetailedChartTextSecondary
                                 )
                                 Text(
-                                    text = selectedDate,
+                                    text = selectedRangeTitle,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = DetailedChartTextPrimary,
@@ -753,7 +816,7 @@ fun DetailedGlucoseChartScreen(
                                     lineHeight = 11.sp
                                 )
                                 Text(
-                                    text = "средний за день",
+                                    text = if (selectedDaysCount == 1) "средний за день" else "средний за период",
                                     fontSize = 10.sp,
                                     color = DetailedChartTextSecondary,
                                     lineHeight = 10.sp
@@ -787,12 +850,15 @@ fun DetailedGlucoseChartScreen(
 
         if (isDatePickerVisible) {
             GlucoseDatePickerDialog(
-                initialDate = selectedDate,
+                initialStartDate = selectedStartDate,
+                initialEndDate = selectedEndDate,
                 dayStatuses = dayStatuses,
                 onDismissRequest = { isDatePickerVisible = false },
-                onDateSelected = { date ->
-                    selectedDate = date
+                onDateRangeSelected = { start, end ->
+                    selectedRangeStart = start.toString()
+                    selectedRangeEnd = end.toString()
                     selectedPointIndex = null
+                    onDateRangeSelected(start, end)
                     isDatePickerVisible = false
                 }
             )
@@ -800,20 +866,66 @@ fun DetailedGlucoseChartScreen(
     }
 }
 
-private fun detailedGraphFraction(timeLabel: String): Float {
-    val minutes = timeLabelToMinutes(timeLabel)
-    return ((minutes - DETAILED_GRAPH_START_MINUTES).toFloat() /
-        (DETAILED_GRAPH_END_MINUTES - DETAILED_GRAPH_START_MINUTES)).coerceIn(0f, 1f)
+private fun daysInDetailedRange(start: LocalDate, end: LocalDate): Int =
+    org.threeten.bp.temporal.ChronoUnit.DAYS.between(start, end).toInt() + 1
+
+private fun detailedGraphWidth(daysCount: Int): Dp =
+    if (daysCount == 1) {
+        (24 * DETAILED_GRAPH_HOUR_WIDTH_DP).dp
+    } else {
+        (daysCount * DETAILED_GRAPH_DAY_WIDTH_DP).dp
+    }
+
+private fun detailedGraphFraction(
+    date: LocalDate?,
+    timeLabel: String,
+    rangeStart: LocalDate,
+    daysCount: Int
+): Float {
+    val dayOffset = org.threeten.bp.temporal.ChronoUnit.DAYS
+        .between(rangeStart, date ?: rangeStart)
+        .coerceIn(0, (daysCount - 1).toLong())
+    val minutesFromStart = dayOffset * 24 * 60 + timeLabelToMinutes(timeLabel)
+    return (minutesFromStart.toFloat() / (daysCount * 24 * 60)).coerceIn(0f, 1f)
 }
 
-private fun detailedGraphHours(): Int =
-    (DETAILED_GRAPH_END_MINUTES - DETAILED_GRAPH_START_MINUTES) / 60
-
-private fun detailedTimeLabels(): List<String> =
-    (DETAILED_GRAPH_START_MINUTES..DETAILED_GRAPH_END_MINUTES step 60).map { minutes ->
-        val hour = minutes / 60
-        String.format(java.util.Locale.US, "%02d:00", hour)
+private fun detailedTimeLabels(start: LocalDate, end: LocalDate): List<String> {
+    val daysCount = daysInDetailedRange(start, end)
+    val stepHours = when {
+        daysCount == 1 -> 1
+        daysCount <= 3 -> 6
+        else -> 24
     }
+    val totalHours = daysCount * 24
+    return (0..totalHours step stepHours).map { hourOffset ->
+        val date = start.plusDays((hourOffset / 24).toLong().coerceAtMost((daysCount - 1).toLong()))
+        when {
+            daysCount == 1 -> String.format(java.util.Locale.US, "%02d:00", hourOffset)
+            stepHours == 24 -> "${date.dayOfMonth} ${DETAILED_MONTHS_SHORT[date.monthValue - 1]}"
+            else -> "${date.dayOfMonth} ${DETAILED_MONTHS_SHORT[date.monthValue - 1]}\n${String.format(java.util.Locale.US, "%02d:00", hourOffset % 24)}"
+        }
+    }
+}
+
+private fun formatDetailedDateRange(start: LocalDate, end: LocalDate): String =
+    if (start == end) {
+        formatDetailedDate(start)
+    } else {
+        "${formatDetailedDate(start)} — ${formatDetailedDate(end)}"
+    }
+
+private fun formatDetailedDate(date: LocalDate): String =
+    "${date.dayOfMonth} ${DETAILED_MONTHS_GENITIVE[date.monthValue - 1]} ${date.year}"
+
+private val DETAILED_MONTHS_GENITIVE = listOf(
+    "января", "февраля", "марта", "апреля", "мая", "июня",
+    "июля", "августа", "сентября", "октября", "ноября", "декабря"
+)
+
+private val DETAILED_MONTHS_SHORT = listOf(
+    "янв.", "фев.", "мар.", "апр.", "мая", "июн.",
+    "июл.", "авг.", "сен.", "окт.", "ноя.", "дек."
+)
 
 private fun String.toDetailedLocalDate(): LocalDate {
     val months = listOf(
@@ -832,9 +944,11 @@ private fun String.toDetailedLocalDate(): LocalDate {
 
 private fun DetailedGlucosePoint.toGraphOffset(
     graphWidth: Dp,
-    graphHeight: Dp
+    graphHeight: Dp,
+    rangeStart: LocalDate,
+    daysCount: Int
 ): DpOffset {
-    val x = graphWidth * detailedGraphFraction(timeLabel)
+    val x = graphWidth * detailedGraphFraction(date, timeLabel, rangeStart, daysCount)
     val yRatio = (value / DETAILED_GRAPH_MAX_VALUE).coerceIn(0f, 1f)
     val chartHeight = (graphHeight - 9.dp).coerceAtLeast(0.dp)
     val pointRadius = 8.dp

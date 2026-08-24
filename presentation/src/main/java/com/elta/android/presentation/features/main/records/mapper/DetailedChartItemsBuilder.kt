@@ -27,7 +27,10 @@ object DetailedChartItemsBuilder {
 
             // Calculate trend relative to previous measurement
             val prevVal = if (index > 0) {
-                glucoseEvents[index - 1].glucoseValue(dailyGlucoseModel.glucoseFormat).toFloat()
+                glucoseEvents[index - 1]
+                    .takeIf { it.additionTime.toLocalDate() == event.additionTime.toLocalDate() }
+                    ?.glucoseValue(dailyGlucoseModel.glucoseFormat)
+                    ?.toFloat()
             } else null
             val diff = if (prevVal != null) glucoseVal - prevVal else 0f
             val trendText = when {
@@ -74,6 +77,7 @@ object DetailedChartItemsBuilder {
             DetailedGlucosePoint(
                 timeLabel = timeStr,
                 value = glucoseVal,
+                date = event.additionTime.toLocalDate(),
                 isMin = event == dailyGlucoseModel.minEvent,
                 isMax = event == dailyGlucoseModel.maxEvent,
                 trendText = trendText,
@@ -110,7 +114,8 @@ object DetailedChartItemsBuilder {
                 timeLabel = timeStr,
                 xIndex = closestIdx,
                 units = valStr,
-                heightRatio = hRatio
+                heightRatio = hRatio,
+                date = ins.additionTime.toLocalDate()
             )
         }
     }
@@ -137,7 +142,8 @@ object DetailedChartItemsBuilder {
                 timeLabel = timeStr,
                 xIndex = closestIdx,
                 breadUnits = valStr,
-                heightRatio = hRatio
+                heightRatio = hRatio,
+                date = food.additionTime.toLocalDate()
             )
         }
     }
@@ -152,7 +158,9 @@ object DetailedChartItemsBuilder {
             com.elta.android.presentation.features.main.records.ui.compose.DetailedActivityEntry(
                 startTimeLabel = startStr,
                 endTimeLabel = endStr,
-                durationMins = act.duration?.toLong() ?: 0L
+                durationMins = act.duration?.toLong() ?: 0L,
+                startDate = act.additionTime.toLocalDate(),
+                endDate = act.additionTime.plusMinutes(act.duration?.toLong() ?: 0L).toLocalDate()
             )
         }
     }

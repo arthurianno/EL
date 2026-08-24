@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.events
+import com.elta.android.presentation.core.bus.event
 import com.nullgr.core.rx.RxBus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -59,6 +61,14 @@ fun GlucoseDashboardScreen(
     var isStatusVisible by remember { mutableStateOf(false) }
     var isSyncing by remember { mutableStateOf(false) }
     var isDetailedChartVisible by rememberSaveable { mutableStateOf(false) }
+    var detailedChartEvents by remember { mutableStateOf(allDayEvents) }
+    var requestedDetailedRange by remember { mutableStateOf<Pair<org.threeten.bp.LocalDate, org.threeten.bp.LocalDate>?>(null) }
+
+    LaunchedEffect(allDayEvents) {
+        if (requestedDetailedRange == null) {
+            detailedChartEvents = allDayEvents
+        }
+    }
 
     val coroutineScope = rememberCoroutineScope()
     var hideJob by remember { mutableStateOf<Job?>(null) }
@@ -126,10 +136,16 @@ fun GlucoseDashboardScreen(
             val netDisposable = bus.events<Events.NetworkProblemTryLater>().subscribe {
                 showStatus("Отсутствует подключение к сети", syncing = false, autoHideMs = 4000L)
             }
+            val detailedChartDisposable = bus.events<Events.DetailedChartRangeLoaded>().subscribe { event ->
+                if (requestedDetailedRange == (event.start to event.end)) {
+                    detailedChartEvents = event.events
+                }
+            }
 
             onDispose {
                 syncDisposable.dispose()
                 netDisposable.dispose()
+                detailedChartDisposable.dispose()
             }
         }
     }
@@ -273,6 +289,8 @@ fun GlucoseDashboardScreen(
             DetailedGlucoseChartScreen(
                 onBackClick = {
                     isDetailedChartVisible = false
+                    requestedDetailedRange = null
+                    detailedChartEvents = allDayEvents
                 },
                 initialDate = todayDate,
                 glucosePoints = realPoints ?: emptyList(),
@@ -280,7 +298,11 @@ fun GlucoseDashboardScreen(
                 foodEntries = realFood ?: emptyList(),
                 activityEntries = realActivity ?: emptyList(),
                 dailyGlucoseModel = dailyGlucoseModel,
-                allEvents = allDayEvents
+                allEvents = detailedChartEvents,
+                onDateRangeSelected = { start, end ->
+                    requestedDetailedRange = start to end
+                    bus?.event(Events.DetailedChartRangeRequested(start, end))
+                }
             )
         }
     }

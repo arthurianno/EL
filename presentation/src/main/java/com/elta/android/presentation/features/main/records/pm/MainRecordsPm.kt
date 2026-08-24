@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.main.records.pm
 
 import android.content.Context
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
+import com.elta.android.domain.features.diary.events.interactor.GetEventsByPeriodUseCase
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
@@ -33,6 +34,7 @@ import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
     private val getHomeModelUseCase: GetHomeModelUseCase,
+    private val getEventsByPeriodUseCase: GetEventsByPeriodUseCase,
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val recordsMapper: MainRecordsMapper,
     private val context: Context,
@@ -93,6 +95,20 @@ class MainRecordsPm @Inject constructor(
             bus.events<DateChangedEvent>().map { Unit }
         )
             .subscribe(loadScreenAction.consumer)
+            .untilDestroy()
+
+        bus.events<Events.DetailedChartRangeRequested>()
+            .switchMap { request ->
+                getEventsByPeriodUseCase.execute(
+                    GetEventsByPeriodUseCase.Params(request.start, request.end)
+                )
+                    .map { events ->
+                        Events.DetailedChartRangeLoaded(request.start, request.end, events)
+                    }
+                    .doOnError(::handleError)
+                    .onErrorResumeNext(Observable.empty())
+            }
+            .subscribe(bus::event)
             .untilDestroy()
 
         Observables.combineLatest(
