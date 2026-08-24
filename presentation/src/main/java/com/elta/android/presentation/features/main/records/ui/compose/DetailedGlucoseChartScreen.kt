@@ -846,6 +846,7 @@ fun DetailedGlucoseChartScreen(
 
                         Spacer(modifier = Modifier.width(6.dp))
 
+
                         Column(
                             modifier = Modifier
                                 .width(42.dp)
