@@ -87,8 +87,31 @@ class AppActivity : BaseActivity<AppPm>() {
 
         if (openDebugHowToConnectIfRequested(intent)) return
 
-        if (savedInstanceState == null) {
-            router.newRootScreen(Screens.HomeFlow)
+        val shouldOpenGreetingAfterLanguageSelection =
+            LocaleHelper.consumePendingGreetingAfterLanguageSelection(this)
+        val shouldOpenHomeAfterLanguageChange =
+            !shouldOpenGreetingAfterLanguageSelection &&
+                LocaleHelper.consumePendingHomeAfterLanguageChange(this)
+
+        when {
+            shouldOpenGreetingAfterLanguageSelection -> {
+                Log.i(TAG, "AppActivity.onCreate: continue to GreetingFlow after language selection")
+                router.newRootFlow(Screens.GreetingFlow)
+            }
+
+            shouldOpenHomeAfterLanguageChange -> {
+                val homeFlow = if (getFeatureConfigUseCase.invoke().improvedEnablingLocation) {
+                    Screens.HomeFlow
+                } else {
+                    Screens.HomeFlowVariantA
+                }
+                Log.i(TAG, "AppActivity.onCreate: continue to ${homeFlow::class.java.simpleName} after language change")
+                router.newRootFlow(homeFlow)
+            }
+
+            savedInstanceState == null -> {
+                router.newRootScreen(Screens.HomeFlow)
+            }
         }
 
 
