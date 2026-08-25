@@ -528,7 +528,7 @@ fun DetailedGlucoseChartScreen(
                                         Canvas(
                                             modifier = Modifier
                                                 .fillMaxSize()
-                                                .pointerInput(displayedPoints) {
+                                                .pointerInput(displayedPoints, selectedStartDate, selectedDaysCount) {
                                                     detectTapGestures(
                                                         onDoubleTap = {
                                                             graphZoomState.value = 1f
@@ -537,16 +537,36 @@ fun DetailedGlucoseChartScreen(
                                                             zoomVisualTranslationPx = 0f
                                                         },
                                                         onTap = { offset ->
-                                                            if (displayedPoints.isNotEmpty()) {
-                                                                selectedPointIndex = displayedPoints.indices.minByOrNull { index ->
-                                                                    val pointX = detailedGraphFraction(
-                                                                        displayedPoints[index].date,
-                                                                        displayedPoints[index].timeLabel,
-                                                                        selectedStartDate,
-                                                                        selectedDaysCount
-                                                                    ) * size.width
-                                                                    kotlin.math.abs(pointX - offset.x)
-                                                                }
+                                                            val canvasSize = Size(
+                                                                width = size.width.toFloat(),
+                                                                height = size.height.toFloat()
+                                                            )
+                                                            val activityTrackHeight = with(density) { 9.dp.toPx() }
+                                                            val pointRadius = with(density) { 8.dp.toPx() }
+                                                            val hitRadius = with(density) { 24.dp.toPx() }
+                                                            val nearestPointIndex = displayedPoints.indices.minByOrNull { index ->
+                                                                val pointOffset = detailedGraphPointOffset(
+                                                                    point = displayedPoints[index],
+                                                                    rangeStart = selectedStartDate,
+                                                                    daysCount = selectedDaysCount,
+                                                                    canvasSize = canvasSize,
+                                                                    activityTrackHeight = activityTrackHeight,
+                                                                    pointRadius = pointRadius
+                                                                )
+                                                                (pointOffset - offset).getDistance()
+                                                            }
+
+                                                            selectedPointIndex = nearestPointIndex?.takeIf { index ->
+                                                                val pointOffset = detailedGraphPointOffset(
+                                                                    point = displayedPoints[index],
+                                                                    rangeStart = selectedStartDate,
+                                                                    daysCount = selectedDaysCount,
+                                                                    canvasSize = canvasSize,
+                                                                    activityTrackHeight = activityTrackHeight,
+                                                                    pointRadius = pointRadius
+                                                                )
+                                                                (pointOffset - offset).getDistance() <= hitRadius &&
+                                                                    selectedPointIndex != index
                                                             }
                                                         }
                                                     )
@@ -657,16 +677,13 @@ fun DetailedGlucoseChartScreen(
                                             }
 
                                             val linePoints = displayedPoints.map { point ->
-                                                val pointRadius = 8.dp.toPx()
-                                                Offset(
-                                                    x = detailedGraphFraction(
-                                                        point.date,
-                                                        point.timeLabel,
-                                                        selectedStartDate,
-                                                        selectedDaysCount
-                                                    ) * size.width,
-                                                    y = (chartHeight - (point.value / DETAILED_GRAPH_MAX_VALUE).coerceIn(0f, 1f) * chartHeight)
-                                                        .coerceIn(pointRadius, chartHeight - pointRadius)
+                                                detailedGraphPointOffset(
+                                                    point = point,
+                                                    rangeStart = selectedStartDate,
+                                                    daysCount = selectedDaysCount,
+                                                    canvasSize = size,
+                                                    activityTrackHeight = activityTrackHeight,
+                                                    pointRadius = 8.dp.toPx()
                                                 )
                                             }
 
@@ -999,6 +1016,27 @@ private fun detailedGraphWidth(daysCount: Int): Dp =
     } else {
         (daysCount * DETAILED_GRAPH_DAY_WIDTH_DP).dp
     }
+
+private fun detailedGraphPointOffset(
+    point: DetailedGlucosePoint,
+    rangeStart: LocalDate,
+    daysCount: Int,
+    canvasSize: Size,
+    activityTrackHeight: Float,
+    pointRadius: Float
+): Offset {
+    val chartHeight = canvasSize.height - activityTrackHeight
+    return Offset(
+        x = detailedGraphFraction(
+            date = point.date,
+            timeLabel = point.timeLabel,
+            rangeStart = rangeStart,
+            daysCount = daysCount
+        ) * canvasSize.width,
+        y = (chartHeight - (point.value / DETAILED_GRAPH_MAX_VALUE).coerceIn(0f, 1f) * chartHeight)
+            .coerceIn(pointRadius, chartHeight - pointRadius)
+    )
+}
 
 private fun detailedGraphFraction(
     date: LocalDate?,
