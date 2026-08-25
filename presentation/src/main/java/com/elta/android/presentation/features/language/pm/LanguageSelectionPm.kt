@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.elta.android.domain.features.user.interactor.UpdateLanguageTagUseCase
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.language.model.AppLanguage
@@ -77,7 +78,27 @@ class LanguageSelectionPm @Inject constructor(
                 Log.i(TAG, "selectLanguageAction: clicked=${language.code}, current=${selectedLanguageState.valueOrNull?.code}")
             }
             .filter { language -> selectedLanguageState.valueOrNull != language }
-            .doOnNext(selectedLanguageState.consumer)
+            .flatMapCompletable { language ->
+                Completable.fromAction {
+                    selectedLanguageState.consumer.accept(language)
+                    if (isFirstLaunchState.value) {
+                        LocaleHelper.markLanguageSelectionInProgress(context)
+                    }
+                }.andThen(
+                    if (isFirstLaunchState.value) {
+                        applyLanguage(language)
+                            .andThen(
+                                Completable.fromAction {
+                                    if (LocaleHelper.needsManualRecreate()) {
+                                        recreateActivityCommand.consumer.accept(Unit)
+                                    }
+                                }
+                            )
+                    } else {
+                        Completable.complete()
+                    }
+                )
+            }
             .doOnError(::handleError)
             .retry()
             .subscribe()
@@ -114,21 +135,12 @@ class LanguageSelectionPm @Inject constructor(
                 Log.i(TAG, "SAVE: region read right after save=$savedNow")
 
                 if (isFirstLaunchState.value) {
-                    Log.i(TAG, "continueAction: first launch, applying language=${language.code}")
-                    applyLanguage(language)
-                        .andThen(
-                            Completable.fromAction {
-                                LocaleHelper.markPendingGreetingAfterLanguageSelection(context)
-                                Log.i(TAG, "continueAction: pending Greeting flag saved (committed)")
-                                // Fix 9: on API 33+ LocaleManager triggers recreation automatically.
-                                if (LocaleHelper.needsManualRecreate()) {
-                                    Log.i(TAG, "continueAction: recreateActivityCommand sent (< API 33)")
-                                    recreateActivityCommand.consumer.accept(Unit)
-                                } else {
-                                    Log.i(TAG, "continueAction: skip manual recreate — LocaleManager handles it (API 33+)")
-                                }
-                            }
-                        )
+                    Completable.fromAction {
+                        LocaleHelper.completeLanguageSelection(context, language.code)
+                        OneSignalTags.apply(context)
+                        Log.i(TAG, "continueAction: first launch complete, navigating to GreetingFlow")
+                        router.newRootFlow(Screens.GreetingFlow)
+                    }
                 } else {
                     if (language == currentLanguage) {
                         Log.i(TAG, "continueAction: settings mode, language unchanged (${language.code}), syncing region/country and navigating back")

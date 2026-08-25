@@ -12,6 +12,7 @@ object LocaleHelper {
     private const val PREF_LANGUAGE = "language_preference"
     private const val KEY_LANGUAGE = "selected_language"
     private const val KEY_REGION = "selected_region"
+    private const val KEY_LANGUAGE_SELECTION_IN_PROGRESS = "language_selection_in_progress"
     private const val KEY_PENDING_GREETING_AFTER_LANGUAGE = "pending_greeting_after_language"
     private const val KEY_PENDING_HOME_AFTER_LANGUAGE = "pending_home_after_language"
     private const val LANGUAGE_RU = "ru"
@@ -64,9 +65,35 @@ object LocaleHelper {
             return false
         }
         val prefs = context.getSharedPreferences(PREF_LANGUAGE, Context.MODE_PRIVATE)
-        val shouldShow = prefs.getString(KEY_LANGUAGE, null) == null
+        val shouldShow = prefs.getString(KEY_LANGUAGE, null) == null ||
+            prefs.getBoolean(KEY_LANGUAGE_SELECTION_IN_PROGRESS, false)
         Log.i(TAG, "LocaleHelper.shouldShowLanguageSelection=$shouldShow")
         return shouldShow
+    }
+
+    fun markLanguageSelectionInProgress(context: Context) {
+        val prefs = context.getSharedPreferences(PREF_LANGUAGE, Context.MODE_PRIVATE)
+        val committed = prefs.edit().putBoolean(KEY_LANGUAGE_SELECTION_IN_PROGRESS, true).commit()
+        Log.i(TAG, "LocaleHelper.markLanguageSelectionInProgress(committed=$committed)")
+        if (!committed) {
+            prefs.edit().putBoolean(KEY_LANGUAGE_SELECTION_IN_PROGRESS, true).apply()
+        }
+    }
+
+    fun completeLanguageSelection(context: Context, languageCode: String) {
+        val normalizedLanguageCode = resolveLanguageForBuild(languageCode)
+        val prefs = context.getSharedPreferences(PREF_LANGUAGE, Context.MODE_PRIVATE)
+        val committed = prefs.edit()
+            .putString(KEY_LANGUAGE, normalizedLanguageCode)
+            .putBoolean(KEY_LANGUAGE_SELECTION_IN_PROGRESS, false)
+            .commit()
+        Log.i(TAG, "LocaleHelper.completeLanguageSelection(code=$normalizedLanguageCode, committed=$committed)")
+        if (!committed) {
+            prefs.edit()
+                .putString(KEY_LANGUAGE, normalizedLanguageCode)
+                .putBoolean(KEY_LANGUAGE_SELECTION_IN_PROGRESS, false)
+                .apply()
+        }
     }
 
     // Fix 1: use commit() (synchronous) so the flag is guaranteed to be persisted
