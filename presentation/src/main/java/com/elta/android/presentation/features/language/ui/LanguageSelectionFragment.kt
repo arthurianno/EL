@@ -66,11 +66,11 @@ class LanguageSelectionFragment :
             val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
             v.updatePadding(
                 top = statusBars.top,
-                bottom = if (isFirstLaunch) navBars.bottom else 0
+                bottom = 0
             )
             Log.i(
                 TAG,
-                "WindowInsets: statusBarTop=${statusBars.top}, navBarBottom=${navBars.bottom}, isFirstLaunch=$isFirstLaunch, appliedBottom=${if (isFirstLaunch) navBars.bottom else 0}"
+                "WindowInsets: statusBarTop=${statusBars.top}, navBarBottom=${navBars.bottom}, isFirstLaunch=$isFirstLaunch, appliedBottom=0"
             )
             insets
         }
