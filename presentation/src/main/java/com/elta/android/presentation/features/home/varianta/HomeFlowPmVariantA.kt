@@ -111,7 +111,6 @@ class HomeFlowPmVariantA @Inject constructor(
     val showBottomSheetCommand = command<Unit>()
     val closeHelpBottomSheetCommand = command<Unit>()
     val showHelpBottomSheetCommand = command<Unit>()
-    val pulseCommand = command<Boolean>()
     val homeAction = action<Boolean>()
     val menuItemSelectedAction = action<Int>()
     val menuItemRestoredAction = action<Int>()
@@ -229,11 +228,6 @@ class HomeFlowPmVariantA @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        bus.events<Events.HomeModelChanged>()
-            .map { it.model.isFirstEntrance || !it.model.hasEvents }
-            .subscribe(pulseCommand.consumer)
-            .untilDestroy()
-
         bus.events<Events.EventsChanged>()
             .filter { it.isCreated }
             .map { }
@@ -293,6 +287,7 @@ class HomeFlowPmVariantA @Inject constructor(
         items.add(UserEventItem(R.drawable.ic_event_refresh, R.string.event_type_sync, META_SYNC))
         bottomSheetItems.consumer.accept(items)
     }
+
 
     private fun observeClicks() {
         bus.clicks<Clicks.AddUserEvent>()
@@ -481,6 +476,11 @@ class HomeFlowPmVariantA @Inject constructor(
     }
 
     private fun bindSyncWithBackendAction() {
+        bus.events<Events.ServerSyncRequested>()
+            .map { Unit }
+            .subscribe(startSyncWithBackendAction.consumer)
+            .untilDestroy()
+
         syncWithBackendProgressState.observable
             .subscribe { inProgress ->
                 bus.event(Events.BackendSyncProgress(inProgress))

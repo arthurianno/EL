@@ -52,7 +52,7 @@ fun GlucoseRingGauge(
     deltaText: String = "—",
     glucoseTrend: GlucoseTrend? = null,
     tirPercentage: String = "49%",
-    syncTimeText: String = "5 часов назад",
+    syncTimeText: String = "Нет измерений",
     breadUnitsText: String = "0,9 Ед.",
     insulinText: String = "0,1 ХЕ",
     state: GlucoseState = GlucoseState.NORMAL,

@@ -21,6 +21,7 @@ import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.core.ui.dialog.buttons
@@ -41,7 +42,6 @@ import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import com.tbruyelle.rxpermissions2.RxPermissions
-import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 import me.dmdev.rxpm.bindTo
@@ -70,6 +70,9 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
         RxPermissions(requireActivity())
     }
 
+    private var selectedBottomNavigationItemId = R.id.mainMenuItemView
+    private var isMainScreenEmpty = false
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBottomNavigationInsets()
@@ -93,27 +96,19 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
             .subscribe { binding.homeActionView.isSelected.not().passTo(pm.homeAction) }
             .addTo(compositeDestroy)
         pm.selectedItemIdState.bindTo(binding.homeBottomNavigationView.selection())
+        pm.selectedItemIdState.bindTo { itemId ->
+            selectedBottomNavigationItemId = itemId
+            updateBottomNavigationBackground()
+        }
+        bus.events<Events.HomeModelChanged>()
+            .subscribe { modelChanged ->
+                isMainScreenEmpty = !modelChanged.model.hasEvents
+                updateBottomNavigationBackground()
+            }
+            .addTo(compositeDestroy)
         pm.bottomSheetItems.bindTo { adapter.submitList(it) }
         pm.closeBottomSheetCommand.bindTo { binding.homeBottomSheetView.hide() }
         pm.showBottomSheetCommand.bindTo { binding.homeBottomSheetView.show() }
-        Observables.combineLatest(
-            pm.pulseCommand.observable,
-            pm.selectedItemIdState.observable.map { it == R.id.mainMenuItemView }
-        )
-            .map { it.first && it.second }
-            .distinctUntilChanged()
-            .subscribe {
-                with(binding) {
-                    if (it) {
-                        homePulseView.show()
-                        homePulseView.start()
-                    } else {
-                        homePulseView.stop()
-                        homePulseView.hide()
-                    }
-                }
-            }
-            .addTo(compositeDestroy)
         binding.homeBottomSheetView.visibilityChanges().subscribe { visible ->
             binding.homeActionView.isVisible = !visible
             bus.event(Events.HomeBottomSheetStateChanged(visible))
@@ -133,6 +128,17 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
         pm.glucoseDataReminderDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.openSettingsCommand.bindTo { openSettingsIntent(requireContext()) }
         bindHelpBottomSheet(pm)
+    }
+
+    private fun updateBottomNavigationBackground() {
+        val backgroundRes = when (selectedBottomNavigationItemId) {
+            R.id.mainMenuItemView -> {
+                if (isMainScreenEmpty) R.drawable.bg_home_bottom_empty_state else android.R.color.white
+            }
+            R.id.notesMenuItemView -> R.color.pale_gray
+            else -> android.R.color.white
+        }
+        binding.bottomContainer.setBackgroundResource(backgroundRes)
     }
 
     private fun bindHelpBottomSheet(pm: HomeFlowPm) {
@@ -319,12 +325,6 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
             (binding.homeActionView.layoutParams as? FrameLayout.LayoutParams)?.let { actionParams ->
                 actionParams.bottomMargin = initialPlusMargin + navigationBarsInsets.bottom
                 binding.homeActionView.layoutParams = actionParams
-            }
-
-            val initialPulseMargin = (-31 * resources.displayMetrics.density).toInt()
-            (binding.homePulseView.layoutParams as? FrameLayout.LayoutParams)?.let { pulseParams ->
-                pulseParams.bottomMargin = initialPulseMargin + navigationBarsInsets.bottom
-                binding.homePulseView.layoutParams = pulseParams
             }
 
             insets

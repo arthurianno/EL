@@ -142,7 +142,7 @@
 
     <!-- BOTTOM NAVIGATION -->
     <color name="color_bottom_menu_selected_state">@color/black_blue</color>
-    <color name="color_bottom_menu_normal_state">@color/pale_gray_2.0</color>
+    <color name="color_bottom_menu_normal_state">#667085</color>
 
     <!-- BACKGROUND GRADIENT COLORS -->
     <color name="color_background_green_gradient_start">@color/g_green_a</color>

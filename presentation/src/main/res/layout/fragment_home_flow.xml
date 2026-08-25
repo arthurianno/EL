@@ -25,14 +25,6 @@
 
     </LinearLayout>
 
-    <pl.bclogic.pulsator4droid.library.PulsatorLayout
-        android:id="@+id/homePulseView"
-        style="@style/PulseStyle"
-        android:layout_width="142dp"
-        android:layout_height="142dp"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="-31dp" />
-
     <FrameLayout
         android:id="@+id/homeActionView"
         android:layout_width="64dp"

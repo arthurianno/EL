@@ -31,6 +31,7 @@ sealed class Events : Event {
     data class PinCodeEntered(val pin: String) : Events()
     object DeviceChanged : Events()
     object FirmwareUpdated : Events()
+    object ServerSyncRequested : Events()
     data class BackendSyncProgress(val inProgress: Boolean) : Events()
     object BootCompleted : Events()
     object PackageReplaced : Events()

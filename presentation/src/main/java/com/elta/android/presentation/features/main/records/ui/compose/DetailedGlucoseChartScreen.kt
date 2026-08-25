@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.records.ui.compose
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -75,13 +76,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
+import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.main.records.mapper.DetailedChartItemsBuilder
 import org.threeten.bp.LocalDate
@@ -143,10 +144,6 @@ private const val DETAILED_GRAPH_MAX_VALUE = 40f
 private const val DETAILED_BREAD_UNITS_MAX_VALUE = 150f
 private val DETAILED_GLUCOSE_AXIS_VALUES = listOf("40", "30", "20", "10", "0")
 private val DETAILED_BREAD_UNITS_AXIS_VALUES = listOf("150", "112,5", "75", "37,5", "0")
-private const val DETAILED_BADGE_WIDTH_DP = 70
-private const val DETAILED_BADGE_HEIGHT_DP = 22
-private const val DETAILED_BADGE_POINT_GAP_DP = 4
-
 fun getTodayFormattedDate(): String {
     val now = org.threeten.bp.LocalDate.now()
     val months = listOf(
@@ -301,6 +298,7 @@ fun DetailedGlucoseChartScreen(
     }
 
     val totalPoints = displayedPoints.size
+    val hasMeasurements = totalPoints > 0
     val hasData = totalPoints >= 2
     val averageValue = if (hasData) displayedPoints.map { it.value }.average().toFloat() else 0f
     val averageValueText = if (hasData) {
@@ -308,9 +306,11 @@ fun DetailedGlucoseChartScreen(
     } else {
         "-"
     }
-    val normalCount = displayedPoints.count { it.value in 3.91f..9.99f }
-    val highCount = displayedPoints.count { it.value >= 10.0f }
-    val lowCount = displayedPoints.count { it.value <= 3.9f }
+    val glucoseLevelSettings = selectedRangeModel?.glucoseLevelSettings
+        ?: dailyGlucoseModel?.glucoseLevelSettings
+    val normalCount = displayedPoints.count { it.value.isInNormalRange(glucoseLevelSettings) }
+    val highCount = displayedPoints.count { it.value.isInHighRange(glucoseLevelSettings) }
+    val lowCount = displayedPoints.count { it.value.isInLowRange(glucoseLevelSettings) }
     val normalPercent = if (totalPoints > 0) normalCount * 100 / totalPoints else 0
     val highPercent = if (totalPoints > 0) highCount * 100 / totalPoints else 0
     val lowPercent = if (totalPoints > 0) lowCount * 100 / totalPoints else 0
@@ -456,25 +456,35 @@ fun DetailedGlucoseChartScreen(
                                     )
                                 }
 
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(
-                                        text = "Количество измерений:",
-                                        fontSize = 12.sp,
-                                        color = DetailedChartTextSecondary
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = totalPoints.toString(),
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = DetailedChartTextPrimary.copy(alpha = 0.9f)
-                                    )
+                                Row(verticalAlignment = Alignment.Top) {
+                                    Column {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = "Количество измерений:",
+                                                fontSize = 12.sp,
+                                                color = DetailedChartTextSecondary
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = totalPoints.toString(),
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = DetailedChartTextPrimary.copy(alpha = 0.9f)
+                                            )
+                                        }
+                                        ChartExtremesSummary(displayedPoints)
+                                    }
                                     Spacer(modifier = Modifier.width(24.dp))
+                                    Row(
+                                        modifier = Modifier.padding(top = 2.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
                                     LegendDotItem(color = DetailedLowColor, label = "Низкий")
                                     Spacer(modifier = Modifier.width(16.dp))
                                     LegendDotItem(color = DetailedNormalColor, label = "Норма")
                                     Spacer(modifier = Modifier.width(16.dp))
                                     LegendDotItem(color = DetailedHighColor, label = "Высокий")
+                                    }
                                 }
                             }
 
@@ -507,24 +517,23 @@ fun DetailedGlucoseChartScreen(
                                     }
                                 }
 
-                                Column(
+                                Box(
                                     modifier = Modifier
                                         .weight(1f)
                                         .fillMaxHeight()
-                                        .horizontalScroll(graphScrollState)
                                 ) {
-                                    BoxWithConstraints(
-                                        modifier = Modifier
-                                            .width(graphContentWidth)
-                                            .weight(1f)
-                                            .graphicsLayer { translationX = zoomVisualTranslationPx }
-                                    ) {
-                                        val graphWidth = graphContentWidth
-                                        val maxPoint = displayedPoints.maxByOrNull { it.value }
-                                        val minPoint = displayedPoints.minByOrNull { it.value }
-                                        val maxPointIndex = maxPoint?.let { displayedPoints.indexOf(it) } ?: -1
-                                        val minPointIndex = minPoint?.let { displayedPoints.indexOf(it) } ?: -1
-
+                                    Box(modifier = Modifier.fillMaxSize()) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .horizontalScroll(graphScrollState)
+                                        ) {
+                                            BoxWithConstraints(
+                                                modifier = Modifier
+                                                    .width(graphContentWidth)
+                                                    .weight(1f)
+                                                    .graphicsLayer { translationX = zoomVisualTranslationPx }
+                                            ) {
                                         Canvas(
                                             modifier = Modifier
                                                 .fillMaxSize()
@@ -764,8 +773,8 @@ fun DetailedGlucoseChartScreen(
                                                     ) * size.width
                                                     drawLine(
                                                         color = Color(0xFF6078EA),
-                                                        start = Offset(start, chartHeight + 4.dp.toPx()),
-                                                        end = Offset(end.coerceAtLeast(start + 18.dp.toPx()), chartHeight + 4.dp.toPx()),
+                                                        start = Offset(start, chartHeight + 7.dp.toPx()),
+                                                        end = Offset(end.coerceAtLeast(start + 18.dp.toPx()), chartHeight + 7.dp.toPx()),
                                                         strokeWidth = 3.dp.toPx(),
                                                         cap = StrokeCap.Round
                                                     )
@@ -782,61 +791,38 @@ fun DetailedGlucoseChartScreen(
                                             )
                                         }
 
-                                        if (selectedDaysCount == 1 && maxPointIndex >= 0) {
-                                            val point = displayedPoints[maxPointIndex].toGraphOffset(
-                                                graphWidth,
-                                                maxHeight,
-                                                selectedStartDate,
-                                                selectedDaysCount
-                                            )
-                                            PeakBadgeOverlay(
-                                                text = "max ${String.format(java.util.Locale.US, "%.1f", displayedPoints[maxPointIndex].value).replace('.', ',')}",
-                                                bgColor = DetailedHighColor,
-                                                modifier = Modifier.padding(
-                                                    start = detailedBadgeStart(point.x, graphWidth, preferRight = true),
-                                                    top = detailedBadgeTop(point.y, maxHeight, preferAbove = true)
-                                                )
-                                            )
-                                        }
-
-                                        if (selectedDaysCount == 1 && minPointIndex >= 0 && minPointIndex != maxPointIndex) {
-                                            val point = displayedPoints[minPointIndex].toGraphOffset(
-                                                graphWidth,
-                                                maxHeight,
-                                                selectedStartDate,
-                                                selectedDaysCount
-                                            )
-                                            PeakBadgeOverlay(
-                                                text = "min ${String.format(java.util.Locale.US, "%.1f", displayedPoints[minPointIndex].value).replace('.', ',')}",
-                                                bgColor = DetailedLowColor,
-                                                modifier = Modifier.padding(
-                                                    start = detailedBadgeStart(point.x, graphWidth, preferRight = false),
-                                                    top = detailedBadgeTop(point.y, maxHeight, preferAbove = false)
-                                                )
-                                            )
-                                        }
                                     }
 
-                                    Box(
-                                        modifier = Modifier
-                                            .width(graphContentWidth)
-                                            .height(30.dp)
-                                            .graphicsLayer { translationX = zoomVisualTranslationPx }
-                                    ) {
-                                        timeLabels.forEach { label ->
-                                            Text(
-                                                text = label.text,
-                                                fontSize = 12.sp,
-                                                color = DetailedChartTextSecondary,
-                                                fontWeight = FontWeight.Medium,
-                                                modifier = Modifier.offset(
-                                                    x = (graphContentWidth * label.fraction - 16.dp)
-                                                        .coerceIn(0.dp, graphContentWidth - 32.dp)
-                                                )
-                                            )
+                                            Box(
+                                                modifier = Modifier
+                                                    .width(graphContentWidth)
+                                                    .height(30.dp)
+                                                    .graphicsLayer { translationX = zoomVisualTranslationPx }
+                                            ) {
+                                                timeLabels.forEach { label ->
+                                                    Text(
+                                                        text = label.text,
+                                                        fontSize = 12.sp,
+                                                        color = DetailedChartTextSecondary,
+                                                        fontWeight = FontWeight.Medium,
+                                                        modifier = Modifier.offset(
+                                                            x = (graphContentWidth * label.fraction - 16.dp)
+                                                                .coerceIn(0.dp, graphContentWidth - 32.dp)
+                                                        )
+                                                    )
+                                                }
+                                            }
                                         }
-                                    }
 
+                                        GraphScrollIndicator(
+                                            scrollState = graphScrollState,
+                                            contentWidth = graphContentWidth,
+                                            modifier = Modifier
+                                                .align(Alignment.BottomCenter)
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 2.dp)
+                                        )
+                                    }
                                 }
 
                                 Column(
@@ -969,11 +955,11 @@ fun DetailedGlucoseChartScreen(
                             DetailedVerticalDivider()
 
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                TirStatItem(color = DetailedNormalColor, percent = if (hasData) "$normalPercent%" else "-", label = if (hasData) percentToDuration(normalPercent) else "-")
+                                TirStatItem(color = DetailedNormalColor, percent = if (hasMeasurements) "$normalPercent%" else "-", label = if (hasMeasurements) "$normalCount изм." else "-")
                                 Spacer(modifier = Modifier.width(14.dp))
-                                TirStatItem(color = DetailedHighColor, percent = if (hasData) "$highPercent%" else "-", label = if (hasData) percentToDuration(highPercent) else "-")
+                                TirStatItem(color = DetailedHighColor, percent = if (hasMeasurements) "$highPercent%" else "-", label = if (hasMeasurements) "$highCount изм." else "-")
                                 Spacer(modifier = Modifier.width(14.dp))
-                                TirStatItem(color = DetailedLowColor, percent = if (hasData) "$lowPercent%" else "-", label = if (hasData) percentToDuration(lowPercent) else "-")
+                                TirStatItem(color = DetailedLowColor, percent = if (hasMeasurements) "$lowPercent%" else "-", label = if (hasMeasurements) "$lowCount изм." else "-")
                             }
 
                             DetailedVerticalDivider()
@@ -1272,6 +1258,11 @@ private fun DrawScope.drawEventBar(
         size = Size(barWidth, barHeight),
         cornerRadius = CornerRadius(3.dp.toPx(), 3.dp.toPx())
     )
+    drawCircle(
+        color = color,
+        radius = 2.5.dp.toPx(),
+        center = Offset(x, chartHeight + 3.dp.toPx())
+    )
 
     val horizontalPadding = 7.dp.toPx()
     val labelHeight = 20.dp.toPx()
@@ -1287,6 +1278,46 @@ private fun DrawScope.drawEventBar(
     val textBaseline = labelTop + (labelHeight - labelPaint.descent() - labelPaint.ascent()) / 2f
     drawIntoCanvas { canvas ->
         canvas.nativeCanvas.drawText(label, labelLeft + labelWidth / 2f, textBaseline, labelPaint)
+    }
+}
+
+@Composable
+private fun GraphScrollIndicator(
+    scrollState: ScrollState,
+    contentWidth: Dp,
+    modifier: Modifier = Modifier
+) {
+    Canvas(modifier = modifier.height(8.dp)) {
+        val scrollRange = scrollState.maxValue.toFloat()
+        val contentWidthPx = contentWidth.toPx()
+        val visibleContentWidth = (contentWidthPx - scrollRange).coerceAtLeast(0f)
+        val thumbWidth = if (scrollRange == 0f || contentWidthPx == 0f) {
+            size.width
+        } else {
+            (size.width * (visibleContentWidth / contentWidthPx))
+                .coerceIn(24.dp.toPx(), size.width)
+        }
+        val scrollFraction = if (scrollRange == 0f) 0f else {
+            (scrollState.value / scrollRange).coerceIn(0f, 1f)
+        }
+        val trackHeight = 2.dp.toPx()
+        val thumbHeight = 4.dp.toPx()
+        val trackY = (size.height - trackHeight) / 2f
+        val thumbY = (size.height - thumbHeight) / 2f
+        val thumbX = (size.width - thumbWidth) * scrollFraction
+
+        drawRoundRect(
+            color = DetailedChartTextSecondary.copy(alpha = 0.35f),
+            topLeft = Offset(0f, trackY),
+            size = Size(size.width, trackHeight),
+            cornerRadius = CornerRadius(trackHeight / 2f, trackHeight / 2f)
+        )
+        drawRoundRect(
+            color = DetailedChartTextSecondary.copy(alpha = 0.85f),
+            topLeft = Offset(thumbX, thumbY),
+            size = Size(thumbWidth, thumbHeight),
+            cornerRadius = CornerRadius(thumbHeight / 2f, thumbHeight / 2f)
+        )
     }
 }
 
@@ -1424,48 +1455,6 @@ private fun String.toDetailedLocalDate(): LocalDate {
     }.getOrDefault(LocalDate.now())
 }
 
-private fun DetailedGlucosePoint.toGraphOffset(
-    graphWidth: Dp,
-    graphHeight: Dp,
-    rangeStart: LocalDate,
-    daysCount: Int
-): DpOffset {
-    val x = graphWidth * detailedGraphFraction(date, timeLabel, rangeStart, daysCount)
-    val yRatio = (value / DETAILED_GRAPH_MAX_VALUE).coerceIn(0f, 1f)
-    val chartHeight = (graphHeight - 9.dp).coerceAtLeast(0.dp)
-    val pointRadius = 8.dp
-    return DpOffset(
-        x = x,
-        y = (chartHeight * (1f - yRatio)).coerceIn(pointRadius, chartHeight - pointRadius)
-    )
-}
-
-private fun detailedBadgeStart(pointX: Dp, graphWidth: Dp, preferRight: Boolean): Dp {
-    val badgeWidth = DETAILED_BADGE_WIDTH_DP.dp
-    val gap = DETAILED_BADGE_POINT_GAP_DP.dp
-    val preferred = if (preferRight) pointX + gap else pointX - badgeWidth - gap
-    val fallback = if (preferRight) pointX - badgeWidth - gap else pointX + gap
-    val maxStart = (graphWidth - badgeWidth).coerceAtLeast(0.dp)
-    return when {
-        preferred in 0.dp..maxStart -> preferred
-        fallback in 0.dp..maxStart -> fallback
-        else -> preferred.coerceIn(0.dp, maxStart)
-    }
-}
-
-private fun detailedBadgeTop(pointY: Dp, graphHeight: Dp, preferAbove: Boolean): Dp {
-    val badgeHeight = DETAILED_BADGE_HEIGHT_DP.dp
-    val gap = DETAILED_BADGE_POINT_GAP_DP.dp
-    val preferred = if (preferAbove) pointY - badgeHeight - gap else pointY + gap
-    val fallback = if (preferAbove) pointY + gap else pointY - badgeHeight - gap
-    val maxTop = (graphHeight - badgeHeight).coerceAtLeast(0.dp)
-    return when {
-        preferred in 0.dp..maxTop -> preferred
-        fallback in 0.dp..maxTop -> fallback
-        else -> preferred.coerceIn(0.dp, maxTop)
-    }
-}
-
 private fun timeLabelToMinutes(timeLabel: String): Int {
     val parts = timeLabel.trim().split(":")
     val hours = parts.getOrNull(0)?.toIntOrNull() ?: 0
@@ -1479,16 +1468,14 @@ private fun detailedPointColor(value: Float): Color = when {
     else -> DetailedNormalColor
 }
 
-private fun percentToDuration(percent: Int): String {
-    val totalMinutes = percent * 24 * 60 / 100
-    val hours = totalMinutes / 60
-    val minutes = totalMinutes % 60
-    return when {
-        hours > 0 && minutes > 0 -> "${hours}ч ${minutes}м"
-        hours > 0 -> "${hours}ч"
-        else -> "${minutes}м"
-    }
-}
+private fun Float.isInNormalRange(settings: GlucoseLevelSettings?): Boolean =
+    settings?.normal?.contains(toDouble()) ?: (this in 3.9f..10.0f)
+
+private fun Float.isInHighRange(settings: GlucoseLevelSettings?): Boolean =
+    settings?.high?.contains(toDouble()) ?: (this > 10.0f)
+
+private fun Float.isInLowRange(settings: GlucoseLevelSettings?): Boolean =
+    settings?.low?.contains(toDouble()) ?: (this < 3.9f)
 
 @Composable
 private fun SelectedPointSummaryRow(point: DetailedGlucosePoint) {
@@ -1652,26 +1639,68 @@ private fun LegendDotItem(color: Color, label: String) {
 }
 
 @Composable
-private fun PeakBadgeOverlay(
-    text: String,
-    bgColor: Color,
-    modifier: Modifier = Modifier
+private fun ChartExtremesSummary(points: List<DetailedGlucosePoint>) {
+    val minPoint = points.minByOrNull { it.value } ?: return
+    val maxPoint = points.maxByOrNull { it.value } ?: return
+    val hasSingleValue = points.size == 1 || minPoint.value == maxPoint.value
+
+    Row(
+        modifier = Modifier.padding(top = 3.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (hasSingleValue) {
+            ChartExtremeCard(
+                label = if (points.size == 1) "Измерение" else "Значение",
+                point = minPoint
+            )
+        } else {
+            ChartExtremeCard(label = "Мин", point = minPoint)
+            Spacer(modifier = Modifier.width(6.dp))
+            ChartExtremeCard(label = "Макс", point = maxPoint)
+        }
+    }
+}
+
+@Composable
+private fun ChartExtremeCard(
+    label: String,
+    point: DetailedGlucosePoint
 ) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(bgColor)
+    val cardColor = when (label) {
+        "Мин" -> DetailedLowColor
+        "Макс" -> DetailedHighColor
+        else -> DetailedNormalColor
+    }
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(5.dp))
+            .background(cardColor)
             .padding(horizontal = 6.dp, vertical = 2.dp),
-        contentAlignment = Alignment.Center
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = text,
+            text = label,
+            fontSize = 10.sp,
+            color = Color.White
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = formatDetailedGlucoseValue(point.value),
             fontSize = 10.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
+        Spacer(modifier = Modifier.width(3.dp))
+        Text(
+            text = point.timeLabel,
+            fontSize = 10.sp,
+            color = Color.White
+        )
     }
 }
+
+private fun formatDetailedGlucoseValue(value: Float): String =
+    String.format(java.util.Locale.US, "%.1f", value).replace('.', ',')
 
 @Composable
 private fun LayerToggleButton(

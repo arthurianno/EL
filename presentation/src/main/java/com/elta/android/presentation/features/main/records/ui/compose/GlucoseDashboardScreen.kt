@@ -45,7 +45,7 @@ fun GlucoseDashboardScreen(
     deltaText: String = "—",
     glucoseTrend: GlucoseTrend? = null,
     tirPercentage: String = "—",
-    syncTimeText: String = "5 часов назад",
+    syncTimeText: String = "Нет измерений",
     breadUnitsText: String = "0,9 Ед.",
     insulinText: String = "0,1 ХЕ",
     initialGlucoseState: GlucoseState = GlucoseState.NORMAL,
@@ -59,6 +59,7 @@ fun GlucoseDashboardScreen(
     var statusText by remember { mutableStateOf("") }
     var isStatusVisible by remember { mutableStateOf(false) }
     var isSyncing by remember { mutableStateOf(false) }
+    var displayedSyncTime by remember(syncTimeText) { mutableStateOf(syncTimeText) }
     var isDetailedChartVisible by rememberSaveable { mutableStateOf(false) }
     var detailedChartEvents by remember { mutableStateOf(allDayEvents) }
     var requestedDetailedRange by remember { mutableStateOf<Pair<org.threeten.bp.LocalDate, org.threeten.bp.LocalDate>?>(null) }
@@ -106,9 +107,11 @@ fun GlucoseDashboardScreen(
                         showStatus("Синхронизация с прибором...", syncing = true, autoHideMs = null)
                     }
                     is Events.Sync.Glucometer.Success -> {
+                        displayedSyncTime = "Только что"
                         showStatus("Синхронизация с прибором завершена", syncing = false, autoHideMs = 3000L)
                     }
                     is Events.Sync.Glucometer.NoNewEvents -> {
+                        displayedSyncTime = "Только что"
                         showStatus("Нет новых измерений", syncing = false, autoHideMs = 3000L)
                     }
                     is Events.Sync.Glucometer.Error,
@@ -119,6 +122,7 @@ fun GlucoseDashboardScreen(
                         showStatus("Синхронизация с сервером...", syncing = true, autoHideMs = null)
                     }
                     is Events.Sync.Server.Success -> {
+                        displayedSyncTime = "Только что"
                         showStatus("Синхронизация с сервером завершена", syncing = false, autoHideMs = 3000L)
                     }
                     is Events.Sync.Server.Error,
@@ -227,7 +231,7 @@ fun GlucoseDashboardScreen(
                         deltaText = deltaText,
                         glucoseTrend = glucoseTrend,
                         tirPercentage = "73%",
-                        syncTimeText = syncTimeText,
+                        syncTimeText = displayedSyncTime,
                         breadUnitsText = breadUnitsText,
                         insulinText = insulinText,
                         state = currentState,
@@ -235,10 +239,9 @@ fun GlucoseDashboardScreen(
                         isStatusVisible = isStatusVisible,
                         isSyncing = isSyncing,
                         onSyncClick = {
-                            if (isSyncing) {
-                                showStatus("Синхронизация завершена", syncing = false, autoHideMs = 2000L)
-                            } else {
-                                showStatus("Синхронизация с прибором...", syncing = true, autoHideMs = null)
+                            if (!isSyncing) {
+                                bus?.event(Events.ServerSyncRequested)
+                                    ?: showStatus("Синхронизация недоступна", syncing = false, autoHideMs = 3000L)
                             }
                         }
                     )
