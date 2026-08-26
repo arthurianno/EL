@@ -76,6 +76,8 @@ private val CalendarBorder = Color(0xFFA4A4A4)
 fun GlucoseDatePickerDialog(
     initialDate: LocalDate = LocalDate.now(),
     dayStatuses: Map<LocalDate, DayGlycemicStatus> = emptyMap(),
+    minDate: LocalDate? = null,
+    maxDate: LocalDate = LocalDate.now(),
     onDismissRequest: () -> Unit = {},
     onDateRangeSelected: (LocalDate, LocalDate) -> Unit = { _, _ -> }
 ) {
@@ -245,6 +247,7 @@ fun GlucoseDatePickerDialog(
                         ) {
                             IconButton(
                                 onClick = { currentYearMonth = currentYearMonth.minusMonths(1) },
+                                enabled = minDate == null || currentYearMonth > YearMonth.from(minDate),
                                 modifier = Modifier
                                     .align(Alignment.CenterStart)
                                     .size(24.dp)
@@ -267,6 +270,7 @@ fun GlucoseDatePickerDialog(
 
                             IconButton(
                                 onClick = { currentYearMonth = currentYearMonth.plusMonths(1) },
+                                enabled = currentYearMonth < YearMonth.from(maxDate),
                                 modifier = Modifier
                                     .align(Alignment.CenterEnd)
                                     .padding(end = 42.dp)
@@ -328,13 +332,14 @@ fun GlucoseDatePickerDialog(
                                         } else {
                                             val date = currentYearMonth.atDay(day.dayNumber)
                                             val isSelected = date == selectedDate
-                                            val isFuture = date.isAfter(LocalDate.now())
+                                            val isOutsideAllowedRange =
+                                                date.isAfter(maxDate) || (minDate != null && date.isBefore(minDate))
                                             val (bgColor, textColor) = when {
                                                 isSelected -> CalendarTextPrimary to Color.White
                                                 day.status == DayGlycemicStatus.NORM -> Color(0xFFDDF6F1) to CalendarTextPrimary
                                                 day.status == DayGlycemicStatus.HIGH -> Color(0xFFFFF0D8) to CalendarTextPrimary
                                                 day.status == DayGlycemicStatus.LOW -> Color(0xFFFDE1DC) to CalendarTextPrimary
-                                                else -> Color.Transparent to if (isFuture) CalendarTextSecondary.copy(alpha = 0.5f) else CalendarTextPrimary
+                                                else -> Color.Transparent to if (isOutsideAllowedRange) CalendarTextSecondary.copy(alpha = 0.5f) else CalendarTextPrimary
                                             }
 
                                             Box(
@@ -343,7 +348,7 @@ fun GlucoseDatePickerDialog(
                                                     .height(36.dp)
                                                     .clip(RoundedCornerShape(10.dp))
                                                     .background(bgColor)
-                                                    .clickable(enabled = !isFuture) {
+                                                    .clickable(enabled = !isOutsideAllowedRange) {
                                                         selectedDate = date
                                                     },
                                                 contentAlignment = Alignment.Center

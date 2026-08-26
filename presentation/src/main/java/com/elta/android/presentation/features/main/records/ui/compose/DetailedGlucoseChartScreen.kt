@@ -44,6 +44,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -72,6 +73,9 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -86,6 +90,7 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.main.records.mapper.DetailedChartItemsBuilder
 import org.threeten.bp.LocalDate
+import org.threeten.bp.YearMonth
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
@@ -194,15 +199,32 @@ fun DetailedGlucoseChartScreen(
     }
 
     val initialLocalDate = remember(initialDate) { initialDate.toDetailedLocalDate() }
-    var selectedRangeStart by rememberSaveable { mutableStateOf(initialLocalDate.toString()) }
+    var selectedMonthValue by rememberSaveable { mutableStateOf(YearMonth.from(initialLocalDate).toString()) }
+    var selectedAnchorValue by rememberSaveable { mutableStateOf(initialLocalDate.toString()) }
+    var selectedPeriodName by rememberSaveable { mutableStateOf(DetailedChartPeriod.DAY.name) }
     var isDatePickerVisible by remember { mutableStateOf(false) }
-    val selectedStartDate = remember(selectedRangeStart) { LocalDate.parse(selectedRangeStart) }
-    val selectedEndDate = selectedStartDate
+    val selectedRange = remember(selectedMonthValue, selectedAnchorValue, selectedPeriodName) {
+        DetailedChartRange(
+            month = YearMonth.parse(selectedMonthValue),
+            anchorDate = LocalDate.parse(selectedAnchorValue),
+            period = DetailedChartPeriod.valueOf(selectedPeriodName)
+        )
+    }
+    val selectedMonth = selectedRange.month
+    val selectedPeriod = selectedRange.period
+    val selectedStartDate = selectedRange.start
+    val selectedEndDate = selectedRange.end
     val selectedRangeTitle = remember(selectedStartDate, selectedEndDate) {
         formatDetailedDateRange(selectedStartDate, selectedEndDate)
     }
-    val selectedDaysCount = remember(selectedStartDate, selectedEndDate) {
-        daysInDetailedRange(selectedStartDate, selectedEndDate)
+    val selectedDaysCount = daysInDetailedRange(selectedStartDate, selectedEndDate)
+    val earliestMonth = remember(initialLocalDate) { YearMonth.from(initialLocalDate).minusMonths(11) }
+    val latestMonth = remember(initialLocalDate) { YearMonth.from(initialLocalDate) }
+
+    fun updateRange(range: DetailedChartRange) {
+        selectedMonthValue = range.month.toString()
+        selectedAnchorValue = range.anchorDate.toString()
+        selectedPeriodName = range.period.name
     }
 
     // Layer toggles
@@ -219,6 +241,27 @@ fun DetailedGlucoseChartScreen(
     var zoomVisualTranslationPx by remember { mutableStateOf(0f) }
     val graphScrollState = rememberScrollState()
     val screenScrollState = rememberScrollState()
+    var boundaryDragDistancePx by remember { mutableStateOf(0f) }
+    val rangeNavigationThresholdPx = with(density) { 64.dp.toPx() }
+    val graphRangeNavigationConnection = remember(selectedRange, rangeNavigationThresholdPx) {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                if (source != NestedScrollSource.UserInput || available.x == 0f) return Offset.Zero
+
+                boundaryDragDistancePx += available.x
+                if (kotlin.math.abs(boundaryDragDistancePx) >= rangeNavigationThresholdPx) {
+                    val direction = if (boundaryDragDistancePx > 0f) -1 else 1
+                    selectedRange.moveWithinMonth(direction)?.let(::updateRange)
+                    boundaryDragDistancePx = 0f
+                }
+                return Offset.Zero
+            }
+        }
+    }
     LaunchedEffect(selectedStartDate, selectedEndDate) {
         graphScrollState.scrollTo(0)
         graphZoomState.value = 1f
@@ -226,6 +269,8 @@ fun DetailedGlucoseChartScreen(
         pendingZoomScroll = null
         zoomVisualTranslationPx = 0f
         selectedPointIndex = null
+        boundaryDragDistancePx = 0f
+        onDateRangeSelected(selectedStartDate, selectedEndDate)
     }
 
     val selectedRangeEvents = remember(allEvents, selectedStartDate, selectedEndDate) {
@@ -244,25 +289,25 @@ fun DetailedGlucoseChartScreen(
         }
     }
     val isInitialSingleDay = selectedStartDate == initialLocalDate && selectedEndDate == initialLocalDate
-    val displayedPoints = remember(selectedRangeModel, glucosePoints, isInitialSingleDay, selectedRangeEvents) {
+    val sourcePoints = remember(selectedRangeModel, glucosePoints, isInitialSingleDay, selectedRangeEvents) {
         selectedRangeModel?.let { model ->
             DetailedChartItemsBuilder.buildPoints(model, selectedRangeEvents)
         }.orEmpty().ifEmpty {
             if (isInitialSingleDay) glucosePoints else emptyList()
         }
     }
-    val displayedInsulinEntries = remember(displayedPoints, selectedRangeEvents, insulinEntries, isInitialSingleDay) {
+    val displayedInsulinEntries = remember(sourcePoints, selectedRangeEvents, insulinEntries, isInitialSingleDay) {
         if (selectedRangeEvents.isNotEmpty()) {
-            DetailedChartItemsBuilder.buildInsulinEntries(displayedPoints, selectedRangeEvents)
+            DetailedChartItemsBuilder.buildInsulinEntries(sourcePoints, selectedRangeEvents)
         } else if (isInitialSingleDay) {
             insulinEntries
         } else {
             emptyList()
         }
     }
-    val displayedFoodEntries = remember(displayedPoints, selectedRangeEvents, foodEntries, isInitialSingleDay) {
+    val displayedFoodEntries = remember(sourcePoints, selectedRangeEvents, foodEntries, isInitialSingleDay) {
         if (selectedRangeEvents.isNotEmpty()) {
-            DetailedChartItemsBuilder.buildFoodEntries(displayedPoints, selectedRangeEvents)
+            DetailedChartItemsBuilder.buildFoodEntries(sourcePoints, selectedRangeEvents)
         } else if (isInitialSingleDay) {
             foodEntries
         } else {
@@ -276,6 +321,15 @@ fun DetailedGlucoseChartScreen(
             activityEntries
         } else {
             emptyList()
+        }
+    }
+    val isDailyAveragePresentation = selectedPeriod != DetailedChartPeriod.DAY && graphZoom < 2f
+    val isHourlyAveragePresentation = selectedPeriod == DetailedChartPeriod.DAY && graphZoom < 2f
+    val chartPoints = remember(sourcePoints, isDailyAveragePresentation, isHourlyAveragePresentation) {
+        when {
+            isDailyAveragePresentation -> sourcePoints.dailyAverages()
+            isHourlyAveragePresentation -> sourcePoints.hourlyAverages()
+            else -> sourcePoints
         }
     }
     val dayStatuses = remember(allEvents, dailyGlucoseModel) {
@@ -297,10 +351,10 @@ fun DetailedGlucoseChartScreen(
             }
     }
 
-    val totalPoints = displayedPoints.size
+    val totalPoints = sourcePoints.size
     val hasMeasurements = totalPoints > 0
     val hasData = totalPoints >= 2
-    val averageValue = if (hasData) displayedPoints.map { it.value }.average().toFloat() else 0f
+    val averageValue = if (hasData) sourcePoints.map { it.value }.average().toFloat() else 0f
     val averageValueText = if (hasData) {
         String.format(java.util.Locale.US, "%.1f", averageValue).replace('.', ',')
     } else {
@@ -308,14 +362,14 @@ fun DetailedGlucoseChartScreen(
     }
     val glucoseLevelSettings = selectedRangeModel?.glucoseLevelSettings
         ?: dailyGlucoseModel?.glucoseLevelSettings
-    val normalCount = displayedPoints.count { it.value.isInNormalRange(glucoseLevelSettings) }
-    val highCount = displayedPoints.count { it.value.isInHighRange(glucoseLevelSettings) }
-    val lowCount = displayedPoints.count { it.value.isInLowRange(glucoseLevelSettings) }
+    val normalCount = sourcePoints.count { it.value.isInNormalRange(glucoseLevelSettings) }
+    val highCount = sourcePoints.count { it.value.isInHighRange(glucoseLevelSettings) }
+    val lowCount = sourcePoints.count { it.value.isInLowRange(glucoseLevelSettings) }
     val normalPercent = if (totalPoints > 0) normalCount * 100 / totalPoints else 0
     val highPercent = if (totalPoints > 0) highCount * 100 / totalPoints else 0
     val lowPercent = if (totalPoints > 0) lowCount * 100 / totalPoints else 0
     val sdValue = if (hasData) {
-        val variance = displayedPoints.map { point ->
+        val variance = sourcePoints.map { point ->
             val diff = point.value - averageValue
             diff * diff
         }.average()
@@ -432,28 +486,83 @@ fun DetailedGlucoseChartScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .clickable { isDatePickerVisible = true }
-                                        .padding(vertical = 2.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = selectedRangeTitle,
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = DetailedChartTextPrimary
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_arrow_left),
-                                        contentDescription = "Select Date",
-                                        tint = DetailedChartTextPrimary,
-                                        modifier = Modifier
-                                            .size(14.dp)
-                                            .rotate(270f)
-                                    )
+                                Column {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        DetailedChartNavigationButton(
+                                            contentDescription = "Previous range",
+                                            enabled = selectedRange.moveWithinMonth(-1) != null,
+                                            onClick = {
+                                                selectedRange.moveWithinMonth(-1)?.let(::updateRange)
+                                            }
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .clickable { isDatePickerVisible = true }
+                                                .padding(vertical = 2.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = selectedRangeTitle,
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = DetailedChartTextPrimary
+                                            )
+                                            Spacer(modifier = Modifier.width(5.dp))
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.ic_arrow_left),
+                                                contentDescription = "Select Date",
+                                                tint = DetailedChartTextPrimary,
+                                                modifier = Modifier
+                                                    .size(14.dp)
+                                                    .rotate(270f)
+                                            )
+                                        }
+                                        DetailedChartNavigationButton(
+                                            contentDescription = "Next range",
+                                            enabled = selectedRange.moveWithinMonth(1) != null,
+                                            isForward = true,
+                                            onClick = {
+                                                selectedRange.moveWithinMonth(1)?.let(::updateRange)
+                                            }
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        DetailedChartPeriod.values().forEach { period ->
+                                            val isSelected = selectedPeriod == period
+                                            Text(
+                                                text = period.label,
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                color = if (isSelected) Color.White else DetailedChartTextSecondary,
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .background(
+                                                        if (isSelected) DetailedChartTextPrimary else Color.Transparent
+                                                    )
+                                                    .clickable { updateRange(selectedRange.withPeriod(period)) }
+                                                    .padding(horizontal = 7.dp, vertical = 3.dp)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        DetailedChartNavigationButton(
+                                            contentDescription = "Previous month",
+                                            enabled = selectedMonth > earliestMonth,
+                                            onClick = { updateRange(selectedRange.withMonth(selectedMonth.minusMonths(1))) }
+                                        )
+                                        Text(
+                                            text = formatDetailedMonth(selectedMonth),
+                                            fontSize = 11.sp,
+                                            color = DetailedChartTextSecondary
+                                        )
+                                        DetailedChartNavigationButton(
+                                            contentDescription = "Next month",
+                                            enabled = selectedMonth < latestMonth,
+                                            isForward = true,
+                                            onClick = { updateRange(selectedRange.withMonth(selectedMonth.plusMonths(1))) }
+                                        )
+                                    }
                                 }
 
                                 Row(verticalAlignment = Alignment.Top) {
@@ -472,7 +581,7 @@ fun DetailedGlucoseChartScreen(
                                                 color = DetailedChartTextPrimary.copy(alpha = 0.9f)
                                             )
                                         }
-                                        ChartExtremesSummary(displayedPoints)
+                                        ChartExtremesSummary(sourcePoints)
                                     }
                                     Spacer(modifier = Modifier.width(24.dp))
                                     Row(
@@ -521,6 +630,7 @@ fun DetailedGlucoseChartScreen(
                                     modifier = Modifier
                                         .weight(1f)
                                         .fillMaxHeight()
+                                        .nestedScroll(graphRangeNavigationConnection)
                                 ) {
                                     Box(modifier = Modifier.fillMaxSize()) {
                                         Column(
@@ -537,7 +647,7 @@ fun DetailedGlucoseChartScreen(
                                         Canvas(
                                             modifier = Modifier
                                                 .fillMaxSize()
-                                                .pointerInput(displayedPoints, selectedStartDate, selectedDaysCount) {
+                                                .pointerInput(chartPoints, selectedStartDate, selectedDaysCount) {
                                                     detectTapGestures(
                                                         onDoubleTap = {
                                                             graphZoomState.value = 1f
@@ -553,9 +663,9 @@ fun DetailedGlucoseChartScreen(
                                                             val activityTrackHeight = with(density) { 9.dp.toPx() }
                                                             val pointRadius = with(density) { 8.dp.toPx() }
                                                             val hitRadius = with(density) { 24.dp.toPx() }
-                                                            val nearestPointIndex = displayedPoints.indices.minByOrNull { index ->
+                                                            val nearestPointIndex = chartPoints.indices.minByOrNull { index ->
                                                                 val pointOffset = detailedGraphPointOffset(
-                                                                    point = displayedPoints[index],
+                                                                    point = chartPoints[index],
                                                                     rangeStart = selectedStartDate,
                                                                     daysCount = selectedDaysCount,
                                                                     canvasSize = canvasSize,
@@ -567,7 +677,7 @@ fun DetailedGlucoseChartScreen(
 
                                                             selectedPointIndex = nearestPointIndex?.takeIf { index ->
                                                                 val pointOffset = detailedGraphPointOffset(
-                                                                    point = displayedPoints[index],
+                                                                    point = chartPoints[index],
                                                                     rangeStart = selectedStartDate,
                                                                     daysCount = selectedDaysCount,
                                                                     canvasSize = canvasSize,
@@ -585,10 +695,10 @@ fun DetailedGlucoseChartScreen(
                                                         val currentGraphWidth = with(density) {
                                                             (detailedGraphWidth(selectedDaysCount) * graphZoomState.value).toPx()
                                                         }
-                                                        val nearestPointIndex = displayedPoints.indices.minByOrNull { index ->
+                                                        val nearestPointIndex = chartPoints.indices.minByOrNull { index ->
                                                             val pointX = detailedGraphFraction(
-                                                                displayedPoints[index].date,
-                                                                displayedPoints[index].timeLabel,
+                                                                chartPoints[index].date,
+                                                                chartPoints[index].timeLabel,
                                                                 selectedStartDate,
                                                                 selectedDaysCount
                                                             ) * currentGraphWidth
@@ -596,8 +706,8 @@ fun DetailedGlucoseChartScreen(
                                                         }
                                                         val pointAnchorFraction = nearestPointIndex?.let { index ->
                                                             val pointFraction = detailedGraphFraction(
-                                                                displayedPoints[index].date,
-                                                                displayedPoints[index].timeLabel,
+                                                                chartPoints[index].date,
+                                                                chartPoints[index].timeLabel,
                                                                 selectedStartDate,
                                                                 selectedDaysCount
                                                             )
@@ -681,13 +791,28 @@ fun DetailedGlucoseChartScreen(
                                                     label = event.label,
                                                     labelTop = event.labelTop,
                                                     labelPaint = eventLabelPaint,
-                                                    barAlpha = if (useTransparentEventBars) 0.45f else 1f
+                                                    barAlpha = if (useTransparentEventBars) 0.45f else 1f,
+                                                    showLabel = !isDailyAveragePresentation
                                                 )
                                             }
 
-                                            val linePoints = displayedPoints.map { point ->
-                                                detailedGraphPointOffset(
-                                                    point = point,
+                                            val viewportWidth = (size.width - graphScrollState.maxValue)
+                                                .coerceAtLeast(0f)
+                                            val visibleStartFraction = (
+                                                (graphScrollState.value - 48.dp.toPx()) / size.width
+                                            ).coerceIn(0f, 1f)
+                                            val visibleEndFraction = (
+                                                (graphScrollState.value + viewportWidth + 48.dp.toPx()) / size.width
+                                            ).coerceIn(0f, 1f)
+                                            val visiblePointIndices = chartPoints.visibleIndices(
+                                                rangeStart = selectedStartDate,
+                                                daysCount = selectedDaysCount,
+                                                startFraction = visibleStartFraction,
+                                                endFraction = visibleEndFraction
+                                            )
+                                            val linePoints = visiblePointIndices.map { index ->
+                                                index to detailedGraphPointOffset(
+                                                    point = chartPoints[index],
                                                     rangeStart = selectedStartDate,
                                                     daysCount = selectedDaysCount,
                                                     canvasSize = size,
@@ -698,11 +823,11 @@ fun DetailedGlucoseChartScreen(
 
                                             if (linePoints.size > 1) {
                                                 for (index in 0 until linePoints.lastIndex) {
-                                                    val start = linePoints[index]
-                                                    val end = linePoints[index + 1]
-                                                    val value = displayedPoints[index].value
-                                                    if (displayedPoints[index].date != null &&
-                                                        displayedPoints[index].date != displayedPoints[index + 1].date
+                                                    val (startIndex, start) = linePoints[index]
+                                                    val (endIndex, end) = linePoints[index + 1]
+                                                    val value = chartPoints[startIndex].value
+                                                    if (!isDailyAveragePresentation && chartPoints[startIndex].date != null &&
+                                                        chartPoints[startIndex].date != chartPoints[endIndex].date
                                                     ) {
                                                         continue
                                                     }
@@ -725,7 +850,7 @@ fun DetailedGlucoseChartScreen(
                                                 }
                                             }
 
-                                            linePoints.forEachIndexed { index, point ->
+                                            linePoints.forEach { (index, point) ->
                                                 val isSelected = selectedPointIndex == index
                                                 drawCircle(
                                                     color = Color.White,
@@ -733,14 +858,14 @@ fun DetailedGlucoseChartScreen(
                                                     center = point
                                                 )
                                                 drawCircle(
-                                                    color = detailedPointColor(displayedPoints[index].value),
+                                                    color = detailedPointColor(chartPoints[index].value),
                                                     radius = if (isSelected) 4.5.dp.toPx() else 3.dp.toPx(),
                                                     center = point
                                                 )
                                             }
 
-                                            selectedPointIndex?.let { index ->
-                                                linePoints.getOrNull(index)?.let { point ->
+                                            selectedPointIndex?.let { selectedIndex ->
+                                                linePoints.firstOrNull { it.first == selectedIndex }?.second?.let { point ->
                                                     drawLine(
                                                         color = DetailedChartTextSecondary.copy(alpha = 0.7f),
                                                         start = Offset(point.x, 0f),
@@ -782,7 +907,7 @@ fun DetailedGlucoseChartScreen(
                                             }
                                         }
 
-                                        if (displayedPoints.isEmpty()) {
+                                        if (chartPoints.isEmpty()) {
                                             Text(
                                                 text = "Нет измерений за выбранный период",
                                                 fontSize = 13.sp,
@@ -895,7 +1020,7 @@ fun DetailedGlucoseChartScreen(
                         .background(Color.White)
                         .padding(horizontal = 30.dp, vertical = if (isVeryShort) 8.dp else 10.dp)
                 ) {
-                    val selectedPoint = selectedPointIndex?.let { displayedPoints.getOrNull(it) }
+                    val selectedPoint = selectedPointIndex?.let { chartPoints.getOrNull(it) }
 
                     if (selectedPoint != null) {
                         SelectedPointSummaryRow(selectedPoint)
@@ -981,11 +1106,14 @@ fun DetailedGlucoseChartScreen(
             GlucoseDatePickerDialog(
                 initialDate = selectedStartDate,
                 dayStatuses = dayStatuses,
+                minDate = earliestMonth.atDay(1),
+                maxDate = initialLocalDate,
                 onDismissRequest = { isDatePickerVisible = false },
                 onDateRangeSelected = { start, _ ->
-                    selectedRangeStart = start.toString()
+                    updateRange(
+                        selectedRange.withMonth(YearMonth.from(start)).copy(anchorDate = start)
+                    )
                     selectedPointIndex = null
-                    onDateRangeSelected(start, start)
                     isDatePickerVisible = false
                 }
             )
@@ -1044,6 +1172,44 @@ private fun detailedGraphMinute(
         .between(rangeStart, date ?: rangeStart)
         .coerceIn(0, (daysCount - 1).toLong())
     return dayOffset * 24 * 60 + timeLabelToMinutes(timeLabel)
+}
+
+private fun List<DetailedGlucosePoint>.visibleIndices(
+    rangeStart: LocalDate,
+    daysCount: Int,
+    startFraction: Float,
+    endFraction: Float
+): IntRange {
+    if (isEmpty()) return IntRange.EMPTY
+
+    val totalMinutes = daysCount * 24L * 60L
+    val startMinute = (totalMinutes * startFraction).toLong()
+    val endMinute = (totalMinutes * endFraction).toLong()
+    val firstVisible = lowerBoundByMinute(startMinute, rangeStart, daysCount)
+    val afterLastVisible = lowerBoundByMinute(endMinute + 1, rangeStart, daysCount)
+    if (firstVisible == afterLastVisible) return IntRange.EMPTY
+
+    return (firstVisible - 1).coerceAtLeast(0)..afterLastVisible.coerceAtMost(lastIndex)
+}
+
+private fun List<DetailedGlucosePoint>.lowerBoundByMinute(
+    minute: Long,
+    rangeStart: LocalDate,
+    daysCount: Int
+): Int {
+    var low = 0
+    var high = size
+    while (low < high) {
+        val middle = (low + high) ushr 1
+        val middleMinute = detailedGraphMinute(
+            date = this[middle].date,
+            timeLabel = this[middle].timeLabel,
+            rangeStart = rangeStart,
+            daysCount = daysCount
+        )
+        if (middleMinute < minute) low = middle + 1 else high = middle
+    }
+    return low
 }
 
 private data class DetailedChartEvent(
@@ -1248,7 +1414,8 @@ private fun DrawScope.drawEventBar(
     label: String,
     labelTop: Float,
     labelPaint: Paint,
-    barAlpha: Float
+    barAlpha: Float,
+    showLabel: Boolean
 ) {
     val barWidth = 18.dp.toPx()
     val barTop = chartHeight - barHeight
@@ -1264,20 +1431,22 @@ private fun DrawScope.drawEventBar(
         center = Offset(x, chartHeight + 3.dp.toPx())
     )
 
-    val horizontalPadding = 7.dp.toPx()
-    val labelHeight = 20.dp.toPx()
-    val labelWidth = labelPaint.measureText(label) + horizontalPadding * 2
-    val labelLeft = eventLabelLeft(x, labelWidth, size.width)
+    if (showLabel) {
+        val horizontalPadding = 7.dp.toPx()
+        val labelHeight = 20.dp.toPx()
+        val labelWidth = labelPaint.measureText(label) + horizontalPadding * 2
+        val labelLeft = eventLabelLeft(x, labelWidth, size.width)
 
-    drawRoundRect(
-        color = color,
-        topLeft = Offset(labelLeft, labelTop),
-        size = Size(labelWidth, labelHeight),
-        cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
-    )
-    val textBaseline = labelTop + (labelHeight - labelPaint.descent() - labelPaint.ascent()) / 2f
-    drawIntoCanvas { canvas ->
-        canvas.nativeCanvas.drawText(label, labelLeft + labelWidth / 2f, textBaseline, labelPaint)
+        drawRoundRect(
+            color = color,
+            topLeft = Offset(labelLeft, labelTop),
+            size = Size(labelWidth, labelHeight),
+            cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
+        )
+        val textBaseline = labelTop + (labelHeight - labelPaint.descent() - labelPaint.ascent()) / 2f
+        drawIntoCanvas { canvas ->
+            canvas.nativeCanvas.drawText(label, labelLeft + labelWidth / 2f, textBaseline, labelPaint)
+        }
     }
 }
 
@@ -1383,7 +1552,6 @@ private fun detailedTimeLabels(
     val daysCount = daysInDetailedRange(start, end)
     if (daysCount == 1) {
         val stepMinutes = when {
-            zoom >= 3f -> 15
             zoom >= 2f -> 30
             else -> 60
         }
@@ -1401,21 +1569,55 @@ private fun detailedTimeLabels(
         }
     }
 
-    val stepHours = when {
-        daysCount <= 3 -> 6
-        else -> 24
-    }
-    val totalHours = daysCount * 24
-    val hourOffsets = 0 until totalHours step stepHours
-    return hourOffsets.map { hourOffset ->
-        val date = start.plusDays((hourOffset / 24).toLong().coerceAtMost((daysCount - 1).toLong()))
-        val text = when {
-            stepHours == 24 -> "${date.dayOfMonth} ${DETAILED_MONTHS_SHORT[date.monthValue - 1]}"
-            else -> "${date.dayOfMonth} ${DETAILED_MONTHS_SHORT[date.monthValue - 1]}\n${String.format(java.util.Locale.US, "%02d:00", hourOffset % 24)}"
+    val totalMinutes = daysCount * 24 * 60
+    if (zoom >= 2f) {
+        val stepMinutes = when {
+            zoom >= 4f -> 30
+            zoom >= 3f -> 60
+            else -> 120
         }
+        return (0 until totalMinutes step stepMinutes).map { minuteOffset ->
+            val date = start.plusDays((minuteOffset / (24 * 60)).toLong())
+            val minuteOfDay = minuteOffset % (24 * 60)
+            DetailedTimelineLabel(
+                fraction = minuteOffset.toFloat() / totalMinutes,
+                text = if (minuteOfDay == 0) {
+                    "${date.dayOfMonth} ${DETAILED_MONTHS_SHORT[date.monthValue - 1]}"
+                } else {
+                    String.format(java.util.Locale.US, "%02d:%02d", minuteOfDay / 60, minuteOfDay % 60)
+                }
+            )
+        }
+    }
+
+    return (0 until daysCount).map { dayOffset ->
+        val date = start.plusDays(dayOffset.toLong())
         DetailedTimelineLabel(
-            fraction = hourOffset.toFloat() / totalHours,
-            text = text
+            fraction = dayOffset.toFloat() / daysCount,
+            text = "${date.dayOfMonth} ${DETAILED_MONTHS_SHORT[date.monthValue - 1]}"
+        )
+    }
+}
+
+@Composable
+private fun DetailedChartNavigationButton(
+    contentDescription: String,
+    enabled: Boolean,
+    isForward: Boolean = false,
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.size(22.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_arrow_left),
+            contentDescription = contentDescription,
+            tint = DetailedChartTextSecondary.copy(alpha = if (enabled) 1f else 0.35f),
+            modifier = Modifier
+                .size(14.dp)
+                .rotate(if (isForward) 180f else 0f)
         )
     }
 }
@@ -1429,6 +1631,9 @@ private fun formatDetailedDateRange(start: LocalDate, end: LocalDate): String =
 
 private fun formatDetailedDate(date: LocalDate): String =
     "${date.dayOfMonth} ${DETAILED_MONTHS_GENITIVE[date.monthValue - 1]} ${date.year}"
+
+private fun formatDetailedMonth(month: YearMonth): String =
+    "${DETAILED_MONTHS_SHORT[month.monthValue - 1]} ${month.year}"
 
 private val DETAILED_MONTHS_GENITIVE = listOf(
     "января", "февраля", "марта", "апреля", "мая", "июня",
