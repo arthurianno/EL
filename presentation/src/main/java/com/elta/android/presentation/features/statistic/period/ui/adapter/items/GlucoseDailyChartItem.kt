@@ -5,7 +5,7 @@ import com.nullgr.core.adapter.items.ListItem
 
 data class GlucoseDailyChartItem(
     val chartDataModel: ChartDataModel,
-    val dateTitle: String
+    val dateTitle : String
 ) : ListItem {
 
     override fun getChangePayload(other: ListItem): Any {
