@@ -131,12 +131,12 @@ data class DetailedActivityEntry(
     val endDate: LocalDate? = null
 )
 
-private val DetailedChartBackground = Color(0xFF1FBFD2)
+private val DetailedChartBackground get() = NewDesignPaletteController.colors.normalEnd
 private val DetailedChartCardBorder = Color(0xFFA4A4A4)
 private val DetailedChartTextPrimary = Color(0xFF3D4556)
 private val DetailedChartTextSecondary = Color(0xFF878B93)
 private val DetailedLowColor = Color(0xFFD93B17)
-private val DetailedNormalColor = Color(0xFF29AF99)
+private val DetailedNormalColor = GlucoseDashboardTheme.NormalChartColor
 private val DetailedHighColor = Color(0xFFEE9C17)
 private const val DETAILED_GRAPH_HOUR_WIDTH_DP = 72
 private const val DETAILED_GRAPH_DAY_WIDTH_DP = 320
@@ -772,7 +772,7 @@ fun DetailedGlucoseChartScreen(
                                                         selectedDaysCount
                                                     ) * size.width
                                                     drawLine(
-                                                        color = Color(0xFF6078EA),
+                                                        color = NewDesignPaletteController.colors.normalStart,
                                                         start = Offset(start, chartHeight + 7.dp.toPx()),
                                                         end = Offset(end.coerceAtLeast(start + 18.dp.toPx()), chartHeight + 7.dp.toPx()),
                                                         strokeWidth = 3.dp.toPx(),
@@ -837,7 +837,7 @@ fun DetailedGlucoseChartScreen(
                                         Text(
                                             text = yValue,
                                             fontSize = 10.sp,
-                                            color = Color(0xFFFF8058),
+                                            color = DetailedHighColor,
                                             fontWeight = FontWeight.Medium,
                                             textAlign = TextAlign.End,
                                             modifier = Modifier.fillMaxWidth()
@@ -860,24 +860,24 @@ fun DetailedGlucoseChartScreen(
                             LayerToggleButton(
                                 iconRes = R.drawable.ic_syringe_blue,
                                 isActive = isInsulinLayerVisible,
-                                activeBgColor = Color(0xFFE0F6FF),
-                                activeTint = Color(0xFF38B7E1),
+                                activeBgColor = NewDesignPaletteController.colors.normalEnd.copy(alpha = 0.16f),
+                                activeTint = DetailedNormalColor,
                                 onClick = { isInsulinLayerVisible = !isInsulinLayerVisible }
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             LayerToggleButton(
                                 iconRes = R.drawable.ic_spoon_and_fork_orange,
                                 isActive = isFoodLayerVisible,
-                                activeBgColor = Color(0xFFFFE7DF),
-                                activeTint = Color(0xFFFF8058),
+                                activeBgColor = DetailedHighColor.copy(alpha = 0.16f),
+                                activeTint = DetailedHighColor,
                                 onClick = { isFoodLayerVisible = !isFoodLayerVisible }
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             LayerToggleButton(
                                 iconRes = R.drawable.ic_walking_blue,
                                 isActive = isActivityLayerVisible,
-                                activeBgColor = Color(0xFFE7EAFF),
-                                activeTint = Color(0xFF6078EA),
+                                activeBgColor = NewDesignPaletteController.colors.normalStart.copy(alpha = 0.16f),
+                                activeTint = NewDesignPaletteController.colors.normalStart,
                                 onClick = { isActivityLayerVisible = !isActivityLayerVisible }
                             )
                         }
@@ -1106,7 +1106,7 @@ private fun buildHourlyChartEvents(
             timestampMinutes = event.hourStartMinutes + 30L,
             x = hourCenterX(event.hourStartMinutes),
             heightRatio = (event.value / DETAILED_BREAD_UNITS_MAX_VALUE).coerceIn(0f, 1f),
-            color = Color(0xFFFF8058),
+            color = DetailedHighColor,
             label = detailedEventLabel(event.value, "ХЕ"),
             order = index
         )
@@ -1117,7 +1117,7 @@ private fun buildHourlyChartEvents(
             timestampMinutes = event.hourStartMinutes + 30L,
             x = hourCenterX(event.hourStartMinutes),
             heightRatio = (event.value / DETAILED_BREAD_UNITS_MAX_VALUE).coerceIn(0f, 1f),
-            color = Color(0xFF38B7E1),
+            color = DetailedNormalColor,
             label = detailedEventLabel(event.value, "Ед."),
             order = hourlyFood.size + index
         )
@@ -1550,21 +1550,21 @@ private fun SelectedPointSummaryRow(point: DetailedGlucosePoint) {
         DetailedVerticalDivider()
         EventInfoItem(
             iconRes = R.drawable.ic_verify_dish,
-            activeColor = Color(0xFFFF8058),
+            activeColor = DetailedHighColor,
             timeAgo = point.foodTimeAgo,
             value = point.foodUnits
         )
         DetailedVerticalDivider()
         EventInfoItem(
             iconRes = R.drawable.ic_save_edit,
-            activeColor = Color(0xFF38B7E1),
+            activeColor = DetailedNormalColor,
             timeAgo = point.insulinTimeAgo,
             value = point.insulinUnits
         )
         DetailedVerticalDivider()
         EventInfoItem(
             iconRes = R.drawable.ic_list,
-            activeColor = Color(0xFF6078EA),
+            activeColor = NewDesignPaletteController.colors.normalStart,
             timeAgo = point.activityTimeAgo,
             value = point.activityDuration
         )
@@ -1642,22 +1642,15 @@ private fun LegendDotItem(color: Color, label: String) {
 private fun ChartExtremesSummary(points: List<DetailedGlucosePoint>) {
     val minPoint = points.minByOrNull { it.value } ?: return
     val maxPoint = points.maxByOrNull { it.value } ?: return
-    val hasSingleValue = points.size == 1 || minPoint.value == maxPoint.value
+    if (points.size < 2 || minPoint.value == maxPoint.value) return
 
     Row(
         modifier = Modifier.padding(top = 3.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (hasSingleValue) {
-            ChartExtremeCard(
-                label = if (points.size == 1) "Измерение" else "Значение",
-                point = minPoint
-            )
-        } else {
-            ChartExtremeCard(label = "Мин", point = minPoint)
-            Spacer(modifier = Modifier.width(6.dp))
-            ChartExtremeCard(label = "Макс", point = maxPoint)
-        }
+        ChartExtremeCard(label = "Мин", point = minPoint)
+        Spacer(modifier = Modifier.width(6.dp))
+        ChartExtremeCard(label = "Макс", point = maxPoint)
     }
 }
 

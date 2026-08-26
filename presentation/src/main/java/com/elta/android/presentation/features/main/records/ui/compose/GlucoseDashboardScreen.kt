@@ -27,12 +27,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.utils.SyncAttemptTimeStore
 import com.nullgr.core.rx.RxBus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -54,8 +56,9 @@ fun GlucoseDashboardScreen(
     allDayEvents: List<com.elta.android.domain.features.diary.events.model.EventV2> = emptyList(),
     onTabSelected: (String) -> Unit = {}
 ) {
+    val context = LocalContext.current
     var selectedCategoryTab by remember { mutableStateOf("Глюкоза") }
-    var currentState by remember { mutableStateOf(initialGlucoseState) }
+    val currentState = initialGlucoseState
     var statusText by remember { mutableStateOf("") }
     var isStatusVisible by remember { mutableStateOf(false) }
     var isSyncing by remember { mutableStateOf(false) }
@@ -104,6 +107,7 @@ fun GlucoseDashboardScreen(
             val syncDisposable = bus.events<Events.Sync>().subscribe { event ->
                 when (event) {
                     is Events.Sync.Glucometer.Started -> {
+                        displayedSyncTime = SyncAttemptTimeStore.recordAttempt(context)
                         showStatus("Синхронизация с прибором...", syncing = true, autoHideMs = null)
                     }
                     is Events.Sync.Glucometer.Success -> {
@@ -119,6 +123,7 @@ fun GlucoseDashboardScreen(
                         showStatus("Устройство недоступно", syncing = false, autoHideMs = 4000L)
                     }
                     is Events.Sync.Server.Started -> {
+                        displayedSyncTime = SyncAttemptTimeStore.recordAttempt(context)
                         showStatus("Синхронизация с сервером...", syncing = true, autoHideMs = null)
                     }
                     is Events.Sync.Server.Success -> {
@@ -218,6 +223,41 @@ fun GlucoseDashboardScreen(
                                         )
                                     }
                                 }
+                            }
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 6.dp, end = 20.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        NewDesignPalette.entries.forEach { palette ->
+                            val isSelected = NewDesignPaletteController.activePalette == palette
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(
+                                        if (isSelected) Color.White.copy(alpha = 0.42f)
+                                        else Color.White.copy(alpha = 0.16f)
+                                    )
+                                    .clickable {
+                                        NewDesignPaletteController.select(palette)
+                                        bus?.event(Events.NewDesignPaletteChanged)
+                                    }
+                                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Палитра ${palette.name}",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White
+                                )
+                            }
+                            if (palette != NewDesignPalette.entries.last()) {
+                                Spacer(modifier = Modifier.padding(horizontal = 3.dp))
                             }
                         }
                     }

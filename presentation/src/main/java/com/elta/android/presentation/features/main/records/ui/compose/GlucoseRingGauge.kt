@@ -3,6 +3,11 @@ package com.elta.android.presentation.features.main.records.ui.compose
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -62,6 +68,15 @@ fun GlucoseRingGauge(
     onSyncClick: () -> Unit = {}
 ) {
     val mainColor = GlucoseDashboardTheme.getMainTextColor(state)
+    val syncIconTransition = rememberInfiniteTransition(label = "syncIconRotation")
+    val syncIconRotation = syncIconTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 900, easing = LinearEasing)
+        ),
+        label = "syncIconRotation"
+    ).value.takeIf { isSyncing } ?: 0f
 
     Box(
         modifier = Modifier.fillMaxWidth(),
@@ -211,23 +226,10 @@ fun GlucoseRingGauge(
                                 painter = painterResource(id = R.drawable.ic_refresh_2),
                                 contentDescription = "Sync",
                                 tint = Color.White,
-                                modifier = Modifier.size(54.dp)
-                            )
-                            // Info indicator dot on top right of sync arrows
-                            Box(
                                 modifier = Modifier
-                                    .size(20.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.White.copy(alpha = 0.35f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "i",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White.copy(alpha = 0.95f)
-                                )
-                            }
+                                    .size(54.dp)
+                                    .rotate(syncIconRotation)
+                            )
                         }
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(

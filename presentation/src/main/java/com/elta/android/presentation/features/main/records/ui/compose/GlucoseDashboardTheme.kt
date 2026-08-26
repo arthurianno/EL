@@ -25,41 +25,26 @@ object GlucoseDashboardTheme {
                 )
             )
         }
+        val colors = NewDesignPaletteController.colors
         return when (state) {
-            GlucoseState.NORMAL -> Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFF8CD8A7),
-                    Color(0xFF3BB2B8),
-                    Color(0xFF1CB0B8)
-                )
-            )
-            GlucoseState.HIGH -> Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFFFFD56B),
-                    Color(0xFFFFA24C),
-                    Color(0xFFF98B44)
-                )
-            )
-            GlucoseState.LOW -> Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFFFFA8A8),
-                    Color(0xFFF85F73),
-                    Color(0xFFE84562)
-                )
-            )
+            GlucoseState.NORMAL -> Brush.verticalGradient(listOf(colors.normalStart, colors.normalEnd))
+            GlucoseState.HIGH -> Brush.verticalGradient(listOf(colors.highStart, colors.highEnd))
+            GlucoseState.LOW -> Brush.verticalGradient(listOf(colors.lowStart, colors.lowEnd))
         }
     }
 
     fun getMainTextColor(state: GlucoseState): Color {
+        val colors = NewDesignPaletteController.colors
         return when (state) {
-            GlucoseState.NORMAL -> Color(0xFF3BB2B8)
-            GlucoseState.HIGH -> Color(0xFFFFA24C)
-            GlucoseState.LOW -> Color(0xFFF85F73)
+            GlucoseState.NORMAL -> colors.normalEnd
+            GlucoseState.HIGH -> colors.highEnd
+            GlucoseState.LOW -> colors.lowEnd
         }
     }
 
-    val MaxBadgeColor = Color(0xFFFF9800)
-    val MinBadgeColor = Color(0xFFFF5252)
+    val MaxBadgeColor = Color(0xFFEE9C17)
+    val MinBadgeColor = Color(0xFFD93B17)
+    val NormalChartColor = Color(0xFF29AF99)
 
     val TabSelectedBackground = Color(0x33FFFFFF)
     val TabUnselectedText = Color(0xCCFFFFFF)

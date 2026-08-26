@@ -197,6 +197,7 @@ fun GlucoseLineChartCard(
                     val minPt = displayPoints.minByOrNull { it.value }
                     val maxIdx = if (maxPt != null) displayPoints.indexOf(maxPt) else -1
                     val minIdx = if (minPt != null) displayPoints.indexOf(minPt) else -1
+                    val hasDistinctExtremes = displayPoints.size > 1 && minPt?.value != maxPt?.value
 
                     var maxOffset by remember { mutableStateOf<Offset?>(null) }
                     var minOffset by remember { mutableStateOf<Offset?>(null) }
@@ -289,10 +290,10 @@ fun GlucoseLineChartCard(
                                 )
                             }
 
-                            if (maxIdx >= 0 && maxIdx < linePoints.size) {
+                            if (hasDistinctExtremes && maxIdx >= 0 && maxIdx < linePoints.size) {
                                 maxOffset = linePoints[maxIdx]
                             }
-                            if (minIdx >= 0 && minIdx < linePoints.size && minIdx != maxIdx) {
+                            if (hasDistinctExtremes && minIdx >= 0 && minIdx < linePoints.size && minIdx != maxIdx) {
                                 minOffset = linePoints[minIdx]
                             }
                         }
@@ -308,7 +309,7 @@ fun GlucoseLineChartCard(
                     }
 
                     // Dynamic Max Peak Badge
-                    maxPt?.let { maxItem ->
+                    if (hasDistinctExtremes) maxPt?.let { maxItem ->
                         maxOffset?.let { pt ->
                             val xDp = with(LocalDensity.current) { pt.x.toDp() }
                             val yDp = with(LocalDensity.current) { pt.y.toDp() }
@@ -325,7 +326,7 @@ fun GlucoseLineChartCard(
                     }
 
                     // Dynamic Min Peak Badge
-                    minPt?.let { minItem ->
+                    if (hasDistinctExtremes) minPt?.let { minItem ->
                         if (minPt != maxPt) {
                             minOffset?.let { pt ->
                                 val xDp = with(LocalDensity.current) { pt.x.toDp() }
@@ -405,7 +406,7 @@ private fun periodToHours(period: String): Int = when (period) {
 private fun glucoseLineColor(value: Float): Color = when {
     value <= 3.9f -> GlucoseDashboardTheme.MinBadgeColor
     value >= 10f -> GlucoseDashboardTheme.MaxBadgeColor
-    else -> Color(0xFF40D39B)
+    else -> GlucoseDashboardTheme.NormalChartColor
 }
 
 private fun String.toMinutes(): Int {

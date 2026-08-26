@@ -8,12 +8,11 @@ import com.elta.android.presentation.features.main.records.ui.compose.GlucoseDas
 import com.elta.android.presentation.features.main.records.ui.compose.GlucoseState
 import com.elta.android.presentation.features.main.records.ui.compose.GlucoseTrend
 import com.elta.android.presentation.features.main.records.ui.compose.GlucoseTrendDirection
+import com.elta.android.presentation.utils.SyncAttemptTimeStore
 import com.nullgr.core.rx.RxBus
 import com.elta.android.domain.features.diary.events.model.glucoseValue
 import java.util.Locale
 import kotlin.math.abs
-import org.threeten.bp.Duration
-import org.threeten.bp.ZonedDateTime
 
 class ItemRecordsHeaderViewHolder(
     private val binding: ItemRecordsHeaderBinding,
@@ -55,7 +54,7 @@ class ItemRecordsHeaderViewHolder(
                 deltaText = item.glucoseLevelIndex?.format()?.takeIf { it.isNotBlank() } ?: "—",
                 glucoseTrend = item.calculateGlucoseTrend(),
                 tirPercentage = tirPercentage,
-                syncTimeText = item.lastMeasurementTimeText(),
+                syncTimeText = SyncAttemptTimeStore.getLastAttemptText(binding.root.context),
                 initialGlucoseState = glucoseState,
                 breadUnitsText = item.breadLevel?.let { "$it XE" } ?: "—",
                 insulinText = item.insulinLevel?.let { "$it ед" } ?: "—",
@@ -85,17 +84,4 @@ class ItemRecordsHeaderViewHolder(
         )
     }
 
-    private fun RecordsHeaderItem.lastMeasurementTimeText(): String {
-        val lastMeasurementTime = dailyGlucoseModel?.lastEvent?.additionTime ?: return "Нет измерений"
-        val minutesAgo = Duration.between(lastMeasurementTime, ZonedDateTime.now())
-            .toMinutes()
-            .coerceAtLeast(0)
-
-        return when {
-            minutesAgo == 0L -> "Только что"
-            minutesAgo < 60L -> "${minutesAgo}м назад"
-            minutesAgo < 24 * 60L -> "${minutesAgo / 60}ч назад"
-            else -> "${minutesAgo / (24 * 60)}д назад"
-        }
-    }
 }
