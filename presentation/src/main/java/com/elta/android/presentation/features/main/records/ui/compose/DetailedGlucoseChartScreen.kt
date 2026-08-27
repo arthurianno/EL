@@ -186,6 +186,19 @@ fun DetailedGlucoseChartScreen(
     allEvents: List<EventV2> = emptyList(),
     onDateRangeSelected: (LocalDate, LocalDate) -> Unit = { _, _ -> }
 ) {
+    ContinuousDetailedGlucoseChartScreen(
+        onBackClick = onBackClick,
+        initialDate = initialDate,
+        fallbackGlucosePoints = glucosePoints,
+        fallbackInsulinEntries = insulinEntries,
+        fallbackFoodEntries = foodEntries,
+        fallbackActivityEntries = activityEntries,
+        dailyGlucoseModel = dailyGlucoseModel,
+        allEvents = allEvents,
+        onMonthsNeeded = onDateRangeSelected
+    )
+    return
+
     val activity = LocalContext.current.findActivity()
     val density = LocalDensity.current
     DisposableEffect(activity) {

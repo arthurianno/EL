@@ -15,6 +15,8 @@ import java.util.Locale
 object DetailedChartItemsBuilder {
 
     private const val MAX_EVENT_CHART_VALUE = 150.0
+    private const val MAX_ACTIVITY_DURATION_MINUTES = 12L * 60L
+    private const val ACTIVITY_RELEVANCE_WINDOW_MINUTES = 6L * 60L
 
     fun buildPoints(
         dailyGlucoseModel: DailyGlucoseModel,
@@ -58,9 +60,21 @@ object DetailedChartItemsBuilder {
                 .filter { it.type is EventType.Insulin && it.value != null && !it.additionTime.isAfter(event.additionTime) }
                 .maxByOrNull { it.additionTime }
 
-            // Nearest Activity event before/around this measurement
+            // An old or malformed activity must not be shown as contextual data for
+            // a glucose measurement. Use only an activity from the same day that
+            // finished no more than six hours before the measurement.
             val activityEvent = allDayEvents
-                .filter { it.type is EventType.Activity && it.duration != null && !it.additionTime.isAfter(event.additionTime) }
+                .asSequence()
+                .filter { it.type is EventType.Activity && it.duration != null }
+                .filter { it.additionTime.toLocalDate() == event.additionTime.toLocalDate() }
+                .filter { activity ->
+                    val duration = activity.duration?.toLong() ?: return@filter false
+                    duration in 1..MAX_ACTIVITY_DURATION_MINUTES && !activity.additionTime.isAfter(event.additionTime)
+                }
+                .filter { activity ->
+                    val end = activity.additionTime.plusMinutes(activity.duration?.toLong() ?: 0L)
+                    Duration.between(end, event.additionTime).toMinutes() <= ACTIVITY_RELEVANCE_WINDOW_MINUTES
+                }
                 .maxByOrNull { it.additionTime }
 
             val foodTimeAgoStr = foodEvent?.let {
@@ -157,7 +171,9 @@ object DetailedChartItemsBuilder {
     fun buildActivityEntries(
         allDayEvents: List<EventV2>
     ): List<com.elta.android.presentation.features.main.records.ui.compose.DetailedActivityEntry> {
-        val activityEvents = allDayEvents.filter { it.type is EventType.Activity && it.duration != null }
+        val activityEvents = allDayEvents.filter {
+            it.type is EventType.Activity && (it.duration?.toLong() ?: 0L) in 1..MAX_ACTIVITY_DURATION_MINUTES
+        }
         return activityEvents.map { act ->
             val startStr = act.additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME)
             val endStr = act.additionTime.plusMinutes(act.duration?.toLong() ?: 0L).toStringWithFormat(CommonFormats.FORMAT_TIME)

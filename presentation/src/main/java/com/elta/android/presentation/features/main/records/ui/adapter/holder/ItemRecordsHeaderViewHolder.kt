@@ -56,8 +56,8 @@ class ItemRecordsHeaderViewHolder(
                 tirPercentage = tirPercentage,
                 syncTimeText = SyncAttemptTimeStore.getLastAttemptText(binding.root.context),
                 initialGlucoseState = glucoseState,
-                breadUnitsText = item.breadLevel?.let { "$it XE" } ?: "—",
-                insulinText = item.insulinLevel?.let { "$it ед" } ?: "—",
+                breadUnitsText = item.breadLevel?.let { "$it XE" } ?: "0,0 ХЕ",
+                insulinText = item.insulinLevel?.let { "$it ед" } ?: "0,0 Ед",
                 dailyGlucoseModel = item.dailyGlucoseModel,
                 allDayEvents = item.allEvents
             )

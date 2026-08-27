@@ -98,7 +98,10 @@ class MainRecordsPm @Inject constructor(
             .untilDestroy()
 
         bus.events<Events.DetailedChartRangeRequested>()
-            .switchMap { request ->
+            // Several neighbouring months can be requested while the user pans the
+            // continuous chart. Cancelling the previous request loses data that is
+            // still useful for the in-memory month cache.
+            .flatMap { request ->
                 getEventsByPeriodUseCase.execute(
                     GetEventsByPeriodUseCase.Params(request.start, request.end)
                 )

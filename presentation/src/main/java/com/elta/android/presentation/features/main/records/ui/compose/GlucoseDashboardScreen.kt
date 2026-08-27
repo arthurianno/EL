@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -32,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.utils.SyncAttemptTimeStore
@@ -65,10 +68,11 @@ fun GlucoseDashboardScreen(
     var displayedSyncTime by remember(syncTimeText) { mutableStateOf(syncTimeText) }
     var isDetailedChartVisible by rememberSaveable { mutableStateOf(false) }
     var detailedChartEvents by remember { mutableStateOf(allDayEvents) }
-    var requestedDetailedRange by remember { mutableStateOf<Pair<org.threeten.bp.LocalDate, org.threeten.bp.LocalDate>?>(null) }
+    var detailedChartEventsByMonth by remember { mutableStateOf(emptyMap<org.threeten.bp.YearMonth, List<com.elta.android.domain.features.diary.events.model.EventV2>>()) }
+    var requestedDetailedMonths by remember { mutableStateOf(emptySet<org.threeten.bp.YearMonth>()) }
 
     LaunchedEffect(allDayEvents) {
-        if (requestedDetailedRange == null) {
+        if (detailedChartEventsByMonth.isEmpty()) {
             detailedChartEvents = allDayEvents
         }
     }
@@ -145,9 +149,10 @@ fun GlucoseDashboardScreen(
                 showStatus("Отсутствует подключение к сети", syncing = false, autoHideMs = 4000L)
             }
             val detailedChartDisposable = bus.events<Events.DetailedChartRangeLoaded>().subscribe { event ->
-                if (requestedDetailedRange == (event.start to event.end)) {
-                    detailedChartEvents = event.events
-                }
+                val month = org.threeten.bp.YearMonth.from(event.start)
+                detailedChartEventsByMonth = detailedChartEventsByMonth + (month to event.events)
+                requestedDetailedMonths = requestedDetailedMonths - month
+                detailedChartEvents = detailedChartEventsByMonth.values.flatten()
             }
 
             onDispose {
@@ -161,10 +166,15 @@ fun GlucoseDashboardScreen(
     val screenBg = if (isDarkTheme) GlucoseDashboardTheme.DarkBackground else Color.White
     val selectedTabTextColor = GlucoseDashboardTheme.getMainTextColor(currentState)
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
     ) {
+        // The reference layout is a 375 dp Figma frame. Keep its proportions on wider phones.
+        val designScale = maxWidth.value / 375f
+        // The host already applies the status-bar inset, so compensate for its extra top space.
+        val headerTopPadding = (35.dp * designScale - 12.dp).coerceAtLeast(0.dp)
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -177,23 +187,24 @@ fun GlucoseDashboardScreen(
                     .fillMaxWidth()
                     .background(GlucoseDashboardTheme.getHeaderGradient(currentState, isDarkTheme))
                     .statusBarsPadding()
-                    .padding(top = 12.dp)
+                    .padding(top = headerTopPadding)
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     // Top Category Pill Tabs Switcher ("Глюкоза", "Давление", "Инсулин")
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
+                            .padding(horizontal = 14.dp * designScale),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(24.dp))
+                                .height(33.dp * designScale)
+                                .clip(RoundedCornerShape(16.5.dp * designScale))
                                 .background(Color.White.copy(alpha = 0.2f))
-                                .padding(3.dp)
+                                .padding(2.dp * designScale)
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -203,16 +214,16 @@ fun GlucoseDashboardScreen(
                                     val isSelected = category == selectedCategoryTab
                                     Box(
                                         modifier = Modifier
-                                            .weight(1f)
-                                            .clip(RoundedCornerShape(20.dp))
+                                            .weight(3f)
+                                            .height(29.dp * designScale)
+                                            .clip(RoundedCornerShape(14.5.dp * designScale))
                                             .background(
-                                                if (isSelected) Color.White.copy(alpha = 0.65f) else Color.Transparent
+                                                if (isSelected) Color.White.copy(alpha = 0.72f) else Color.Transparent
                                             )
                                             .clickable {
                                                 selectedCategoryTab = category
                                                 onTabSelected(category)
-                                            }
-                                            .padding(vertical = 8.dp),
+                                            },
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
@@ -227,42 +238,7 @@ fun GlucoseDashboardScreen(
                         }
                     }
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 6.dp, end = 20.dp),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        NewDesignPalette.entries.forEach { palette ->
-                            val isSelected = NewDesignPaletteController.activePalette == palette
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(
-                                        if (isSelected) Color.White.copy(alpha = 0.42f)
-                                        else Color.White.copy(alpha = 0.16f)
-                                    )
-                                    .clickable {
-                                        NewDesignPaletteController.select(palette)
-                                        bus?.event(Events.NewDesignPaletteChanged)
-                                    }
-                                    .padding(horizontal = 10.dp, vertical = 4.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "Палитра ${palette.name}",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = Color.White
-                                )
-                            }
-                            if (palette != NewDesignPalette.entries.last()) {
-                                Spacer(modifier = Modifier.padding(horizontal = 3.dp))
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(11.dp * designScale))
 
                     // Central Circular Ring Gauge Widget
                     GlucoseRingGauge(
@@ -270,7 +246,7 @@ fun GlucoseDashboardScreen(
                         glucoseUnit = "ммоль/л",
                         deltaText = deltaText,
                         glucoseTrend = glucoseTrend,
-                        tirPercentage = "73%",
+                        tirPercentage = tirPercentage,
                         syncTimeText = displayedSyncTime,
                         breadUnitsText = breadUnitsText,
                         insulinText = insulinText,
@@ -278,6 +254,7 @@ fun GlucoseDashboardScreen(
                         statusText = statusText,
                         isStatusVisible = isStatusVisible,
                         isSyncing = isSyncing,
+                        designScale = designScale,
                         onSyncClick = {
                             if (!isSyncing) {
                                 bus?.event(Events.ServerSyncRequested)
@@ -286,7 +263,42 @@ fun GlucoseDashboardScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(11.dp * designScale))
+                }
+
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 33.dp * designScale, end = 20.dp * designScale),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    NewDesignPalette.entries.forEach { palette ->
+                        val isSelected = NewDesignPaletteController.activePalette == palette
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp * designScale))
+                                .background(
+                                    if (isSelected) Color.White.copy(alpha = 0.42f)
+                                    else Color.White.copy(alpha = 0.16f)
+                                )
+                                .clickable {
+                                    NewDesignPaletteController.select(palette)
+                                    bus?.event(Events.NewDesignPaletteChanged)
+                                }
+                                .padding(horizontal = 10.dp * designScale, vertical = 4.dp * designScale),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Палитра ${palette.name}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White
+                            )
+                        }
+                        if (palette != NewDesignPalette.entries.last()) {
+                            Spacer(modifier = Modifier.padding(horizontal = 3.dp * designScale))
+                        }
+                    }
                 }
             }
 
@@ -303,11 +315,16 @@ fun GlucoseDashboardScreen(
             GlucoseLineChartCard(
                 isDarkTheme = isDarkTheme,
                 points = chartPoints,
+                designScale = designScale,
                 onChartClick = {
                     isDetailedChartVisible = true
                 }
             )
 
+            ChartInteractionHint(
+                isDarkTheme = isDarkTheme,
+                designScale = designScale
+            )
 
         }
 
@@ -330,7 +347,8 @@ fun GlucoseDashboardScreen(
             DetailedGlucoseChartScreen(
                 onBackClick = {
                     isDetailedChartVisible = false
-                    requestedDetailedRange = null
+                    requestedDetailedMonths = emptySet()
+                    detailedChartEventsByMonth = emptyMap()
                     detailedChartEvents = allDayEvents
                 },
                 initialDate = todayDate,
@@ -341,10 +359,56 @@ fun GlucoseDashboardScreen(
                 dailyGlucoseModel = dailyGlucoseModel,
                 allEvents = detailedChartEvents,
                 onDateRangeSelected = { start, end ->
-                    requestedDetailedRange = start to end
-                    bus?.event(Events.DetailedChartRangeRequested(start, end))
+                    var month = org.threeten.bp.YearMonth.from(start)
+                    val lastMonth = org.threeten.bp.YearMonth.from(end)
+                    while (!month.isAfter(lastMonth)) {
+                        if (month !in detailedChartEventsByMonth && month !in requestedDetailedMonths) {
+                            requestedDetailedMonths = requestedDetailedMonths + month
+                            bus?.event(
+                                Events.DetailedChartRangeRequested(
+                                    month.atDay(1),
+                                    month.atEndOfMonth()
+                                )
+                            )
+                        }
+                        month = month.plusMonths(1)
+                    }
                 }
             )
         }
+    }
+}
+
+@Composable
+private fun ChartInteractionHint(
+    isDarkTheme: Boolean,
+    designScale: Float
+) {
+    val hintColor = if (isDarkTheme) {
+        Color.White.copy(alpha = 0.62f)
+    } else {
+        Color(0xFF878B93)
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(38.dp * designScale),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = androidx.compose.ui.res.painterResource(R.drawable.ic_info_circle),
+            contentDescription = null,
+            tint = hintColor,
+            modifier = Modifier.height(20.dp * designScale)
+        )
+        Spacer(modifier = Modifier.padding(horizontal = 7.dp * designScale))
+        Text(
+            text = "Нажмите на график для большей статистики",
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium,
+            color = hintColor
+        )
     }
 }
