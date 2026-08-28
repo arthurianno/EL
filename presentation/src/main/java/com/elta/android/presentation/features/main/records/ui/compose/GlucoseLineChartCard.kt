@@ -90,7 +90,7 @@ fun GlucoseLineChartCard(
             )
             .background(cardBg)
             .padding(
-                start = 14.dp * designScale,
+                start = 8.dp * designScale,
                 top = 14.dp * designScale,
                 end = 12.dp * designScale,
                 bottom = 10.dp * designScale
@@ -99,7 +99,9 @@ fun GlucoseLineChartCard(
         Column(modifier = Modifier.fillMaxWidth()) {
             // Header Row: Date Dropdown & Time Filter Chips
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 6.dp * designScale),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -181,9 +183,8 @@ fun GlucoseLineChartCard(
                 // Y-Axis Scale Labels
                 Column(
                     modifier = Modifier
-                        .width(20.dp * designScale)
-                        .fillMaxHeight()
-                        .padding(bottom = 18.dp * designScale),
+                        .width(16.dp * designScale)
+                        .fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.End
                 ) {
@@ -197,7 +198,7 @@ fun GlucoseLineChartCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.width(8.dp * designScale))
+                Spacer(modifier = Modifier.width(5.5.dp * designScale))
 
                 // Chart Canvas & Peak Badges
                 Box(
@@ -218,22 +219,30 @@ fun GlucoseLineChartCard(
                     Canvas(modifier = Modifier.matchParentSize()) {
                         val width = size.width
                         val height = size.height
-                        val paddingBottom = (20.dp * designScale).toPx()
                         val chartWidth = width
                         val chartRightInset = (24.dp * designScale).toPx()
                         val usableChartWidth = chartWidth - chartRightInset
-                        val chartHeight = height - paddingBottom
+                        val chartHeight = height
+
+                        // Draw Vertical Axis Line (Vector 26 in Figma)
+                        drawLine(
+                            color = gridLineColor,
+                            start = Offset(0f, 0f),
+                            end = Offset(0f, chartHeight),
+                            strokeWidth = (1.dp * designScale).toPx()
+                        )
 
                         // Draw Horizontal Grid Lines
-                        val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                        val pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 8f), 0f)
 
                         yLabels.forEachIndexed { index, _ ->
                             val y = (index.toFloat() / (yLabels.size - 1)) * chartHeight
+                            val isBottomBaseline = index == yLabels.lastIndex
                             drawLine(
                                 color = gridLineColor,
                                 start = Offset(0f, y),
                                 end = Offset(width, y),
-                                pathEffect = pathEffect,
+                                pathEffect = if (isBottomBaseline) null else pathEffect,
                                 strokeWidth = (1.dp * designScale).toPx()
                             )
                         }
@@ -355,20 +364,21 @@ fun GlucoseLineChartCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(6.dp * designScale))
 
-            // X-Axis Time Labels Row
+            // X-Axis Time Labels Row (aligned strictly under the grid)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 5.dp),
+                    .padding(start = (21.5.dp * designScale), end = (4.dp * designScale)),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                displayTimeLabels.forEach { label ->
+                displayTimeLabels.forEachIndexed { index, label ->
+                    val isLast = index == displayTimeLabels.lastIndex
                     Text(
                         text = label,
-                        fontSize = 12.sp,
-                        color = axisLabelColor,
+                        fontSize = 11.sp,
+                        color = if (isLast) (if (isDarkTheme) Color.White.copy(alpha = 0.4f) else Color(0xFFBBBFCA)) else axisLabelColor,
                         fontWeight = FontWeight.Medium
                     )
                 }
