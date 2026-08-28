@@ -28,14 +28,12 @@ sealed class ConsultantAction : Action {
     data class ChatMessageLongClick(val message: MessageUiEntity) :
         ConsultantAction()
 
-    @OptIn(ExperimentalPermissionsApi::class)
-    data class SelectPhotoClick(val permissionStatus: PermissionStatus) : ConsultantAction()
+    data object SelectPhotoClick : ConsultantAction()
 
     @OptIn(ExperimentalPermissionsApi::class)
     data class MakePhotoClick(val permissionStatus: PermissionStatus) : ConsultantAction()
 
-    @OptIn(ExperimentalPermissionsApi::class)
-    data class SelectFileClick(val permissionStatus: PermissionStatus) : ConsultantAction()
+    data object SelectFileClick : ConsultantAction()
     data object PreviewBackPressure : ConsultantAction()
     data object PictureSendClick : ConsultantAction()
     data class FileSelected(val uri: Uri) : ConsultantAction()

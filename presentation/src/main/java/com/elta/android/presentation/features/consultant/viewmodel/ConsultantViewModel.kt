@@ -442,17 +442,7 @@ class ConsultantViewModel @Inject constructor(
         when (action) {
             is ConsultantAction.InputChanged -> currentState.copy(inputMessage = action.text)
             is ConsultantAction.SelectPhotoClick -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    sendEvent(PhotoSelect)
-                } else {
-                    verifyPermission(
-                        status = action.permissionStatus,
-                        onGranted = { sendEvent(PhotoSelect) },
-                        onShouldShow = { storageDialog.dialogOpen() },
-                        onDenied = { sendEvent(PermissionEvent.Storage()) }
-                    )
-                }
-
+                sendEvent(PhotoSelect)
                 currentState.copy(isOpenBottomSheet = false)
             }
 
@@ -475,17 +465,7 @@ class ConsultantViewModel @Inject constructor(
             }
 
             is ConsultantAction.SelectFileClick -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    sendEvent(FileSelect)
-                } else {
-                    verifyPermission(
-                        status = action.permissionStatus,
-                        onGranted = { sendEvent(FileSelect) },
-                        onShouldShow = { storageDialog.dialogOpen() },
-                        onDenied = { sendEvent(PermissionEvent.Storage()) }
-                    )
-                }
-
+                sendEvent(FileSelect)
                 currentState.copy(isOpenBottomSheet = false)
             }
 

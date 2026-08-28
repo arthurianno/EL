@@ -129,8 +129,6 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                 else viewModel sendAction ConsultantAction.CancelPhotoClick
             }
 
-        val storageAccessPermission =
-            rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
         val recordAudioPermission =
             rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
         val cameraPermission =
@@ -177,9 +175,9 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                         getString(R.string.consultant_auto_message_question_not_resolved)
                     )
 
-                    is PermissionEvent.Storage -> storageAccessPermission.launchPermissionRequest()
                     is PermissionEvent.RecordAudio -> recordAudioPermission.launchPermissionRequest()
                     is PermissionEvent.Camera -> cameraPermission.launchPermissionRequest()
+                    else -> {}
                 }
             }
         }
@@ -189,9 +187,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
             sheetState = sheetState,
             listState = listState,
             onPhotoSelectClick = {
-                viewModel sendAction ConsultantAction.SelectPhotoClick(
-                    storageAccessPermission.status
-                )
+                viewModel sendAction ConsultantAction.SelectPhotoClick
             },
             onTakingPhotoClick = {
                 viewModel sendAction ConsultantAction.MakePhotoClick(
@@ -199,9 +195,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                 )
             },
             onFileSelectClick = {
-                viewModel sendAction ConsultantAction.SelectFileClick(
-                    storageAccessPermission.status
-                )
+                viewModel sendAction ConsultantAction.SelectFileClick
             },
             onRightBottomBarIconClick = { iconState ->
                 val action =

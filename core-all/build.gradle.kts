@@ -38,7 +38,6 @@ dependencies {
     implementation(project(Module.core_preferences))
     implementation(project(Module.core_resources))
     implementation(project(Module.core_rx))
-    implementation(project(Module.core_rx_contacts))
     implementation(project(Module.core_rx_location))
     implementation(project(Module.core_security))
     implementation(project(Module.core_ui))
