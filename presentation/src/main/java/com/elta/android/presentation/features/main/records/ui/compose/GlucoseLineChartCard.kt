@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -55,10 +56,11 @@ fun GlucoseLineChartCard(
     onPeriodSelected: (String) -> Unit = {},
     onChartClick: () -> Unit = {},
     points: List<GlucosePoint> = emptyList(),
-    designScale: Float = 1f
+    designScale: Float = 1f,
+    cardHeight: androidx.compose.ui.unit.Dp = 201.dp * designScale
 ) {
     var activePeriod by remember { mutableStateOf(selectedPeriod) }
-    val periods = listOf("3ч", "6ч", "12ч", "24ч")
+    val periods = listOf("3 ч", "6 ч", "12 ч", "24 ч")
 
     val cardBg = if (isDarkTheme) GlucoseDashboardTheme.DarkCardBackground else GlucoseDashboardTheme.LightCardBackground
     val cardTextColor = if (isDarkTheme) Color.White else Color(0xFF17191F)
@@ -71,12 +73,15 @@ fun GlucoseLineChartCard(
     val displayPoints = filteredPoints
     val displayTimeLabels = filteredTimeLabels
 
+    val maxPointVal = displayPoints.maxOfOrNull { it.value } ?: 0f
+    val maxVal = if (maxPointVal > 16f) 20f else 16f
+    val yLabels = if (maxVal == 20f) listOf("20", "15", "10", "5", "0") else listOf("16", "12", "8", "4", "0")
+
     Box(
         modifier = Modifier
-            .padding(14.dp * designScale)
+            .padding(start = 14.dp * designScale, top = 16.dp * designScale, end = 14.dp * designScale, bottom = 0.dp)
             .fillMaxWidth()
-            // Keep room for the fixed hint below the chart instead of extending the header.
-            .height(199.dp * designScale)
+            .height(cardHeight)
             .clip(RoundedCornerShape(13.dp * designScale))
             .border(
                 width = 1.dp,
@@ -84,7 +89,12 @@ fun GlucoseLineChartCard(
                 shape = RoundedCornerShape(13.dp * designScale)
             )
             .background(cardBg)
-            .padding(start = 5.dp * designScale, top = 5.dp * designScale, end = 10.dp * designScale, bottom = 9.dp * designScale)
+            .padding(
+                start = 14.dp * designScale,
+                top = 14.dp * designScale,
+                end = 12.dp * designScale,
+                bottom = 10.dp * designScale
+            )
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Header Row: Date Dropdown & Time Filter Chips
@@ -98,12 +108,12 @@ fun GlucoseLineChartCard(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp * designScale))
                         .clickable { }
-                        .padding(vertical = 4.dp * designScale, horizontal = 6.dp * designScale),
+                        .padding(vertical = 2.dp * designScale, horizontal = 4.dp * designScale),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Сегодня",
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = cardTextColor
                     )
@@ -112,27 +122,28 @@ fun GlucoseLineChartCard(
                         painter = painterResource(id = R.drawable.ic_arrow_down),
                         contentDescription = "Select Date",
                         tint = cardTextColor,
-                        modifier = Modifier.height(16.dp)
+                        modifier = Modifier.height(14.dp)
                     )
                 }
 
-                // Time Filter Segmented Switcher
+                // Time Filter Segmented Switcher (149x24 dp in Figma reference)
                 Row(
                     modifier = Modifier
-                        .height(28.dp * designScale)
+                        .height(24.dp * designScale)
                         .clip(RoundedCornerShape(7.dp * designScale))
                         .border(
-                            width = 1.dp,
+                            width = 0.5.dp,
                             color = if (isDarkTheme) Color.White.copy(alpha = 0.2f) else Color(0xFFBBBFCA),
                             shape = RoundedCornerShape(7.dp * designScale)
                         )
-                        .padding(2.dp * designScale),
+                        .padding(1.5.dp * designScale),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     periods.forEach { period ->
-                        val isSelected = period == activePeriod
+                        val isSelected = period == activePeriod || period.replace(" ", "") == activePeriod.replace(" ", "")
                         Box(
                             modifier = Modifier
+                                .height(20.dp * designScale)
                                 .clip(RoundedCornerShape(7.dp * designScale))
                                 .background(
                                     if (isSelected) {
@@ -145,12 +156,12 @@ fun GlucoseLineChartCard(
                                     activePeriod = period
                                     onPeriodSelected(period)
                                 }
-                                .padding(horizontal = 9.dp * designScale, vertical = 1.dp * designScale),
+                                .padding(horizontal = 7.dp * designScale),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = period,
-                                fontSize = if (isSelected) 15.sp else 14.sp,
+                                fontSize = if (isSelected) 14.sp else 13.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = if (isSelected) Color.White else axisLabelColor
                             )
@@ -159,7 +170,7 @@ fun GlucoseLineChartCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp * designScale))
+            Spacer(modifier = Modifier.height(6.dp * designScale))
 
             // Graph Section with Y-Axis Scale on the Left + Canvas + X-Axis Row
             Row(
@@ -170,13 +181,13 @@ fun GlucoseLineChartCard(
                 // Y-Axis Scale Labels
                 Column(
                     modifier = Modifier
-                    .width(24.dp * designScale)
+                        .width(20.dp * designScale)
                         .fillMaxHeight()
-                    .padding(bottom = 18.dp * designScale),
+                        .padding(bottom = 18.dp * designScale),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.End
                 ) {
-                    listOf("40", "30", "20", "10", "0").forEach { yVal ->
+                    yLabels.forEach { yVal ->
                         Text(
                             text = yVal,
                             fontSize = 12.sp,
@@ -213,13 +224,11 @@ fun GlucoseLineChartCard(
                         val usableChartWidth = chartWidth - chartRightInset
                         val chartHeight = height - paddingBottom
 
-
                         // Draw Horizontal Grid Lines
-                        val yLevels = listOf(40f, 30f, 20f, 10f, 0f)
                         val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
 
-                        yLevels.forEachIndexed { index, _ ->
-                            val y = (index.toFloat() / (yLevels.size - 1)) * chartHeight
+                        yLabels.forEachIndexed { index, _ ->
+                            val y = (index.toFloat() / (yLabels.size - 1)) * chartHeight
                             drawLine(
                                 color = gridLineColor,
                                 start = Offset(0f, y),
@@ -230,7 +239,6 @@ fun GlucoseLineChartCard(
                         }
 
                         // Draw Curve Path
-                        val maxVal = CHART_MAX_GLUCOSE_VALUE
                         val linePoints = displayPoints.map { pt ->
                             val latestPointMinutes = displayPoints.maxOfOrNull { it.timeLabel.toMinutes() } ?: 0
                             val endMinutes = roundUpToHour(latestPointMinutes)
@@ -397,7 +405,7 @@ private fun roundUpToHour(minutes: Int): Int {
     return if (minutes % 60 == 0) minutes else ((minutes / 60) + 1) * 60
 }
 
-private fun periodToHours(period: String): Int = when (period) {
+private fun periodToHours(period: String): Int = when (period.replace(" ", "")) {
     "3ч" -> 3
     "6ч" -> 6
     "12ч" -> 12
@@ -420,7 +428,7 @@ private fun String.toMinutes(): Int {
 
 private fun buildTimelineLabels(endMinutes: Int, hours: Int, period: String): List<String> {
     val endHour = endMinutes / 60
-    val step = when (period) {
+    val step = when (period.replace(" ", "")) {
         "3ч", "6ч" -> 1
         "12ч" -> 2
         "24ч" -> 4

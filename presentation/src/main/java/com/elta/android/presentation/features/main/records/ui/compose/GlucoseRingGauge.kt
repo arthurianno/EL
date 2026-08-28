@@ -70,6 +70,7 @@ fun GlucoseRingGauge(
     statusText: String = "",
     isStatusVisible: Boolean = false,
     designScale: Float = 1f,
+    verticalScale: Float = 1f,
     onSyncClick: () -> Unit = {}
 ) {
     val mainColor = GlucoseDashboardTheme.getMainTextColor(state)
@@ -83,6 +84,12 @@ fun GlucoseRingGauge(
         label = "syncIconRotation"
     ).value.takeIf { isSyncing } ?: 0f
 
+    val gaugeBoxHeight = (280.dp * verticalScale) * designScale
+    val centerBoxHeight = (195.dp * verticalScale) * designScale
+    val ringSize = (185.dp * verticalScale) * designScale
+    val discWidth = (152.dp * verticalScale) * designScale
+    val discHeight = (150.dp * verticalScale) * designScale
+
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -90,44 +97,44 @@ fun GlucoseRingGauge(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp * designScale, vertical = 4.dp * designScale),
+                .padding(horizontal = 16.dp * designScale, vertical = 0.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Gauge, callout line, and bottom indicators need one coordinate space.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(321.dp * designScale)
+                    .height(gaugeBoxHeight)
             ) {
                 Canvas(modifier = Modifier.matchParentSize()) {
-                    // Figma: the pointer occupies x=77..130, y=306..360 in the
-                    // 375 dp frame. Coordinates below are relative to this box,
-                    // whose left edge is 16 dp from the screen edge.
-                    val lineStart = Offset(
-                        x = (114.dp * designScale).toPx(),
-                        y = (200.dp * designScale).toPx()
-                    )
-                    val lineEnd = Offset(
-                        (61.dp * designScale).toPx(),
-                        (254.dp * designScale).toPx()
-                    )
+                    val centerX = size.width / 2f
+                    val centerY = (centerBoxHeight / 2f + (6.dp * verticalScale * designScale)).toPx()
+                    val strokeWidth = (11.dp * designScale * verticalScale).toPx()
+                    val ringRadius = (ringSize / 2f).toPx() - strokeWidth / 2f
+
+                    // Point directly on the outer circle ring contour line (Figma Vector 60 touching Ellipse 17)
+                    val lineStartX = centerX - ringRadius * 0.578f
+                    val lineStartY = centerY + ringRadius * 0.812f
+                    // Point to the center top of TIR block
+                    val lineEndX = (51.5.dp * designScale).toPx()
+                    val lineEndY = gaugeBoxHeight.toPx() - (57.dp * verticalScale * designScale).toPx()
 
                     drawLine(
-                        color = Color.White.copy(alpha = 0.29f),
-                        start = lineStart,
-                        end = lineEnd,
-                        strokeWidth = (1.dp * designScale).toPx()
+                        color = Color.White.copy(alpha = 0.35f),
+                        start = Offset(lineStartX, lineStartY),
+                        end = Offset(lineEndX, lineEndY),
+                        strokeWidth = (1.5.dp * designScale).toPx()
                     )
                 }
 
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(214.dp * designScale)
+                        .height(centerBoxHeight)
                         .align(Alignment.TopCenter),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Top-Left State Pill Badge ("Норма", "Высокая", "Низкая")
+                    // Top-Left State Pill Badge ("Норма", "Высокий", "Низкий")
                     val stateText = when (state) {
                         GlucoseState.NORMAL -> "Норма"
                         GlucoseState.HIGH -> "Высокий"
@@ -141,16 +148,15 @@ fun GlucoseRingGauge(
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopStart)
-                            .padding(start = 8.dp * designScale, top = 6.dp * designScale)
-                            .offset(x = (-9).dp * designScale, y = (-4).dp * designScale)
-                            .size(width = 108.dp * designScale, height = 29.dp * designScale)
+                            .padding(start = 0.dp, top = 2.dp * designScale)
+                            .size(width = 85.dp * designScale, height = 29.dp * designScale)
                             .clip(RoundedCornerShape(35.5.dp * designScale))
                             .background(stateBadgeColor),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = stateText,
-                            fontSize = 18.sp,
+                            fontSize = (18f * verticalScale).coerceAtLeast(14f).sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.White.copy(alpha = 0.9f)
                         )
@@ -159,10 +165,10 @@ fun GlucoseRingGauge(
                     // Outer Canvas for Arc Gauge Ring
                     Canvas(
                         modifier = Modifier
-                            .size(199.dp * designScale)
-                            .offset(y = 8.dp * designScale)
+                            .size(ringSize)
+                            .offset(y = (6.dp * verticalScale) * designScale)
                     ) {
-                        val strokeWidth = (10.dp * designScale).toPx()
+                        val strokeWidth = (11.dp * designScale * verticalScale).toPx()
                         val diameter = size.minDimension - strokeWidth
                         val topLeft = Offset(strokeWidth / 2, strokeWidth / 2)
                         val centerX = size.width / 2f
@@ -178,7 +184,7 @@ fun GlucoseRingGauge(
                             color = Color.White.copy(alpha = 0.35f),
                             radius = radius,
                             center = Offset(centerX, centerY),
-                            style = Stroke(width = (2.dp * designScale).toPx())
+                            style = Stroke(width = (1.dp * designScale).toPx())
                         )
 
                         // Thick highlighted progress arc for TIR (starts at top 12 o'clock, goes clockwise)
@@ -195,12 +201,11 @@ fun GlucoseRingGauge(
                         }
                     }
 
-                    // The center panel comes from Figma. The Canvas above stays responsible
-                    // for the dynamic TIR arc, while this asset owns the inner gauge shape.
+                    // The center panel comes from Figma.
                     Box(
                         modifier = Modifier
-                            .size(width = 154.dp * designScale, height = 161.dp * designScale)
-                            .offset(y = 8.dp * designScale),
+                            .size(width = discWidth, height = discHeight)
+                            .offset(y = (6.dp * verticalScale) * designScale),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
@@ -214,22 +219,22 @@ fun GlucoseRingGauge(
                         ) {
                             Text(
                                 text = glucoseValue,
-                                fontSize = 48.sp,
+                                fontSize = (64f * verticalScale).coerceAtLeast(44f).sp,
                                 fontWeight = FontWeight.Bold,
                                 color = mainColor,
-                                lineHeight = 50.sp
+                                lineHeight = (46f * verticalScale).coerceAtLeast(34f).sp
                             )
                             Text(
                                 text = glucoseUnit,
-                                fontSize = 12.sp,
+                                fontSize = (12f * verticalScale).coerceAtLeast(10f).sp,
                                 fontWeight = FontWeight.Normal,
                                 color = Color.Gray
                             )
-                            Spacer(modifier = Modifier.height(2.dp * designScale))
+                            Spacer(modifier = Modifier.height((2.dp * verticalScale) * designScale))
                             GlucoseTrendValue(
                                 trend = glucoseTrend,
                                 fallbackText = deltaText,
-                                designScale = designScale
+                                designScale = designScale * verticalScale
                             )
                         }
                     }
@@ -238,8 +243,8 @@ fun GlucoseRingGauge(
                     Column(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .padding(end = 5.dp * designScale, bottom = 8.dp * designScale)
-                            .offset(x = (-18).dp * designScale, y = 50.dp * designScale)
+                            .padding(end = 4.dp * designScale, bottom = 4.dp * designScale)
+                            .offset(x = (-8).dp * designScale, y = (28.dp * verticalScale) * designScale)
                             .clickable { onSyncClick() },
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -251,55 +256,55 @@ fun GlucoseRingGauge(
                                 contentDescription = "Sync",
                                 tint = Color.White,
                                 modifier = Modifier
-                                    .size(54.dp * designScale)
+                                    .size((48.dp * verticalScale).coerceAtLeast(36.dp) * designScale)
                                     .rotate(syncIconRotation)
                             )
                         }
                         Spacer(modifier = Modifier.height(2.dp * designScale))
                         Text(
                             text = if (isSyncing) "Синхр..." else syncTimeText,
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.White.copy(alpha = 0.95f)
                         )
                     }
                 }
 
-                // Indicator Pills Row: "TIR", "Хлебных ед." & "Инсулина"
+                // Indicator Pills Row: "TIR" (80dp), "Хлебных ед." (109dp) & "Инсулина" (109dp)
+                // Figma exact columns: 28dp left, 80dp TIR, 23dp gap, 109dp Bread, 10dp gap, 109dp Insulin, 16dp right
                 Row(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
-                        .height(57.dp * designScale),
-                    horizontalArrangement = Arrangement.Center,
+                        .height((57.dp * verticalScale) * designScale),
+                    horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 12 / 72 / 31 / 108 / 12 / 108: Figma's horizontal columns.
                     Spacer(modifier = Modifier.width(12.dp * designScale))
                     TirIndicator(
                         tirPercentage = tirPercentage,
                         modifier = Modifier
-                            .width(72.dp * designScale)
+                            .width(80.dp * designScale)
                             .align(Alignment.Top),
-                        designScale = designScale
+                        designScale = designScale * verticalScale
                     )
-                    Spacer(modifier = Modifier.width(31.dp * designScale))
+                    Spacer(modifier = Modifier.width(23.dp * designScale))
                     IndicatorPill(
                         title = "Хлебных ед.",
                         value = breadUnitsText,
                         modifier = Modifier
-                            .weight(1f)
+                            .width(109.dp * designScale)
                             .align(Alignment.Bottom),
-                        designScale = designScale
+                        designScale = designScale * verticalScale
                     )
-                    Spacer(modifier = Modifier.width(12.dp * designScale))
+                    Spacer(modifier = Modifier.width(10.dp * designScale))
                     IndicatorPill(
                         title = "Инсулина",
                         value = insulinText,
                         modifier = Modifier
-                            .weight(1f)
+                            .width(109.dp * designScale)
                             .align(Alignment.Bottom),
-                        designScale = designScale
+                        designScale = designScale * verticalScale
                     )
                 }
             }
@@ -413,9 +418,8 @@ private fun TirIndicator(
     modifier: Modifier = Modifier,
     designScale: Float
 ) {
+    val isDash = tirPercentage == "—" || tirPercentage.isBlank()
     Box(
-        // The percentage has a 38sp glyph height. Keep the full design group
-        // height here so its descenders are never clipped by the TIR cell.
         modifier = modifier.height(57.dp * designScale),
         contentAlignment = Alignment.Center
     ) {
@@ -430,18 +434,16 @@ private fun TirIndicator(
 
         Text(
             text = tirPercentage,
-            fontSize = 38.sp,
-            lineHeight = 44.sp,
+            fontSize = if (isDash) 30.sp else 38.sp,
+            lineHeight = if (isDash) 34.sp else 44.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White.copy(alpha = 0.9f),
             maxLines = 1,
             softWrap = false,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                // Keep the TIR caption above the pills while the value itself
-                // aligns with the pills' two-line content.
-                .offset(y = 10.dp * designScale)
-                .graphicsLayer(scaleX = 1.18f)
+                .offset(y = if (isDash) 8.dp * designScale else 10.dp * designScale)
+                .graphicsLayer(scaleX = if (isDash) 1.0f else 1.18f)
         )
     }
 }

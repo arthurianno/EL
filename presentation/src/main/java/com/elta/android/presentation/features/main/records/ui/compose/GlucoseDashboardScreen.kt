@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -166,15 +168,31 @@ fun GlucoseDashboardScreen(
     val screenBg = if (isDarkTheme) GlucoseDashboardTheme.DarkBackground else Color.White
     val selectedTabTextColor = GlucoseDashboardTheme.getMainTextColor(currentState)
 
-    BoxWithConstraints(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        // The reference layout is a 375 dp Figma frame. Keep its proportions on wider phones.
-        val designScale = maxWidth.value / 375f
-        // The host already applies the status-bar inset, so compensate for its extra top space.
-        val headerTopPadding = (35.dp * designScale - 12.dp).coerceAtLeast(0.dp)
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp.dp
+    val screenHeightDp = configuration.screenHeightDp.dp
+    val designScale = (screenWidthDp.value / 375f).coerceIn(0.85f, 1.25f)
 
+    // Calculate vertical scale from physical device height (812 dp is standard reference).
+    val verticalScale = when {
+        screenHeightDp.value < 650f -> 0.78f
+        screenHeightDp.value < 720f -> 0.85f
+        screenHeightDp.value < 800f -> 0.92f
+        else -> 1.0f
+    }
+
+    // Chart card height adapted to screen height (Figma 592 -> 142dp, 716 -> 164dp, 812 -> 201dp, 966 -> 265dp)
+    val chartCardHeight = when {
+        screenHeightDp.value < 620f -> 142.dp * designScale
+        screenHeightDp.value < 720f -> 164.dp * designScale
+        screenHeightDp.value < 800f -> 195.dp * designScale
+        screenHeightDp.value < 880f -> 228.dp * designScale
+        else -> 265.dp * designScale
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -187,7 +205,7 @@ fun GlucoseDashboardScreen(
                     .fillMaxWidth()
                     .background(GlucoseDashboardTheme.getHeaderGradient(currentState, isDarkTheme))
                     .statusBarsPadding()
-                    .padding(top = headerTopPadding)
+                    .padding(top = (8.dp * verticalScale) * designScale)
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     // Top Category Pill Tabs Switcher ("Глюкоза", "Давление", "Инсулин")
@@ -202,7 +220,7 @@ fun GlucoseDashboardScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(33.dp * designScale)
-                                .clip(RoundedCornerShape(16.5.dp * designScale))
+                                .clip(RoundedCornerShape(35.5.dp * designScale))
                                 .background(Color.White.copy(alpha = 0.2f))
                                 .padding(2.dp * designScale)
                         ) {
@@ -216,7 +234,7 @@ fun GlucoseDashboardScreen(
                                         modifier = Modifier
                                             .weight(3f)
                                             .height(29.dp * designScale)
-                                            .clip(RoundedCornerShape(14.5.dp * designScale))
+                                            .clip(RoundedCornerShape(35.5.dp * designScale))
                                             .background(
                                                 if (isSelected) Color.White.copy(alpha = 0.72f) else Color.Transparent
                                             )
@@ -238,7 +256,43 @@ fun GlucoseDashboardScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(11.dp * designScale))
+                    // Compact Palette Switcher Row under tabs
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp * designScale, top = 4.dp * designScale, end = 16.dp * designScale),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        NewDesignPalette.entries.forEach { palette ->
+                            val isSelected = NewDesignPaletteController.activePalette == palette
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp * designScale))
+                                    .background(
+                                        if (isSelected) Color.White.copy(alpha = 0.42f)
+                                        else Color.White.copy(alpha = 0.16f)
+                                    )
+                                    .clickable {
+                                        NewDesignPaletteController.select(palette)
+                                        bus?.event(Events.NewDesignPaletteChanged)
+                                    }
+                                    .padding(horizontal = 8.dp * designScale, vertical = 2.dp * designScale),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Палитра ${palette.name}",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White
+                                )
+                            }
+                            if (palette != NewDesignPalette.entries.last()) {
+                                Spacer(modifier = Modifier.padding(horizontal = 2.dp * designScale))
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height((4.dp * verticalScale) * designScale))
 
                     // Central Circular Ring Gauge Widget
                     GlucoseRingGauge(
@@ -255,6 +309,7 @@ fun GlucoseDashboardScreen(
                         isStatusVisible = isStatusVisible,
                         isSyncing = isSyncing,
                         designScale = designScale,
+                        verticalScale = verticalScale,
                         onSyncClick = {
                             if (!isSyncing) {
                                 bus?.event(Events.ServerSyncRequested)
@@ -263,42 +318,7 @@ fun GlucoseDashboardScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(11.dp * designScale))
-                }
-
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 33.dp * designScale, end = 20.dp * designScale),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    NewDesignPalette.entries.forEach { palette ->
-                        val isSelected = NewDesignPaletteController.activePalette == palette
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp * designScale))
-                                .background(
-                                    if (isSelected) Color.White.copy(alpha = 0.42f)
-                                    else Color.White.copy(alpha = 0.16f)
-                                )
-                                .clickable {
-                                    NewDesignPaletteController.select(palette)
-                                    bus?.event(Events.NewDesignPaletteChanged)
-                                }
-                                .padding(horizontal = 10.dp * designScale, vertical = 4.dp * designScale),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Палитра ${palette.name}",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.White
-                            )
-                        }
-                        if (palette != NewDesignPalette.entries.last()) {
-                            Spacer(modifier = Modifier.padding(horizontal = 3.dp * designScale))
-                        }
-                    }
+                    Spacer(modifier = Modifier.height((16.dp * verticalScale) * designScale))
                 }
             }
 
@@ -316,15 +336,20 @@ fun GlucoseDashboardScreen(
                 isDarkTheme = isDarkTheme,
                 points = chartPoints,
                 designScale = designScale,
+                cardHeight = chartCardHeight,
                 onChartClick = {
                     isDetailedChartVisible = true
                 }
             )
 
+            Spacer(modifier = Modifier.height((10.dp * verticalScale) * designScale))
+
             ChartInteractionHint(
                 isDarkTheme = isDarkTheme,
                 designScale = designScale
             )
+
+            Spacer(modifier = Modifier.height((8.dp * verticalScale) * designScale))
 
         }
 
@@ -393,21 +418,21 @@ private fun ChartInteractionHint(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(38.dp * designScale),
+            .height(25.dp * designScale),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            painter = androidx.compose.ui.res.painterResource(R.drawable.ic_info_circle),
+            painter = androidx.compose.ui.res.painterResource(R.drawable.ic_info_fill),
             contentDescription = null,
             tint = hintColor,
-            modifier = Modifier.height(20.dp * designScale)
+            modifier = Modifier.size(20.dp * designScale)
         )
-        Spacer(modifier = Modifier.padding(horizontal = 7.dp * designScale))
+        Spacer(modifier = Modifier.width(13.dp * designScale))
         Text(
             text = "Нажмите на график для большей статистики",
             fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Normal,
             color = hintColor
         )
     }
