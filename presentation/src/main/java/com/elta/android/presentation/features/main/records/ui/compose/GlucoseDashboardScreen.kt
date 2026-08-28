@@ -69,6 +69,7 @@ fun GlucoseDashboardScreen(
     var isSyncing by remember { mutableStateOf(false) }
     var displayedSyncTime by remember(syncTimeText) { mutableStateOf(syncTimeText) }
     var isDetailedChartVisible by rememberSaveable { mutableStateOf(false) }
+    var isTransitioningToDetailed by remember { mutableStateOf(false) }
     var detailedChartEvents by remember { mutableStateOf(allDayEvents) }
     var detailedChartEventsByMonth by remember { mutableStateOf(emptyMap<org.threeten.bp.YearMonth, List<com.elta.android.domain.features.diary.events.model.EventV2>>()) }
     var requestedDetailedMonths by remember { mutableStateOf(emptySet<org.threeten.bp.YearMonth>()) }
@@ -338,7 +339,7 @@ fun GlucoseDashboardScreen(
                 designScale = designScale,
                 cardHeight = chartCardHeight,
                 onChartClick = {
-                    isDetailedChartVisible = true
+                    isTransitioningToDetailed = true
                 }
             )
 
@@ -346,11 +347,24 @@ fun GlucoseDashboardScreen(
 
             ChartInteractionHint(
                 isDarkTheme = isDarkTheme,
-                designScale = designScale
+                designScale = designScale,
+                onClick = {
+                    isTransitioningToDetailed = true
+                }
             )
 
             Spacer(modifier = Modifier.height((8.dp * verticalScale) * designScale))
 
+        }
+
+        if (isTransitioningToDetailed) {
+            GlucoseChartTransitionOverlay(
+                isDarkTheme = isDarkTheme,
+                onAnimationFinished = {
+                    isDetailedChartVisible = true
+                    isTransitioningToDetailed = false
+                }
+            )
         }
 
         if (isDetailedChartVisible) {
@@ -407,7 +421,8 @@ fun GlucoseDashboardScreen(
 @Composable
 private fun ChartInteractionHint(
     isDarkTheme: Boolean,
-    designScale: Float
+    designScale: Float,
+    onClick: () -> Unit = {}
 ) {
     val hintColor = if (isDarkTheme) {
         Color.White.copy(alpha = 0.62f)
@@ -418,7 +433,9 @@ private fun ChartInteractionHint(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(25.dp * designScale),
+            .height(25.dp * designScale)
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {

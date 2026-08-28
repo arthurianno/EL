@@ -7,6 +7,9 @@ import android.content.pm.ActivityInfo
 import android.graphics.Paint
 import android.graphics.drawable.ColorDrawable
 import android.view.ViewGroup
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,25 +17,23 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.max
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -59,6 +60,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -67,11 +69,14 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
+import kotlinx.coroutines.launch
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
@@ -219,6 +224,18 @@ internal fun ContinuousDetailedGlucoseChartScreen(
 
     Dialog(onDismissRequest = onBackClick, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         val view = LocalView.current
+        val contentAlpha = remember { Animatable(0f) }
+        val contentScale = remember { Animatable(0.96f) }
+
+        LaunchedEffect(Unit) {
+            launch {
+                contentAlpha.animateTo(1f, tween(durationMillis = 320, easing = FastOutSlowInEasing))
+            }
+            launch {
+                contentScale.animateTo(1f, tween(durationMillis = 320, easing = FastOutSlowInEasing))
+            }
+        }
+
         SideEffect {
             (view.parent as? DialogWindowProvider)?.window?.let { window ->
                 window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -237,7 +254,14 @@ internal fun ContinuousDetailedGlucoseChartScreen(
         val maxSideMargin = max(max(leftInset, rightInset), 32.dp)
 
         BoxWithConstraints(
-            modifier = Modifier.fillMaxSize().background(ContinuousBackground)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ContinuousBackground)
+                .graphicsLayer {
+                    alpha = contentAlpha.value
+                    scaleX = contentScale.value
+                    scaleY = contentScale.value
+                }
         ) {
             val isShort = maxHeight < 420.dp
             val bottomHeight = if (isShort) 74.dp else 80.dp
