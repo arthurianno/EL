@@ -217,7 +217,7 @@ class GlucoseEventPm @Inject constructor(
 
     private fun bindEvent(event: EventV2) {
         glucoseValueState.consumer.accept(NumberFormatter.format(event.glucoseValue(glucoseFormatState.value)))
-        
+
         val temperatureValue = event.getFormattedTemperature()
         val baseInfo = if (event.isTemperatureInvalid) {
             "Внимание: измерение произведено вне рабочего диапазона температур (+15...+35 °С)"
@@ -227,9 +227,9 @@ class GlucoseEventPm @Inject constructor(
                 temperatureValue
             )
         }
-        
+
         val spannableBuilder = android.text.SpannableStringBuilder(baseInfo)
-        
+
         if (event.isTemperatureInvalid) {
             spannableBuilder.setSpan(
                 android.text.style.ForegroundColorSpan(
@@ -240,11 +240,11 @@ class GlucoseEventPm @Inject constructor(
                 android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
-        
+
         if (event.isTimeInvalid) {
             spannableBuilder.append("\n\n${resources.getString(R.string.event_invalid_time_warning)}")
         }
-        
+
         Timber.d("⏰ GlucoseEventPm bindEvent: eventId=${event.id}, isTimeInvalid=${event.isTimeInvalid}")
         glucoseInfoState.consumer.accept(spannableBuilder)
         event.getTag(resources)?.let { tagSelector.option.consumer.accept(it) }

@@ -105,7 +105,7 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         val date = ZonedDateTime.ofInstant(Instant.ofEpochSecond(unixSeconds), ZoneOffset.UTC)
         val isInvalid = isDateInvalid(date, statusWord)
         val isTempInvalid = (statusWord and MEM_INVALID_TEMPERATURE_BIT_MASK) != 0
-        
+
         val actualDate = if (isInvalid) ZonedDateTime.now(ZoneOffset.UTC) else date
 
         return ParsedMeasurement(
