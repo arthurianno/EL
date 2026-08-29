@@ -49,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
 
@@ -79,6 +80,7 @@ fun GlucoseRingGauge(
     isStatusVisible: Boolean = false,
     ringSize: Dp,
     ringTopOffset: Dp,
+    lowerControlsExtraOffset: Dp = 0.dp,
     onSyncClick: () -> Unit = {}
 ) {
     val mainColor = GlucoseDashboardTheme.getMainTextColor(state)
@@ -96,9 +98,9 @@ fun GlucoseRingGauge(
     // breakpoints. Every visual part of the gauge uses this one scale.
     val scaleFactor = ringSize.value / 199f
     val centerBoxHeight = ringSize + ringTopOffset
-    // The lower controls are positioned below the ring, not below its unshifted size.
-    // Including ringTopOffset preserves the Figma distance on regular and tall phones.
-    val gaugeBoxHeight = centerBoxHeight + gaugeBottomSectionHeight(ringSize)
+    // On tall screens the unused part of the 60%-high header is added here, so the lower
+    // controls retain their Figma bottom inset rather than floating above the gradient edge.
+    val gaugeBoxHeight = glucoseGaugeBaseHeight(ringSize, ringTopOffset) + lowerControlsExtraOffset
     val discTopInset = glucoseGaugeDiscTopInset(ringSize)
     val discWidth = ringSize * (152f / 185f)
     val discHeight = ringSize * (150f / 185f)
@@ -136,19 +138,19 @@ fun GlucoseRingGauge(
                     val strokeWidth = (11.dp * scaleFactor).toPx()
                     val ringRadius = (ringSize / 2f).toPx() - strokeWidth / 2f
 
-                    // Point directly on the outer circle ring contour line (Figma Vector 60 touching Ellipse 17)
+                    // Point directly on the outer circle contour and travel at a fixed 45°.
+                    // The callout no longer changes its angle when the TIR text changes width.
                     val lineStartX = centerX - ringRadius * 0.578f
                     val lineStartY = centerY + ringRadius * 0.812f
-                    // Point to the centre of Figma's fixed 80 dp TIR block:
-                    // 12 dp left inset + 40 dp half-width.
-                    val lineEndX = (52.dp * scaleFactor).toPx()
-                    val lineEndY = gaugeBoxHeight.toPx() - (54.dp * scaleFactor).toPx()
+                    val calloutLength = (56.dp * scaleFactor).toPx()
+                    val lineEndX = lineStartX - calloutLength
+                    val lineEndY = lineStartY + calloutLength
 
                     drawLine(
-                        color = Color.White.copy(alpha = 0.35f * indicatorsAlpha),
+                        color = Color.White.copy(alpha = 0.25f * indicatorsAlpha),
                         start = Offset(lineStartX, lineStartY),
                         end = Offset(lineEndX, lineEndY),
-                        strokeWidth = (1.5.dp * scaleFactor).toPx()
+                        strokeWidth = (1.dp * scaleFactor).toPx()
                     )
                 }
 
@@ -165,11 +167,7 @@ fun GlucoseRingGauge(
                         GlucoseState.HIGH -> "Высокий"
                         GlucoseState.LOW -> "Низкий"
                     }
-                    val stateBadgeColor = when (state) {
-                        GlucoseState.NORMAL -> GlucoseDashboardTheme.NormalChartColor
-                        GlucoseState.HIGH -> Color(0xFFE47F1F)
-                        GlucoseState.LOW -> GlucoseDashboardTheme.MinBadgeColor
-                    }
+                    val stateBadgeColor = GlucoseDashboardTheme.getStateBadgeColor(state)
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopStart)
@@ -208,10 +206,10 @@ fun GlucoseRingGauge(
 
                         // Thin outer background ring contour around the central disc
                         drawCircle(
-                            color = Color.White.copy(alpha = 0.35f),
+                            color = Color.White.copy(alpha = 0.30f),
                             radius = radius,
                             center = Offset(centerX, centerY),
-                            style = Stroke(width = (1.dp * scaleFactor).toPx())
+                            style = Stroke(width = (0.75.dp * scaleFactor).toPx())
                         )
 
                         // Thick highlighted progress arc for TIR (starts at top 12 o'clock, goes clockwise)
@@ -250,6 +248,7 @@ fun GlucoseRingGauge(
                                 fontSize = glucoseValueFontSize.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = mainColor,
+                                letterSpacing = (-0.067f).em,
                                 lineHeight = 48.sp
                             )
                             Text(
@@ -267,7 +266,7 @@ fun GlucoseRingGauge(
                         }
                     }
 
-                    // Figma anchors: icon (280, 301, 53 x 43), timestamp (center 307.5, y=357).
+                    // The icon is deliberately a little larger than the former 53 x 43dp asset.
                     // They are intentionally not laid out relative to the indicator row.
                     Column(
                         modifier = Modifier
@@ -285,7 +284,7 @@ fun GlucoseRingGauge(
                                 contentDescription = "Sync",
                                 tint = Color.White,
                                 modifier = Modifier
-                                    .size(width = 53.dp * scaleFactor, height = 43.dp * scaleFactor)
+                                    .size(width = 56.dp * scaleFactor, height = 46.dp * scaleFactor)
                                     .rotate(syncIconRotation)
                             )
                         }
@@ -358,17 +357,6 @@ fun GlucoseRingGauge(
             }
         }
     }
-}
-
-private fun gaugeBottomSectionHeight(ringSize: Dp): Dp {
-    val diameter = ringSize.value
-    val height = when {
-        diameter <= 146f -> 71f
-        diameter <= 175f -> 71f + (diameter - 146f) * 10f / 29f
-        diameter <= 199f -> 81f + (diameter - 175f) * 19f / 24f
-        else -> 100f + (diameter - 199f) * 100f / 199f
-    }
-    return height.dp
 }
 
 /** Figma: the 199dp outer ring starts at y=126.24 and the disc at y=146.11. */
@@ -496,23 +484,40 @@ private fun TirIndicator(
             modifier = Modifier.align(Alignment.TopCenter)
         )
 
-        Text(
-            text = tirPercentage,
-            fontSize = if (isDash) 30.sp else percentageFontSize.sp,
-            lineHeight = if (isDash) 34.sp else (percentageFontSize + 6f).sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White.copy(alpha = 0.9f),
-            maxLines = 1,
-            softWrap = false,
-            overflow = TextOverflow.Visible,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                // The TIR anchor is intentionally 80 dp wide to keep the leader line
-                // at the Figma coordinate. The numeric value itself may be wider (100%),
-                // so it is measured without that width constraint instead of being clipped.
-                .wrapContentWidth(unbounded = true)
-                .offset(y = if (isDash) 8.dp * designScale else 23.dp * designScale)
-        )
+        if (isDash) {
+            Canvas(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = 29.dp * designScale)
+                    .size(width = 24.dp * designScale, height = 2.dp * designScale)
+            ) {
+                drawLine(
+                    color = Color.White.copy(alpha = 0.9f),
+                    start = Offset(0f, size.height / 2f),
+                    end = Offset(size.width, size.height / 2f),
+                    strokeWidth = (1.25.dp * designScale).toPx(),
+                    cap = StrokeCap.Round
+                )
+            }
+        } else {
+            Text(
+                text = tirPercentage,
+                fontSize = percentageFontSize.sp,
+                lineHeight = (percentageFontSize + 6f).sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White.copy(alpha = 0.9f),
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Visible,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    // The TIR anchor is intentionally 80 dp wide to keep the leader line
+                    // at the Figma coordinate. The numeric value itself may be wider (100%),
+                    // so it is measured without that width constraint instead of being clipped.
+                    .wrapContentWidth(unbounded = true)
+                    .offset(y = 23.dp * designScale)
+            )
+        }
     }
     }
 }

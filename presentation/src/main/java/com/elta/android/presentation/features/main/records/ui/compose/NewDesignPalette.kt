@@ -13,7 +13,10 @@ data class NewDesignPaletteColors(
     val normalStart: Color,
     val normalEnd: Color,
     val highStart: Color,
-    val highEnd: Color
+    val highEnd: Color,
+    val normalBadge: Color,
+    val highBadge: Color,
+    val lowBadge: Color
 )
 
 object NewDesignPaletteController {
@@ -28,7 +31,10 @@ object NewDesignPaletteController {
                 normalStart = Color(0xFFCEEA96),
                 normalEnd = Color(0xFF1FBFD2),
                 highStart = Color(0xFFFFE471),
-                highEnd = Color(0xFFFFA669)
+                highEnd = Color(0xFFFFA669),
+                normalBadge = Color(0xFF77D5B4),
+                highBadge = Color(0xFFF97E71),
+                lowBadge = Color(0xFFFFC56D)
             )
             NewDesignPalette.B -> NewDesignPaletteColors(
                 lowStart = Color(0xFFD93B17),
@@ -36,7 +42,10 @@ object NewDesignPaletteController {
                 normalStart = Color(0xFF43E695),
                 normalEnd = Color(0xFF26A69A),
                 highStart = Color(0xFFFCC30D),
-                highEnd = Color(0xFFDF7122)
+                highEnd = Color(0xFFDF7122),
+                normalBadge = Color(0xFF2DB799),
+                highBadge = Color(0xFFAF2A2A),
+                lowBadge = Color(0xFFE47F1F)
             )
         }
 

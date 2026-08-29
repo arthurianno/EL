@@ -5,10 +5,9 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.max
 
 /**
- * Geometry derived from the four approved Figma frames (375 x 592/716/812/966).
- *
- * The height controls the compact/regular composition. Width then scales the complete
- * gauge proportionally, so the central metric stays balanced on narrow and wide phones.
+ * The dashboard reserves the bottom navigation area and divides the remaining working
+ * space into a 60% gauge header and 40% chart area. Width then scales the gauge so the
+ * central metric stays balanced on narrow and wide phones.
  */
 internal data class GlucoseDashboardLayout(
     val horizontalScale: Float,
@@ -17,7 +16,9 @@ internal data class GlucoseDashboardLayout(
     val headerHeight: Dp,
     val chartHeight: Dp,
     val navigationTopSpacing: Dp,
-    val gaugeTopSpacing: Dp
+    val gaugeTopSpacing: Dp,
+    /** Extra height that anchors the TIR/pill row near the bottom of the gradient header. */
+    val lowerControlsExtraOffset: Dp
 )
 
 internal fun calculateGlucoseDashboardLayout(
@@ -26,8 +27,6 @@ internal fun calculateGlucoseDashboardLayout(
 ): GlucoseDashboardLayout {
     val height = screenHeight.value
     val baseRingSize = interpolateByHeight(height, 146f, 175f, 199f, 199f)
-    val baseHeaderHeight = interpolateByHeight(height, 312f, 381f, 440f, 506f)
-    val chartHeight = interpolateByHeight(height, 142f, 164f, 201f, 272f).dp
     val navigationTopSpacing = interpolateByHeight(height, 34f, 53f, 59f, 59f).dp
     val gaugeTopSpacing = interpolateByHeight(height, 16f, 18f, 17f, 17f).dp
     val baseRingTopOffset = interpolateByHeight(height, 0f, 5f, 17f, 17f)
@@ -38,17 +37,54 @@ internal fun calculateGlucoseDashboardLayout(
     val horizontalScale = (availableGaugeWidth / 343f).coerceIn(0.8f, 1.2f)
     val ringSize = (baseRingSize * horizontalScale).coerceIn(128f, 239f)
 
+    // The Figma frames include a 72dp bottom navigation area. The remaining cell space
+    // follows the 60/40 composition rule. The minimum keeps the compact 592dp layout
+    // from clipping a gauge that has grown because of screen width.
+    val workingHeight = (height - 72f).coerceAtLeast(0f)
+    val minimumHeaderHeight = 300f + (ringSize - 146f).coerceAtLeast(0f)
+    val headerHeight = max(minimumHeaderHeight, workingHeight * 0.60f).dp
+    val chartHeight = (workingHeight * 0.40f - 88f).coerceIn(142f, 300f).dp
+    val ringTopOffset = (baseRingTopOffset * horizontalScale).dp
+
+    // In Figma the lower data row ends 16dp above the gradient edge. On tall phones the
+    // 60% header gains height, so transfer that free space to this row instead of leaving
+    // an expanding empty area below it.
+    val lowerControlsExtraOffset = (
+        headerHeight -
+            navigationTopSpacing -
+            (33.dp * horizontalScale) -
+            gaugeTopSpacing -
+            glucoseGaugeBaseHeight(ringSize.dp, ringTopOffset) -
+            (16.dp * horizontalScale)
+        ).coerceAtLeast(0.dp)
+
     return GlucoseDashboardLayout(
         horizontalScale = horizontalScale,
         ringSize = ringSize.dp,
-        ringTopOffset = (baseRingTopOffset * horizontalScale).dp,
-        // A wider ring requires exactly that additional vertical room; fixed controls keep
-        // their Figma dimensions and therefore do not contribute to this delta.
-        headerHeight = max(300f, baseHeaderHeight + ringSize - baseRingSize).dp,
+        ringTopOffset = ringTopOffset,
+        headerHeight = headerHeight,
         chartHeight = chartHeight,
         navigationTopSpacing = navigationTopSpacing,
-        gaugeTopSpacing = gaugeTopSpacing
+        gaugeTopSpacing = gaugeTopSpacing,
+        lowerControlsExtraOffset = lowerControlsExtraOffset
     )
+}
+
+/** Height of the gauge before the adaptive space that moves its lower data row down. */
+internal fun glucoseGaugeBaseHeight(ringSize: Dp, ringTopOffset: Dp): Dp {
+    val scaleFactor = ringSize.value / 199f
+    return ringSize + ringTopOffset + glucoseGaugeBottomSectionHeight(ringSize) + 7.dp * scaleFactor
+}
+
+private fun glucoseGaugeBottomSectionHeight(ringSize: Dp): Dp {
+    val diameter = ringSize.value
+    val height = when {
+        diameter <= 146f -> 71f
+        diameter <= 175f -> 71f + (diameter - 146f) * 10f / 29f
+        diameter <= 199f -> 81f + (diameter - 175f) * 19f / 24f
+        else -> 100f + (diameter - 199f) * 100f / 199f
+    }
+    return height.dp
 }
 
 internal fun glucoseValueFontSize(ringSize: Dp): Float {

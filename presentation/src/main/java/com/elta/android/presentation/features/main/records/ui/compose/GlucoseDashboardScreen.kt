@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -35,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -171,7 +173,7 @@ fun GlucoseDashboardScreen(
     }
 
     val screenBg = if (isDarkTheme) GlucoseDashboardTheme.DarkBackground else Color.White
-    val selectedTabTextColor = GlucoseDashboardTheme.getMainTextColor(currentState)
+    val selectedTabTextColor = GlucoseDashboardTheme.getSelectedTabTextColor(currentState)
 
     val configuration = androidx.compose.ui.platform.LocalConfiguration.current
     val displayAspectRatio = remember(context, configuration) {
@@ -179,9 +181,10 @@ fun GlucoseDashboardScreen(
             ?: (configuration.screenHeightDp.toFloat() / configuration.screenWidthDp.coerceAtLeast(1))
     }
 
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    ProvideTextStyle(value = TextStyle(fontFamily = GlucoseDashboardGothamPro)) {
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxWidth()
+        ) {
         val layout = calculateGlucoseDashboardLayout(
             screenWidth = maxWidth,
             // Figma has one reference width (375) and several heights. This composable is
@@ -249,7 +252,7 @@ fun GlucoseDashboardScreen(
                                         Text(
                                             text = category,
                                             fontSize = 14.sp,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            fontWeight = FontWeight.Normal,
                                             color = if (isSelected) selectedTabTextColor else GlucoseDashboardTheme.TabUnselectedText
                                         )
                                     }
@@ -276,6 +279,7 @@ fun GlucoseDashboardScreen(
                         isSyncing = isSyncing,
                         ringSize = layout.ringSize,
                         ringTopOffset = layout.ringTopOffset,
+                        lowerControlsExtraOffset = layout.lowerControlsExtraOffset,
                         onSyncClick = {
                             if (!isSyncing) {
                                 bus?.event(Events.ServerSyncRequested)
@@ -284,7 +288,6 @@ fun GlucoseDashboardScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.weight(1f))
                 }
 
                 if (BuildConfig.DEBUG) {
@@ -392,6 +395,7 @@ fun GlucoseDashboardScreen(
                 }
             )
             }
+        }
         }
     }
 }

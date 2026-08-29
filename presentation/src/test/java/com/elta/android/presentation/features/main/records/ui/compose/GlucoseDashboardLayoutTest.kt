@@ -7,12 +7,12 @@ import org.junit.Test
 class GlucoseDashboardLayoutTest {
 
     @Test
-    fun `matches the four Figma height reference points`() {
+    fun `keeps the 60 40 working-space composition at the reference heights`() {
         val references = listOf(
             592 to Triple(146f, 312f, 142f),
-            716 to Triple(175f, 381f, 164f),
-            812 to Triple(199f, 440f, 201f),
-            966 to Triple(199f, 506f, 272f)
+            716 to Triple(175f, 386.4f, 169.6f),
+            812 to Triple(199f, 444f, 208f),
+            966 to Triple(199f, 536.4f, 269.6f)
         )
 
         references.forEach { (height, expected) ->
@@ -22,6 +22,15 @@ class GlucoseDashboardLayoutTest {
             assertEquals(expected.second, layout.headerHeight.value, 0.01f)
             assertEquals(expected.third, layout.chartHeight.value, 0.01f)
         }
+    }
+
+    @Test
+    fun `uses free header height to keep lower controls near the gradient edge`() {
+        val regular = calculateGlucoseDashboardLayout(375.dp, 812.dp)
+        val tall = calculateGlucoseDashboardLayout(375.dp, 966.dp)
+
+        assertEquals(0f, regular.lowerControlsExtraOffset.value, 0.01f)
+        assertEquals(88.4f, tall.lowerControlsExtraOffset.value, 0.01f)
     }
 
     @Test

@@ -42,6 +42,21 @@ object GlucoseDashboardTheme {
         }
     }
 
+    fun getStateBadgeColor(state: GlucoseState): Color {
+        val colors = NewDesignPaletteController.colors
+        return when (state) {
+            GlucoseState.NORMAL -> colors.normalBadge
+            GlucoseState.HIGH -> colors.highBadge
+            GlucoseState.LOW -> colors.lowBadge
+        }
+    }
+
+    fun getSelectedTabTextColor(state: GlucoseState): Color = when (state) {
+        GlucoseState.NORMAL -> Color(0xFF3FDC96)
+        GlucoseState.HIGH -> Color(0xFFD2381A)
+        GlucoseState.LOW -> Color(0xFFF8B610)
+    }
+
     val MaxBadgeColor = Color(0xFFEE9C17)
     val MinBadgeColor = Color(0xFFD93B17)
     val NormalChartColor = Color(0xFF29AF99)
