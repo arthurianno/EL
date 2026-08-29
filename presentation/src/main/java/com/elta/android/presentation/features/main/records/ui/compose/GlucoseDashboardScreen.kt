@@ -1,5 +1,9 @@
 package com.elta.android.presentation.features.main.records.ui.compose
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.util.DisplayMetrics
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,12 +12,11 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -35,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.events
@@ -170,31 +174,24 @@ fun GlucoseDashboardScreen(
     val selectedTabTextColor = GlucoseDashboardTheme.getMainTextColor(currentState)
 
     val configuration = androidx.compose.ui.platform.LocalConfiguration.current
-    val screenWidthDp = configuration.screenWidthDp.dp
-    val screenHeightDp = configuration.screenHeightDp.dp
-    val designScale = (screenWidthDp.value / 375f).coerceIn(0.85f, 1.25f)
-
-    // Calculate vertical scale from physical device height (812 dp is standard reference).
-    val verticalScale = when {
-        screenHeightDp.value < 650f -> 0.78f
-        screenHeightDp.value < 720f -> 0.85f
-        screenHeightDp.value < 800f -> 0.92f
-        else -> 1.0f
+    val displayAspectRatio = remember(context, configuration) {
+        context.findActivity()?.realDisplayAspectRatio()
+            ?: (configuration.screenHeightDp.toFloat() / configuration.screenWidthDp.coerceAtLeast(1))
     }
 
-    // Chart card height adapted to screen height (Figma 592 -> 142dp, 716 -> 164dp, 812 -> 201dp, 966 -> 265dp)
-    val chartCardHeight = when {
-        screenHeightDp.value < 620f -> 142.dp * designScale
-        screenHeightDp.value < 720f -> 164.dp * designScale
-        screenHeightDp.value < 800f -> 195.dp * designScale
-        screenHeightDp.value < 880f -> 228.dp * designScale
-        else -> 265.dp * designScale
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize()
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
+        val layout = calculateGlucoseDashboardLayout(
+            screenWidth = maxWidth,
+            // Figma has one reference width (375) and several heights. This composable is
+            // hosted by a wrap-content RecyclerView item, so derive the matching Figma height
+            // from the physical display aspect ratio rather than the item's own measurement.
+            screenHeight = maxWidth * displayAspectRatio
+        )
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(screenBg)
@@ -204,26 +201,30 @@ fun GlucoseDashboardScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(layout.headerHeight)
                     .background(GlucoseDashboardTheme.getHeaderGradient(currentState, isDarkTheme))
-                    .statusBarsPadding()
-                    .padding(top = (8.dp * verticalScale) * designScale)
             ) {
-                Column(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                ) {
+                    Spacer(modifier = Modifier.height(layout.navigationTopSpacing))
+
                     // Top Category Pill Tabs Switcher ("Глюкоза", "Давление", "Инсулин")
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 14.dp * designScale),
+                            .padding(horizontal = 14.dp * layout.horizontalScale),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(33.dp * designScale)
-                                .clip(RoundedCornerShape(35.5.dp * designScale))
+                                .height(33.dp * layout.horizontalScale)
+                                .clip(RoundedCornerShape(35.5.dp * layout.horizontalScale))
                                 .background(Color.White.copy(alpha = 0.2f))
-                                .padding(2.dp * designScale)
+                                .padding(2.dp * layout.horizontalScale)
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -234,8 +235,8 @@ fun GlucoseDashboardScreen(
                                     Box(
                                         modifier = Modifier
                                             .weight(3f)
-                                            .height(29.dp * designScale)
-                                            .clip(RoundedCornerShape(35.5.dp * designScale))
+                                            .height(29.dp * layout.horizontalScale)
+                                            .clip(RoundedCornerShape(35.5.dp * layout.horizontalScale))
                                             .background(
                                                 if (isSelected) Color.White.copy(alpha = 0.72f) else Color.Transparent
                                             )
@@ -257,45 +258,9 @@ fun GlucoseDashboardScreen(
                         }
                     }
 
-                    // Compact Palette Switcher Row under tabs
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp * designScale, top = 4.dp * designScale, end = 16.dp * designScale),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        NewDesignPalette.entries.forEach { palette ->
-                            val isSelected = NewDesignPaletteController.activePalette == palette
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp * designScale))
-                                    .background(
-                                        if (isSelected) Color.White.copy(alpha = 0.42f)
-                                        else Color.White.copy(alpha = 0.16f)
-                                    )
-                                    .clickable {
-                                        NewDesignPaletteController.select(palette)
-                                        bus?.event(Events.NewDesignPaletteChanged)
-                                    }
-                                    .padding(horizontal = 8.dp * designScale, vertical = 2.dp * designScale),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "Палитра ${palette.name}",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = Color.White
-                                )
-                            }
-                            if (palette != NewDesignPalette.entries.last()) {
-                                Spacer(modifier = Modifier.padding(horizontal = 2.dp * designScale))
-                            }
-                        }
-                    }
+                    Spacer(modifier = Modifier.height(layout.gaugeTopSpacing))
 
-                    Spacer(modifier = Modifier.height((4.dp * verticalScale) * designScale))
-
-                    // Central Circular Ring Gauge Widget
+                    // Central Circular Ring Gauge Widget (Scales 100% dynamically with screenWidthDp)
                     GlucoseRingGauge(
                         glucoseValue = glucoseValue,
                         glucoseUnit = "ммоль/л",
@@ -309,8 +274,8 @@ fun GlucoseDashboardScreen(
                         statusText = statusText,
                         isStatusVisible = isStatusVisible,
                         isSyncing = isSyncing,
-                        designScale = designScale,
-                        verticalScale = verticalScale,
+                        ringSize = layout.ringSize,
+                        ringTopOffset = layout.ringTopOffset,
                         onSyncClick = {
                             if (!isSyncing) {
                                 bus?.event(Events.ServerSyncRequested)
@@ -319,7 +284,19 @@ fun GlucoseDashboardScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height((16.dp * verticalScale) * designScale))
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+
+                if (BuildConfig.DEBUG) {
+                    PaletteSwitcher(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 6.dp, end = 12.dp),
+                        onPaletteSelected = { palette ->
+                            NewDesignPaletteController.select(palette)
+                            bus?.event(Events.NewDesignPaletteChanged)
+                        }
+                    )
                 }
             }
 
@@ -336,28 +313,28 @@ fun GlucoseDashboardScreen(
             GlucoseLineChartCard(
                 isDarkTheme = isDarkTheme,
                 points = chartPoints,
-                designScale = designScale,
-                cardHeight = chartCardHeight,
+                designScale = layout.horizontalScale,
+                cardHeight = layout.chartHeight,
                 onChartClick = {
                     isTransitioningToDetailed = true
                 }
             )
 
-            Spacer(modifier = Modifier.height((10.dp * verticalScale) * designScale))
+            Spacer(modifier = Modifier.height(10.dp))
 
             ChartInteractionHint(
                 isDarkTheme = isDarkTheme,
-                designScale = designScale,
+                designScale = layout.horizontalScale,
                 onClick = {
                     isTransitioningToDetailed = true
                 }
             )
 
-            Spacer(modifier = Modifier.height((8.dp * verticalScale) * designScale))
+            Spacer(modifier = Modifier.height(8.dp))
 
         }
 
-        if (isTransitioningToDetailed) {
+            if (isTransitioningToDetailed) {
             GlucoseChartTransitionOverlay(
                 isDarkTheme = isDarkTheme,
                 onAnimationFinished = {
@@ -367,7 +344,7 @@ fun GlucoseDashboardScreen(
             )
         }
 
-        if (isDetailedChartVisible) {
+            if (isDetailedChartVisible) {
             val realPoints = remember(dailyGlucoseModel, allDayEvents) {
                 dailyGlucoseModel?.let { com.elta.android.presentation.features.main.records.mapper.DetailedChartItemsBuilder.buildPoints(it, allDayEvents) }
             }
@@ -414,8 +391,79 @@ fun GlucoseDashboardScreen(
                     }
                 }
             )
+            }
         }
     }
+}
+
+@Composable
+private fun PaletteSwitcher(
+    modifier: Modifier = Modifier,
+    onPaletteSelected: (NewDesignPalette) -> Unit
+) {
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.End
+    ) {
+        Box(
+            modifier = Modifier
+                .size(30.dp)
+                .clip(RoundedCornerShape(15.dp))
+                .background(Color.White.copy(alpha = 0.2f))
+                .clickable { isExpanded = !isExpanded },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = NewDesignPaletteController.activePalette.name,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+        }
+        if (isExpanded) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Row {
+                NewDesignPalette.entries.forEach { palette ->
+                    val isSelected = NewDesignPaletteController.activePalette == palette
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(
+                                if (isSelected) Color.White.copy(alpha = 0.45f)
+                                else Color.White.copy(alpha = 0.18f)
+                            )
+                            .clickable { onPaletteSelected(palette) }
+                            .padding(horizontal = 8.dp, vertical = 2.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Палитра ${palette.name}",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
+                        )
+                    }
+                    if (palette != NewDesignPalette.entries.last()) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
+}
+
+private fun Activity.realDisplayAspectRatio(): Float {
+    @Suppress("DEPRECATION")
+    val displayMetrics = DisplayMetrics().also(windowManager.defaultDisplay::getRealMetrics)
+    return displayMetrics.heightPixels.toFloat() / displayMetrics.widthPixels.coerceAtLeast(1)
 }
 
 @Composable

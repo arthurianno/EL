@@ -97,7 +97,7 @@ fun GlucoseLineChartCard(
 
     Box(
         modifier = Modifier
-            .padding(start = 14.dp * designScale, top = 16.dp * designScale, end = 14.dp * designScale, bottom = 0.dp)
+            .padding(start = 17.dp * designScale, top = 16.dp * designScale, end = 17.dp * designScale, bottom = 0.dp)
             .fillMaxWidth()
             .height(cardHeight)
             .graphicsLayer {
