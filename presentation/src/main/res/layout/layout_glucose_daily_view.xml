@@ -21,4 +21,16 @@
         android:id="@+id/dailyGlucoseRangesOverlayView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/dailyGlucoseTrendSettingsView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/glucose_trend_line_settings"
+        android:padding="8dp"
+        android:src="@drawable/ic_chart_settings" />
 </merge>

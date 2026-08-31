@@ -40,6 +40,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -67,6 +69,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
@@ -101,6 +104,9 @@ private const val RAW_DETAILS_MAX_MINUTES = 2L * DAY_MINUTES
 private const val INTERMEDIATE_DETAILS_MAX_MINUTES = 6L * DAY_MINUTES
 private const val INTERMEDIATE_BUCKET_MINUTES = 3L * 60L
 private const val MAX_GLUCOSE = 16f
+private const val TREND_LINE_DASH_GAP_MINUTES = DAY_MINUTES
+private const val TREND_LINE_PREFERENCES = "glucose_chart_preferences"
+private const val TREND_LINE_STYLE_KEY = "continuous_trend_line_style"
 
 private val ContinuousBackground get() = NewDesignPaletteController.colors.normalEnd
 private val ContinuousPrimary = Color(0xFF3D4556)
@@ -109,6 +115,11 @@ private val ContinuousBorder = Color(0xFFA4A4A4)
 private val ContinuousLow = Color(0xFFD93B17)
 private val ContinuousNormal = GlucoseDashboardTheme.NormalChartColor
 private val ContinuousHigh = Color(0xFFEE9C17)
+
+private enum class ContinuousTrendLineStyle {
+    SHARP,
+    SMOOTH
+}
 
 /**
  * The detailed chart is a single real-time viewport. Its position and duration are
@@ -126,7 +137,8 @@ internal fun ContinuousDetailedGlucoseChartScreen(
     allEvents: List<EventV2>,
     onMonthsNeeded: (LocalDate, LocalDate) -> Unit
 ) {
-    val activity = LocalContext.current.continuousFindActivity()
+    val context = LocalContext.current
+    val activity = context.continuousFindActivity()
     DisposableEffect(activity) {
         val previousOrientation = activity?.requestedOrientation
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -150,6 +162,20 @@ internal fun ContinuousDetailedGlucoseChartScreen(
     var insulinVisible by remember { mutableStateOf(true) }
     var foodVisible by remember { mutableStateOf(true) }
     var activityVisible by remember { mutableStateOf(true) }
+    val trendLinePreferences = remember(context) {
+        context.applicationContext.getSharedPreferences(TREND_LINE_PREFERENCES, Context.MODE_PRIVATE)
+    }
+    var trendLineStyle by remember {
+        mutableStateOf(
+            runCatching {
+                ContinuousTrendLineStyle.valueOf(
+                    trendLinePreferences.getString(TREND_LINE_STYLE_KEY, ContinuousTrendLineStyle.SHARP.name)
+                        ?: ContinuousTrendLineStyle.SHARP.name
+                )
+            }.getOrDefault(ContinuousTrendLineStyle.SHARP)
+        )
+    }
+    var isTrendLineMenuVisible by remember { mutableStateOf(false) }
     val maxViewportDuration = MAX_VIEWPORT_MINUTES.coerceAtMost(historyDuration)
 
     fun updateViewport(start: Long, duration: Long) {
@@ -314,13 +340,52 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = ContinuousPrimary
                             )
-                            Row(
-                                modifier = Modifier.padding(end = 36.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text("Количество измерений:", fontSize = 12.sp, color = ContinuousSecondary)
-                                Spacer(Modifier.width(4.dp))
-                                Text("${statistics.count}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ContinuousPrimary)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Row(
+                                    modifier = Modifier.padding(end = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("Количество измерений:", fontSize = 12.sp, color = ContinuousSecondary)
+                                    Spacer(Modifier.width(4.dp))
+                                    Text("${statistics.count}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ContinuousPrimary)
+                                }
+                                Box {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_chart_settings),
+                                        contentDescription = stringResource(R.string.glucose_trend_line_settings),
+                                        tint = ContinuousSecondary,
+                                        modifier = Modifier
+                                            .size(20.dp)
+                                            .clickable { isTrendLineMenuVisible = true }
+                                    )
+                                    DropdownMenu(
+                                        expanded = isTrendLineMenuVisible,
+                                        onDismissRequest = { isTrendLineMenuVisible = false }
+                                    ) {
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                trendLineStyle = ContinuousTrendLineStyle.SHARP
+                                                trendLinePreferences.edit()
+                                                    .putString(TREND_LINE_STYLE_KEY, trendLineStyle.name)
+                                                    .apply()
+                                                isTrendLineMenuVisible = false
+                                            }
+                                        ) {
+                                            Text(stringResource(R.string.glucose_trend_line_sharp))
+                                        }
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                trendLineStyle = ContinuousTrendLineStyle.SMOOTH
+                                                trendLinePreferences.edit()
+                                                    .putString(TREND_LINE_STYLE_KEY, trendLineStyle.name)
+                                                    .apply()
+                                                isTrendLineMenuVisible = false
+                                            }
+                                        ) {
+                                            Text(stringResource(R.string.glucose_trend_line_smooth))
+                                        }
+                                    }
+                                }
                             }
                         }
                         Spacer(Modifier.height(2.dp))
@@ -350,6 +415,7 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                                 activityEntries = if (activityVisible) activityEntries else emptyList(),
                                 transparentBars = insulinVisible && foodVisible && activityVisible,
                                 selectedPoint = selectedPoint,
+                                trendLineStyle = trendLineStyle,
                                 onPointSelected = { selectedPoint = it },
                                 onViewportChanged = ::updateViewport
                             )
@@ -494,6 +560,7 @@ private fun ContinuousTimelineGraph(
     activityEntries: List<DetailedActivityEntry>,
     transparentBars: Boolean,
     selectedPoint: DetailedGlucosePoint?,
+    trendLineStyle: ContinuousTrendLineStyle,
     onPointSelected: (DetailedGlucosePoint?) -> Unit,
     onViewportChanged: (Long, Long) -> Unit
 ) {
@@ -596,15 +663,46 @@ private fun ContinuousTimelineGraph(
                         .coerceIn(5.dp.toPx(), chartHeight - 5.dp.toPx())
                 ) }
                 offsets.zipWithNext().forEach { (first, second) ->
-                    val maxGap = when (visualResolution) {
-                        ContinuousGlucoseResolution.RAW -> 2L * 60L
-                        ContinuousGlucoseResolution.INTERMEDIATE -> 6L * 60L
-                        ContinuousGlucoseResolution.DAILY -> DAY_MINUTES
-                    }
                     val gap = second.first.continuousMinute(origin) - first.first.continuousMinute(origin)
-                    if (gap <= maxGap) {
-                        drawLine(continuousPointColor(first.first.value), first.second, second.second,
-                            strokeWidth = 2.dp.toPx(), cap = StrokeCap.Round)
+                    val lineColor = continuousPointColor(first.first.value)
+                    val gapPathEffect = if (gap > TREND_LINE_DASH_GAP_MINUTES) {
+                        PathEffect.dashPathEffect(floatArrayOf(8.dp.toPx(), 6.dp.toPx()), 0f)
+                    } else {
+                        null
+                    }
+                    when (trendLineStyle) {
+                        ContinuousTrendLineStyle.SHARP -> drawLine(
+                            lineColor,
+                            first.second,
+                            second.second,
+                            strokeWidth = 2.dp.toPx(),
+                            cap = StrokeCap.Round,
+                            pathEffect = gapPathEffect
+                        )
+
+                        ContinuousTrendLineStyle.SMOOTH -> {
+                            val middleX = (first.second.x + second.second.x) / 2f
+                            val segment = Path().apply {
+                                moveTo(first.second.x, first.second.y)
+                                cubicTo(
+                                    middleX,
+                                    first.second.y,
+                                    middleX,
+                                    second.second.y,
+                                    second.second.x,
+                                    second.second.y
+                                )
+                            }
+                            drawPath(
+                                path = segment,
+                                color = lineColor,
+                                style = Stroke(
+                                    width = 2.dp.toPx(),
+                                    cap = StrokeCap.Round,
+                                    pathEffect = gapPathEffect
+                                )
+                            )
+                        }
                     }
                 }
                 offsets.forEach { (point, offset) ->

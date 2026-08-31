@@ -27,8 +27,14 @@ import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.extensions.dpToPx
 import com.nullgr.core.ui.extensions.getDisplaySize
 import com.nullgr.core.ui.extensions.spToPx
+import org.threeten.bp.Duration
 import org.threeten.bp.ZonedDateTime
 import kotlin.math.max
+
+enum class GlucoseTrendLineStyle {
+    SHARP,
+    SMOOTH
+}
 
 @Suppress("LongMethod", "MagicNumber")
 class GlucoseDailyChartView @JvmOverloads constructor(
@@ -43,6 +49,12 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             _chartDataModel = value
             currentDateCalendar = ZonedDateTime.now()
             onDataModelChanged()
+        }
+
+    var trendLineStyle: GlucoseTrendLineStyle = GlucoseTrendLineStyle.SHARP
+        set(value) {
+            field = value
+            invalidate()
         }
 
     private var glucoseRangesOverlayView: GlucoseRangesOverlayView? = null
@@ -86,6 +98,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private var sectionsDividerWidth = 0f
     private var chartOffset = 0f
     private var chartItemRadius = 0f
+    private var trendLineWidth = 0f
+    private var trendLineDashLength = 0f
     private var chartPointTitleSize = 0f
     private var chartPointTitleBackgroundWidth = 0f
     private var chartPointTitleBackgroundHeight = 0f
@@ -112,6 +126,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private val sectionsDividerPaint = Paint()
     private val timeTitlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val chartItemPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val trendLinePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val selectedItemPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val selectedItemTimeTitlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val selectedItemTimeBgPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -186,9 +201,53 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         with(canvas) {
             drawSections()
             drawSectionDividers()
+            drawTrendLine()
             drawTimeLine()
             drawPoints()
         }
+    }
+
+    /** Draws the measurement history behind the markers, preserving every interval. */
+    private fun Canvas.drawTrendLine() {
+        val orderedPoints = chartPoints.entries.sortedBy { it.key.dateTime }
+        if (orderedPoints.size < 2) return
+
+        orderedPoints.zipWithNext().forEach { (previous, current) ->
+            val hasLongGap = Duration.between(previous.key.dateTime, current.key.dateTime)
+                .toHours() > TREND_LINE_DASH_GAP_HOURS
+            trendLinePaint.pathEffect = if (hasLongGap) {
+                DashPathEffect(floatArrayOf(trendLineDashLength, trendLineDashLength), 0f)
+            } else {
+                null
+            }
+
+            when (trendLineStyle) {
+                GlucoseTrendLineStyle.SHARP -> drawLine(
+                    previous.value.x,
+                    previous.value.y,
+                    current.value.x,
+                    current.value.y,
+                    trendLinePaint
+                )
+
+                GlucoseTrendLineStyle.SMOOTH -> {
+                    val middleX = (previous.value.x + current.value.x) / 2f
+                    val segment = Path().apply {
+                        moveTo(previous.value.x, previous.value.y)
+                        cubicTo(
+                            middleX,
+                            previous.value.y,
+                            middleX,
+                            current.value.y,
+                            current.value.x,
+                            current.value.y
+                        )
+                    }
+                    drawPath(segment, trendLinePaint)
+                }
+            }
+        }
+        trendLinePaint.pathEffect = null
     }
 
     private fun Canvas.drawPoints() {
@@ -378,6 +437,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         singleHourWidth = SINGLE_HOUR_WIDTH.dpToPx(context)
         timeLineOffset = TIME_LINE_OFFSET.dpToPx(context)
         chartItemRadius = ITEM_RADIUS.dpToPx(context)
+        trendLineWidth = TREND_LINE_WIDTH.dpToPx(context)
+        trendLineDashLength = TREND_LINE_DASH_LENGTH.dpToPx(context)
         selectedChartItemRadius = SELECTED_ITEM_RADIUS.dpToPx(context)
         titlePadding = TITLE_PADDING.dpToPx(context)
 
@@ -430,6 +491,14 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         }
         chartItemPaint.apply {
             style = Paint.Style.FILL
+        }
+        trendLinePaint.apply {
+            color = normalRangeItemColor
+            alpha = TREND_LINE_ALPHA
+            style = Paint.Style.STROKE
+            strokeWidth = trendLineWidth
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
         }
         selectedItemPaint.apply {
             style = Paint.Style.STROKE
@@ -570,6 +639,10 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         private const val SINGLE_HOUR_WIDTH = 54f // dp
         private const val TIME_LINE_OFFSET = 33f // dp
         private const val ITEM_RADIUS = 4f // dp
+        private const val TREND_LINE_WIDTH = 2f // dp
+        private const val TREND_LINE_DASH_LENGTH = 5f // dp
+        private const val TREND_LINE_ALPHA = 150
+        private const val TREND_LINE_DASH_GAP_HOURS = 24L
         private const val TITLE_PADDING = 16f // dp
         private const val TYPEFACE_MEDIUM = "roboto_medium.ttf"
         private const val TYPEFACE_BOLD = "roboto_bold.ttf"

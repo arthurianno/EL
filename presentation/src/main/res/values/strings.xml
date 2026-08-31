@@ -263,6 +263,9 @@
     <string name="main_records_daily_chart_time_mask">0%s:00</string>
     <string name="main_records_daily_chart_time_two_symbols_mask">%s:00</string>
     <string name="main_records_daily_chart_min_title">min</string>
+    <string name="glucose_trend_line_settings">Настройки линии графика</string>
+    <string name="glucose_trend_line_sharp">Ломаная линия</string>
+    <string name="glucose_trend_line_smooth">Плавная линия</string>
     <string name="main_records_daily_chart_max_title">max</string>
     <string name="main_records_event_time_mask">в %s (UTC %s)</string>
     <string name="main_records_glucose_plasma">Уровень глюкозы в плазме крови</string>
