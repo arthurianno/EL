@@ -14,10 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.ProvideTextStyle
@@ -43,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.Events
-import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.utils.SyncAttemptTimeStore
@@ -363,18 +359,6 @@ fun GlucoseDashboardScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            ChartInteractionHint(
-                isDarkTheme = isDarkTheme,
-                designScale = layout.horizontalScale,
-                onClick = {
-                    isTransitioningToDetailed = true
-                }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
         }
 
             if (isTransitioningToDetailed) {
@@ -482,42 +466,5 @@ private fun PaletteSelectionSheet(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun ChartInteractionHint(
-    isDarkTheme: Boolean,
-    designScale: Float,
-    onClick: () -> Unit = {}
-) {
-    val hintColor = if (isDarkTheme) {
-        Color.White.copy(alpha = 0.62f)
-    } else {
-        Color(0xFF878B93)
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(25.dp * designScale)
-            .clip(RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = androidx.compose.ui.res.painterResource(R.drawable.ic_info_fill),
-            contentDescription = null,
-            tint = hintColor,
-            modifier = Modifier.size(20.dp * designScale)
-        )
-        Spacer(modifier = Modifier.width(13.dp * designScale))
-        Text(
-            text = "Нажмите на график для большей статистики",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Normal,
-            color = hintColor
-        )
     }
 }

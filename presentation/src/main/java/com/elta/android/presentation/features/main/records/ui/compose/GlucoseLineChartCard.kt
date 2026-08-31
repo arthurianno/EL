@@ -90,7 +90,7 @@ fun GlucoseLineChartCard(
 
     Box(
         modifier = Modifier
-            .padding(start = 17.dp * designScale, top = 16.dp * designScale, end = 17.dp * designScale, bottom = 0.dp)
+            .padding(start = 17.dp * designScale, top = 45.dp * designScale, end = 17.dp * designScale, bottom = 0.dp)
             .fillMaxWidth()
             .height(cardHeight)
             .clip(RoundedCornerShape(13.dp * designScale))
@@ -102,7 +102,7 @@ fun GlucoseLineChartCard(
             .background(cardBg)
             .padding(
                 start = 8.dp * designScale,
-                top = 14.dp * designScale,
+                top = 4.dp * designScale,
                 end = 12.dp * designScale,
                 bottom = 10.dp * designScale
             )
@@ -126,7 +126,7 @@ fun GlucoseLineChartCard(
                 ) {
                     Text(
                         text = "Сегодня",
-                        fontSize = 18.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = cardTextColor
                     )

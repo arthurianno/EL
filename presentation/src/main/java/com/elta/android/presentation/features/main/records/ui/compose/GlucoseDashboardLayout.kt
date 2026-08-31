@@ -61,7 +61,15 @@ internal fun calculateGlucoseDashboardLayout(
         )
     }
     val minimumHeaderHeight = 300f + (ringSize.value - 146f).coerceAtLeast(0f)
-    val regularHeaderHeight = max(minimumHeaderHeight, workingHeight * 0.60f).dp
+    val requiredHeaderHeight = navigationTopSpacing +
+        tabHeight +
+        gaugeTopSpacing +
+        glucoseGaugeBaseHeight(ringSize, ringTopOffset) +
+        16.dp
+    val regularHeaderHeight = max(
+        max(minimumHeaderHeight, workingHeight * 0.60f),
+        requiredHeaderHeight.value
+    ).dp
 
     // The empty state uses a 185dp circle at the 375dp design reference. Reserve enough
     // vertical space for it rather than shrinking it to fit a fixed 60% header.
@@ -157,19 +165,18 @@ private fun fitRingSizeToHeader(
 
 /** Height of the gauge before the adaptive space that moves its lower data row down. */
 internal fun glucoseGaugeBaseHeight(ringSize: Dp, ringTopOffset: Dp): Dp {
-    // At the 812dp Figma reference the lower metrics group begins at y=367 and
-    // ends at y=424, leaving the specified 16dp inset before the 440dp gradient edge.
-    // The former extra 7dp shifted this group into the chart on compact MIUI layouts.
+    // The lower section includes both the metric row and the 45dp sync button. Keeping
+    // this in the required height calculation prevents the button from spilling into the chart.
     return ringSize + ringTopOffset + glucoseGaugeBottomSectionHeight(ringSize)
 }
 
 private fun glucoseGaugeBottomSectionHeight(ringSize: Dp): Dp {
     val diameter = ringSize.value
     val height = when {
-        diameter <= 146f -> 71f
-        diameter <= 175f -> 71f + (diameter - 146f) * 10f / 29f
-        diameter <= 199f -> 81f + (diameter - 175f) * 19f / 24f
-        else -> 100f + (diameter - 199f) * 100f / 199f
+        diameter <= 146f -> 88f
+        diameter <= 175f -> 88f + (diameter - 146f) * 10f / 29f
+        diameter <= 199f -> 98f + (diameter - 175f) * 19f / 24f
+        else -> 117f + (diameter - 199f) * 100f / 199f
     }
     return height.dp
 }

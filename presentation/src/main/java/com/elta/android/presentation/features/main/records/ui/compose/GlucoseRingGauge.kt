@@ -14,6 +14,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -63,10 +64,28 @@ data class GlucoseTrend(
     val valueText: String
 )
 
-private val LowerIndicatorsBottomInset = 10.dp
 private val IndicatorPillHeight = 45.dp
 // The percentage has a 23dp top offset and a 44dp line box at the base size.
 private val TirVisualHeight = 67.dp
+
+private val TirTitleOffset = 8.dp
+private val TirPercentageOffset = 24.dp
+private val SyncRowHeight = 45.dp
+private val SyncRowBottomInset = 10.dp
+private val MetricValueBottomInset = 1.5.dp
+private val MetricToSyncSpacing = 8.dp
+// This affects only the visual gauge group (arc, disc, and callout), not the
+// layout anchors for metrics and sync. Keeping it proportional preserves the
+// Figma vertical rhythm on compact and tall devices alike.
+private const val RingVisualLiftFraction = 0.05f
+private const val MetricsReferenceWidth = 343f
+private const val TirStart = 12f / MetricsReferenceWidth
+private const val TirWidth = 80f / MetricsReferenceWidth
+// The leader finishes in the empty space to the right of the TIR label.
+private const val TirCalloutEnd = 88f / MetricsReferenceWidth
+private const val BreadUnitsStart = 115f / MetricsReferenceWidth
+private const val InsulinStart = 234f / MetricsReferenceWidth
+private const val IndicatorWidth = 109f / MetricsReferenceWidth
 
 enum class GlucoseTrendDirection {
     UP,
@@ -108,6 +127,8 @@ fun GlucoseRingGauge(
     // The dashboard calculates this from both the available width and the Figma height
     // breakpoints. Every visual part of the gauge uses this one scale.
     val scaleFactor = ringSize.value / 199f
+
+    val visualRingOffset = ringTopOffset - ringSize * RingVisualLiftFraction
     val centerBoxHeight = ringSize + ringTopOffset
     // On tall screens the unused part of the 60%-high header is added here, so the lower
     // controls retain their Figma bottom inset rather than floating above the gradient edge.
@@ -115,14 +136,16 @@ fun GlucoseRingGauge(
     val discTopInset = glucoseGaugeDiscTopInset(ringSize)
     val discWidth = ringSize * (152f / 185f)
     val discHeight = ringSize * (150f / 185f)
-    // Both lower pills and the visible TIR content end 15dp before the white section.
-    // Their tops differ because the TIR label/value stack is taller than a pill.
-    val pillTop = gaugeBoxHeight - LowerIndicatorsBottomInset - IndicatorPillHeight
-    val tirTop = gaugeBoxHeight - LowerIndicatorsBottomInset - TirVisualHeight
-    // The callout and the TIR component share this anchor. Keeping it in the same
-    // coordinate space prevents the line ending beside the label on other screen sizes.
-    val tirAnchorX = 52.dp * scaleFactor
-    val tirAnchorY = tirTop + 10.dp
+    // The Figma frame has two independent lower rows: metrics and the sync action.
+    // Both are anchored from the gradient bottom, so tall devices receive extra space
+    // without separating the action from the cards above it.
+    val syncRowHeight = SyncRowHeight * scaleFactor
+    val syncRowBottomInset = SyncRowBottomInset * scaleFactor
+    val syncRowTop = gaugeBoxHeight - syncRowBottomInset - syncRowHeight
+    val metricsBottom = syncRowTop - MetricToSyncSpacing * scaleFactor
+    val metricsTop = metricsBottom - TirVisualHeight * scaleFactor
+    // In the reference, the callout ends in the clear space beside the TIR heading.
+    val tirAnchorY = metricsTop + (10.dp + TirTitleOffset) * scaleFactor
     val glucoseValueFontSize = fittedGlucoseValueFontSize(
         value = glucoseValue,
         ringSize = ringSize,
@@ -153,18 +176,19 @@ fun GlucoseRingGauge(
             ) {
                 Canvas(modifier = Modifier.matchParentSize()) {
                     val centerX = size.width / 2f
-                    val centerY = (ringTopOffset + ringSize / 2f).toPx()
+                    val centerY = (visualRingOffset + ringSize / 2f).toPx()
                     val strokeWidth = (11.dp * scaleFactor).toPx()
                     val ringRadius = (ringSize / 2f).toPx() - strokeWidth / 2f
 
                     // Point directly on the outer circle contour and end at the actual TIR anchor.
                     val lineStartX = centerX - ringRadius * 0.578f
                     val lineStartY = centerY + ringRadius * 0.812f
+                    val tirCalloutEndX = size.width * TirCalloutEnd
 
                     drawLine(
                         color = Color.White.copy(alpha = 0.25f * indicatorsAlpha),
                         start = Offset(lineStartX, lineStartY),
-                        end = Offset(tirAnchorX.toPx(), tirAnchorY.toPx()),
+                        end = Offset(tirCalloutEndX, tirAnchorY.toPx()),
                         strokeWidth = (1.dp * scaleFactor).toPx()
                     )
                 }
@@ -216,7 +240,7 @@ fun GlucoseRingGauge(
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .size(ringSize)
-                            .offset(y = ringTopOffset)
+                            .offset(y = visualRingOffset)
                     ) {
                         val strokeWidth = (11.dp * scaleFactor).toPx()
                         val diameter = size.minDimension - strokeWidth
@@ -259,7 +283,7 @@ fun GlucoseRingGauge(
                         height = discHeight,
                         modifier = Modifier
                             .align(Alignment.TopCenter)
-                            .offset(y = ringTopOffset + discTopInset)
+                            .offset(y = visualRingOffset + discTopInset)
                     ) {
                         // Keep each text baseline at a proportion of the inner disc. A centered
                         // Column makes the large value pull the unit and trend upward on compact
@@ -274,13 +298,15 @@ fun GlucoseRingGauge(
                                 lineHeight = 48.sp,
                                 modifier = Modifier
                                     .align(Alignment.TopCenter)
-                                    .offset(y = discHeight * 0.18f)
+                                    // The main Figma value is visually centred in the disc;
+                                    // its glyph box needs a lower anchor than the unit and trend.
+                                    .offset(y = discHeight * 0.29f)
                             )
                             Text(
                                 text = glucoseUnit,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Normal,
-                                color = Color.Gray,
+                                color = mainColor,
                                 modifier = Modifier
                                     .align(Alignment.TopCenter)
                                     .offset(y = discHeight * 0.70f)
@@ -296,48 +322,11 @@ fun GlucoseRingGauge(
                         }
                     }
 
-                    // The icon is deliberately a little larger than the former 53 x 43dp asset.
-                    // They are intentionally not laid out relative to the indicator row.
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(x = 26.dp * scaleFactor, y = 192.dp * scaleFactor)
-                            .width(166.dp * scaleFactor)
-                            .clickable { onSyncClick() },
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.TopEnd
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_refresh_2),
-                                contentDescription = "Sync",
-                                tint = Color.White,
-                                modifier = Modifier
-                                    .size(width = 56.dp * scaleFactor, height = 46.dp * scaleFactor)
-                                    .rotate(syncIconRotation)
-                            )
-                        }
-                        Text(
-                            text = if (isSyncing) "Синхр..." else syncTimeText,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = Color.White.copy(alpha = 0.8f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center,
-
-                            modifier = Modifier
-
-                                .padding(top = 10.dp * scaleFactor)
-                                .fillMaxWidth()
-                        )
-                    }
                 }
 
-                // Figma's lower group is an overlay with independent coordinates, rather than
-                // an evenly distributed Row. This keeps TIR and both cards aligned on every width.
-                Box(
+                // Positions are percentages of the 343dp Figma content width. This keeps
+                // the asymmetric visual rhythm from the mockup without fixed screen pixels.
+                BoxWithConstraints(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .fillMaxWidth()
@@ -348,38 +337,53 @@ fun GlucoseRingGauge(
                         tirPercentage = tirPercentage,
                         modifier = Modifier
                             .align(Alignment.TopStart)
-                            .offset(x = 12.dp * scaleFactor, y = tirTop)
-                            .width(80.dp * scaleFactor),
-                        designScale = 1f
+                            .offset(x = maxWidth * TirStart, y = metricsTop)
+                            .width(maxWidth * TirWidth),
+                        designScale = scaleFactor
                     )
-                    IndicatorPill(
+                    MetricValue(
                         title = "Хлебных ед.",
                         value = breadUnitsText,
-                            modifier = Modifier
-                                .align(Alignment.TopStart)
-                            // Figma: x=131 on a 380dp frame. The gauge content starts
-                            // at x=16, so the local anchor is 115dp. Keeping this anchor
-                            // independent from the right card preserves its designed gap.
-                            .offset(x = 115.dp * scaleFactor, y = pillTop)
-                            .width(109.dp * scaleFactor),
-                        designScale = 1f
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .offset(
+                                x = maxWidth * BreadUnitsStart,
+                                y = metricsBottom - IndicatorPillHeight * scaleFactor
+                            )
+                            .width(maxWidth * IndicatorWidth),
+                        designScale = scaleFactor
                     )
-                    IndicatorPill(
+                    MetricValue(
                         title = "Инсулина",
                         value = insulinText,
                         modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(y = pillTop)
-                            .width(109.dp * scaleFactor),
-                        designScale = 1f
+                            .align(Alignment.TopStart)
+                            .offset(
+                                x = maxWidth * InsulinStart,
+                                y = metricsBottom - IndicatorPillHeight * scaleFactor
+                            )
+                            .width(maxWidth * IndicatorWidth),
+                        designScale = scaleFactor
                     )
                 }
+
+                SyncDeviceButton(
+                    actionText = if (isSyncing) "Синхронизация..." else "Синхронизация с устройством",
+                    syncTimeText = syncTimeText,
+                    isSyncing = isSyncing,
+                    iconRotation = syncIconRotation,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .offset(y = syncRowTop)
+                        .fillMaxWidth(),
+                    onClick = onSyncClick
+                )
 
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        // The full-width status banner needs clearance below the sync timestamp.
-                        .offset(y = gaugeBoxHeight - 57.dp + 10.dp * scaleFactor)
+                        // The status replaces the lower rows at the same bottom anchor.
+                        .offset(y = gaugeBoxHeight - 57.dp * scaleFactor - syncRowBottomInset)
                         .fillMaxWidth()
                         .graphicsLayer(alpha = 1f - indicatorsAlpha)
                 ) {
@@ -510,36 +514,19 @@ fun NoMeasurementsGlucoseGauge(
             )
         }
 
-        Row(
+        SyncDeviceButton(
+            actionText = actionText,
+            syncTimeText = null,
+            isSyncing = isSyncing,
+            iconRotation = syncIconRotation,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(start = 14.dp, end = 14.dp, bottom = 16.dp * compactScale)
-                .height((45f * compactScale).dp)
-                .clip(RoundedCornerShape(24.dp))
-                .border(1.dp, Color.White, RoundedCornerShape(24.dp))
-                .clickable(enabled = !isSyncing, onClick = onSyncClick),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_refresh_2),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .size(30.dp * compactScale)
-                    .rotate(syncIconRotation)
-            )
-            Spacer(modifier = Modifier.width(12.dp * compactScale))
-            Text(
-                text = actionText,
-                fontSize = (15f * compactScale).sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+                .padding(start = 14.dp, end = 14.dp, bottom = 16.dp * compactScale),
+            designScale = compactScale,
+            outlined = true,
+            onClick = onSyncClick
+        )
     }
 }
 
@@ -680,6 +667,8 @@ private fun TirIndicator(
     val density = LocalDensity.current
     val percentageFontSize = fittedTirValueFontSize(tirPercentage, designScale)
 
+
+
     CompositionLocalProvider(
         // This metric is part of the data visualisation rather than body text. Keep it
         // geometrically aligned with Figma when a device has a custom font-scale setting.
@@ -695,7 +684,9 @@ private fun TirIndicator(
             lineHeight = 20.sp,
             fontWeight = FontWeight.Normal,
             color = Color.White,
-            modifier = Modifier.align(Alignment.TopCenter)
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = TirTitleOffset * designScale)
         )
 
         if (isDash) {
@@ -729,7 +720,7 @@ private fun TirIndicator(
                     // at the Figma coordinate. The numeric value itself may be wider (100%),
                     // so it is measured without that width constraint instead of being clipped.
                     .wrapContentWidth(unbounded = true)
-                    .offset(y = 23.dp * designScale)
+                    .offset(y = TirPercentageOffset * designScale)
             )
         }
     }
@@ -747,40 +738,80 @@ internal fun fittedTirValueFontSize(value: String, designScale: Float): Float {
 }
 
 @Composable
-private fun IndicatorPill(
+private fun MetricValue(
     title: String,
     value: String,
     modifier: Modifier = Modifier,
     designScale: Float
 ) {
-    Box(
-        modifier = modifier
-            .height(IndicatorPillHeight * designScale)
-            .clip(RoundedCornerShape(40.dp * designScale))
-            .background(GlucoseDashboardTheme.IndicatorPillBackground),
-        contentAlignment = Alignment.Center
+    Column(
+        modifier = modifier.height(IndicatorPillHeight * designScale),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = title,
-            fontSize = 13.sp,
-            lineHeight = 16.sp,
+            fontSize = (13f * designScale).sp,
+            lineHeight = (16f * designScale).sp,
             fontWeight = FontWeight.Normal,
             color = Color.White.copy(alpha = 0.8f),
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 4.dp * designScale)
+            textAlign = TextAlign.Center
         )
         Text(
             text = value,
-            fontSize = 20.sp,
-            lineHeight = 26.sp,
+            fontSize = (20f * designScale).sp,
+            lineHeight = (26f * designScale).sp,
             fontWeight = FontWeight.Bold,
             color = Color.White.copy(alpha = 0.8f),
             maxLines = 1,
             softWrap = false,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun SyncDeviceButton(
+    actionText: String,
+    syncTimeText: String?,
+    isSyncing: Boolean,
+    iconRotation: Float,
+    modifier: Modifier = Modifier,
+    designScale: Float = 1f,
+    outlined: Boolean = false,
+    onClick: () -> Unit
+) {
+    val shape = RoundedCornerShape(24.dp * designScale)
+    val buttonModifier = modifier
+        .height(SyncRowHeight * designScale)
+        .clip(shape)
+        .background(Color.White.copy(alpha = if (outlined) 0f else 0.14f))
+        .then(
+            if (outlined) Modifier.border(1.dp, Color.White, shape) else Modifier
+        )
+        .clickable(enabled = !isSyncing, onClick = onClick)
+
+    Row(
+        modifier = buttonModifier,
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_refresh_2),
+            contentDescription = syncTimeText?.let { "Синхронизация с устройством. $it" },
+            tint = Color.White,
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 2.dp * designScale)
+                .size(30.dp * designScale)
+                .rotate(iconRotation)
+        )
+        Spacer(modifier = Modifier.width(12.dp * designScale))
+        Text(
+            text = actionText,
+            fontSize = (15f * designScale).sp,
+            fontWeight = FontWeight.Normal,
+            color = Color.White,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

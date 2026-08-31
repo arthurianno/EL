@@ -10,9 +10,9 @@ class GlucoseDashboardLayoutTest {
     @Test
     fun `keeps the 60 40 working-space composition at the reference heights`() {
         val references = listOf(
-            520 to Triple(146f, 312f, 142f),
-            644 to Triple(175f, 386.4f, 169.6f),
-            740 to Triple(199f, 444f, 208f),
+            520 to Triple(146f, 333f, 142f),
+            644 to Triple(175f, 398f, 169.6f),
+            740 to Triple(199f, 458f, 208f),
             894 to Triple(199f, 536.4f, 269.6f)
         )
 
@@ -30,8 +30,8 @@ class GlucoseDashboardLayoutTest {
         val regular = calculateGlucoseDashboardLayout(375.dp, 740.dp)
         val tall = calculateGlucoseDashboardLayout(375.dp, 894.dp)
 
-        assertEquals(3f, regular.lowerControlsExtraOffset.value, 0.01f)
-        assertEquals(95.4f, tall.lowerControlsExtraOffset.value, 0.01f)
+        assertEquals(0f, regular.lowerControlsExtraOffset.value, 0.01f)
+        assertEquals(78.4f, tall.lowerControlsExtraOffset.value, 0.01f)
     }
 
     @Test
