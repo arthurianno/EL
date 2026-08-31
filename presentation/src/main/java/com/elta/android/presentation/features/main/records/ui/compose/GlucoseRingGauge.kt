@@ -264,6 +264,7 @@ fun GlucoseRingGauge(
                             )
                             Spacer(modifier = Modifier.height(2.dp * scaleFactor))
                             GlucoseTrendValue(
+
                                 trend = glucoseTrend,
                                 fallbackText = deltaText,
                                 designScale = scaleFactor
