@@ -18,8 +18,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -85,6 +88,10 @@ fun GlucoseDashboardScreen(
     }
 
     val coroutineScope = rememberCoroutineScope()
+    val paletteSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true
+    )
     var hideJob by remember { mutableStateOf<Job?>(null) }
 
     fun showStatus(text: String, syncing: Boolean, autoHideMs: Long?) {
@@ -184,6 +191,23 @@ fun GlucoseDashboardScreen(
             availableContentHeight = maxHeight
         )
 
+        ModalBottomSheetLayout(
+            modifier = Modifier.fillMaxSize(),
+            sheetState = paletteSheetState,
+            sheetContent = {
+                if (BuildConfig.DEBUG) {
+                    PaletteSelectionSheet(
+                        onPaletteSelected = { palette ->
+                            NewDesignPaletteController.select(palette)
+                            bus?.event(Events.NewDesignPaletteChanged)
+                            coroutineScope.launch { paletteSheetState.hide() }
+                        }
+                    )
+                } else {
+                    Spacer(modifier = Modifier.height(1.dp))
+                }
+            }
+        ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
             modifier = Modifier
@@ -232,7 +256,11 @@ fun GlucoseDashboardScreen(
                                             .height(29.dp * layout.horizontalScale)
                                             .clip(RoundedCornerShape(35.5.dp * layout.horizontalScale))
                                             .background(
-                                                if (isSelected) Color.White.copy(alpha = 0.72f) else Color.Transparent
+                                                if (isSelected) {
+                                                    GlucoseDashboardTheme.IndicatorPillBackground
+                                                } else {
+                                                    Color.Transparent
+                                                }
                                             )
                                             .clickable {
                                                 selectedCategoryTab = category
@@ -276,21 +304,12 @@ fun GlucoseDashboardScreen(
                                 bus?.event(Events.ServerSyncRequested)
                                     ?: showStatus("Синхронизация недоступна", syncing = false, autoHideMs = 3000L)
                             }
-                        }
+                        },
+                        onStatePillLongClick = if (BuildConfig.DEBUG) {
+                            { coroutineScope.launch { paletteSheetState.show() } }
+                        } else null
                     )
 
-                }
-
-                if (BuildConfig.DEBUG) {
-                    PaletteSwitcher(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(top = 6.dp, end = 12.dp),
-                        onPaletteSelected = { palette ->
-                            NewDesignPaletteController.select(palette)
-                            bus?.event(Events.NewDesignPaletteChanged)
-                        }
-                    )
                 }
             }
 
@@ -388,61 +407,48 @@ fun GlucoseDashboardScreen(
             }
         }
         }
+        }
     }
 }
 
 @Composable
-private fun PaletteSwitcher(
-    modifier: Modifier = Modifier,
+private fun PaletteSelectionSheet(
     onPaletteSelected: (NewDesignPalette) -> Unit
 ) {
-    var isExpanded by rememberSaveable { mutableStateOf(false) }
-
     Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.End
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(GlucoseDashboardTheme.LightCardBackground)
+            .padding(horizontal = 24.dp, vertical = 20.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .size(30.dp)
-                .clip(RoundedCornerShape(15.dp))
-                .background(Color.White.copy(alpha = 0.2f))
-                .clickable { isExpanded = !isExpanded },
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = NewDesignPaletteController.activePalette.name,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
-        if (isExpanded) {
-            Spacer(modifier = Modifier.height(4.dp))
-            Row {
-                NewDesignPalette.entries.forEach { palette ->
-                    val isSelected = NewDesignPaletteController.activePalette == palette
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(
-                                if (isSelected) Color.White.copy(alpha = 0.45f)
-                                else Color.White.copy(alpha = 0.18f)
-                            )
-                            .clickable { onPaletteSelected(palette) }
-                            .padding(horizontal = 8.dp, vertical = 2.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Палитра ${palette.name}",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White
+        Text(
+            text = "Палитра интерфейса",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFF353B4B)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            NewDesignPalette.entries.forEach { palette ->
+                val isSelected = NewDesignPaletteController.activePalette == palette
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(44.dp)
+                        .clip(RoundedCornerShape(22.dp))
+                        .background(
+                            if (isSelected) GlucoseDashboardTheme.NormalChartColor
+                            else Color(0xFFF1F3F5)
                         )
-                    }
-                    if (palette != NewDesignPalette.entries.last()) {
-                        Spacer(modifier = Modifier.width(4.dp))
-                    }
+                        .clickable { onPaletteSelected(palette) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Палитра ${palette.name}",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = if (isSelected) Color.White else Color(0xFF353B4B)
+                    )
                 }
             }
         }

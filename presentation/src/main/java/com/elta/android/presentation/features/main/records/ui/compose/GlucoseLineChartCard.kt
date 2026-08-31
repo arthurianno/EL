@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -25,22 +26,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
 import java.util.Locale
+import kotlin.math.roundToInt
 
 data class GlucosePoint(
     val timeLabel: String,
@@ -205,10 +210,14 @@ fun GlucoseLineChartCard(
                 Spacer(modifier = Modifier.width(5.5.dp * designScale))
 
                 // Chart Canvas & Peak Badges
+                var chartSize by remember { mutableStateOf(IntSize.Zero) }
+                var maxBadgeSize by remember { mutableStateOf(IntSize.Zero) }
+                var minBadgeSize by remember { mutableStateOf(IntSize.Zero) }
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
+                        .onSizeChanged { chartSize = it }
                         .clickable { handleChartClick() }
                 ) {
                     val maxPt = displayPoints.maxByOrNull { it.value }
@@ -217,15 +226,51 @@ fun GlucoseLineChartCard(
                     val minIdx = if (minPt != null) displayPoints.indexOf(minPt) else -1
                     val hasDistinctExtremes = displayPoints.size > 1 && minPt?.value != maxPt?.value
 
-                    var maxOffset by remember { mutableStateOf<Offset?>(null) }
-                    var minOffset by remember { mutableStateOf<Offset?>(null) }
+                    val density = LocalDensity.current
+                    val chartPoints = remember(
+                        displayPoints,
+                        activePeriod,
+                        chartSize,
+                        maxVal,
+                        designScale,
+                        density
+                    ) {
+                        calculateChartPointOffsets(
+                            points = displayPoints,
+                            activePeriod = activePeriod,
+                            chartWidth = chartSize.width.toFloat(),
+                            chartHeight = chartSize.height.toFloat(),
+                            maxValue = maxVal,
+                            pointRadiusPx = with(density) { (6.dp * designScale).toPx() },
+                            rightInsetPx = with(density) { (24.dp * designScale).toPx() }
+                        )
+                    }
+                    val peakBadgePlacements = remember(
+                        chartSize,
+                        chartPoints,
+                        minIdx,
+                        maxIdx,
+                        minBadgeSize,
+                        maxBadgeSize,
+                        density,
+                        designScale
+                    ) {
+                        calculatePeakBadgePlacements(
+                            chartSize = chartSize,
+                            minPoint = chartPoints.getOrNull(minIdx),
+                            maxPoint = chartPoints.getOrNull(maxIdx),
+                            minBadgeSize = minBadgeSize,
+                            maxBadgeSize = maxBadgeSize,
+                            edgePx = with(density) { (4.dp * designScale).roundToPx() },
+                            gapPx = with(density) { (8.dp * designScale).roundToPx() }
+                        )
+                    }
 
                     Canvas(modifier = Modifier.matchParentSize()) {
                         val width = size.width
                         val height = size.height
                         val chartWidth = width
                         val chartRightInset = (24.dp * designScale).toPx()
-                        val usableChartWidth = chartWidth - chartRightInset
                         val chartHeight = height
 
                         // Draw Vertical Axis Line (Vector 26 in Figma)
@@ -252,21 +297,15 @@ fun GlucoseLineChartCard(
                         }
 
                         // Draw Curve Path
-                        val linePoints = displayPoints.map { pt ->
-                            val latestPointMinutes = displayPoints.maxOfOrNull { it.timeLabel.toMinutes() } ?: 0
-                            val endMinutes = roundUpToHour(latestPointMinutes)
-                            val startMinutes = endMinutes - periodToHours(activePeriod) * 60
-                            val x = ((pt.timeLabel.toMinutes() - startMinutes).toFloat() /
-                                (periodToHours(activePeriod) * 60)).coerceIn(0f, 1f) * usableChartWidth
-                            // During the press animation a parent may briefly report a
-                            // height smaller than a point diameter. Clamp the radius first
-                            // so coerceIn never receives an empty range on MIUI.
-                            val pointRadius = minOf((6.dp * designScale).toPx(), chartHeight / 2f)
-                            val safeValue = pt.value.coerceIn(0f, maxVal)
-                            val y = (chartHeight - (safeValue / maxVal) * chartHeight)
-                                .coerceIn(pointRadius, maxOf(pointRadius, chartHeight - pointRadius))
-                            Offset(x, y)
-                        }
+                        val linePoints = calculateChartPointOffsets(
+                            points = displayPoints,
+                            activePeriod = activePeriod,
+                            chartWidth = chartWidth,
+                            chartHeight = chartHeight,
+                            maxValue = maxVal,
+                            pointRadiusPx = (6.dp * designScale).toPx(),
+                            rightInsetPx = chartRightInset
+                        )
 
                         if (linePoints.isNotEmpty()) {
                             for (i in 0 until linePoints.size - 1) {
@@ -316,12 +355,6 @@ fun GlucoseLineChartCard(
                                 )
                             }
 
-                            if (hasDistinctExtremes && maxIdx >= 0 && maxIdx < linePoints.size) {
-                                maxOffset = linePoints[maxIdx]
-                            }
-                            if (hasDistinctExtremes && minIdx >= 0 && minIdx < linePoints.size && minIdx != maxIdx) {
-                                minOffset = linePoints[minIdx]
-                            }
                         }
                     }
 
@@ -336,36 +369,27 @@ fun GlucoseLineChartCard(
 
                     // Dynamic Max Peak Badge
                     if (hasDistinctExtremes) maxPt?.let { maxItem ->
-                        maxOffset?.let { pt ->
-                            val xDp = with(LocalDensity.current) { pt.x.toDp() }
-                            val yDp = with(LocalDensity.current) { pt.y.toDp() }
-                            PeakBadge(
-                                text = "max ${String.format(Locale.US, "%.1f", maxItem.value).replace('.', ',')}",
-                                bgColor = GlucoseDashboardTheme.MaxBadgeColor,
-                                modifier = Modifier.padding(
-                                    start = (xDp - 58.dp).coerceAtLeast(4.dp),
-                                    top = (if (yDp < 36.dp) yDp + 10.dp else yDp - 28.dp)
-                                        .coerceIn(2.dp, 130.dp)
-                                )
-                            )
-                        }
+                        PeakBadge(
+                            text = "max ${String.format(Locale.US, "%.1f", maxItem.value).replace('.', ',')}",
+                            bgColor = GlucoseDashboardTheme.MaxBadgeColor,
+                            modifier = Modifier
+                                .onSizeChanged { maxBadgeSize = it }
+                                .alpha(if (peakBadgePlacements.max == null) 0f else 1f)
+                                .offset { peakBadgePlacements.max?.toIntOffset() ?: IntOffset.Zero }
+                        )
                     }
 
                     // Dynamic Min Peak Badge
                     if (hasDistinctExtremes) minPt?.let { minItem ->
                         if (minPt != maxPt) {
-                            minOffset?.let { pt ->
-                                val xDp = with(LocalDensity.current) { pt.x.toDp() }
-                                val yDp = with(LocalDensity.current) { pt.y.toDp() }
-                                PeakBadge(
-                                    text = "min ${String.format(Locale.US, "%.1f", minItem.value).replace('.', ',')}",
-                                    bgColor = GlucoseDashboardTheme.MinBadgeColor,
-                                    modifier = Modifier.padding(
-                                        start = (xDp - 58.dp).coerceAtLeast(4.dp),
-                                        top = (yDp + 8.dp).coerceIn(2.dp, 145.dp)
-                                    )
-                                )
-                            }
+                            PeakBadge(
+                                text = "min ${String.format(Locale.US, "%.1f", minItem.value).replace('.', ',')}",
+                                bgColor = GlucoseDashboardTheme.MinBadgeColor,
+                                modifier = Modifier
+                                    .onSizeChanged { minBadgeSize = it }
+                                    .alpha(if (peakBadgePlacements.min == null) 0f else 1f)
+                                    .offset { peakBadgePlacements.min?.toIntOffset() ?: IntOffset.Zero }
+                            )
                         }
                     }
                 }
@@ -394,6 +418,140 @@ fun GlucoseLineChartCard(
     }
 }
 
+internal data class PeakBadgePlacement(
+    val x: Int,
+    val y: Int
+) {
+    fun toIntOffset() = IntOffset(x, y)
+}
+
+internal data class PeakBadgePlacements(
+    val min: PeakBadgePlacement?,
+    val max: PeakBadgePlacement?
+)
+
+private fun calculateChartPointOffsets(
+    points: List<GlucosePoint>,
+    activePeriod: String,
+    chartWidth: Float,
+    chartHeight: Float,
+    maxValue: Float,
+    pointRadiusPx: Float,
+    rightInsetPx: Float
+): List<Offset> {
+    if (chartWidth <= 0f || chartHeight <= 0f || maxValue <= 0f) return emptyList()
+
+    val latestPointMinutes = points.maxOfOrNull { it.timeLabel.toMinutes() } ?: return emptyList()
+    val periodMinutes = periodToHours(activePeriod) * 60
+    val endMinutes = roundUpToHour(latestPointMinutes)
+    val startMinutes = endMinutes - periodMinutes
+    val usableChartWidth = (chartWidth - rightInsetPx).coerceAtLeast(0f)
+    val pointRadius = minOf(pointRadiusPx, chartHeight / 2f)
+
+    return points.map { point ->
+        val x = ((point.timeLabel.toMinutes() - startMinutes).toFloat() / periodMinutes)
+            .coerceIn(0f, 1f) * usableChartWidth
+        val safeValue = point.value.coerceIn(0f, maxValue)
+        val y = (chartHeight - (safeValue / maxValue) * chartHeight)
+            .coerceIn(pointRadius, maxOf(pointRadius, chartHeight - pointRadius))
+        Offset(x, y)
+    }
+}
+
+/**
+ * Positions badges in the measured graph bounds rather than a fixed design frame.
+ * The minimum prefers the free space above its point and the maximum prefers the
+ * free space below its point; either one flips when its preferred side is unavailable.
+ */
+internal fun calculatePeakBadgePlacements(
+    chartSize: IntSize,
+    minPoint: Offset?,
+    maxPoint: Offset?,
+    minBadgeSize: IntSize,
+    maxBadgeSize: IntSize,
+    edgePx: Int,
+    gapPx: Int
+): PeakBadgePlacements {
+    if (chartSize == IntSize.Zero) return PeakBadgePlacements(min = null, max = null)
+
+    var minPlacement = minPoint?.takeIf { minBadgeSize != IntSize.Zero }?.let {
+        placeBadge(it, minBadgeSize, chartSize, edgePx, gapPx, preferAbove = true)
+    }
+    var maxPlacement = maxPoint?.takeIf { maxBadgeSize != IntSize.Zero }?.let {
+        placeBadge(it, maxBadgeSize, chartSize, edgePx, gapPx, preferAbove = false)
+    }
+
+    if (minPlacement != null && maxPlacement != null &&
+        placementsIntersect(minPlacement, minBadgeSize, maxPlacement, maxBadgeSize)
+    ) {
+        val actualMinPoint = minPoint ?: return PeakBadgePlacements(min = null, max = maxPlacement)
+        val actualMaxPoint = maxPoint ?: return PeakBadgePlacements(min = minPlacement, max = null)
+        val flippedMin = placeBadge(actualMinPoint, minBadgeSize, chartSize, edgePx, gapPx, preferAbove = false)
+        val flippedMax = placeBadge(actualMaxPoint, maxBadgeSize, chartSize, edgePx, gapPx, preferAbove = true)
+
+        when {
+            !placementsIntersect(flippedMin, minBadgeSize, maxPlacement, maxBadgeSize) -> {
+                minPlacement = flippedMin
+            }
+            !placementsIntersect(minPlacement, minBadgeSize, flippedMax, maxBadgeSize) -> {
+                maxPlacement = flippedMax
+            }
+        }
+    }
+
+    return PeakBadgePlacements(min = minPlacement, max = maxPlacement)
+}
+
+private fun placeBadge(
+    point: Offset,
+    badgeSize: IntSize,
+    chartSize: IntSize,
+    edgePx: Int,
+    gapPx: Int,
+    preferAbove: Boolean
+): PeakBadgePlacement {
+    fun candidate(above: Boolean): PeakBadgePlacement = PeakBadgePlacement(
+        x = (point.x.roundToInt() - badgeSize.width / 2),
+        y = point.y.roundToInt() + if (above) -badgeSize.height - gapPx else gapPx
+    )
+
+    val preferred = candidate(preferAbove)
+    val alternative = candidate(!preferAbove)
+    return when {
+        preferred.fitsInside(chartSize, badgeSize, edgePx) -> preferred
+        alternative.fitsInside(chartSize, badgeSize, edgePx) -> alternative
+        else -> preferred.clampInside(chartSize, badgeSize, edgePx)
+    }
+}
+
+private fun PeakBadgePlacement.fitsInside(
+    chartSize: IntSize,
+    badgeSize: IntSize,
+    edgePx: Int
+): Boolean = x >= edgePx && y >= edgePx &&
+    x + badgeSize.width <= chartSize.width - edgePx &&
+    y + badgeSize.height <= chartSize.height - edgePx
+
+private fun PeakBadgePlacement.clampInside(
+    chartSize: IntSize,
+    badgeSize: IntSize,
+    edgePx: Int
+): PeakBadgePlacement {
+    val maxX = (chartSize.width - badgeSize.width - edgePx).coerceAtLeast(edgePx)
+    val maxY = (chartSize.height - badgeSize.height - edgePx).coerceAtLeast(edgePx)
+    return copy(x = x.coerceIn(edgePx, maxX), y = y.coerceIn(edgePx, maxY))
+}
+
+private fun placementsIntersect(
+    first: PeakBadgePlacement,
+    firstSize: IntSize,
+    second: PeakBadgePlacement,
+    secondSize: IntSize
+): Boolean = first.x < second.x + secondSize.width &&
+    first.x + firstSize.width > second.x &&
+    first.y < second.y + secondSize.height &&
+    first.y + firstSize.height > second.y
+
 private fun filterPointsAndLabelsForPeriod(
     rawPoints: List<GlucosePoint>,
     period: String
@@ -402,7 +560,7 @@ private fun filterPointsAndLabelsForPeriod(
         return emptyList<GlucosePoint>() to emptyList()
     }
 
-    val hours = when (period) {
+    val hours = when (period.replace(" ", "")) {
         "3ч" -> 3
         "6ч" -> 6
         "12ч" -> 12

@@ -33,8 +33,8 @@ object NewDesignPaletteController {
                 highStart = Color(0xFFFFE471),
                 highEnd = Color(0xFFFFA669),
                 normalBadge = Color(0xFF77D5B4),
-                highBadge = Color(0xFFF97E71),
-                lowBadge = Color(0xFFFFC56D)
+                highBadge = Color(0xFFFFC56D),
+                lowBadge = Color(0xFFF97E71)
             )
             NewDesignPalette.B -> NewDesignPaletteColors(
                 lowStart = Color(0xFFD93B17),
@@ -44,8 +44,8 @@ object NewDesignPaletteController {
                 highStart = Color(0xFFFCC30D),
                 highEnd = Color(0xFFDF7122),
                 normalBadge = Color(0xFF2DB799),
-                highBadge = Color(0xFFAF2A2A),
-                lowBadge = Color(0xFFE47F1F)
+                highBadge = Color(0xFFE47F1F),
+                lowBadge = Color(0xFFAF2A2A)
             )
         }
 
