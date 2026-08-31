@@ -18,6 +18,7 @@ import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
 import com.elta.android.presentation.features.main.records.ui.adapter.MainRecordsAdapter
 import com.elta.android.presentation.features.main.records.ui.status_bar.MainScreenLightStatusBarConfigProvider
 import com.elta.android.presentation.features.main.records.ui.status_bar.MainScreenTransparentStatusBarConfigProvider
+import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.decoration.MainScreenMarginItemDecoration
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.nullgr.core.adapter.items.ListItem
@@ -49,6 +50,11 @@ class MainRecordsFragment :
     private val bottomSheetState = BehaviorRelay.createDefault(false)
     private val headerState = BehaviorRelay.createDefault(true)
     private var lastMainScreenConfig: ScreenEntity? = null
+
+    // MainRecordsMapper supplies one full-screen dashboard item. Scrolling it would allow
+    // the footer to move underneath the app navigation on devices with tall system insets.
+    override fun provideLayoutManager(): RecyclerView.LayoutManager =
+        FixedLinearLayoutManager(requireContext(), isScrollEnabled = false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

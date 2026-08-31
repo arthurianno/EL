@@ -1,9 +1,5 @@
 package com.elta.android.presentation.features.main.records.ui.compose
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,14 +34,12 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
-import kotlinx.coroutines.launch
 import java.util.Locale
 
 data class GlucosePoint(
@@ -74,16 +67,9 @@ fun GlucoseLineChartCard(
     val gridLineColor = if (isDarkTheme) Color.White.copy(alpha = 0.15f) else Color(0xFFE3E3E3)
     val axisLabelColor = if (isDarkTheme) Color.White.copy(alpha = 0.6f) else Color(0xFF878B93)
 
-    val coroutineScope = rememberCoroutineScope()
-    val pressScale = remember { Animatable(1f) }
-
-    fun handleChartClick() {
-        coroutineScope.launch {
-            pressScale.animateTo(0.96f, tween(70))
-            pressScale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow))
-            onChartClick()
-        }
-    }
+    // Do not scale the whole chart on tap: a fractional graphics layer rasterizes the
+    // dynamic min/max labels and makes their text blurry on some Android renderers.
+    fun handleChartClick() = onChartClick()
 
     val (filteredPoints, filteredTimeLabels) = remember(points, activePeriod) {
         filterPointsAndLabelsForPeriod(points, activePeriod)
@@ -100,10 +86,6 @@ fun GlucoseLineChartCard(
             .padding(start = 17.dp * designScale, top = 16.dp * designScale, end = 17.dp * designScale, bottom = 0.dp)
             .fillMaxWidth()
             .height(cardHeight)
-            .graphicsLayer {
-                scaleX = pressScale.value
-                scaleY = pressScale.value
-            }
             .clip(RoundedCornerShape(13.dp * designScale))
             .border(
                 width = 1.dp,
@@ -276,10 +258,13 @@ fun GlucoseLineChartCard(
                             val startMinutes = endMinutes - periodToHours(activePeriod) * 60
                             val x = ((pt.timeLabel.toMinutes() - startMinutes).toFloat() /
                                 (periodToHours(activePeriod) * 60)).coerceIn(0f, 1f) * usableChartWidth
-                            val pointRadius = (6.dp * designScale).toPx()
+                            // During the press animation a parent may briefly report a
+                            // height smaller than a point diameter. Clamp the radius first
+                            // so coerceIn never receives an empty range on MIUI.
+                            val pointRadius = minOf((6.dp * designScale).toPx(), chartHeight / 2f)
                             val safeValue = pt.value.coerceIn(0f, maxVal)
                             val y = (chartHeight - (safeValue / maxVal) * chartHeight)
-                                .coerceIn(pointRadius, chartHeight - pointRadius)
+                                .coerceIn(pointRadius, maxOf(pointRadius, chartHeight - pointRadius))
                             Offset(x, y)
                         }
 

@@ -8,8 +8,12 @@ import timber.log.Timber
 class FixedLinearLayoutManager(
     context: Context,
     orientation: Int = RecyclerView.VERTICAL,
-    reverseLayout: Boolean = false
+    reverseLayout: Boolean = false,
+    private val isScrollEnabled: Boolean = true
 ) : LinearLayoutManager(context, orientation, reverseLayout) {
+
+    override fun canScrollVertically(): Boolean =
+        isScrollEnabled && super.canScrollVertically()
 
     @Suppress("TooGenericExceptionCaught", "SwallowedException")
     override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {

@@ -171,9 +171,14 @@ fun GlucoseRingGauge(
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopStart)
-                            .size(width = 85.dp, height = 29.dp)
+                            // "Норма" is close to the 85dp reference width, but longer
+                            // statuses must retain the same Figma inner insets instead of
+                            // being squeezed into a fixed container.
+                            .height(29.dp)
+                            .wrapContentWidth()
                             .clip(RoundedCornerShape(35.5.dp))
-                            .background(stateBadgeColor),
+                            .background(stateBadgeColor)
+                            .padding(horizontal = 12.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -322,9 +327,12 @@ fun GlucoseRingGauge(
                     IndicatorPill(
                         title = "Хлебных ед.",
                         value = breadUnitsText,
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .offset(x = 124.dp * scaleFactor, y = indicatorRowTop + 12.dp)
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                            // Figma: x=131 on a 380dp frame. The gauge content starts
+                            // at x=16, so the local anchor is 115dp. Keeping this anchor
+                            // independent from the right card preserves its designed gap.
+                            .offset(x = 115.dp * scaleFactor, y = indicatorRowTop + 12.dp)
                             .width(109.dp * scaleFactor),
                         designScale = 1f
                     )

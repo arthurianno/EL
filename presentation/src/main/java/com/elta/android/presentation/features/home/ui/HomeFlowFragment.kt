@@ -72,6 +72,9 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
 
     private var selectedBottomNavigationItemId = R.id.mainMenuItemView
     private var isMainScreenEmpty = false
+    private var bottomContainerView: View? = null
+    private var bottomContainerLayoutListener: View.OnLayoutChangeListener? = null
+    private var contentMarginUpdate: Runnable? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -88,6 +91,18 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
         view?.findViewById<BottomNavigationView>(R.id.homeBottomNavigationView)?.selectedId?.let {
             outState.putInt(KEY_SELECTED_MENU_ID, it)
         }
+    }
+
+    override fun onDestroyView() {
+        bottomContainerView?.let { bottomContainer ->
+            bottomContainerLayoutListener?.let(bottomContainer::removeOnLayoutChangeListener)
+            contentMarginUpdate?.let(bottomContainer::removeCallbacks)
+            ViewCompat.setOnApplyWindowInsetsListener(bottomContainer, null)
+        }
+        bottomContainerView = null
+        bottomContainerLayoutListener = null
+        contentMarginUpdate = null
+        super.onDestroyView()
     }
 
     override fun onBindPresentationModel(pm: HomeFlowPm) {
@@ -285,6 +300,11 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
     }
 
     private fun setupBottomNavigationInsets() {
+        val contentContainer = binding.containerView
+        val bottomContainer = binding.bottomContainer
+        val homeActionView = binding.homeActionView
+        bottomContainerView = bottomContainer
+
         val syncStatusView = requireActivity().findViewById<View>(R.id.syncStatusView)
         syncStatusView?.let { view ->
             ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
@@ -312,7 +332,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
             }
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomContainer) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(bottomContainer) { v, insets ->
             val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
             v.setPadding(
                 v.paddingLeft,
@@ -322,12 +342,43 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
             )
 
             val initialPlusMargin = (16 * resources.displayMetrics.density).toInt()
-            (binding.homeActionView.layoutParams as? FrameLayout.LayoutParams)?.let { actionParams ->
+            (homeActionView.layoutParams as? FrameLayout.LayoutParams)?.let { actionParams ->
                 actionParams.bottomMargin = initialPlusMargin + navigationBarsInsets.bottom
-                binding.homeActionView.layoutParams = actionParams
+                homeActionView.layoutParams = actionParams
             }
 
+            // Padding changes the measured navigation height. The deferred operation keeps
+            // us out of the layout pass, but never reads Fragment.binding after this point.
+            scheduleContentBottomMarginUpdate(contentContainer, bottomContainer)
+
             insets
+        }
+
+        bottomContainerLayoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            scheduleContentBottomMarginUpdate(contentContainer, bottomContainer)
+        }
+        bottomContainer.addOnLayoutChangeListener(requireNotNull(bottomContainerLayoutListener))
+        scheduleContentBottomMarginUpdate(contentContainer, bottomContainer)
+    }
+
+    private fun scheduleContentBottomMarginUpdate(contentContainer: View, bottomContainer: View) {
+        contentMarginUpdate?.let(bottomContainer::removeCallbacks)
+        val update = Runnable {
+            if (contentContainer.isAttachedToWindow && bottomContainer.isAttachedToWindow) {
+                updateContentBottomMargin(contentContainer, bottomContainer.height)
+            }
+        }
+        contentMarginUpdate = update
+        bottomContainer.post(update)
+    }
+
+    private fun updateContentBottomMargin(contentContainer: View, navigationHeight: Int) {
+        if (navigationHeight == 0) return
+        (contentContainer.layoutParams as? FrameLayout.LayoutParams)?.let { contentParams ->
+            if (contentParams.bottomMargin != navigationHeight) {
+                contentParams.bottomMargin = navigationHeight
+                contentContainer.layoutParams = contentParams
+            }
         }
     }
 

@@ -1,9 +1,6 @@
 package com.elta.android.presentation.features.main.records.ui.compose
 
-import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
-import android.util.DisplayMetrics
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -175,28 +173,21 @@ fun GlucoseDashboardScreen(
     val screenBg = if (isDarkTheme) GlucoseDashboardTheme.DarkBackground else Color.White
     val selectedTabTextColor = GlucoseDashboardTheme.getSelectedTabTextColor(currentState)
 
-    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
-    val displayAspectRatio = remember(context, configuration) {
-        context.findActivity()?.realDisplayAspectRatio()
-            ?: (configuration.screenHeightDp.toFloat() / configuration.screenWidthDp.coerceAtLeast(1))
-    }
-
     ProvideTextStyle(value = TextStyle(fontFamily = GlucoseDashboardGothamPro)) {
         BoxWithConstraints(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxSize()
         ) {
         val layout = calculateGlucoseDashboardLayout(
             screenWidth = maxWidth,
-            // Figma has one reference width (375) and several heights. This composable is
-            // hosted by a wrap-content RecyclerView item, so derive the matching Figma height
-            // from the physical display aspect ratio rather than the item's own measurement.
-            screenHeight = maxWidth * displayAspectRatio
+            // The hosting container is measured above the app navigation and any system
+            // navigation controls. This keeps the 60/40 layout inside the visible viewport.
+            availableContentHeight = maxHeight
         )
 
-        Box(modifier = Modifier.fillMaxWidth()) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .background(screenBg)
         ) {
 
@@ -456,18 +447,6 @@ private fun PaletteSwitcher(
             }
         }
     }
-}
-
-private tailrec fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
-}
-
-private fun Activity.realDisplayAspectRatio(): Float {
-    @Suppress("DEPRECATION")
-    val displayMetrics = DisplayMetrics().also(windowManager.defaultDisplay::getRealMetrics)
-    return displayMetrics.heightPixels.toFloat() / displayMetrics.widthPixels.coerceAtLeast(1)
 }
 
 @Composable
