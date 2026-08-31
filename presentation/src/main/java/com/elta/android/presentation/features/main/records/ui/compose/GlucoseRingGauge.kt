@@ -14,6 +14,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -253,23 +254,17 @@ fun GlucoseRingGauge(
                     }
 
                     // The center panel comes from Figma.
-                    Box(
+                    RingGaugeDisc(
+                        width = discWidth,
+                        height = discHeight,
                         modifier = Modifier
                             .align(Alignment.TopCenter)
-                            .size(width = discWidth, height = discHeight)
-                            .offset(y = ringTopOffset + discTopInset),
-                        contentAlignment = Alignment.Center
+                            .offset(y = ringTopOffset + discTopInset)
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_ring_gauge),
-                            contentDescription = null,
-                            contentScale = ContentScale.FillBounds,
-                            modifier = Modifier.matchParentSize()
-                        )
                         // Keep each text baseline at a proportion of the inner disc. A centered
                         // Column makes the large value pull the unit and trend upward on compact
                         // devices, which no longer matches the intended gauge composition.
-                        Box(modifier = Modifier.size(discWidth, discHeight)) {
+                        Box(modifier = Modifier.matchParentSize()) {
                             Text(
                                 text = glucoseValue,
                                 fontSize = glucoseValueFontSize.sp,
@@ -457,16 +452,10 @@ fun NoMeasurementsGlucoseGauge(
                         style = Stroke(width = 0.75.dp.toPx())
                     )
                 }
-                Box(
-                    modifier = Modifier.size(width = discWidth, height = discHeight),
-                    contentAlignment = Alignment.Center
+                RingGaugeDisc(
+                    width = discWidth,
+                    height = discHeight
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_ring_gauge),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds,
-                        modifier = Modifier.matchParentSize()
-                    )
                     Canvas(
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -551,6 +540,33 @@ fun NoMeasurementsGlucoseGauge(
                 overflow = TextOverflow.Ellipsis
             )
         }
+    }
+}
+
+/**
+ * Common decorative centre disc for both dashboard states.
+ *
+ * The drawable is deliberately decorative, so it has no accessibility description. Keeping the
+ * background here ensures the empty and populated variants retain identical scaling and z-order.
+ */
+@Composable
+private fun RingGaugeDisc(
+    width: Dp,
+    height: Dp,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
+) {
+    Box(
+        modifier = modifier.size(width = width, height = height),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_ring_gauge),
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.matchParentSize()
+        )
+        content()
     }
 }
 
