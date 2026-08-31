@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.main.records.ui.compose
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.Image
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
+import kotlin.math.min
 
 data class GlucoseTrend(
     val direction: GlucoseTrendDirection,
@@ -394,6 +396,160 @@ fun GlucoseRingGauge(
                     )
                 }
             }
+        }
+    }
+}
+
+/**
+ * Empty dashboard state shown before the first glucose measurement is received.
+ *
+ * The layout intentionally derives its circle and vertical gaps from the space remaining
+ * in the header. This keeps the CTA above the chart on short devices while preserving the
+ * larger composition from the reference on regular and tall phones.
+ */
+@Composable
+fun NoMeasurementsGlucoseGauge(
+    ringSize: Dp,
+    availableHeight: Dp,
+    state: GlucoseState,
+    isSyncing: Boolean,
+    statusText: String,
+    isStatusVisible: Boolean,
+    onSyncClick: () -> Unit
+) {
+    val emptyRingSize = min(ringSize.value, 200f).coerceAtLeast(120f).dp
+    val compactScale = (emptyRingSize.value / 185f).coerceIn(0.76f, 1f)
+    val discWidth = emptyRingSize * (152f / 185f)
+    val discHeight = emptyRingSize * (150f / 185f)
+    val mainColor = GlucoseDashboardTheme.getMainTextColor(state)
+    val syncIconTransition = rememberInfiniteTransition(label = "emptySyncIconRotation")
+    val syncIconRotation = syncIconTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 900, easing = LinearEasing)
+        ),
+        label = "emptySyncIconRotation"
+    ).value.takeIf { isSyncing } ?: 0f
+    val actionText = if (isStatusVisible && statusText.isNotBlank()) {
+        statusText
+    } else {
+        "Синхронизация с устройством"
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(availableHeight)
+    ) {
+        Column(
+            modifier = Modifier.align(Alignment.TopCenter),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier.size(emptyRingSize),
+                contentAlignment = Alignment.Center
+            ) {
+                Canvas(modifier = Modifier.matchParentSize()) {
+                    drawCircle(
+                        color = Color.White.copy(alpha = 0.30f),
+                        radius = size.minDimension / 2f - 0.75.dp.toPx() / 2f,
+                        style = Stroke(width = 0.75.dp.toPx())
+                    )
+                }
+                Box(
+                    modifier = Modifier.size(width = discWidth, height = discHeight),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_ring_gauge),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier.matchParentSize()
+                    )
+                    Canvas(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .offset(y = (-8).dp * compactScale)
+                            .size(width = 62.dp * compactScale, height = 8.dp * compactScale)
+                    ) {
+                        val strokeWidth = 8.dp.toPx() * compactScale
+                        val dashLength = 24.dp.toPx() * compactScale
+                        drawLine(
+                            color = mainColor,
+                            start = Offset(0f, size.height / 2f),
+                            end = Offset(dashLength, size.height / 2f),
+                            strokeWidth = strokeWidth,
+                            cap = StrokeCap.Round
+                        )
+                        drawLine(
+                            color = mainColor,
+                            start = Offset(size.width - dashLength, size.height / 2f),
+                            end = Offset(size.width, size.height / 2f),
+                            strokeWidth = strokeWidth,
+                            cap = StrokeCap.Round
+                        )
+                    }
+                    Text(
+                        text = "ммоль/л",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = mainColor,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .offset(y = 23.dp * compactScale)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(13.dp * compactScale))
+            Text(
+                text = "Данных пока нет",
+                fontSize = (20f * compactScale).sp,
+                lineHeight = (24f * compactScale).sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.White
+            )
+            Spacer(modifier = Modifier.height(2.dp * compactScale))
+            Text(
+                text = "Добавьте показатели вручную через «+»\nили синхронизируйте их с устройством",
+                fontSize = (14f * compactScale).sp,
+                lineHeight = (16f * compactScale).sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.White.copy(alpha = 0.65f),
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(start = 14.dp, end = 14.dp, bottom = 16.dp * compactScale)
+                .height((45f * compactScale).dp)
+                .clip(RoundedCornerShape(24.dp))
+                .border(1.dp, Color.White, RoundedCornerShape(24.dp))
+                .clickable(enabled = !isSyncing, onClick = onSyncClick),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_refresh_2),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier
+                    .size(30.dp * compactScale)
+                    .rotate(syncIconRotation)
+            )
+            Spacer(modifier = Modifier.width(12.dp * compactScale))
+            Text(
+                text = actionText,
+                fontSize = (15f * compactScale).sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

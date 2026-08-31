@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
+import org.threeten.bp.LocalTime
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -62,7 +63,8 @@ fun GlucoseLineChartCard(
     onChartClick: () -> Unit = {},
     points: List<GlucosePoint> = emptyList(),
     designScale: Float = 1f,
-    cardHeight: androidx.compose.ui.unit.Dp = 201.dp * designScale
+    cardHeight: androidx.compose.ui.unit.Dp = 201.dp * designScale,
+    emptyStateText: String = "Нет измерений за выбранный период"
 ) {
     var activePeriod by remember { mutableStateOf(selectedPeriod) }
     val periods = listOf("3 ч", "6 ч", "12 ч", "24 ч")
@@ -360,7 +362,7 @@ fun GlucoseLineChartCard(
 
                     if (displayPoints.isEmpty()) {
                         Text(
-                            text = "Нет измерений за выбранный период",
+                            text = emptyStateText,
                             fontSize = 13.sp,
                             color = axisLabelColor,
                             modifier = Modifier.align(Alignment.Center)
@@ -557,7 +559,17 @@ private fun filterPointsAndLabelsForPeriod(
     period: String
 ): Pair<List<GlucosePoint>, List<String>> {
     if (rawPoints.isEmpty()) {
-        return emptyList<GlucosePoint>() to emptyList()
+        val hours = periodToHours(period)
+        // The empty graph still represents the selected time window. Keeping these labels
+        // visible provides the same context as a populated chart instead of leaving its
+        // horizontal axis blank.
+        val now = LocalTime.now()
+        val currentHourMinutes = now.hour * 60
+        return emptyList<GlucosePoint>() to buildTimelineLabels(
+            endMinutes = currentHourMinutes,
+            hours = hours,
+            period = period
+        )
     }
 
     val hours = when (period.replace(" ", "")) {

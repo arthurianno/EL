@@ -3,7 +3,6 @@ package com.elta.android.presentation.features.main.records.pm
 import android.content.Context
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetEventsByPeriodUseCase
-import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
@@ -11,9 +10,7 @@ import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCas
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
-import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.States
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -168,34 +165,11 @@ class MainRecordsPm @Inject constructor(
     }
 
     private fun HomeModel.launchState() {
-        when {
-            hasEvents -> mainScreenState.visibilityState.consumer.accept(false)
-            isFirstEntrance -> {
-                mainScreenState.dataState.consumer.accept(
-                    States.MainRecordsScreenFirstLaunchState(
-                        resources
-                    )
-                )
-                mainScreenState.visibilityState.consumer.accept(true)
-            }
-            else -> {
-                mainScreenState.dataState.consumer.accept(
-                    States.MainRecordsScreenNewDayState(
-                        resources,
-                        dayPeriod.greetingTitle()
-                    )
-                )
-                mainScreenState.visibilityState.consumer.accept(true)
-            }
-        }
+        // The dashboard owns both the populated and no-measurements states. Leaving the
+        // legacy full-screen state visible here hides the RecyclerView before Compose can
+        // render the dashboard's empty state.
+        mainScreenState.visibilityState.consumer.accept(false)
     }
-
-    private fun DayPeriod.greetingTitle(): Int =
-        when (this) {
-            DayPeriod.MORNING -> R.string.main_records_new_day_title_morning
-            DayPeriod.AFTERNOON -> R.string.main_records_new_day_title_afternoon
-            DayPeriod.EVENING -> R.string.main_records_new_day_title_evening
-        }
 
     private fun createUserInfoParams(): UpdateUserInfoUseCase.Params =
         UpdateUserInfoUseCase.Params(UserInfo(isFirstHomeEntrance = false))

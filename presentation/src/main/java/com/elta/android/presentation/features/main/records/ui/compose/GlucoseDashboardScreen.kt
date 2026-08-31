@@ -119,6 +119,13 @@ fun GlucoseDashboardScreen(
     }
 
     val categories = listOf("Глюкоза", "Давление", "Инсулин")
+    // A formatted glucose value can be available before the day model is populated, for
+    // example immediately after a refresh. Treat it as data so the empty state never
+    // flashes over a valid reading.
+    val hasMeasurements = remember(dailyGlucoseModel, glucoseValue) {
+        dailyGlucoseModel?.hasEvents == true ||
+            glucoseValue.replace(',', '.').toFloatOrNull() != null
+    }
 
     if (bus != null) {
         DisposableEffect(bus) {
@@ -188,7 +195,8 @@ fun GlucoseDashboardScreen(
             screenWidth = maxWidth,
             // The hosting container is measured above the app navigation and any system
             // navigation controls. This keeps the 60/40 layout inside the visible viewport.
-            availableContentHeight = maxHeight
+            availableContentHeight = maxHeight,
+            isEmptyState = !hasMeasurements
         )
 
         ModalBottomSheetLayout(
@@ -226,7 +234,7 @@ fun GlucoseDashboardScreen(
                     modifier = Modifier
                         .fillMaxHeight()
                 ) {
-                    Spacer(modifier = Modifier.height(layout.navigationTopSpacing))
+                    Spacer(modifier = Modifier.height(layout.navigationTopSpacing + 10.dp))
 
                     // Top Category Pill Tabs Switcher ("Глюкоза", "Давление", "Инсулин")
                     Row(
@@ -253,7 +261,7 @@ fun GlucoseDashboardScreen(
                                     Box(
                                         modifier = Modifier
                                             .weight(3f)
-                                            .height(29.dp * layout.horizontalScale)
+                                            .height(33.dp * layout.horizontalScale)
                                             .clip(RoundedCornerShape(35.5.dp * layout.horizontalScale))
                                             .background(
                                                 if (isSelected) {
@@ -282,33 +290,50 @@ fun GlucoseDashboardScreen(
 
                     Spacer(modifier = Modifier.height(layout.gaugeTopSpacing))
 
-                    // Central Circular Ring Gauge Widget (Scales 100% dynamically with screenWidthDp)
-                    GlucoseRingGauge(
-                        glucoseValue = glucoseValue,
-                        glucoseUnit = "ммоль/л",
-                        deltaText = deltaText,
-                        glucoseTrend = glucoseTrend,
-                        tirPercentage = tirPercentage,
-                        syncTimeText = displayedSyncTime,
-                        breadUnitsText = breadUnitsText,
-                        insulinText = insulinText,
-                        state = currentState,
-                        statusText = statusText,
-                        isStatusVisible = isStatusVisible,
-                        isSyncing = isSyncing,
-                        ringSize = layout.ringSize,
-                        ringTopOffset = layout.ringTopOffset,
-                        lowerControlsExtraOffset = layout.lowerControlsExtraOffset,
-                        onSyncClick = {
-                            if (!isSyncing) {
-                                bus?.event(Events.ServerSyncRequested)
-                                    ?: showStatus("Синхронизация недоступна", syncing = false, autoHideMs = 3000L)
-                            }
-                        },
-                        onStatePillLongClick = if (BuildConfig.DEBUG) {
-                            { coroutineScope.launch { paletteSheetState.show() } }
-                        } else null
-                    )
+                    val onSyncClick = {
+                        if (!isSyncing) {
+                            bus?.event(Events.ServerSyncRequested)
+                                ?: showStatus("Синхронизация недоступна", syncing = false, autoHideMs = 3000L)
+                        }
+                    }
+
+                    if (hasMeasurements) {
+                        // Central Circular Ring Gauge Widget (Scales 100% dynamically with screenWidthDp)
+                        GlucoseRingGauge(
+                            glucoseValue = glucoseValue,
+                            glucoseUnit = "ммоль/л",
+                            deltaText = deltaText,
+                            glucoseTrend = glucoseTrend,
+                            tirPercentage = tirPercentage,
+                            syncTimeText = displayedSyncTime,
+                            breadUnitsText = breadUnitsText,
+                            insulinText = insulinText,
+                            state = currentState,
+                            statusText = statusText,
+                            isStatusVisible = isStatusVisible,
+                            isSyncing = isSyncing,
+                            ringSize = layout.ringSize,
+                            ringTopOffset = layout.ringTopOffset,
+                            lowerControlsExtraOffset = layout.lowerControlsExtraOffset,
+                            onSyncClick = onSyncClick,
+                            onStatePillLongClick = if (BuildConfig.DEBUG) {
+                                { coroutineScope.launch { paletteSheetState.show() } }
+                            } else null
+                        )
+                    } else {
+                        NoMeasurementsGlucoseGauge(
+                            ringSize = layout.ringSize,
+                            availableHeight = layout.headerHeight -
+                                layout.navigationTopSpacing -
+                                33.dp * layout.horizontalScale -
+                                layout.gaugeTopSpacing,
+                            state = currentState,
+                            isSyncing = isSyncing,
+                            statusText = statusText,
+                            isStatusVisible = isStatusVisible,
+                            onSyncClick = onSyncClick
+                        )
+                    }
 
                 }
             }
@@ -328,6 +353,11 @@ fun GlucoseDashboardScreen(
                 points = chartPoints,
                 designScale = layout.horizontalScale,
                 cardHeight = layout.chartHeight,
+                emptyStateText = if (hasMeasurements) {
+                    "Нет измерений за выбранный период"
+                } else {
+                    "Здесь появятся ваши данные"
+                },
                 onChartClick = {
                     isTransitioningToDetailed = true
                 }

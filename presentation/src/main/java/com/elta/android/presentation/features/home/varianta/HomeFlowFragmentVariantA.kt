@@ -65,7 +65,6 @@ class HomeFlowFragmentVariantA :
 
     private val rxPermissions by lazy { RxPermissions(requireActivity()) }
     private var selectedBottomNavigationItemId = R.id.mainMenuItemView
-    private var isMainScreenEmpty = false
     private var bottomContainerView: View? = null
     private var bottomContainerLayoutListener: View.OnLayoutChangeListener? = null
     private var contentMarginUpdate: Runnable? = null
@@ -109,10 +108,7 @@ class HomeFlowFragmentVariantA :
             updateBottomNavigationBackground()
         }
         bus.events<Events.HomeModelChanged>()
-            .subscribe { modelChanged ->
-                isMainScreenEmpty = !modelChanged.model.hasEvents
-                updateBottomNavigationBackground()
-            }
+            .subscribe { updateBottomNavigationBackground() }
             .addTo(compositeDestroy)
         pm.bottomSheetItems.bindTo { adapter.submitList(it) }
         pm.closeBottomSheetCommand.bindTo { binding.homeBottomSheetView.hide() }
@@ -135,9 +131,7 @@ class HomeFlowFragmentVariantA :
 
     private fun updateBottomNavigationBackground() {
         val backgroundRes = when (selectedBottomNavigationItemId) {
-            R.id.mainMenuItemView -> {
-                if (isMainScreenEmpty) R.drawable.bg_home_bottom_empty_state else android.R.color.white
-            }
+            R.id.mainMenuItemView -> android.R.color.white
             R.id.notesMenuItemView -> R.color.pale_gray
             else -> android.R.color.white
         }

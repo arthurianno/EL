@@ -23,7 +23,8 @@ internal data class GlucoseDashboardLayout(
 
 internal fun calculateGlucoseDashboardLayout(
     screenWidth: Dp,
-    availableContentHeight: Dp
+    availableContentHeight: Dp,
+    isEmptyState: Boolean = false
 ): GlucoseDashboardLayout {
     // The design references include a 72dp app navigation. The measured content area has
     // already excluded it, so restore it only when selecting the matching Figma breakpoint.
@@ -60,8 +61,38 @@ internal fun calculateGlucoseDashboardLayout(
         )
     }
     val minimumHeaderHeight = 300f + (ringSize.value - 146f).coerceAtLeast(0f)
-    val headerHeight = max(minimumHeaderHeight, workingHeight * 0.60f).dp
-    val chartHeight = (workingHeight * 0.40f - 88f).coerceIn(142f, 300f).dp
+    val regularHeaderHeight = max(minimumHeaderHeight, workingHeight * 0.60f).dp
+
+    // The empty state uses a 185dp circle at the 375dp design reference. Reserve enough
+    // vertical space for it rather than shrinking it to fit a fixed 60% header.
+    val emptyRingSize = minOf(ringSize.value, 185f)
+    val emptyScale = (emptyRingSize / 185f).coerceIn(0.76f, 1f)
+    val emptyStateContentHeight = emptyRingSize +
+        (13f + 24f + 2f + 32f + 10f + 45f) * emptyScale +
+        16f
+    val emptyStateHeaderHeight = (
+        navigationTopSpacing.value +
+            tabHeight.value +
+            gaugeTopSpacing.value +
+            emptyStateContentHeight
+        ).dp
+    val headerHeight = if (isEmptyState) {
+        max(regularHeaderHeight.value, emptyStateHeaderHeight.value).dp
+    } else {
+        regularHeaderHeight
+    }
+
+    val regularChartHeight = (workingHeight * 0.40f - 88f).coerceIn(142f, 300f)
+    // Keep the chart fully above the bottom navigation when the empty-state header grows.
+    // 16dp is the card's top margin; 43dp covers the hint row and its surrounding gaps.
+    val chartHeight = if (isEmptyState) {
+        minOf(
+            regularChartHeight,
+            workingHeight - headerHeight.value - 16f * horizontalScale - 43f * horizontalScale
+        ).coerceIn(120f, 300f).dp
+    } else {
+        regularChartHeight.dp
+    }
 
     // In Figma the lower data row ends 16dp above the gradient edge. On tall phones the
     // 60% header gains height, so transfer that free space to this row instead of leaving
