@@ -42,6 +42,7 @@ import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
+import com.elta.android.presentation.utils.BackendSyncStatusStore
 import com.elta.android.presentation.utils.SyncAttemptTimeStore
 import com.nullgr.core.rx.RxBus
 import kotlinx.coroutines.Job
@@ -128,7 +129,7 @@ fun GlucoseDashboardScreen(
                         if (bus == null) {
                             syncState.showMessage(scope, "Синхронизация недоступна", 3_000L)
                         } else {
-                            bus.event(Events.ServerSyncRequested)
+                            bus.event(Events.ManualGlucometerSyncRequested)
                         }
                     }
                     is GlucoseDashboardAction.RequestDetailedRange -> {
@@ -206,6 +207,7 @@ internal fun GlucoseDashboardContent(
                         points = uiState.chartPoints,
                         designScale = layout.horizontalScale,
                         cardHeight = layout.chartHeight,
+                        showDetailHint = uiState.hasMeasurements,
                         emptyStateText = if (uiState.hasMeasurements) {
                             "Нет измерений за выбранный период"
                         } else {
@@ -363,12 +365,17 @@ private fun DashboardCategoryTabs(
     }
 }
 
-private class DashboardSyncState(initialTime: String) {
+private class DashboardSyncState(
+    initialTime: String,
+    isBackendSyncInProgress: Boolean
+) {
     var displayedTime by mutableStateOf(initialTime)
         private set
-    var statusMessage by mutableStateOf<String?>(null)
+    var statusMessage by mutableStateOf(
+        if (isBackendSyncInProgress) "Подключение к серверу..." else null
+    )
         private set
-    var isSyncing by mutableStateOf(false)
+    var isSyncing by mutableStateOf(isBackendSyncInProgress)
         private set
     private var hideJob: Job? = null
 
@@ -378,17 +385,30 @@ private class DashboardSyncState(initialTime: String) {
 
     fun handle(event: Events.Sync, context: android.content.Context, scope: kotlinx.coroutines.CoroutineScope) {
         when (event) {
-            is Events.Sync.Glucometer.Started -> start(scope, "Синхронизация с прибором...", context)
-            is Events.Sync.Server.Started -> start(scope, "Синхронизация с сервером...", context)
-            is Events.Sync.Glucometer.Success -> completed(scope, "Синхронизация с прибором завершена")
-            is Events.Sync.Server.Success -> completed(scope, "Синхронизация с сервером завершена")
-            is Events.Sync.Glucometer.NoNewEvents -> completed(scope, "Нет новых измерений")
+            is Events.Sync.Glucometer.Started -> start(
+                scope,
+                "Подключение к устройству...",
+                "Ошибка синхронизации с устройством",
+                context
+            )
+            is Events.Sync.Glucometer.Success,
+            is Events.Sync.Glucometer.NoNewEvents,
+            is Events.Sync.Glucometer.InvalidTime -> updateInProgress("Устройство синхронизировано")
             is Events.Sync.Glucometer.Error,
-            is Events.Sync.Glucometer.ErrorWithMessage -> showMessage(scope, "Устройство недоступно", 4_000L)
+            is Events.Sync.Glucometer.ErrorWithMessage,
+            is Events.Sync.Glucometer.Nothing -> showMessage(
+                scope,
+                "Ошибка синхронизации с устройством",
+                4_000L
+            )
+            is Events.Sync.Server.Started -> startServer(scope, context)
+            is Events.Sync.Server.Success -> completed(scope, "Успешная синхронизация с сервером")
             is Events.Sync.Server.Error,
-            is Events.Sync.Server.ErrorWithMessage -> showMessage(scope, "Сервер недоступен", 4_000L)
-            is Events.Sync.Glucometer.Nothing,
-            is Events.Sync.Glucometer.InvalidTime -> showMessage(scope, "Синхронизация завершена", 2_000L)
+            is Events.Sync.Server.ErrorWithMessage -> showMessage(
+                scope,
+                "Ошибка синхронизации с сервером",
+                4_000L
+            )
         }
     }
 
@@ -408,15 +428,36 @@ private class DashboardSyncState(initialTime: String) {
         isSyncing = isSyncing
     )
 
-    private fun start(scope: kotlinx.coroutines.CoroutineScope, message: String, context: android.content.Context) {
+    private fun start(
+        scope: kotlinx.coroutines.CoroutineScope,
+        message: String,
+        fallbackMessage: String,
+        context: android.content.Context
+    ) {
         hideJob?.cancel()
         displayedTime = SyncAttemptTimeStore.recordAttempt(context)
         isSyncing = true
         statusMessage = message
         hideJob = scope.launch {
             delay(SyncFallbackTimeoutMillis)
-            if (isSyncing) showMessage(scope, "Устройство недоступно", 3_000L)
+            if (isSyncing) showMessage(scope, fallbackMessage, 3_000L)
         }
+    }
+
+    private fun startServer(
+        scope: kotlinx.coroutines.CoroutineScope,
+        context: android.content.Context
+    ) {
+        hideJob?.cancel()
+        if (!isSyncing) displayedTime = SyncAttemptTimeStore.recordAttempt(context)
+        isSyncing = true
+        statusMessage = "Подключение к серверу..."
+    }
+
+    private fun updateInProgress(message: String) {
+        hideJob?.cancel()
+        isSyncing = true
+        statusMessage = message
     }
 
     private fun completed(scope: kotlinx.coroutines.CoroutineScope, message: String) {
@@ -427,7 +468,12 @@ private class DashboardSyncState(initialTime: String) {
 
 @Composable
 private fun rememberDashboardSyncState(initialTime: String): DashboardSyncState =
-    remember { DashboardSyncState(initialTime) }
+    remember {
+        DashboardSyncState(
+            initialTime = initialTime,
+            isBackendSyncInProgress = BackendSyncStatusStore.isInProgress()
+        )
+    }
 
 @Composable
 private fun PaletteSelectionSheet(onPaletteSelected: (NewDesignPalette) -> Unit) {

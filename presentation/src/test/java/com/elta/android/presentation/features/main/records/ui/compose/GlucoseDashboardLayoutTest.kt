@@ -8,12 +8,12 @@ import org.junit.Test
 class GlucoseDashboardLayoutTest {
 
     @Test
-    fun `keeps the 60 40 working-space composition at the reference heights`() {
+    fun `reserves the detail hint below a populated chart`() {
         val references = listOf(
-            520 to Triple(146f, 333f, 142f),
-            644 to Triple(175f, 398f, 169.6f),
-            740 to Triple(199f, 458f, 208f),
-            894 to Triple(199f, 536.4f, 269.6f)
+            520 to Triple(146f, 333f, 120f),
+            644 to Triple(175f, 398f, 178f),
+            740 to Triple(199f, 458f, 214f),
+            894 to Triple(199f, 536.4f, 289.6f)
         )
 
         references.forEach { (height, expected) ->
@@ -30,8 +30,8 @@ class GlucoseDashboardLayoutTest {
         val regular = calculateGlucoseDashboardLayout(375.dp, 740.dp)
         val tall = calculateGlucoseDashboardLayout(375.dp, 894.dp)
 
-        assertEquals(0f, regular.lowerControlsExtraOffset.value, 0.01f)
-        assertEquals(78.4f, tall.lowerControlsExtraOffset.value, 0.01f)
+        assertEquals(14f, regular.lowerControlsExtraOffset.value, 0.01f)
+        assertEquals(92.4f, tall.lowerControlsExtraOffset.value, 0.01f)
     }
 
     @Test
@@ -46,7 +46,7 @@ class GlucoseDashboardLayoutTest {
     }
 
     @Test
-    fun `prioritizes the Figma lower inset when a wide phone has limited height`() {
+    fun `anchors the populated sync row at the shared gradient inset`() {
         val layout = calculateGlucoseDashboardLayout(393.dp, 733.dp)
         val lowerMetricsEnd = layout.navigationTopSpacing +
             33.dp * layout.horizontalScale +
@@ -54,7 +54,10 @@ class GlucoseDashboardLayoutTest {
             glucoseGaugeBaseHeight(layout.ringSize, layout.ringTopOffset) +
             layout.lowerControlsExtraOffset
 
-        assertTrue((layout.headerHeight - lowerMetricsEnd).value >= 15.99f)
+        val syncRowInset = GaugeSyncRowBottomInset * (layout.ringSize.value / 199f)
+        val finalButtonBottomInset = layout.headerHeight - lowerMetricsEnd + syncRowInset
+
+        assertEquals(GradientBottomInset.value, finalButtonBottomInset.value, 0.01f)
         assertTrue(layout.ringSize.value < 207f)
     }
 
@@ -92,7 +95,8 @@ class GlucoseDashboardLayoutTest {
             33.dp * layout.horizontalScale -
             layout.gaugeTopSpacing
 
-        assertEquals(32f, metrics.buttonBottomInset.value, 0.01f)
+        assertEquals(12f, metrics.buttonBottomInset.value, 0.01f)
+        assertEquals(67f, metrics.contentBottomInset.value, 0.01f)
         assertTrue(availableGaugeHeight >= metrics.requiredHeight)
     }
 }

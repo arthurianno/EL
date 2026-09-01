@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -64,7 +65,8 @@ fun GlucoseLineChartCard(
     points: List<GlucosePoint> = emptyList(),
     designScale: Float = 1f,
     cardHeight: androidx.compose.ui.unit.Dp = 201.dp * designScale,
-    emptyStateText: String = "Нет измерений за выбранный период"
+    emptyStateText: String = "Нет измерений за выбранный период",
+    showDetailHint: Boolean = false
 ) {
     var activePeriod by remember { mutableStateOf(selectedPeriod) }
     val periods = listOf("3 ч", "6 ч", "12 ч", "24 ч")
@@ -88,25 +90,30 @@ fun GlucoseLineChartCard(
     val maxVal = if (maxPointVal > 16f) 20f else 16f
     val yLabels = if (maxVal == 20f) listOf("20", "15", "10", "5", "0") else listOf("16", "12", "8", "4", "0")
 
-    Box(
-        modifier = Modifier
-            .padding(start = 17.dp * designScale, top = 45.dp * designScale, end = 17.dp * designScale, bottom = 0.dp)
-            .fillMaxWidth()
-            .height(cardHeight)
-            .clip(RoundedCornerShape(13.dp * designScale))
-            .border(
-                width = 1.dp,
-                color = if (isDarkTheme) GlucoseDashboardTheme.DarkCardBorder else Color(0xFFE3E3E3),
-                shape = RoundedCornerShape(13.dp * designScale)
-            )
-            .background(cardBg)
-            .padding(
-                start = 8.dp * designScale,
-                top = 4.dp * designScale,
-                end = 12.dp * designScale,
-                bottom = 10.dp * designScale
-            )
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .padding(
+                    start = ChartCardHorizontalInset * designScale,
+                    top = ChartCardTopInset * designScale,
+                    end = ChartCardHorizontalInset * designScale
+                )
+                .fillMaxWidth()
+                .height(cardHeight)
+                .clip(RoundedCornerShape(13.dp * designScale))
+                .border(
+                    width = 1.dp,
+                    color = if (isDarkTheme) GlucoseDashboardTheme.DarkCardBorder else Color(0xFFE3E3E3),
+                    shape = RoundedCornerShape(13.dp * designScale)
+                )
+                .background(cardBg)
+                .padding(
+                    start = 8.dp * designScale,
+                    top = 4.dp * designScale,
+                    end = 12.dp * designScale,
+                    bottom = 10.dp * designScale
+                )
+        ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Header Row: Date Dropdown & Time Filter Chips
             Row(
@@ -417,6 +424,34 @@ fun GlucoseLineChartCard(
                 }
             }
         }
+
+        }
+
+        if (showDetailHint) {
+            Spacer(modifier = Modifier.height(ChartDetailHintTopInset * designScale))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(ChartDetailHintHeight * designScale),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_info_circle),
+                    contentDescription = null,
+                    tint = axisLabelColor,
+                    modifier = Modifier.size(18.dp * designScale)
+                )
+                Spacer(modifier = Modifier.width(8.dp * designScale))
+                Text(
+                    text = "Нажмите на график для большей статистики",
+                    fontSize = 11.sp,
+                    color = axisLabelColor
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(ChartCardBottomInset * designScale))
     }
 }
 

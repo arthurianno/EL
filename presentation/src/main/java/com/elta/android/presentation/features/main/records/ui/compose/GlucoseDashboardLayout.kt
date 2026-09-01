@@ -26,6 +26,7 @@ internal data class EmptyGaugeLayoutMetrics(
     val ringSize: Dp,
     val scale: Float,
     val buttonBottomInset: Dp,
+    val contentBottomInset: Dp,
     val requiredHeight: Dp
 )
 
@@ -35,6 +36,8 @@ internal fun emptyGaugeLayoutMetrics(ringSize: Dp): EmptyGaugeLayoutMetrics {
         .dp
     val scale = (emptyRingSize.value / EmptyGaugeReferenceRingSize.value).coerceIn(0.76f, 1f)
     val buttonBottomInset = EmptyGaugeButtonBottomInset * scale
+    val contentBottomInset = buttonBottomInset +
+        (EmptyGaugeButtonHeight + EmptyGaugeContentToButtonSpacing) * scale
     val requiredHeight = emptyRingSize +
         (EmptyGaugeTitleTopSpacing +
             EmptyGaugeTitleLineHeight +
@@ -48,6 +51,7 @@ internal fun emptyGaugeLayoutMetrics(ringSize: Dp): EmptyGaugeLayoutMetrics {
         ringSize = emptyRingSize,
         scale = scale,
         buttonBottomInset = buttonBottomInset,
+        contentBottomInset = contentBottomInset,
         requiredHeight = requiredHeight
     )
 }
@@ -115,29 +119,39 @@ internal fun calculateGlucoseDashboardLayout(
         regularHeaderHeight
     }
 
-    val regularChartHeight = (workingHeight * 0.40f - 88f).coerceIn(142f, 300f)
-    // Keep the chart fully above the bottom navigation when the empty-state header grows.
-    // 16dp is the card's top margin; 43dp covers the hint row and its surrounding gaps.
-    val chartHeight = if (isEmptyState) {
-        minOf(
-            regularChartHeight,
-            workingHeight - headerHeight.value - 16f * horizontalScale - 43f * horizontalScale
-        ).coerceIn(120f, 300f).dp
-    } else {
-        regularChartHeight.dp
+    val chartTopInset = ChartCardTopInset * horizontalScale
+    val chartBottomInset = ChartCardBottomInset * horizontalScale
+    // A populated graph has a short tap hint below the card. Reserve that space here,
+    // rather than pushing the navigation down or letting the card overlap the center action.
+    val chartDetailHintSpace = if (isEmptyState) 0.dp else {
+        (ChartDetailHintTopInset + ChartDetailHintHeight) * horizontalScale
     }
+    val preferredChartHeight = (
+        workingHeight * 0.40f - chartTopInset.value - chartBottomInset.value - chartDetailHintSpace.value
+    )
+    val availableChartHeight = (
+        workingHeight - headerHeight.value - chartTopInset.value - chartBottomInset.value - chartDetailHintSpace.value
+    )
+    // The chart occupies all usable space below the gradient, with the same top and bottom
+    // insets on both dashboard states. This avoids a compressed card on short screens and a
+    // large unexplained gap above the navigation on tall screens.
+    val chartHeight = minOf(preferredChartHeight, availableChartHeight)
+        .coerceIn(120f, 300f)
+        .dp
 
-    // In Figma the lower data row ends 16dp above the gradient edge. On tall phones the
-    // 60% header gains height, so transfer that free space to this row instead of leaving
-    // an expanding empty area below it.
+    // Keep the CTA and metrics at the same 12dp gradient-bottom inset as the empty state.
+    // On tall phones the unused header height is transferred to this lower group.
+    val scaledSyncRowBottomInset = GaugeSyncRowBottomInset * (ringSize.value / 199f)
+    val populatedGaugeBottomInset = (GradientBottomInset - scaledSyncRowBottomInset)
+        .coerceAtLeast(0.dp)
     val lowerControlsExtraOffset = (
         headerHeight -
             navigationTopSpacing -
             tabHeight -
             gaugeTopSpacing -
             glucoseGaugeBaseHeight(ringSize, ringTopOffset) -
-            16.dp
-        ).coerceAtLeast(0.dp)
+            populatedGaugeBottomInset
+    ).coerceAtLeast(0.dp)
 
     return GlucoseDashboardLayout(
         horizontalScale = horizontalScale,
@@ -206,6 +220,16 @@ private fun glucoseGaugeBottomSectionHeight(ringSize: Dp): Dp {
     return height.dp
 }
 
+internal val GradientBottomInset = 12.dp
+internal val GaugeSyncRowBottomInset = 10.dp
+internal val ChartCardHorizontalInset = 16.dp
+internal val ChartCardTopInset = 16.dp
+// The center action button projects above the bottom navigation. Reserve its visual area so
+// the chart ends before the button instead of rendering underneath it.
+internal val ChartCardBottomInset = 24.dp
+internal val ChartDetailHintTopInset = 8.dp
+internal val ChartDetailHintHeight = 20.dp
+
 private val EmptyGaugeReferenceRingSize = 185.dp
 private val EmptyGaugeMinRingSize = 120.dp
 private val EmptyGaugeMaxRingSize = 200.dp
@@ -216,7 +240,7 @@ private val EmptyGaugeDescriptionLineHeight = 16.dp
 private const val EmptyGaugeDescriptionLines = 2
 private val EmptyGaugeContentToButtonSpacing = 10.dp
 private val EmptyGaugeButtonHeight = 45.dp
-private val EmptyGaugeButtonBottomInset = 32.dp
+private val EmptyGaugeButtonBottomInset = GradientBottomInset
 
 internal fun glucoseValueFontSize(ringSize: Dp): Float {
     val diameter = ringSize.value

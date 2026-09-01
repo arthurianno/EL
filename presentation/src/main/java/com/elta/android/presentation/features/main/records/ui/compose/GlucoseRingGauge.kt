@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.Image
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -42,7 +41,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -70,7 +68,6 @@ private val TirVisualHeight = 67.dp
 private val TirTitleOffset = 8.dp
 private val TirPercentageOffset = 24.dp
 private val SyncRowHeight = 45.dp
-private val SyncRowBottomInset = 10.dp
 private val MetricValueBottomInset = 1.5.dp
 private val MetricToSyncSpacing = 8.dp
 // This affects only the visual gauge group (arc, disc, and callout), not the
@@ -139,7 +136,7 @@ fun GlucoseRingGauge(
     // Both are anchored from the gradient bottom, so tall devices receive extra space
     // without separating the action from the cards above it.
     val syncRowHeight = SyncRowHeight * scaleFactor
-    val syncRowBottomInset = SyncRowBottomInset * scaleFactor
+    val syncRowBottomInset = GaugeSyncRowBottomInset * scaleFactor
     val syncRowTop = gaugeBoxHeight - syncRowBottomInset - syncRowHeight
     val metricsBottom = syncRowTop - MetricToSyncSpacing * scaleFactor
     val metricsTop = metricsBottom - TirVisualHeight * scaleFactor
@@ -151,11 +148,7 @@ fun GlucoseRingGauge(
         discWidth = discWidth
     )
     val showSyncStatus = isStatusVisible && statusText.isNotBlank()
-    val indicatorsAlpha = animateFloatAsState(
-        targetValue = if (showSyncStatus) 0f else 1f,
-        animationSpec = tween(durationMillis = 180),
-        label = "indicatorsAlpha"
-    ).value
+    val syncActionText = if (showSyncStatus) statusText else "Синхронизация с устройством"
 
     Box(
         modifier = Modifier.fillMaxWidth(),
@@ -185,7 +178,7 @@ fun GlucoseRingGauge(
                     val tirCalloutEndX = size.width * TirCalloutEnd
 
                     drawLine(
-                        color = Color.White.copy(alpha = 0.25f * indicatorsAlpha),
+                        color = Color.White.copy(alpha = 0.25f),
                         start = Offset(lineStartX, lineStartY),
                         end = Offset(tirCalloutEndX, tirAnchorY.toPx()),
                         strokeWidth = (1.dp * scaleFactor).toPx()
@@ -330,7 +323,6 @@ fun GlucoseRingGauge(
                         .align(Alignment.TopStart)
                         .fillMaxWidth()
                         .height(gaugeBoxHeight)
-                        .graphicsLayer(alpha = indicatorsAlpha)
                 ) {
                     TirIndicator(
                         tirPercentage = tirPercentage,
@@ -367,7 +359,7 @@ fun GlucoseRingGauge(
                 }
 
                 SyncDeviceButton(
-                    actionText = if (isSyncing) "Синхронизация..." else "Синхронизация с устройством",
+                    actionText = syncActionText,
                     syncTimeText = syncTimeText,
                     isSyncing = isSyncing,
                     iconRotation = syncIconRotation,
@@ -378,21 +370,6 @@ fun GlucoseRingGauge(
                     onClick = onSyncClick
                 )
 
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        // The status replaces the lower rows at the same bottom anchor.
-                        .offset(y = gaugeBoxHeight - 57.dp * scaleFactor - syncRowBottomInset)
-                        .fillMaxWidth()
-                        .graphicsLayer(alpha = 1f - indicatorsAlpha)
-                ) {
-                    SyncStatusPillBanner(
-                        statusText = statusText,
-                        onClick = onSyncClick,
-                        modifier = Modifier.height(57.dp * scaleFactor),
-                        isEnabled = showSyncStatus
-                    )
-                }
             }
         }
     }
@@ -442,7 +419,9 @@ fun NoMeasurementsGlucoseGauge(
             .height(availableHeight)
     ) {
         Column(
-            modifier = Modifier.align(Alignment.TopCenter),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = layoutMetrics.contentBottomInset),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -560,51 +539,6 @@ private fun RingGaugeDisc(
 /** Figma: the 199dp outer ring starts at y=126.24 and the disc at y=146.11. */
 internal fun glucoseGaugeDiscTopInset(ringSize: Dp): Dp =
     (19.87f * (ringSize.value / 199f)).dp
-
-@Composable
-fun SyncStatusPillBanner(
-    statusText: String,
-    onClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
-    isEnabled: Boolean = true
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
-            .background(Color(0xFF353B4B))
-            .clickable(enabled = isEnabled) { onClick() }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "i",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White.copy(alpha = 0.9f)
-                )
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = statusText,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.White,
-                maxLines = 1
-            )
-        }
-    }
-}
 
 @Composable
 private fun GlucoseTrendValue(
@@ -792,7 +726,7 @@ private fun SyncDeviceButton(
         .clickable(enabled = !isSyncing, onClick = onClick)
 
     Row(
-        modifier = buttonModifier,
+        modifier = buttonModifier.padding(horizontal = 16.dp * designScale),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -807,11 +741,13 @@ private fun SyncDeviceButton(
         Spacer(modifier = Modifier.width(12.dp * designScale))
         Text(
             text = actionText,
+            modifier = Modifier.weight(1f),
             fontSize = (15f * designScale).sp,
             fontWeight = FontWeight.Normal,
             color = Color.White,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
         )
     }
 }

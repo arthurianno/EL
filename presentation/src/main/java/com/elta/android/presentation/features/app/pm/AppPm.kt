@@ -42,6 +42,7 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.features.app.model.SyncStatus
+import com.elta.android.presentation.utils.BackendSyncStatusStore
 import com.elta.android.presentation.utils.LocaleHelper
 import com.elta.android.presentation.utils.OneSignalTags
 import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
@@ -469,6 +470,8 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         bus.events<Events.Sync>()
+            // Keep an immediately readable value for screens that open after this event.
+            .doOnNext(BackendSyncStatusStore::handle)
             .concatMap { event ->
                 val delay = when {
                     !syncStatusState.hasValue() -> EMPTY_STATUS_DELAY_MILLIS // first start add delay to make smoooth

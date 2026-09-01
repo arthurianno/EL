@@ -371,6 +371,11 @@ class HomeFlowPm @Inject constructor(
     }
 
     private fun bindSyncAction() {
+        bus.events<Events.ManualGlucometerSyncRequested>()
+            .map { Unit }
+            .subscribe(startSyncAction.consumer)
+            .untilDestroy()
+
         firstSyncAction.observable
             .doOnNext(startSyncAction.consumer)
             .doOnNext(closeHelpBottomSheetCommand.consumer)
@@ -659,7 +664,7 @@ class HomeFlowPm @Inject constructor(
                     bus.event(Events.Sync.Glucometer.Success)
                 } else bus.event(Events.Sync.Glucometer.NoNewEvents)
             }
-            .doOnComplete { if (!isAuto) startSyncWithIomtAction.consumer.accept(Unit) }
+            .doOnComplete { if (!isAuto) startSyncWithBackendAction.consumer.accept(Unit) }
             .doOnError { error ->
                 if (isAuto) {
                     handleAutoSyncError(error)
@@ -728,7 +733,9 @@ class HomeFlowPm @Inject constructor(
 
 
     private fun handleManualSyncError(error: Throwable) {
-        bus.event(Events.Sync.Glucometer.Nothing)
+        // `Nothing` means the user cancelled the flow. A real device failure must be
+        // published as an error so every sync-status surface can show the correct state.
+        bus.event(Events.Sync.Glucometer.Error)
 
         when (error) {
 

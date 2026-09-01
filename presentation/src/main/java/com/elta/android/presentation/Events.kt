@@ -32,6 +32,7 @@ sealed class Events : Event {
     object DeviceChanged : Events()
     object FirmwareUpdated : Events()
     object ServerSyncRequested : Events()
+    object ManualGlucometerSyncRequested : Events()
     object NewDesignPaletteChanged : Events()
     data class BackendSyncProgress(val inProgress: Boolean) : Events()
     object BootCompleted : Events()
