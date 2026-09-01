@@ -61,7 +61,7 @@ internal fun calculateGlucoseDashboardLayout(
     availableContentHeight: Dp,
     isEmptyState: Boolean = false
 ): GlucoseDashboardLayout {
-    // The design references include a 72dp app navigation. The measured content area has
+    // The design references  a 72dp app navigation. The measured content area has
     // already excluded it, so restore it only when selecting the matching Figma breakpoint.
     val designReferenceHeight = availableContentHeight.value + 72f
     val baseRingSize = interpolateByHeight(designReferenceHeight, 146f, 175f, 199f, 199f)
