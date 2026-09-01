@@ -60,6 +60,16 @@ class StatisticFlowPm @Inject constructor(
         router.navigateToTab(Screens.PeriodScreen(Period.SEVEN))
     }
 
+    fun selectPeriod(period: Period) {
+        val id = when (period) {
+            Period.SEVEN -> R.id.periodSevenDaysView
+            Period.FOURTEEN -> R.id.periodFourteenDaysView
+            Period.THIRTY -> R.id.periodThirtyDaysView
+            Period.NINETY -> R.id.periodNinetyDaysView
+        }
+        periodSelectedAction.consumer.accept(id)
+    }
+
     private fun handleFileUri(uri: Uri) {
         if (uri != Uri.EMPTY)
             router.navigateTo(Screens.ViewPdfScreen(uri))
