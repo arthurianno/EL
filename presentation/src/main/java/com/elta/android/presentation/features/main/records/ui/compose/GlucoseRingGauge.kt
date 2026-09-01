@@ -57,7 +57,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
-import kotlin.math.min
 
 data class GlucoseTrend(
     val direction: GlucoseTrendDirection,
@@ -416,8 +415,9 @@ fun NoMeasurementsGlucoseGauge(
     isStatusVisible: Boolean,
     onSyncClick: () -> Unit
 ) {
-    val emptyRingSize = min(ringSize.value, 200f).coerceAtLeast(120f).dp
-    val compactScale = (emptyRingSize.value / 185f).coerceIn(0.76f, 1f)
+    val layoutMetrics = emptyGaugeLayoutMetrics(ringSize)
+    val emptyRingSize = layoutMetrics.ringSize
+    val compactScale = layoutMetrics.scale
     val discWidth = emptyRingSize * (152f / 185f)
     val discHeight = emptyRingSize * (150f / 185f)
     val mainColor = GlucoseDashboardTheme.getMainTextColor(state)
@@ -522,7 +522,7 @@ fun NoMeasurementsGlucoseGauge(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(start = 14.dp, end = 14.dp, bottom = 16.dp * compactScale),
+                .padding(start = 14.dp, end = 14.dp, bottom = layoutMetrics.buttonBottomInset),
             designScale = compactScale,
             outlined = true,
             onClick = onSyncClick

@@ -130,12 +130,7 @@ class HomeFlowFragmentVariantA :
     }
 
     private fun updateBottomNavigationBackground() {
-        val backgroundRes = when (selectedBottomNavigationItemId) {
-            R.id.mainMenuItemView -> android.R.color.white
-            R.id.notesMenuItemView -> R.color.pale_gray
-            else -> android.R.color.white
-        }
-        binding.bottomContainer.setBackgroundResource(backgroundRes)
+        binding.bottomContainer.setBackgroundResource(android.R.color.transparent)
     }
 
     private fun bindHelpBottomSheet(pm: HomeFlowPmVariantA) {
@@ -330,6 +325,7 @@ class HomeFlowFragmentVariantA :
 
     private fun updateContentBottomMargin(contentContainer: View, navigationHeight: Int) {
         if (navigationHeight == 0) return
+
         (contentContainer.layoutParams as? FrameLayout.LayoutParams)?.let { contentParams ->
             if (contentParams.bottomMargin != navigationHeight) {
                 contentParams.bottomMargin = navigationHeight

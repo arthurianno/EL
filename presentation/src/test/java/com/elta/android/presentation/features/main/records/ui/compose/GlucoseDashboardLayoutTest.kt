@@ -78,4 +78,21 @@ class GlucoseDashboardLayoutTest {
         assertEquals(19.87f, glucoseGaugeDiscTopInset(199.dp).value, 0.01f)
         assertEquals(14.57f, glucoseGaugeDiscTopInset(146.dp).value, 0.01f)
     }
+
+    @Test
+    fun `reserves the exact empty gauge height used by its bottom aligned CTA`() {
+        val metrics = emptyGaugeLayoutMetrics(185.dp)
+        val layout = calculateGlucoseDashboardLayout(
+            screenWidth = 375.dp,
+            availableContentHeight = 740.dp,
+            isEmptyState = true
+        )
+        val availableGaugeHeight = layout.headerHeight -
+            layout.navigationTopSpacing -
+            33.dp * layout.horizontalScale -
+            layout.gaugeTopSpacing
+
+        assertEquals(32f, metrics.buttonBottomInset.value, 0.01f)
+        assertTrue(availableGaugeHeight >= metrics.requiredHeight)
+    }
 }

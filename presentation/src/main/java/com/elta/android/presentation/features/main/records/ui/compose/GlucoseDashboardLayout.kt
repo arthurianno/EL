@@ -21,6 +21,37 @@ internal data class GlucoseDashboardLayout(
     val lowerControlsExtraOffset: Dp
 )
 
+/** Shared vertical geometry for the dashboard state before the first measurement. */
+internal data class EmptyGaugeLayoutMetrics(
+    val ringSize: Dp,
+    val scale: Float,
+    val buttonBottomInset: Dp,
+    val requiredHeight: Dp
+)
+
+internal fun emptyGaugeLayoutMetrics(ringSize: Dp): EmptyGaugeLayoutMetrics {
+    val emptyRingSize = minOf(ringSize.value, EmptyGaugeMaxRingSize.value)
+        .coerceAtLeast(EmptyGaugeMinRingSize.value)
+        .dp
+    val scale = (emptyRingSize.value / EmptyGaugeReferenceRingSize.value).coerceIn(0.76f, 1f)
+    val buttonBottomInset = EmptyGaugeButtonBottomInset * scale
+    val requiredHeight = emptyRingSize +
+        (EmptyGaugeTitleTopSpacing +
+            EmptyGaugeTitleLineHeight +
+            EmptyGaugeTitleToDescriptionSpacing +
+            EmptyGaugeDescriptionLineHeight * EmptyGaugeDescriptionLines.toFloat() +
+            EmptyGaugeContentToButtonSpacing +
+            EmptyGaugeButtonHeight +
+            EmptyGaugeButtonBottomInset) * scale
+
+    return EmptyGaugeLayoutMetrics(
+        ringSize = emptyRingSize,
+        scale = scale,
+        buttonBottomInset = buttonBottomInset,
+        requiredHeight = requiredHeight
+    )
+}
+
 internal fun calculateGlucoseDashboardLayout(
     screenWidth: Dp,
     availableContentHeight: Dp,
@@ -71,19 +102,13 @@ internal fun calculateGlucoseDashboardLayout(
         requiredHeaderHeight.value
     ).dp
 
-    // The empty state uses a 185dp circle at the 375dp design reference. Reserve enough
-    // vertical space for it rather than shrinking it to fit a fixed 60% header.
-    val emptyRingSize = minOf(ringSize.value, 185f)
-    val emptyScale = (emptyRingSize / 185f).coerceIn(0.76f, 1f)
-    val emptyStateContentHeight = emptyRingSize +
-        (13f + 24f + 2f + 32f + 10f + 45f) * emptyScale +
-        16f
-    val emptyStateHeaderHeight = (
-        navigationTopSpacing.value +
-            tabHeight.value +
-            gaugeTopSpacing.value +
-            emptyStateContentHeight
-        ).dp
+    // Use the exact same metrics as NoMeasurementsGlucoseGauge. The CTA is bottom-aligned,
+    // so a mismatched inset here makes it collide with the explanatory text on compact phones.
+    val emptyStateContentHeight = emptyGaugeLayoutMetrics(ringSize).requiredHeight
+    val emptyStateHeaderHeight = navigationTopSpacing +
+        tabHeight +
+        gaugeTopSpacing +
+        emptyStateContentHeight
     val headerHeight = if (isEmptyState) {
         max(regularHeaderHeight.value, emptyStateHeaderHeight.value).dp
     } else {
@@ -180,6 +205,18 @@ private fun glucoseGaugeBottomSectionHeight(ringSize: Dp): Dp {
     }
     return height.dp
 }
+
+private val EmptyGaugeReferenceRingSize = 185.dp
+private val EmptyGaugeMinRingSize = 120.dp
+private val EmptyGaugeMaxRingSize = 200.dp
+private val EmptyGaugeTitleTopSpacing = 13.dp
+private val EmptyGaugeTitleLineHeight = 24.dp
+private val EmptyGaugeTitleToDescriptionSpacing = 2.dp
+private val EmptyGaugeDescriptionLineHeight = 16.dp
+private const val EmptyGaugeDescriptionLines = 2
+private val EmptyGaugeContentToButtonSpacing = 10.dp
+private val EmptyGaugeButtonHeight = 45.dp
+private val EmptyGaugeButtonBottomInset = 32.dp
 
 internal fun glucoseValueFontSize(ringSize: Dp): Float {
     val diameter = ringSize.value

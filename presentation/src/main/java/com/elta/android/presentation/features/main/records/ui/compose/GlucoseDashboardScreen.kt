@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.main.records.ui.compose
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,399 +35,402 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.Events
-import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.utils.SyncAttemptTimeStore
 import com.nullgr.core.rx.RxBus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.threeten.bp.YearMonth
 
+/**
+ * Production entry point. RxBus integration is kept at this boundary;
+ * [GlucoseDashboardContent] is an independent, previewable Compose UI.
+ */
 @Composable
 fun GlucoseDashboardScreen(
+    uiState: GlucoseDashboardUiState,
     bus: RxBus? = null,
-    glucoseValue: String = "—",
-    deltaText: String = "—",
-    glucoseTrend: GlucoseTrend? = null,
-    tirPercentage: String = "—",
-    syncTimeText: String = "Нет измерений",
-    breadUnitsText: String = "0,9 Ед.",
-    insulinText: String = "0,1 ХЕ",
-    initialGlucoseState: GlucoseState = GlucoseState.NORMAL,
-    isDarkTheme: Boolean = false,
-    dailyGlucoseModel: com.elta.android.domain.features.diary.home.model.DailyGlucoseModel? = null,
-    allDayEvents: List<com.elta.android.domain.features.diary.events.model.EventV2> = emptyList(),
-    onTabSelected: (String) -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    var selectedCategoryTab by remember { mutableStateOf("Глюкоза") }
-    val currentState = initialGlucoseState
-    var statusText by remember { mutableStateOf("") }
-    var isStatusVisible by remember { mutableStateOf(false) }
-    var isSyncing by remember { mutableStateOf(false) }
-    var displayedSyncTime by remember(syncTimeText) { mutableStateOf(syncTimeText) }
-    var isDetailedChartVisible by rememberSaveable { mutableStateOf(false) }
-    var isTransitioningToDetailed by remember { mutableStateOf(false) }
-    var detailedChartEvents by remember { mutableStateOf(allDayEvents) }
-    var detailedChartEventsByMonth by remember { mutableStateOf(emptyMap<org.threeten.bp.YearMonth, List<com.elta.android.domain.features.diary.events.model.EventV2>>()) }
-    var requestedDetailedMonths by remember { mutableStateOf(emptySet<org.threeten.bp.YearMonth>()) }
+    val scope = rememberCoroutineScope()
+    val syncState = rememberDashboardSyncState(uiState.syncTimeText)
+    var loadedEventsByMonth by remember {
+        mutableStateOf(emptyMap<YearMonth, List<com.elta.android.domain.features.diary.events.model.EventV2>>())
+    }
+    var requestedMonths by remember { mutableStateOf(emptySet<YearMonth>()) }
+    val detailedEvents = remember(uiState.detailedChartData.events, loadedEventsByMonth) {
+        (uiState.detailedChartData.events + loadedEventsByMonth.values.flatten()).distinct()
+    }
 
-    LaunchedEffect(allDayEvents) {
-        if (detailedChartEventsByMonth.isEmpty()) {
-            detailedChartEvents = allDayEvents
+    LaunchedEffect(uiState.syncTimeText) {
+        syncState.updateDisplayedTime(uiState.syncTimeText)
+    }
+
+    DisposableEffect(bus) {
+        if (bus == null) return@DisposableEffect onDispose { }
+
+        val syncDisposable = bus.events<Events.Sync>().subscribe { event ->
+            syncState.handle(event, context, scope)
+        }
+        val networkDisposable = bus.events<Events.NetworkProblemTryLater>().subscribe {
+            syncState.showMessage(scope, "Отсутствует подключение к сети", 4_000L)
+        }
+        val rangeDisposable = bus.events<Events.DetailedChartRangeLoaded>().subscribe { event ->
+            val month = YearMonth.from(event.start)
+            loadedEventsByMonth = loadedEventsByMonth + (month to event.events)
+            requestedMonths = requestedMonths - month
+        }
+
+        onDispose {
+            syncDisposable.dispose()
+            networkDisposable.dispose()
+            rangeDisposable.dispose()
         }
     }
 
-    val coroutineScope = rememberCoroutineScope()
     val paletteSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
     )
-    var hideJob by remember { mutableStateOf<Job?>(null) }
 
-    fun showStatus(text: String, syncing: Boolean, autoHideMs: Long?) {
-        hideJob?.cancel()
-        statusText = text
-        isSyncing = syncing
-        isStatusVisible = true
-
-        if (autoHideMs != null) {
-            hideJob = coroutineScope.launch {
-                delay(autoHideMs)
-                isStatusVisible = false
-                isSyncing = false
-            }
-        } else if (syncing) {
-            // Fallback safety timeout: if sync is still active after 8 sec without completion, auto-hide!
-            hideJob = coroutineScope.launch {
-                delay(8000)
-                statusText = "Устройство недоступно"
-                isSyncing = false
-                delay(3000)
-                isStatusVisible = false
-            }
-        }
-    }
-
-    val categories = listOf("Глюкоза", "Давление", "Инсулин")
-    // A formatted glucose value can be available before the day model is populated, for
-    // example immediately after a refresh. Treat it as data so the empty state never
-    // flashes over a valid reading.
-    val hasMeasurements = remember(dailyGlucoseModel, glucoseValue) {
-        dailyGlucoseModel?.hasEvents == true ||
-            glucoseValue.replace(',', '.').toFloatOrNull() != null
-    }
-
-    if (bus != null) {
-        DisposableEffect(bus) {
-            val syncDisposable = bus.events<Events.Sync>().subscribe { event ->
-                when (event) {
-                    is Events.Sync.Glucometer.Started -> {
-                        displayedSyncTime = SyncAttemptTimeStore.recordAttempt(context)
-                        showStatus("Синхронизация с прибором...", syncing = true, autoHideMs = null)
-                    }
-                    is Events.Sync.Glucometer.Success -> {
-                        displayedSyncTime = "Только что"
-                        showStatus("Синхронизация с прибором завершена", syncing = false, autoHideMs = 3000L)
-                    }
-                    is Events.Sync.Glucometer.NoNewEvents -> {
-                        displayedSyncTime = "Только что"
-                        showStatus("Нет новых измерений", syncing = false, autoHideMs = 3000L)
-                    }
-                    is Events.Sync.Glucometer.Error,
-                    is Events.Sync.Glucometer.ErrorWithMessage -> {
-                        showStatus("Устройство недоступно", syncing = false, autoHideMs = 4000L)
-                    }
-                    is Events.Sync.Server.Started -> {
-                        displayedSyncTime = SyncAttemptTimeStore.recordAttempt(context)
-                        showStatus("Синхронизация с сервером...", syncing = true, autoHideMs = null)
-                    }
-                    is Events.Sync.Server.Success -> {
-                        displayedSyncTime = "Только что"
-                        showStatus("Синхронизация с сервером завершена", syncing = false, autoHideMs = 3000L)
-                    }
-                    is Events.Sync.Server.Error,
-                    is Events.Sync.Server.ErrorWithMessage -> {
-                        showStatus("Сервер недоступен", syncing = false, autoHideMs = 4000L)
-                    }
-                    is Events.Sync.Glucometer.Nothing,
-                    is Events.Sync.Glucometer.InvalidTime -> {
-                        showStatus("Синхронизация завершена", syncing = false, autoHideMs = 2000L)
-                    }
+    ModalBottomSheetLayout(
+        modifier = modifier.fillMaxSize(),
+        sheetState = paletteSheetState,
+        sheetElevation = 0.dp,
+        sheetContent = {
+            if (BuildConfig.DEBUG) {
+                PaletteSelectionSheet { palette ->
+                    NewDesignPaletteController.select(palette)
+                    bus?.event(Events.NewDesignPaletteChanged)
+                    scope.launch { paletteSheetState.hide() }
                 }
-            }
-
-            val netDisposable = bus.events<Events.NetworkProblemTryLater>().subscribe {
-                showStatus("Отсутствует подключение к сети", syncing = false, autoHideMs = 4000L)
-            }
-            val detailedChartDisposable = bus.events<Events.DetailedChartRangeLoaded>().subscribe { event ->
-                val month = org.threeten.bp.YearMonth.from(event.start)
-                detailedChartEventsByMonth = detailedChartEventsByMonth + (month to event.events)
-                requestedDetailedMonths = requestedDetailedMonths - month
-                detailedChartEvents = detailedChartEventsByMonth.values.flatten()
-            }
-
-            onDispose {
-                syncDisposable.dispose()
-                netDisposable.dispose()
-                detailedChartDisposable.dispose()
+            } else {
+                Spacer(modifier = Modifier.height(1.dp))
             }
         }
+    ) {
+        GlucoseDashboardContent(
+            uiState = uiState,
+            syncState = syncState.asUiState(),
+            detailedEvents = detailedEvents,
+            onAction = { action ->
+                when (action) {
+                    GlucoseDashboardAction.RequestSync -> {
+                        if (syncState.isSyncing) return@GlucoseDashboardContent
+                        if (bus == null) {
+                            syncState.showMessage(scope, "Синхронизация недоступна", 3_000L)
+                        } else {
+                            bus.event(Events.ServerSyncRequested)
+                        }
+                    }
+                    is GlucoseDashboardAction.RequestDetailedRange -> {
+                        var month = YearMonth.from(action.start)
+                        val lastMonth = YearMonth.from(action.end)
+                        while (!month.isAfter(lastMonth)) {
+                            if (month !in loadedEventsByMonth && month !in requestedMonths) {
+                                requestedMonths = requestedMonths + month
+                                bus?.event(
+                                    Events.DetailedChartRangeRequested(month.atDay(1), month.atEndOfMonth())
+                                )
+                            }
+                            month = month.plusMonths(1)
+                        }
+                    }
+                    is GlucoseDashboardAction.SelectCategory -> Unit
+                }
+            },
+            onDetailedChartClosed = {
+                requestedMonths = emptySet()
+                loadedEventsByMonth = emptyMap()
+            },
+            onDebugPaletteLongClick = if (BuildConfig.DEBUG) {
+                { scope.launch { paletteSheetState.show() } }
+            } else {
+                null
+            }
+        )
     }
+}
 
-    val screenBg = if (isDarkTheme) GlucoseDashboardTheme.DarkBackground else Color.White
-    val selectedTabTextColor = GlucoseDashboardTheme.getSelectedTabTextColor(currentState)
+/** Stateless dashboard UI: state enters through [uiState], user intent leaves through [onAction]. */
+@Composable
+internal fun GlucoseDashboardContent(
+    uiState: GlucoseDashboardUiState,
+    syncState: DashboardSyncUiState,
+    detailedEvents: List<com.elta.android.domain.features.diary.events.model.EventV2> = uiState.detailedChartData.events,
+    modifier: Modifier = Modifier,
+    onAction: (GlucoseDashboardAction) -> Unit = {},
+    onDetailedChartClosed: () -> Unit = {},
+    onDebugPaletteLongClick: (() -> Unit)? = null
+) {
+    var selectedCategory by rememberSaveable { mutableStateOf(DashboardCategories.first()) }
+    var isTransitioningToDetailed by rememberSaveable { mutableStateOf(false) }
+    var isDetailedChartVisible by rememberSaveable { mutableStateOf(false) }
 
     ProvideTextStyle(value = TextStyle(fontFamily = GlucoseDashboardGothamPro)) {
-        BoxWithConstraints(
-            modifier = Modifier.fillMaxSize()
-        ) {
-        val layout = calculateGlucoseDashboardLayout(
-            screenWidth = maxWidth,
-            // The hosting container is measured above the app navigation and any system
-            // navigation controls. This keeps the 60/40 layout inside the visible viewport.
-            availableContentHeight = maxHeight,
-            isEmptyState = !hasMeasurements
-        )
+        BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+            val layout = calculateGlucoseDashboardLayout(
+                screenWidth = maxWidth,
+                availableContentHeight = maxHeight,
+                isEmptyState = !uiState.hasMeasurements
+            )
 
-        ModalBottomSheetLayout(
-            modifier = Modifier.fillMaxSize(),
-            sheetState = paletteSheetState,
-            sheetContent = {
-                if (BuildConfig.DEBUG) {
-                    PaletteSelectionSheet(
-                        onPaletteSelected = { palette ->
-                            NewDesignPaletteController.select(palette)
-                            bus?.event(Events.NewDesignPaletteChanged)
-                            coroutineScope.launch { paletteSheetState.hide() }
-                        }
-                    )
-                } else {
-                    Spacer(modifier = Modifier.height(1.dp))
-                }
-            }
-        ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(screenBg)
-        ) {
-
-            // Gradient Header Box
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(layout.headerHeight)
-                    .background(GlucoseDashboardTheme.getHeaderGradient(currentState, isDarkTheme))
-            ) {
+            Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
-                        .fillMaxHeight()
+                        .fillMaxSize()
+                        .background(if (uiState.isDarkTheme) GlucoseDashboardTheme.DarkBackground else Color.White)
                 ) {
-                    Spacer(modifier = Modifier.height(layout.navigationTopSpacing + 10.dp))
+                    DashboardHeader(
+                        uiState = uiState,
+                        syncState = syncState,
+                        selectedCategory = selectedCategory,
+                        layout = layout,
+                        onCategorySelected = { category ->
+                            selectedCategory = category
+                            onAction(GlucoseDashboardAction.SelectCategory(category))
+                        },
+                        onSyncClick = { onAction(GlucoseDashboardAction.RequestSync) },
+                        onDebugPaletteLongClick = onDebugPaletteLongClick
+                    )
+                    GlucoseLineChartCard(
+                        isDarkTheme = uiState.isDarkTheme,
+                        points = uiState.chartPoints,
+                        designScale = layout.horizontalScale,
+                        cardHeight = layout.chartHeight,
+                        emptyStateText = if (uiState.hasMeasurements) {
+                            "Нет измерений за выбранный период"
+                        } else {
+                            "Здесь появятся ваши данные"
+                        },
+                        onChartClick = { isTransitioningToDetailed = true }
+                    )
+                }
 
-                    // Top Category Pill Tabs Switcher ("Глюкоза", "Давление", "Инсулин")
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 14.dp * layout.horizontalScale),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(33.dp * layout.horizontalScale)
-                                .clip(RoundedCornerShape(35.5.dp * layout.horizontalScale))
-                                .background(Color.White.copy(alpha = 0.2f))
-                                .padding(2.dp * layout.horizontalScale)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                categories.forEach { category ->
-                                    val isSelected = category == selectedCategoryTab
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(3f)
-                                            .height(33.dp * layout.horizontalScale)
-                                            .clip(RoundedCornerShape(35.5.dp * layout.horizontalScale))
-                                            .background(
-                                                if (isSelected) {
-                                                    GlucoseDashboardTheme.IndicatorPillBackground
-                                                } else {
-                                                    Color.Transparent
-                                                }
-                                            )
-                                            .clickable {
-                                                selectedCategoryTab = category
-                                                onTabSelected(category)
-                                            },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = category,
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.Normal,
-                                            color = if (isSelected) selectedTabTextColor else GlucoseDashboardTheme.TabUnselectedText
-                                        )
-                                    }
-                                }
-                            }
+                if (isTransitioningToDetailed) {
+                    GlucoseChartTransitionOverlay(
+                        isDarkTheme = uiState.isDarkTheme,
+                        onAnimationFinished = {
+                            isDetailedChartVisible = true
+                            isTransitioningToDetailed = false
                         }
-                    }
+                    )
+                }
 
-                    Spacer(modifier = Modifier.height(layout.gaugeTopSpacing))
-
-                    val onSyncClick = {
-                        if (!isSyncing) {
-                            bus?.event(Events.ServerSyncRequested)
-                                ?: showStatus("Синхронизация недоступна", syncing = false, autoHideMs = 3000L)
+                if (isDetailedChartVisible) {
+                    DetailedGlucoseChartScreen(
+                        onBackClick = {
+                            isDetailedChartVisible = false
+                            onDetailedChartClosed()
+                        },
+                        glucosePoints = uiState.detailedChartData.glucosePoints,
+                        insulinEntries = uiState.detailedChartData.insulinEntries,
+                        foodEntries = uiState.detailedChartData.foodEntries,
+                        activityEntries = uiState.detailedChartData.activityEntries,
+                        dailyGlucoseModel = uiState.detailedChartData.dailyGlucoseModel,
+                        allEvents = detailedEvents,
+                        onDateRangeSelected = { start, end ->
+                            onAction(GlucoseDashboardAction.RequestDetailedRange(start, end))
                         }
-                    }
-
-                    if (hasMeasurements) {
-                        // Central Circular Ring Gauge Widget (Scales 100% dynamically with screenWidthDp)
-                        GlucoseRingGauge(
-                            glucoseValue = glucoseValue,
-                            glucoseUnit = "ммоль/л",
-                            deltaText = deltaText,
-                            glucoseTrend = glucoseTrend,
-                            tirPercentage = tirPercentage,
-                            syncTimeText = displayedSyncTime,
-                            breadUnitsText = breadUnitsText,
-                            insulinText = insulinText,
-                            state = currentState,
-                            statusText = statusText,
-                            isStatusVisible = isStatusVisible,
-                            isSyncing = isSyncing,
-                            ringSize = layout.ringSize,
-                            ringTopOffset = layout.ringTopOffset,
-                            lowerControlsExtraOffset = layout.lowerControlsExtraOffset,
-                            onSyncClick = onSyncClick,
-                            onStatePillLongClick = if (BuildConfig.DEBUG) {
-                                { coroutineScope.launch { paletteSheetState.show() } }
-                            } else null
-                        )
-                    } else {
-                        NoMeasurementsGlucoseGauge(
-                            ringSize = layout.ringSize,
-                            availableHeight = layout.headerHeight -
-                                layout.navigationTopSpacing -
-                                33.dp * layout.horizontalScale -
-                                layout.gaugeTopSpacing,
-                            state = currentState,
-                            isSyncing = isSyncing,
-                            statusText = statusText,
-                            isStatusVisible = isStatusVisible,
-                            onSyncClick = onSyncClick
-                        )
-                    }
-
+                    )
                 }
             }
-
-            val chartPoints = remember(dailyGlucoseModel, allDayEvents) {
-                val pointsFromModel = dailyGlucoseModel?.let {
-                    com.elta.android.presentation.features.main.records.mapper.DetailedChartItemsBuilder.buildPoints(it, allDayEvents)
-                }
-                if (!pointsFromModel.isNullOrEmpty()) {
-                    pointsFromModel.map { GlucosePoint(it.timeLabel, it.value) }
-                } else emptyList()
-            }
-
-            // Lower Chart Card Section
-            GlucoseLineChartCard(
-                isDarkTheme = isDarkTheme,
-                points = chartPoints,
-                designScale = layout.horizontalScale,
-                cardHeight = layout.chartHeight,
-                emptyStateText = if (hasMeasurements) {
-                    "Нет измерений за выбранный период"
-                } else {
-                    "Здесь появятся ваши данные"
-                },
-                onChartClick = {
-                    isTransitioningToDetailed = true
-                }
-            )
-
-        }
-
-            if (isTransitioningToDetailed) {
-            GlucoseChartTransitionOverlay(
-                isDarkTheme = isDarkTheme,
-                onAnimationFinished = {
-                    isDetailedChartVisible = true
-                    isTransitioningToDetailed = false
-                }
-            )
-        }
-
-            if (isDetailedChartVisible) {
-            val realPoints = remember(dailyGlucoseModel, allDayEvents) {
-                dailyGlucoseModel?.let { com.elta.android.presentation.features.main.records.mapper.DetailedChartItemsBuilder.buildPoints(it, allDayEvents) }
-            }
-            val realInsulin = remember(realPoints, allDayEvents) {
-                realPoints?.let { com.elta.android.presentation.features.main.records.mapper.DetailedChartItemsBuilder.buildInsulinEntries(it, allDayEvents) }
-            }
-            val realFood = remember(realPoints, allDayEvents) {
-                realPoints?.let { com.elta.android.presentation.features.main.records.mapper.DetailedChartItemsBuilder.buildFoodEntries(it, allDayEvents) }
-            }
-            val realActivity = remember(allDayEvents) {
-                com.elta.android.presentation.features.main.records.mapper.DetailedChartItemsBuilder.buildActivityEntries(allDayEvents)
-            }
-
-            val todayDate = remember { getTodayFormattedDate() }
-
-            DetailedGlucoseChartScreen(
-                onBackClick = {
-                    isDetailedChartVisible = false
-                    requestedDetailedMonths = emptySet()
-                    detailedChartEventsByMonth = emptyMap()
-                    detailedChartEvents = allDayEvents
-                },
-                initialDate = todayDate,
-                glucosePoints = realPoints ?: emptyList(),
-                insulinEntries = realInsulin ?: emptyList(),
-                foodEntries = realFood ?: emptyList(),
-                activityEntries = realActivity ?: emptyList(),
-                dailyGlucoseModel = dailyGlucoseModel,
-                allEvents = detailedChartEvents,
-                onDateRangeSelected = { start, end ->
-                    var month = org.threeten.bp.YearMonth.from(start)
-                    val lastMonth = org.threeten.bp.YearMonth.from(end)
-                    while (!month.isAfter(lastMonth)) {
-                        if (month !in detailedChartEventsByMonth && month !in requestedDetailedMonths) {
-                            requestedDetailedMonths = requestedDetailedMonths + month
-                            bus?.event(
-                                Events.DetailedChartRangeRequested(
-                                    month.atDay(1),
-                                    month.atEndOfMonth()
-                                )
-                            )
-                        }
-                        month = month.plusMonths(1)
-                    }
-                }
-            )
-            }
-        }
-        }
         }
     }
 }
 
 @Composable
-private fun PaletteSelectionSheet(
-    onPaletteSelected: (NewDesignPalette) -> Unit
+private fun DashboardHeader(
+    uiState: GlucoseDashboardUiState,
+    syncState: DashboardSyncUiState,
+    selectedCategory: String,
+    layout: GlucoseDashboardLayout,
+    onCategorySelected: (String) -> Unit,
+    onSyncClick: () -> Unit,
+    onDebugPaletteLongClick: (() -> Unit)?
 ) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(layout.headerHeight)
+            .background(GlucoseDashboardTheme.getHeaderGradient(uiState.glucoseState, uiState.isDarkTheme))
+    ) {
+        Column(modifier = Modifier.fillMaxHeight()) {
+            Spacer(modifier = Modifier.height(layout.navigationTopSpacing))
+            DashboardCategoryTabs(
+                selectedCategory = selectedCategory,
+                glucoseState = uiState.glucoseState,
+                horizontalScale = layout.horizontalScale,
+                onCategorySelected = onCategorySelected
+            )
+            Spacer(modifier = Modifier.height(layout.gaugeTopSpacing))
+
+            if (uiState.hasMeasurements) {
+                GlucoseRingGauge(
+                    glucoseValue = uiState.glucoseValue,
+                    deltaText = uiState.deltaText,
+                    glucoseTrend = uiState.glucoseTrend,
+                    tirPercentage = uiState.tirPercentage,
+                    syncTimeText = syncState.displayedTime,
+                    breadUnitsText = uiState.breadUnitsText,
+                    insulinText = uiState.insulinText,
+                    state = uiState.glucoseState,
+                    statusText = syncState.statusMessage.orEmpty(),
+                    isStatusVisible = syncState.statusMessage != null,
+                    isSyncing = syncState.isSyncing,
+                    ringSize = layout.ringSize,
+                    ringTopOffset = layout.ringTopOffset,
+                    lowerControlsExtraOffset = layout.lowerControlsExtraOffset,
+                    onSyncClick = onSyncClick,
+                    onStatePillLongClick = onDebugPaletteLongClick
+                )
+            } else {
+                NoMeasurementsGlucoseGauge(
+                    ringSize = layout.ringSize,
+                    availableHeight = layout.headerHeight -
+                        layout.navigationTopSpacing -
+                        33.dp * layout.horizontalScale -
+                        layout.gaugeTopSpacing,
+                    state = uiState.glucoseState,
+                    isSyncing = syncState.isSyncing,
+                    statusText = syncState.statusMessage.orEmpty(),
+                    isStatusVisible = syncState.statusMessage != null,
+                    onSyncClick = onSyncClick
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DashboardCategoryTabs(
+    selectedCategory: String,
+    glucoseState: GlucoseState,
+    horizontalScale: Float,
+    onCategorySelected: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 14.dp * horizontalScale),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(33.dp * horizontalScale)
+                .clip(RoundedCornerShape(35.5.dp * horizontalScale))
+                .background(Color.White.copy(alpha = 0.2f))
+                .padding(2.dp * horizontalScale)
+        ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                DashboardCategories.forEach { category ->
+                    val isSelected = category == selectedCategory
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(35.5.dp * horizontalScale))
+                            .background(
+                                if (isSelected) GlucoseDashboardTheme.IndicatorPillBackground else Color.Transparent
+                            )
+                            .clickable { onCategorySelected(category) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = category,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = if (isSelected) {
+                                GlucoseDashboardTheme.getSelectedTabTextColor(glucoseState)
+                            } else {
+                                GlucoseDashboardTheme.TabUnselectedText
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+private class DashboardSyncState(initialTime: String) {
+    var displayedTime by mutableStateOf(initialTime)
+        private set
+    var statusMessage by mutableStateOf<String?>(null)
+        private set
+    var isSyncing by mutableStateOf(false)
+        private set
+    private var hideJob: Job? = null
+
+    fun updateDisplayedTime(value: String) {
+        if (!isSyncing) displayedTime = value
+    }
+
+    fun handle(event: Events.Sync, context: android.content.Context, scope: kotlinx.coroutines.CoroutineScope) {
+        when (event) {
+            is Events.Sync.Glucometer.Started -> start(scope, "Синхронизация с прибором...", context)
+            is Events.Sync.Server.Started -> start(scope, "Синхронизация с сервером...", context)
+            is Events.Sync.Glucometer.Success -> completed(scope, "Синхронизация с прибором завершена")
+            is Events.Sync.Server.Success -> completed(scope, "Синхронизация с сервером завершена")
+            is Events.Sync.Glucometer.NoNewEvents -> completed(scope, "Нет новых измерений")
+            is Events.Sync.Glucometer.Error,
+            is Events.Sync.Glucometer.ErrorWithMessage -> showMessage(scope, "Устройство недоступно", 4_000L)
+            is Events.Sync.Server.Error,
+            is Events.Sync.Server.ErrorWithMessage -> showMessage(scope, "Сервер недоступен", 4_000L)
+            is Events.Sync.Glucometer.Nothing,
+            is Events.Sync.Glucometer.InvalidTime -> showMessage(scope, "Синхронизация завершена", 2_000L)
+        }
+    }
+
+    fun showMessage(scope: kotlinx.coroutines.CoroutineScope, message: String, timeoutMillis: Long) {
+        hideJob?.cancel()
+        isSyncing = false
+        statusMessage = message
+        hideJob = scope.launch {
+            delay(timeoutMillis)
+            statusMessage = null
+        }
+    }
+
+    fun asUiState(): DashboardSyncUiState = DashboardSyncUiState(
+        displayedTime = displayedTime,
+        statusMessage = statusMessage,
+        isSyncing = isSyncing
+    )
+
+    private fun start(scope: kotlinx.coroutines.CoroutineScope, message: String, context: android.content.Context) {
+        hideJob?.cancel()
+        displayedTime = SyncAttemptTimeStore.recordAttempt(context)
+        isSyncing = true
+        statusMessage = message
+        hideJob = scope.launch {
+            delay(SyncFallbackTimeoutMillis)
+            if (isSyncing) showMessage(scope, "Устройство недоступно", 3_000L)
+        }
+    }
+
+    private fun completed(scope: kotlinx.coroutines.CoroutineScope, message: String) {
+        displayedTime = "Только что"
+        showMessage(scope, message, 3_000L)
+    }
+}
+
+@Composable
+private fun rememberDashboardSyncState(initialTime: String): DashboardSyncState =
+    remember { DashboardSyncState(initialTime) }
+
+@Composable
+private fun PaletteSelectionSheet(onPaletteSelected: (NewDesignPalette) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -451,8 +453,7 @@ private fun PaletteSelectionSheet(
                         .height(44.dp)
                         .clip(RoundedCornerShape(22.dp))
                         .background(
-                            if (isSelected) GlucoseDashboardTheme.NormalChartColor
-                            else Color(0xFFF1F3F5)
+                            if (isSelected) GlucoseDashboardTheme.NormalChartColor else Color(0xFFF1F3F5)
                         )
                         .clickable { onPaletteSelected(palette) },
                     contentAlignment = Alignment.Center
@@ -467,4 +468,98 @@ private fun PaletteSelectionSheet(
             }
         }
     }
+}
+
+private val DashboardCategories = listOf("Глюкоза", "Давление", "Инсулин")
+private const val SyncFallbackTimeoutMillis = 8_000L
+
+private val PreviewChartPoints = listOf(
+    GlucosePoint("06:00", 5.3f),
+    GlucosePoint("09:00", 6.1f),
+    GlucosePoint("12:00", 7.4f),
+    GlucosePoint("15:00", 5.8f),
+    GlucosePoint("18:00", 6.7f)
+)
+
+private val PopulatedPreviewState = GlucoseDashboardUiState(
+    glucoseValue = "6,7",
+    deltaText = "0,5",
+    glucoseTrend = GlucoseTrend(GlucoseTrendDirection.UP, "0,5"),
+    tirPercentage = "73%",
+    syncTimeText = "Сегодня, 10:42",
+    breadUnitsText = "2,5 ХЕ",
+    insulinText = "4,0 Ед.",
+    chartPoints = PreviewChartPoints,
+    detailedChartData = DetailedChartData(glucosePoints = PreviewChartPoints.map {
+        DetailedGlucosePoint(timeLabel = it.timeLabel, value = it.value)
+    })
+)
+
+@Preview(name = "Данные — норма", widthDp = 360, heightDp = 760, showBackground = true)
+@Composable
+private fun GlucoseDashboardNormalPreview() {
+    GlucoseDashboardContent(
+        uiState = PopulatedPreviewState,
+        syncState = DashboardSyncUiState(displayedTime = PopulatedPreviewState.syncTimeText)
+    )
+}
+
+@Preview(name = "Данные — высокий уровень", widthDp = 360, heightDp = 760, showBackground = true)
+@Composable
+private fun GlucoseDashboardHighPreview() {
+    GlucoseDashboardContent(
+        uiState = PopulatedPreviewState.copy(
+            glucoseValue = "12,4",
+            glucoseState = GlucoseState.HIGH,
+            isDarkTheme = true
+        ),
+        syncState = DashboardSyncUiState(displayedTime = "Только что")
+    )
+}
+
+@Preview(name = "Данные — низкий уровень", widthDp = 360, heightDp = 760, showBackground = true)
+@Composable
+private fun GlucoseDashboardLowPreview() {
+    GlucoseDashboardContent(
+        uiState = PopulatedPreviewState.copy(
+            glucoseValue = "3,2",
+            glucoseState = GlucoseState.LOW,
+            glucoseTrend = GlucoseTrend(GlucoseTrendDirection.DOWN, "0,8")
+        ),
+        syncState = DashboardSyncUiState(displayedTime = "Сегодня, 10:42")
+    )
+}
+
+@Preview(name = "Нет измерений", widthDp = 360, heightDp = 760, showBackground = true)
+@Composable
+private fun GlucoseDashboardEmptyPreview() {
+    GlucoseDashboardContent(
+        uiState = GlucoseDashboardUiState(),
+        syncState = DashboardSyncUiState(displayedTime = "Нет измерений")
+    )
+}
+
+@Preview(name = "Ошибка синхронизации", widthDp = 360, heightDp = 760, showBackground = true)
+@Composable
+private fun GlucoseDashboardSyncErrorPreview() {
+    GlucoseDashboardContent(
+        uiState = PopulatedPreviewState,
+        syncState = DashboardSyncUiState(
+            displayedTime = "Сегодня, 10:42",
+            statusMessage = "Устройство недоступно"
+        )
+    )
+}
+
+@Preview(name = "Синхронизация", widthDp = 360, heightDp = 760, showBackground = true)
+@Composable
+private fun GlucoseDashboardSyncPreview() {
+    GlucoseDashboardContent(
+        uiState = PopulatedPreviewState,
+        syncState = DashboardSyncUiState(
+            displayedTime = "Сегодня, 10:42",
+            statusMessage = "Синхронизация с прибором...",
+            isSyncing = true
+        )
+    )
 }
