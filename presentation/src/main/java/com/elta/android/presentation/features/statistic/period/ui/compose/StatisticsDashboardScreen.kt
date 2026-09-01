@@ -324,6 +324,7 @@ private fun HypoHyperSection(state: StatisticsDashboardUiState) {
                 if (entry == 0) return@forEachIndexed
                 val height = size.height * entry / max * .65f
                 val width = size.width / entries.size * .32f
+
                 val left = (index + .5f) * size.width / entries.size - width / 2
                 drawRoundRect(if (index % 3 == 0) Red else Orange, Offset(left, size.height - height - 15.dp.toPx()), Size(width, height), cornerRadius = androidx.compose.ui.geometry.CornerRadius(3.dp.toPx()))
             }
