@@ -51,9 +51,6 @@ class PeriodFragment :
                         (parentFragment as? StatisticFlowFragment)?.selectPeriod(period)
                     },
                     onBack = { router.exit() },
-                    onSettingsClick = {
-                        (parentFragment as? StatisticFlowFragment)?.openReportChooser()
-                    }
                 )
             }
         }
@@ -62,8 +59,11 @@ class PeriodFragment :
     override fun onBindPresentationModel(pm: PeriodPm) {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
-        pm.statisticsByPeriodState.bindTo { model ->
-            uiState = model.toStatisticsDashboardUiState(selectedPeriod)
+        pm.statisticsByPeriodState.bindTo { models ->
+            uiState = models.current.toStatisticsDashboardUiState(
+                selectedPeriod = selectedPeriod,
+                previous = models.previous
+            )
         }
     }
 

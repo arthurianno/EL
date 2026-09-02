@@ -156,7 +156,7 @@ fun GlucoseChartTransitionOverlay(
                         LottieAnimationView(context).apply {
                             setAnimation(R.raw.turn_the_phone)
                             setMinAndMaxFrame(0, 72)
-                            speed = 0.85f
+                            speed = 1.275f
                             repeatCount = 0
                             scaleType = ImageView.ScaleType.FIT_CENTER
                             addAnimatorListener(object : AnimatorListenerAdapter() {
