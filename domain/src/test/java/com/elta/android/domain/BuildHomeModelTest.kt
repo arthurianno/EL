@@ -8,11 +8,36 @@ import com.elta.android.domain.features.diary.home.interactor.buildHomeModel
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelDirection
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
+import com.elta.android.domain.features.calculator.model.Dish
+import com.elta.android.domain.features.calculator.model.DishType
+import com.elta.android.domain.features.calculator.model.Serving
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.userinfo.model.UserInfo
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class BuildHomeModelTest {
+
+    @Test
+    fun buildHomeModel_calculatesTotalsForAllInsulinAndCatalogFood() {
+        val food = EventTestFactory.create(type = EventType.Bread(CalculatorFlow.PRODUCT_ONLY))
+            .copy(dishes = listOf(testDish(breadUnits = 2.5)))
+        val model = buildHomeModel(
+            events = listOf(
+                food,
+                EventTestFactory.create(type = EventType.Insulin, value = 6.0),
+                EventTestFactory.create(type = EventType.Insulin, value = 10.0)
+            ),
+            tags = emptyList(),
+            settings = GlucoseLevelSettings(),
+            userInfo = UserInfo(),
+            glucoseFormat = GlucoseFormat.CAPILLARY,
+            calculatorFlow = CalculatorFlow.PRODUCT_ONLY
+        )
+
+        assertEquals(2.5, model.breadUnitsTotal, 0.0)
+        assertEquals(16.0, model.insulinTotal, 0.0)
+    }
 
     @Test
     fun buildHomeModel_OneGlucoseEvent_HasGlucoseEvent() {
@@ -229,3 +254,16 @@ class BuildHomeModelTest {
         assert(model.eventsBlocks[0].events[0].additionTime > model.eventsBlocks[1].events[0].additionTime)
     }
 }
+
+private fun testDish(breadUnits: Double) = Dish(
+    id = "dish",
+    localId = "local-dish",
+    name = "Test dish",
+    type = DishType.Generic,
+    brandName = "",
+    servings = emptyList(),
+    servingSelect = Serving.empty(),
+    servingAmount = 1.0,
+    breadUnits = breadUnits,
+    isVerified = false
+)

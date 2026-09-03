@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.diary.home.model
 
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.user.model.GlucoseFormat
 
@@ -19,4 +20,22 @@ data class HomeModel(
 ) {
     val hasEvents: Boolean
         get() = eventsBlocks.isNotEmpty()
+
+    /** Totals for the time range supplied by the home use case. */
+    val breadUnitsTotal: Double
+        get() = eventsBlocks
+            .asSequence()
+            .flatMap { it.events.asSequence() }
+            .filter { it.type is EventType.Bread }
+            .sumOf { event ->
+                event.value ?: event.dishes.sumOf { dish -> dish.breadUnits ?: 0.0 }
+            }
+
+    /** Total insulin units for the time range supplied by the home use case. */
+    val insulinTotal: Double
+        get() = eventsBlocks
+            .asSequence()
+            .flatMap { it.events.asSequence() }
+            .filter { it.type is EventType.Insulin }
+            .sumOf { it.value ?: 0.0 }
 }

@@ -52,7 +52,7 @@ object DetailedChartItemsBuilder {
 
             // Nearest Food event before/around this measurement
             val foodEvent = allDayEvents
-                .filter { it.type is EventType.Bread && it.value != null && !it.additionTime.isAfter(event.additionTime) }
+                .filter { it.type is EventType.Bread && it.breadUnitsValue() != null && !it.additionTime.isAfter(event.additionTime) }
                 .maxByOrNull { it.additionTime }
 
             // Nearest Insulin event before/around this measurement
@@ -99,7 +99,7 @@ object DetailedChartItemsBuilder {
                 trendText = trendText,
                 trendValue = trendValStr,
                 foodTimeAgo = foodTimeAgoStr,
-                foodUnits = foodEvent?.value?.let { "${String.format(Locale.US, "%.1f", it)} ХЕ" },
+                foodUnits = foodEvent?.breadUnitsValue()?.let { "${String.format(Locale.US, "%.1f", it)} ХЕ" },
                 insulinTimeAgo = insulinTimeAgoStr,
                 insulinUnits = insulinEvent?.value?.let { "${String.format(Locale.US, "%.1f", it)} Ед." },
                 activityTimeAgo = activityTimeAgoStr,
@@ -143,7 +143,7 @@ object DetailedChartItemsBuilder {
         allDayEvents: List<EventV2>
     ): List<DetailedFoodEntry> {
         if (glucosePoints.isEmpty()) return emptyList()
-        val foodEvents = allDayEvents.filter { it.type is EventType.Bread && it.value != null }
+        val foodEvents = allDayEvents.filter { it.type is EventType.Bread && it.breadUnitsValue() != null }
 
         return foodEvents.map { food ->
             val timeStr = food.additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME)
@@ -152,8 +152,9 @@ object DetailedChartItemsBuilder {
                 Math.abs(timeStr.toMinutes() - ptTime.toMinutes())
             } ?: 0
 
-            val valStr = String.format(Locale.US, "%.1f ХЕ", food.value ?: 0.0)
-            val hRatio = ((food.value ?: 0.0) / MAX_EVENT_CHART_VALUE)
+            val breadUnits = food.breadUnitsValue() ?: 0.0
+            val valStr = String.format(Locale.US, "%.1f ХЕ", breadUnits)
+            val hRatio = (breadUnits / MAX_EVENT_CHART_VALUE)
                 .coerceIn(0.0, 1.0)
                 .toFloat()
 
@@ -163,7 +164,7 @@ object DetailedChartItemsBuilder {
                 breadUnits = valStr,
                 heightRatio = hRatio,
                 date = food.additionTime.toLocalDate(),
-                value = food.value?.toFloat()
+                value = breadUnits.toFloat()
             )
         }
     }
@@ -202,4 +203,8 @@ object DetailedChartItemsBuilder {
         if (parts.size != 2) return 0
         return (parts[0].toIntOrNull() ?: 0) * 60 + (parts[1].toIntOrNull() ?: 0)
     }
+
+    private fun EventV2.breadUnitsValue(): Double? = value ?: dishes
+        .takeIf { it.isNotEmpty() }
+        ?.sumOf { it.breadUnits ?: 0.0 }
 }

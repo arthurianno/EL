@@ -1,7 +1,5 @@
 package com.elta.android.domain.features.diary.home.interactor
 
-import com.elta.android.common.utils.atEndOfDay
-import com.elta.android.common.utils.atStartOfDay
 import com.elta.android.domain.features.diary.events.model.addTag
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
@@ -26,8 +24,9 @@ class GetHomeModelUseCase @Inject constructor(
 ) : ObservableUseCase<HomeModel, Unit>(schedulers) {
     override fun buildUseCaseObservable(params: Unit?): Observable<HomeModel> {
         val now = LocalDateTime.now()
+        val rangeStart = now.minusHours(HOME_SUMMARY_RANGE_HOURS)
         return Observables.zip(
-            eventsRepo.getEvents(now.atStartOfDay(), now.atEndOfDay()).applyScheduler(schedulers),
+            eventsRepo.getEvents(rangeStart, now).applyScheduler(schedulers),
             tagsRepo.getTags().applyScheduler(schedulers),
             profileRepo.getProfile().toObservable().applyScheduler(schedulers),
             userInfoRepo.getUserInfo().toObservable().applyScheduler(schedulers)
@@ -41,5 +40,9 @@ class GetHomeModelUseCase @Inject constructor(
                 calculatorFlow = profile.diabetes.toCalculatorFlow(events)
             )
         }
+    }
+
+    private companion object {
+        const val HOME_SUMMARY_RANGE_HOURS = 24L
     }
 }
