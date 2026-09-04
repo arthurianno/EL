@@ -34,6 +34,8 @@ abstract class BaseFlowFragment<T : BasePm, B : ViewBinding>(
 
     override val statusBarConfigProvider: StatusBarConfigProvider? = null
 
+    override val applyBottomSystemInsets: Boolean = false
+
     override val backgroundColor: Int? = null
 
     override fun onAttach(context: Context) {

@@ -26,6 +26,7 @@ import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.core.ui.stateview.StateView
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.utils.applySystemBarsInsetsPadding
 import com.elta.android.presentation.utils.applyInsetsToContentView
 import com.elta.android.presentation.utils.findAndClearFocus
 import com.elta.android.presentation.utils.hideKeyboardFun
@@ -68,6 +69,12 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
     protected abstract val statusBarConfigProvider: StatusBarConfigProvider?
 
+    /**
+     * Android 15 draws app content edge-to-edge. Most regular screens need system-bar
+     * padding; flows that manage their own bottom navigation opt out.
+     */
+    protected open val applyBottomSystemInsets: Boolean = true
+
     protected open val backgroundColor: Int? = R.color.color_window_background
 
     open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
@@ -102,6 +109,13 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        // A child hosted by a flow already receives a bottom boundary from that flow's
+        // navigation container. Padding it again would create a visible empty strip.
+        if (applyBottomSystemInsets && parentFragment !is BaseFlowFragment<*, *>) {
+            view.applySystemBarsInsetsPadding(
+                applyStatusBarInset = statusBarConfigProvider?.drawUnderStatusBar == false
+            )
+        }
         errorStateView = view.findViewById<View>(R.id.errorStateView) as? StateView
         emptyStateView = view.findViewById<View>(R.id.emptyStateView) as? StateView
         progressView = view.findViewById(R.id.progressView)

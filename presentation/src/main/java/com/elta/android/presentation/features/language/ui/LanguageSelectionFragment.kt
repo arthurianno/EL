@@ -7,9 +7,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
@@ -61,19 +58,6 @@ class LanguageSelectionFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-            val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-            v.updatePadding(
-                top = statusBars.top,
-                bottom = 0
-            )
-            Log.i(
-                TAG,
-                "WindowInsets: statusBarTop=${statusBars.top}, navBarBottom=${navBars.bottom}, isFirstLaunch=$isFirstLaunch, appliedBottom=0"
-            )
-            insets
-        }
         Log.i(TAG, "LanguageSelectionFragment.onViewCreated(isFirstLaunch=$isFirstLaunch)")
 
         binding.greetingView.visibility = if (isFirstLaunch) View.VISIBLE else View.GONE

@@ -48,6 +48,36 @@ fun View.applyInsetsToContentView(fitsSystemWindows: Boolean) {
     ViewCompat.requestApplyInsets(this)
 }
 
+/**
+ * Keeps content clear of the status bar, gesture navigation, and the on-screen keyboard.
+ * The initial padding is captured once, so receiving a new insets dispatch never
+ * accumulates extra space after configuration changes.
+ */
+fun View.applySystemBarsInsetsPadding(applyStatusBarInset: Boolean) {
+    val initialLeft = paddingLeft
+    val initialTop = paddingTop
+    val initialRight = paddingRight
+    val initialBottom = paddingBottom
+
+    ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
+        val statusTop = if (applyStatusBarInset) {
+            insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+        } else {
+            0
+        }
+        val navigationBottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+        val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+        view.updatePadding(
+            left = initialLeft,
+            top = initialTop + statusTop,
+            right = initialRight,
+            bottom = initialBottom + maxOf(navigationBottom, imeBottom)
+        )
+        insets
+    }
+    ViewCompat.requestApplyInsets(this)
+}
+
 fun View.applyStatusBarInsetsPadding(
     onApplyInsets: (View) -> Unit = {},
     applyNavigationBarInset: Boolean = false,
