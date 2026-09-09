@@ -54,7 +54,7 @@ class DevicesPm @Inject constructor(
     private fun bindClicks() {
         bus.clicks<Clicks.ActiveDeviceItemClicked>()
             .map { it.item }
-            .map { Screens.DeviceInfo(it.name, it.address) }
+            .map { item -> if (item.isNmg) Screens.NmgMonitoringScreen else Screens.DeviceInfo(item.name, item.address) }
             .subscribe(router::navigateTo)
             .untilDestroy()
     }

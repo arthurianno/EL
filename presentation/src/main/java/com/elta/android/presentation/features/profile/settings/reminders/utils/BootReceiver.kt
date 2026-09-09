@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.elta.android.domain.features.cgm.repository.NmgRepository
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
 import com.nullgr.core.rx.RxBus
@@ -14,6 +15,9 @@ class BootReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var bus: RxBus
+
+    @Inject
+    lateinit var nmgRepository: NmgRepository
 
     private val bootAction: String =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -30,6 +34,13 @@ class BootReceiver : BroadcastReceiver() {
         }
         if (action == Intent.ACTION_MY_PACKAGE_REPLACED) {
             bus.event(Events.PackageReplaced)
+        }
+        if (
+            action == Intent.ACTION_BOOT_COMPLETED ||
+            action == Intent.ACTION_LOCKED_BOOT_COMPLETED ||
+            action == Intent.ACTION_MY_PACKAGE_REPLACED
+        ) {
+            nmgRepository.resumeMonitoring()
         }
     }
 }

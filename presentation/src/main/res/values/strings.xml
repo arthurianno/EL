@@ -1093,4 +1093,19 @@
     <string name="splash_loading_message">Не беспокойтесь, установка компонентов происходит только при обновлении!</string>
     <string name="splash_loading_progress">Загрузка компонентов: %1$d/%2$d</string>
 
+    <string name="sync_connect_type_button_nmg">Подключить НМГ датчик</string>
+    <string name="nmg_search_title">Поиск НМГ датчика</string>
+    <string name="nmg_search_description">Включите Bluetooth и расположите НМГ датчик рядом с телефоном. Найденные устройства ELTA появятся в списке.</string>
+    <string name="nmg_search_notifications_disabled">Разрешите уведомления, чтобы видеть статус НМГ и предупреждения о потере связи в фоне.</string>
+    <string name="nmg_search_waiting">Подготовка поиска НМГ датчика…</string>
+    <string name="nmg_search_in_progress">Ищем НМГ датчик…</string>
+    <string name="nmg_search_error">Не удалось начать поиск. Проверьте Bluetooth и разрешения приложения.</string>
+    <string name="nmg_monitoring_title">НМГ датчик</string>
+    <string name="nmg_monitoring_no_sensor">Датчик не выбран</string>
+    <string name="nmg_monitoring_waiting">Ожидаем первый пакет от датчика…</string>
+    <string name="nmg_monitoring_signal">Показание НМГ: %1$d</string>
+    <string name="nmg_monitoring_history">Данные НМГ: %1$d из 720 точек</string>
+    <string name="nmg_monitoring_test_data_note">Датчик подключён. Новые данные поступают автоматически.</string>
+    <string name="nmg_monitoring_stop">Отключить НМГ датчик</string>
+
 </resources>

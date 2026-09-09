@@ -9,27 +9,38 @@ import com.elta.android.presentation.features.main.records.ui.compose.GlucoseSta
 import com.elta.android.presentation.features.main.records.ui.compose.GlucoseTrend
 import com.elta.android.presentation.features.main.records.ui.compose.GlucoseTrendDirection
 import com.elta.android.presentation.features.main.records.ui.compose.GlucosePoint
+import com.elta.android.presentation.features.main.records.ui.compose.NmgDashboardSummary
 import com.elta.android.presentation.utils.SyncAttemptTimeStore
 import java.util.Locale
 import kotlin.math.abs
 
 /** Maps the legacy adapter item to a Compose-specific, immutable UI model. */
 internal fun RecordsHeaderItem.toGlucoseDashboardUiState(context: Context): GlucoseDashboardUiState {
-    val glucoseValue = glucoseLevel?.format()?.takeIf { it.isNotBlank() } ?: "—"
+    val nmgTrend = nmgSummary?.calculateTrend()
+    val glucoseValue = glucoseLevel?.format()?.takeIf { it.isNotBlank() }
+        ?: nmgSummary?.latestReading?.let { value ->
+            String.format(Locale.US, "%.1f", value).replace('.', ',')
+        }
+        ?: "—"
     val numericValue = glucoseValue.replace(',', '.').toFloatOrNull()
     val model = dailyGlucoseModel
     val detailedPoints = model?.let { DetailedChartItemsBuilder.buildPoints(it, allEvents) }.orEmpty()
 
     return GlucoseDashboardUiState(
         glucoseValue = glucoseValue,
-        deltaText = glucoseLevelIndex?.format()?.takeIf { it.isNotBlank() } ?: "—",
-        glucoseTrend = calculateGlucoseTrend(),
-        tirPercentage = calculateTimeInRange(),
+        deltaText = glucoseLevelIndex?.format()?.takeIf { it.isNotBlank() }
+            ?: nmgTrend?.valueText
+            ?: "—",
+        glucoseTrend = calculateGlucoseTrend() ?: nmgTrend,
+        tirPercentage = calculateTimeInRange().takeUnless { it == "—" }
+            ?: nmgSummary?.calculateTimeInRange()
+            ?: "—",
         syncTimeText = SyncAttemptTimeStore.getLastAttemptText(context),
         breadUnitsText = breadLevel?.let { "$it ХЕ" } ?: "0,0 ХЕ",
         insulinText = insulinLevel?.let { "$it Ед." } ?: "0,0 Ед.",
         glucoseState = resolveGlucoseState(numericValue),
         chartPoints = detailedPoints.map { GlucosePoint(it.timeLabel, it.value) },
+        nmgSummary = nmgSummary,
         detailedChartData = DetailedChartData(
             glucosePoints = detailedPoints,
             insulinEntries = DetailedChartItemsBuilder.buildInsulinEntries(detailedPoints, allEvents),
@@ -79,4 +90,26 @@ private fun RecordsHeaderItem.calculateGlucoseTrend(): GlucoseTrend? {
         },
         valueText = String.format(Locale.US, "%.1f", abs(difference)).replace('.', ',')
     )
+}
+
+private fun NmgDashboardSummary.calculateTrend(): GlucoseTrend? {
+    val lastPoints = (points + listOfNotNull(livePoint)).takeLast(2)
+    if (lastPoints.size < 2) return null
+
+    val difference = lastPoints.last().value - lastPoints.first().value
+    return GlucoseTrend(
+        direction = when {
+            difference > 0f -> GlucoseTrendDirection.UP
+            difference < 0f -> GlucoseTrendDirection.DOWN
+            else -> GlucoseTrendDirection.STABLE
+        },
+        valueText = String.format(Locale.US, "%.1f", abs(difference)).replace('.', ',')
+    )
+}
+
+private fun NmgDashboardSummary.calculateTimeInRange(): String? {
+    val allPoints = points + listOfNotNull(livePoint)
+    if (allPoints.size < 2) return null
+    val percentage = allPoints.count { it.value in 3.9f..10f } * 100 / allPoints.size
+    return "$percentage%"
 }

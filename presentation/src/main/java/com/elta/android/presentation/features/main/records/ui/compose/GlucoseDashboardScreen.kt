@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.main.records.ui.compose
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +50,9 @@ import com.nullgr.core.rx.RxBus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.threeten.bp.Instant
+import org.threeten.bp.LocalDate
+import org.threeten.bp.ZoneId
 import org.threeten.bp.YearMonth
 
 /**
@@ -60,6 +65,13 @@ fun GlucoseDashboardScreen(
     bus: RxBus? = null,
     modifier: Modifier = Modifier
 ) {
+    SideEffect {
+        Log.i(
+            "NmgMonitoring",
+            "NMG_UI summary=${uiState.nmgSummary?.historySize ?: 0} " +
+                "glucose=${uiState.hasGlucoseMeasurements} any=${uiState.hasMeasurements}"
+        )
+    }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val syncState = rememberDashboardSyncState(uiState.syncTimeText)
@@ -120,13 +132,24 @@ fun GlucoseDashboardScreen(
     ) {
         GlucoseDashboardContent(
             uiState = uiState,
-            syncState = syncState.asUiState(),
+            syncState = if (uiState.nmgSummary != null) {
+                DashboardSyncUiState(
+                    displayedTime = uiState.nmgSummary.updatedAtText,
+                    statusMessage = syncState.statusMessage,
+                    isSyncing = syncState.isSyncing
+                )
+            } else {
+                syncState.asUiState()
+            },
             detailedEvents = detailedEvents,
             onAction = { action ->
                 when (action) {
                     GlucoseDashboardAction.RequestSync -> {
                         if (syncState.isSyncing) return@GlucoseDashboardContent
-                        if (bus == null) {
+                        if (uiState.nmgSummary != null) {
+                            bus?.event(Events.ManualNmgSyncRequested)
+                            syncState.showMessage(scope, "Получаем данные НМГ", 3_000L)
+                        } else if (bus == null) {
                             syncState.showMessage(scope, "Синхронизация недоступна", 3_000L)
                         } else {
                             bus.event(Events.ManualGlucometerSyncRequested)
@@ -205,6 +228,7 @@ internal fun GlucoseDashboardContent(
                     GlucoseLineChartCard(
                         isDarkTheme = uiState.isDarkTheme,
                         points = uiState.chartPoints,
+                        nmgSummary = uiState.nmgSummary,
                         designScale = layout.horizontalScale,
                         cardHeight = layout.chartHeight,
                         showDetailHint = uiState.hasMeasurements,
@@ -233,7 +257,8 @@ internal fun GlucoseDashboardContent(
                             isDetailedChartVisible = false
                             onDetailedChartClosed()
                         },
-                        glucosePoints = uiState.detailedChartData.glucosePoints,
+                        glucosePoints = uiState.detailedChartData.glucosePoints +
+                            uiState.nmgSummary.orEmptyDetailedPoints(),
                         insulinEntries = uiState.detailedChartData.insulinEntries,
                         foodEntries = uiState.detailedChartData.foodEntries,
                         activityEntries = uiState.detailedChartData.activityEntries,
@@ -275,7 +300,7 @@ private fun DashboardHeader(
             )
             Spacer(modifier = Modifier.height(layout.gaugeTopSpacing))
 
-            if (uiState.hasMeasurements) {
+            if (uiState.hasGlucoseMeasurements) {
                 GlucoseRingGauge(
                     glucoseValue = uiState.glucoseValue,
                     deltaText = uiState.deltaText,
@@ -305,7 +330,8 @@ private fun DashboardHeader(
                     isSyncing = syncState.isSyncing,
                     statusText = syncState.statusMessage.orEmpty(),
                     isStatusVisible = syncState.statusMessage != null,
-                    onSyncClick = onSyncClick
+                    onSyncClick = onSyncClick,
+                    nmgSummary = uiState.nmgSummary
                 )
             }
         }
@@ -472,6 +498,22 @@ private fun rememberDashboardSyncState(initialTime: String): DashboardSyncState 
         DashboardSyncState(
             initialTime = initialTime,
             isBackendSyncInProgress = BackendSyncStatusStore.isInProgress()
+        )
+    }
+
+private fun NmgDashboardSummary?.orEmptyDetailedPoints(): List<DetailedGlucosePoint> =
+    this?.let { it.points + listOfNotNull(it.livePoint) }.orEmpty().map { point ->
+        DetailedGlucosePoint(
+            timeLabel = point.timeLabel,
+            value = point.value,
+            // The continuous chart has a rolling twelve-month timeline. A point without a
+            // calendar date is placed at the start of that timeline and is invisible in the
+            // default "latest hours" viewport.
+            date = point.receivedAtEpochMillis?.let { receivedAt ->
+                Instant.ofEpochMilli(receivedAt)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+            } ?: LocalDate.now()
         )
     }
 

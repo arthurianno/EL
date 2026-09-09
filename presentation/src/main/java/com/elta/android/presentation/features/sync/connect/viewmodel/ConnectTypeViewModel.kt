@@ -56,6 +56,7 @@ class ConnectTypeViewModel @Inject constructor(
             is AppAction.BackPressure -> backClick()
             is ConnectAction.ConnectByPin -> connectByPin()
             is ConnectAction.ConnectByDmc -> connectByDmc()
+            is ConnectAction.ConnectNmg -> router.navigateTo(Screens.NmgSearchScreen)
             is ConnectAction.NeedHelp -> router.navigateTo(Screens.ConnectHelpScreen)
         }
     }

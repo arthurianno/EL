@@ -947,4 +947,19 @@
     <string name="splash_loading_message">Don\'t worry, component installation only happens during updates!</string>
     <string name="splash_loading_progress">Loading components: %1$d/%2$d</string>
 
+    <string name="sync_connect_type_button_nmg">Connect NMG sensor</string>
+    <string name="nmg_search_title">Find NMG sensor</string>
+    <string name="nmg_search_description">Turn on Bluetooth and keep the NMG sensor near the phone. Found ELTA devices will appear below.</string>
+    <string name="nmg_search_notifications_disabled">Allow notifications to see NMG status and background connection-loss alerts.</string>
+    <string name="nmg_search_waiting">Preparing NMG sensor search…</string>
+    <string name="nmg_search_in_progress">Searching for NMG sensor…</string>
+    <string name="nmg_search_error">Unable to start scanning. Check Bluetooth and app permissions.</string>
+    <string name="nmg_monitoring_title">NMG sensor</string>
+    <string name="nmg_monitoring_no_sensor">No sensor selected</string>
+    <string name="nmg_monitoring_waiting">Waiting for the first sensor packet…</string>
+    <string name="nmg_monitoring_signal">NMG reading: %1$d</string>
+    <string name="nmg_monitoring_history">NMG data: %1$d of 720 points</string>
+    <string name="nmg_monitoring_test_data_note">Sensor connected. New data arrives automatically.</string>
+    <string name="nmg_monitoring_stop">Disconnect NMG sensor</string>
+
 </resources>

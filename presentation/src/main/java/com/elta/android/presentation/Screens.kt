@@ -28,6 +28,8 @@ import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragme
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragmentVariantA
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.devices.search.GlucometerSearchFragment
+import com.elta.android.presentation.features.devices.cgm.NmgSearchFragment
+import com.elta.android.presentation.features.devices.cgm.NmgMonitoringFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
 import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
@@ -295,6 +297,14 @@ object Screens {
 
     data class ConnectTypeScreen(val isOnBoarding: Boolean) : SupportAppScreen() {
         override fun getFragment() = ConnectTypeFragment.newInstance(isOnBoarding)
+    }
+
+    object NmgSearchScreen : SupportAppScreen() {
+        override fun getFragment() = NmgSearchFragment()
+    }
+
+    object NmgMonitoringScreen : SupportAppScreen() {
+        override fun getFragment() = NmgMonitoringFragment()
     }
 
     object ConnectHelpScreen : SupportAppScreen() {

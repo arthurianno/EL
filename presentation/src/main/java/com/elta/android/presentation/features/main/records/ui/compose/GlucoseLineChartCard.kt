@@ -1,6 +1,11 @@
 package com.elta.android.presentation.features.main.records.ui.compose
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -51,7 +56,8 @@ import kotlin.math.roundToInt
 
 data class GlucosePoint(
     val timeLabel: String,
-    val value: Float
+    val value: Float,
+    val receivedAtEpochMillis: Long? = null
 )
 
 private const val CHART_MAX_GLUCOSE_VALUE = 40f
@@ -63,6 +69,7 @@ fun GlucoseLineChartCard(
     onPeriodSelected: (String) -> Unit = {},
     onChartClick: () -> Unit = {},
     points: List<GlucosePoint> = emptyList(),
+    nmgSummary: NmgDashboardSummary? = null,
     designScale: Float = 1f,
     cardHeight: androidx.compose.ui.unit.Dp = 201.dp * designScale,
     emptyStateText: String = "Нет измерений за выбранный период",
@@ -80,11 +87,26 @@ fun GlucoseLineChartCard(
     // dynamic min/max labels and makes their text blurry on some Android renderers.
     fun handleChartClick() = onChartClick()
 
-    val (filteredPoints, filteredTimeLabels) = remember(points, activePeriod) {
-        filterPointsAndLabelsForPeriod(points, activePeriod)
+    val nmgPoints = nmgSummary?.points.orEmpty()
+    val liveNmgPoint = nmgSummary?.livePoint
+    val unifiedPoints = remember(points, nmgPoints, liveNmgPoint) {
+        (points + nmgPoints + listOfNotNull(liveNmgPoint))
+            .sortedWith(
+                compareBy<GlucosePoint> { it.timeLabel.toMinutes() }
+                    .thenBy { it.receivedAtEpochMillis ?: Long.MIN_VALUE }
+            )
     }
-    val displayPoints = filteredPoints
-    val displayTimeLabels = filteredTimeLabels
+    val (displayPoints, displayTimeLabels) = remember(unifiedPoints, activePeriod) {
+        filterPointsAndLabelsForPeriod(unifiedPoints, activePeriod)
+    }
+    val livePointPulse by rememberInfiniteTransition(label = "nmgLivePointPulse").animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1_400),
+            repeatMode = RepeatMode.Restart
+        )
+    )
 
     val maxPointVal = displayPoints.maxOfOrNull { it.value } ?: 0f
     val maxVal = if (maxPointVal > 16f) 20f else 16f
@@ -350,20 +372,53 @@ fun GlucoseLineChartCard(
                             }
 
                             linePoints.forEachIndexed { idx, point ->
+                                if (displayPoints[idx] === liveNmgPoint) return@forEachIndexed
                                 val value = displayPoints[idx].value
                                 val dotColor = glucoseLineColor(value)
                                 drawCircle(
-                                    color = Color.White,
-                                    radius = (6.dp * designScale).toPx(),
-                                    center = point
-                                )
-                                drawCircle(
                                     color = dotColor,
-                                    radius = (4.dp * designScale).toPx(),
+                                    radius = (3.5.dp * designScale).toPx(),
                                     center = point
                                 )
                             }
 
+                        }
+
+                        liveNmgPoint?.let { point ->
+                            // The dashboard is reconstructed after the app returns from the
+                            // background. Match by the persisted timestamp, rather than by the
+                            // transient Kotlin object instance, so the active point keeps its
+                            // pulse after that reconstruction.
+                            val livePointIndex = point.receivedAtEpochMillis?.let { receivedAt ->
+                                displayPoints.indexOfLast { it.receivedAtEpochMillis == receivedAt }
+                            } ?: -1
+                            linePoints.getOrNull(livePointIndex)?.let { offset ->
+                                val liveColor = glucoseLineColor(point.value)
+                                val pulseRadius = (8.dp * designScale).toPx() +
+                                    (5.dp * designScale).toPx() * livePointPulse
+                                drawCircle(
+                                    color = liveColor.copy(alpha = 0.55f * (1f - livePointPulse)),
+                                    radius = pulseRadius,
+                                    center = offset,
+                                    style = Stroke(width = (1.5.dp * designScale).toPx())
+                                )
+                                drawCircle(
+                                    color = Color.White,
+                                    radius = (6.5.dp * designScale).toPx(),
+                                    center = offset
+                                )
+                                drawCircle(
+                                    color = liveColor,
+                                    radius = (5.5.dp * designScale).toPx(),
+                                    center = offset,
+                                    style = Stroke(width = (1.5.dp * designScale).toPx())
+                                )
+                                drawCircle(
+                                    color = liveColor,
+                                    radius = (3.25.dp * designScale).toPx(),
+                                    center = offset
+                                )
+                            }
                         }
                     }
 
@@ -474,13 +529,14 @@ private fun calculateChartPointOffsets(
     chartHeight: Float,
     maxValue: Float,
     pointRadiusPx: Float,
-    rightInsetPx: Float
+    rightInsetPx: Float,
+    referenceEndMinutes: Int? = null
 ): List<Offset> {
     if (chartWidth <= 0f || chartHeight <= 0f || maxValue <= 0f) return emptyList()
 
     val latestPointMinutes = points.maxOfOrNull { it.timeLabel.toMinutes() } ?: return emptyList()
     val periodMinutes = periodToHours(activePeriod) * 60
-    val endMinutes = roundUpToHour(latestPointMinutes)
+    val endMinutes = referenceEndMinutes ?: roundUpToHour(latestPointMinutes)
     val startMinutes = endMinutes - periodMinutes
     val usableChartWidth = (chartWidth - rightInsetPx).coerceAtLeast(0f)
     val pointRadius = minOf(pointRadiusPx, chartHeight / 2f)

@@ -15,12 +15,31 @@ data class GlucoseDashboardUiState(
     val glucoseState: GlucoseState = GlucoseState.NORMAL,
     val isDarkTheme: Boolean = false,
     val chartPoints: List<GlucosePoint> = emptyList(),
+    val nmgSummary: NmgDashboardSummary? = null,
     val detailedChartData: DetailedChartData = DetailedChartData()
 ) {
-    val hasMeasurements: Boolean
+    val hasDiaryGlucoseMeasurements: Boolean
         get() = detailedChartData.dailyGlucoseModel?.hasEvents == true ||
             glucoseValue.replace(',', '.').toFloatOrNull() != null
+
+    val hasGlucoseMeasurements: Boolean
+        // A paired NMG must use the full dashboard immediately. The first confirmed
+        // two-minute reading may arrive later, but TIR/XE/insulin must keep their normal places.
+        get() = hasDiaryGlucoseMeasurements || nmgSummary != null
+
+    val hasMeasurements: Boolean
+        get() = hasGlucoseMeasurements || nmgSummary?.points?.isNotEmpty() == true
 }
+
+data class NmgDashboardSummary(
+    val sensorId: String,
+    val isPrimary: Boolean,
+    val latestReading: Float?,
+    val updatedAtText: String,
+    val historySize: Int,
+    val points: List<GlucosePoint>,
+    val livePoint: GlucosePoint? = null
+)
 
 /** Data required by the full-screen chart. It is kept separate from the dashboard summary. */
 data class DetailedChartData(

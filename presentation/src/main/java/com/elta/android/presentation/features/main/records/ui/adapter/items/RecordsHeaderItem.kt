@@ -5,6 +5,7 @@ import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 import com.elta.android.domain.features.user.model.GlucoseFormat
+import com.elta.android.presentation.features.main.records.ui.compose.NmgDashboardSummary
 import com.nullgr.core.adapter.items.ListItem
 
 data class RecordsHeaderItem(
@@ -17,7 +18,8 @@ data class RecordsHeaderItem(
     val glucoseFormat: GlucoseFormat,
     val calculatorFlow: CalculatorFlow,
     val dailyGlucoseModel: DailyGlucoseModel? = null,
-    val allEvents: List<EventV2> = emptyList()
+    val allEvents: List<EventV2> = emptyList(),
+    val nmgSummary: NmgDashboardSummary? = null
 ) : ListItem {
 
     override fun getChangePayload(other: ListItem): Any {
@@ -33,8 +35,9 @@ data class RecordsHeaderItem(
 
     private fun isGlucoseChanged(other: RecordsHeaderItem): Boolean =
         glucoseLevel != other.glucoseLevel ||
-            glucoseLevelIndex != other.glucoseLevelIndex ||
-            glucoseLevelIndexIcon != other.glucoseLevelIndexIcon
+        glucoseLevelIndex != other.glucoseLevelIndex ||
+            glucoseLevelIndexIcon != other.glucoseLevelIndexIcon ||
+            nmgSummary != other.nmgSummary
 
     enum class Payload {
         GLUCOSE_LEVEL_CHANGED,

@@ -31,6 +31,8 @@ class LanguageSelectionFragment :
     override val screenLayout: Int = R.layout.fragment_language_selection
     override val classToken: Class<LanguageSelectionPm> = LanguageSelectionPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
+    override val applyPlatformSystemWindowFitting: Boolean = false
+    override val applyBottomSystemInsets: Boolean = false
 
     private val isFirstLaunch: Boolean by lazy {
         arguments?.getBoolean(EXTRA_IS_FIRST_LAUNCH, false) == true

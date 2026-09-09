@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.devices.all.ui.builder
 
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
+import com.elta.android.domain.features.cgm.repository.NmgRepository
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.devices.all.ui.adapter.items.ActiveDeviceItem
 import com.elta.android.presentation.features.devices.all.ui.adapter.items.DevicesHeaderItem
@@ -10,12 +11,31 @@ import com.nullgr.core.resources.ResourceProvider
 import javax.inject.Inject
 
 class DevicesOptionsItemsBuilder @Inject constructor(
-    private val resources: ResourceProvider
+    private val resources: ResourceProvider,
+    private val nmgRepository: NmgRepository
 ) {
     fun buildItems(glucometers: List<Pair<Glucometer, GlucometerInfo>>) =
         mutableListOf<ListItem>().apply {
-            if (glucometers.isNotEmpty()) {
+            val nmgSensorId = nmgRepository.activeSensorId()
+            if (nmgSensorId != null) {
                 add(DevicesHeaderItem(resources.getString(R.string.profile_devices_primary_device)))
+                add(
+                    ActiveDeviceItem(
+                        icon = R.drawable.ic_primary_device,
+                        name = "НМГ датчик",
+                        address = nmgSensorId,
+                        serial = nmgSensorId,
+                        isPrimary = true,
+                        isNmg = true
+                    )
+                )
+            }
+            if (glucometers.isNotEmpty()) {
+                if (nmgSensorId == null) {
+                    add(DevicesHeaderItem(resources.getString(R.string.profile_devices_primary_device)))
+                } else {
+                    add(DevicesHeaderItem(resources.getString(R.string.profile_devices_other_devices)))
+                }
                 val (primary, other) = glucometers.run {
                     (
                         firstOrNull { it.first.isPrimary }
@@ -30,7 +50,9 @@ class DevicesOptionsItemsBuilder @Inject constructor(
                 )
 
                 if (other.isNotEmpty()) {
-                    add(DevicesHeaderItem(resources.getString(R.string.profile_devices_other_devices)))
+                    if (nmgSensorId == null) {
+                        add(DevicesHeaderItem(resources.getString(R.string.profile_devices_other_devices)))
+                    }
                     addAll(
                         other.map {
                             mapFromGlucometer(it.first, it.second.glucometerSerialNumber.orEmpty())

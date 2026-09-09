@@ -9,6 +9,7 @@ sealed class ConnectAction : Action {
     object CloseHelp : ConnectAction()
     object ConnectByPin : ConnectAction()
     object ConnectByDmc : ConnectAction()
+    object ConnectNmg : ConnectAction()
     data class OnDmcReceived(val pin: String, val name: String) : ConnectAction()
     object SkipNextStep : ConnectAction()
 

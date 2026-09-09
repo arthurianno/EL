@@ -23,6 +23,7 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
 import com.elta.android.domain.features.diary.home.interactor.SetManualGlucoseRemindUseCase
+import com.elta.android.domain.features.cgm.repository.NmgRepository
 import com.elta.android.domain.features.diary.home.interactor.ShouldManualGlucoseRemindShowUseCase
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
 import com.elta.android.domain.features.emias.interactor.GetEmiasStatusUseCase
@@ -103,6 +104,7 @@ class HomeFlowPm @Inject constructor(
     private val getEmiasStatus: GetEmiasStatusUseCase,
     private val shouldShowGlucoseDialog: ShouldManualGlucoseRemindShowUseCase,
     private val setManualGlucoseRemind: SetManualGlucoseRemindUseCase,
+    private val nmgRepository: NmgRepository,
     private val appMetric: AppMetricTracker,
     services: ServiceFacade
 ) : BaseFlowPm(services), ConnectionListener {
@@ -371,6 +373,11 @@ class HomeFlowPm @Inject constructor(
     }
 
     private fun bindSyncAction() {
+        bus.events<Events.ManualNmgSyncRequested>()
+            .doOnNext { nmgRepository.resumeMonitoring() }
+            .subscribe()
+            .untilDestroy()
+
         bus.events<Events.ManualGlucometerSyncRequested>()
             .map { Unit }
             .subscribe(startSyncAction.consumer)
@@ -630,6 +637,9 @@ class HomeFlowPm @Inject constructor(
         UpdateUserInfoUseCase.Params(UserInfo(isFeedbackSent = true))
 
     private fun autoSyncObservable(): Observable<Unit> =
+        if (nmgRepository.activeSensorId() != null) {
+            Observable.empty()
+        } else
         Singles.zip(getUserInfoUseCase.execute(), getDevicesUseCase.execute())
             .flatMapObservable { (info, devices) ->
                 if (devices.find { it.first.isPrimary } != null && info.isFirstHomeEntrance != true) {

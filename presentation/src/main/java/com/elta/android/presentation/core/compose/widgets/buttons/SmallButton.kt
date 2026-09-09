@@ -19,7 +19,7 @@ import com.elta.android.presentation.theme.GetLocalProperties
 @Composable
 fun SmallButton(
     text: String,
-    @DrawableRes icon: Int,
+    @DrawableRes icon: Int? = null,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -35,12 +35,14 @@ fun SmallButton(
                 .background(brush = brash.smallButton)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(id = icon),
-                    tint = colors.white,
-                    contentDescription = null
-                )
-                HSpacerVerySmall()
+                icon?.let {
+                    Icon(
+                        painter = painterResource(id = it),
+                        tint = colors.white,
+                        contentDescription = null
+                    )
+                    HSpacerVerySmall()
+                }
                 Text(
                     text = text,
                     style = types.buttonSmallText,

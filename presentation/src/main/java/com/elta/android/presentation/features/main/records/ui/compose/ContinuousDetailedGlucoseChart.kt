@@ -204,9 +204,9 @@ internal fun ContinuousDetailedGlucoseChartScreen(
         }
     }
     val realPoints = remember(timelineModel, allEvents, fallbackGlucosePoints) {
-        timelineModel?.let { DetailedChartItemsBuilder.buildPoints(it, allEvents) }
-            .orEmpty()
-            .ifEmpty { fallbackGlucosePoints }
+        val diaryPoints = timelineModel?.let { DetailedChartItemsBuilder.buildPoints(it, allEvents) }.orEmpty()
+        (diaryPoints + fallbackGlucosePoints)
+            .distinctBy { point -> "${point.date}:${point.timeLabel}:${point.value}" }
             .sortedBy { it.continuousMinute(historyStartDate) }
     }
     val insulinEntries = remember(realPoints, allEvents, fallbackInsulinEntries) {

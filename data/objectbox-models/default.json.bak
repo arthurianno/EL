@@ -909,7 +909,7 @@
     },
     {
       "id": "27:3900211914005807584",
-      "lastPropertyId": "23:1507175332592219719",
+      "lastPropertyId": "24:275601618279873902",
       "name": "EventV2CachedDto",
       "properties": [
         {
@@ -1026,6 +1026,11 @@
         {
           "id": "23:1507175332592219719",
           "name": "isTimeInvalid",
+          "type": 1
+        },
+        {
+          "id": "24:275601618279873902",
+          "name": "isTemperatureInvalid",
           "type": 1
         }
       ],

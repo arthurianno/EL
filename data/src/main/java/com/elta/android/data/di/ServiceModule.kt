@@ -1,6 +1,7 @@
 package com.elta.android.data.di
 
 import com.elta.android.common.di.scope.ServiceScope
+import com.elta.android.data.features.devices.cgm.service.CgmMonitoringService
 import com.elta.android.data.features.devices.glucometer.service.firmware.BootModeService
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -11,4 +12,8 @@ abstract class ServiceModule {
     @ServiceScope
     @ContributesAndroidInjector
     abstract fun bindBootModeService(): BootModeService
+
+    @ServiceScope
+    @ContributesAndroidInjector
+    abstract fun bindCgmMonitoringService(): CgmMonitoringService
 }

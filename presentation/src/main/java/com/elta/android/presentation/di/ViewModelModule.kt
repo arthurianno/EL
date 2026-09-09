@@ -11,6 +11,8 @@ import com.elta.android.presentation.features.calcutator.custom.viewmodel.Custom
 import com.elta.android.presentation.features.calcutator.products.viewmodel.DishDetailViewModel
 import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
+import com.elta.android.presentation.features.devices.cgm.NmgSearchViewModel
+import com.elta.android.presentation.features.devices.cgm.NmgMonitoringViewModel
 import com.elta.android.presentation.features.main.events.selector.viewmodel.EventSelectorViewModel
 import com.elta.android.presentation.features.newsChannel.viewModel.NewsViewModel
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.viewmodels.GlucoseSettingViewModel
@@ -70,6 +72,16 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(GlucometerSearchViewModel::class)
     abstract fun bindGlucometerSearchViewModel(viewModel: GlucometerSearchViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(NmgSearchViewModel::class)
+    abstract fun bindNmgSearchViewModel(viewModel: NmgSearchViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(NmgMonitoringViewModel::class)
+    abstract fun bindNmgMonitoringViewModel(viewModel: NmgMonitoringViewModel): ViewModel
 
     @Binds
     @IntoMap

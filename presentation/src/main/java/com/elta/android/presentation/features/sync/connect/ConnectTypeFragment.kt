@@ -121,6 +121,16 @@ class ConnectTypeFragment : BaseComposeFragment<ConnectTypeViewModel>() {
                     viewModel sendAction ConnectAction.ConnectByDmc
                 }
             )
+            VSpacerSmall()
+            SmallButton(
+                text = stringResource(id = R.string.sync_connect_type_button_nmg),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(dimens.connectTypeButtonsHeight),
+                onClick = {
+                    viewModel sendAction ConnectAction.ConnectNmg
+                }
+            )
         }
     }
 

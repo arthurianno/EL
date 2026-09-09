@@ -390,7 +390,8 @@ fun NoMeasurementsGlucoseGauge(
     isSyncing: Boolean,
     statusText: String,
     isStatusVisible: Boolean,
-    onSyncClick: () -> Unit
+    onSyncClick: () -> Unit,
+    nmgSummary: NmgDashboardSummary? = null
 ) {
     val layoutMetrics = emptyGaugeLayoutMetrics(ringSize)
     val emptyRingSize = layoutMetrics.ringSize
@@ -439,58 +440,57 @@ fun NoMeasurementsGlucoseGauge(
                     width = discWidth,
                     height = discHeight
                 ) {
-                    Canvas(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .offset(y = (-8).dp * compactScale)
+                    if (nmgSummary == null) Canvas(
+                        modifier = Modifier.align(Alignment.Center).offset(y = (-8).dp * compactScale)
                             .size(width = 62.dp * compactScale, height = 8.dp * compactScale)
                     ) {
                         val strokeWidth = 8.dp.toPx() * compactScale
                         val dashLength = 24.dp.toPx() * compactScale
-                        drawLine(
-                            color = mainColor,
-                            start = Offset(0f, size.height / 2f),
-                            end = Offset(dashLength, size.height / 2f),
-                            strokeWidth = strokeWidth,
-                            cap = StrokeCap.Round
-                        )
-                        drawLine(
-                            color = mainColor,
-                            start = Offset(size.width - dashLength, size.height / 2f),
-                            end = Offset(size.width, size.height / 2f),
-                            strokeWidth = strokeWidth,
-                            cap = StrokeCap.Round
-                        )
+                        drawLine(mainColor, Offset(0f, size.height / 2f), Offset(dashLength, size.height / 2f), strokeWidth, cap = StrokeCap.Round)
+                        drawLine(mainColor, Offset(size.width - dashLength, size.height / 2f), Offset(size.width, size.height / 2f), strokeWidth, cap = StrokeCap.Round)
                     }
                     Text(
-                        text = "ммоль/л",
-                        fontSize = 12.sp,
+                        text = when {
+                            nmgSummary == null -> "ммоль/л"
+                            nmgSummary.latestReading != null -> String.format(
+                                java.util.Locale.US,
+                                "%.1f",
+                                nmgSummary.latestReading
+                            ).replace('.', ',')
+                            else -> "—"
+                        },
+                        fontSize = if (nmgSummary == null) 12.sp else 24.sp,
                         fontWeight = FontWeight.Medium,
                         color = mainColor,
                         modifier = Modifier
                             .align(Alignment.Center)
-                            .offset(y = 23.dp * compactScale)
+                            .offset(y = if (nmgSummary == null) 23.dp * compactScale else 0.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(13.dp * compactScale))
-            Text(
-                text = "Данных пока нет",
-                fontSize = (20f * compactScale).sp,
-                lineHeight = (24f * compactScale).sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.White
-            )
-            Spacer(modifier = Modifier.height(2.dp * compactScale))
-            Text(
-                text = "Добавьте показатели вручную через «+»\nили синхронизируйте их с устройством",
-                fontSize = (14f * compactScale).sp,
-                lineHeight = (16f * compactScale).sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.White.copy(alpha = 0.65f),
-                textAlign = TextAlign.Center
-            )
+            if (nmgSummary == null) {
+                Spacer(modifier = Modifier.height(13.dp * compactScale))
+                Text(
+                    text = "Данных пока нет",
+                    fontSize = (20f * compactScale).sp,
+                    lineHeight = (24f * compactScale).sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(2.dp * compactScale))
+                Text(
+                    text = "Добавьте показатели вручную через «+»\nили синхронизируйте их с устройством",
+                    fontSize = (14f * compactScale).sp,
+                    lineHeight = (16f * compactScale).sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.White.copy(alpha = 0.65f),
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                // Keep the established vertical balance without adding NMG-specific copy to the design.
+                Spacer(modifier = Modifier.height(55.dp * compactScale))
+            }
         }
 
         SyncDeviceButton(

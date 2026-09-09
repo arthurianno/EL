@@ -16,6 +16,8 @@ import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragme
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragmentVariantA
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.devices.search.GlucometerSearchFragment
+import com.elta.android.presentation.features.devices.cgm.NmgSearchFragment
+import com.elta.android.presentation.features.devices.cgm.NmgMonitoringFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.di.MainDiaryModule
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
@@ -292,6 +294,14 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindDeviceSearchFragment(): GlucometerSearchFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindNmgSearchFragment(): NmgSearchFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindNmgMonitoringFragment(): NmgMonitoringFragment
 
     @FragmentScope
     @ContributesAndroidInjector

@@ -4,6 +4,7 @@ import android.content.Context
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetEventsByPeriodUseCase
 import com.elta.android.domain.features.diary.home.model.HomeModel
+import com.elta.android.domain.features.cgm.repository.NmgRepository
 import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
@@ -28,12 +29,14 @@ import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import javax.inject.Inject
+import java.util.concurrent.TimeUnit
 
 class MainRecordsPm @Inject constructor(
     private val getHomeModelUseCase: GetHomeModelUseCase,
     private val getEventsByPeriodUseCase: GetEventsByPeriodUseCase,
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val recordsMapper: MainRecordsMapper,
+    private val nmgRepository: NmgRepository,
     private val context: Context,
     private val getScreenConfigFromCacheUseCase: GetScreenConfigFromCache,
     services: ServiceFacade
@@ -91,6 +94,12 @@ class MainRecordsPm @Inject constructor(
             bus.events<Events.EventsChanged>().map { Unit },
             bus.events<DateChangedEvent>().map { Unit }
         )
+            .subscribe(loadScreenAction.consumer)
+            .untilDestroy()
+
+        Observable.interval(4, TimeUnit.SECONDS)
+            .filter { nmgRepository.activeSensorId() != null }
+            .map { Unit }
             .subscribe(loadScreenAction.consumer)
             .untilDestroy()
 

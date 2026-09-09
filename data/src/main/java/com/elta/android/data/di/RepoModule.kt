@@ -16,6 +16,7 @@ import com.elta.android.data.features.consultant.repository.MediaDataRepository
 import com.elta.android.data.features.devices.repository.BluetoothStateDataRepository
 import com.elta.android.data.features.devices.repository.BluetoothStateDataRepositoryVariantA
 import com.elta.android.data.features.devices.repository.DeviceDataRepository
+import com.elta.android.data.features.devices.cgm.repository.NmgDataRepository
 import com.elta.android.data.features.devices.repository.DeviceInfoDataRepository
 import com.elta.android.data.features.devices.repository.PinDataRepository
 import com.elta.android.data.features.devices.repository.UpdateRepositoryImpl
@@ -56,6 +57,7 @@ import com.elta.android.domain.features.devices.repository.BluetoothStateReposit
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepositoryVariantA
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
+import com.elta.android.domain.features.cgm.repository.NmgRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
 import com.elta.android.domain.features.devices.repository.UpdateRepository
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
@@ -130,6 +132,10 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindDeviceRepository(repo: DeviceDataRepository): DeviceRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNmgRepository(repo: NmgDataRepository): NmgRepository
 
     @Binds
     @Singleton

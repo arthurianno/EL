@@ -1304,10 +1304,73 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "35:9048354809337594530",
+      "lastPropertyId": "10:857779622183867533",
+      "name": "NmgMeasurementEntity",
+      "properties": [
+        {
+          "id": "1:2026533720245743784",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2439232746301373720",
+          "name": "sampleKey",
+          "indexId": "7:430407090046742780",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:6004060721859963284",
+          "name": "sensorId",
+          "indexId": "8:3796060740030199342",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "4:8987246828858206338",
+          "name": "uptimeBucket",
+          "type": 6
+        },
+        {
+          "id": "5:4007861177369160901",
+          "name": "uptimeSeconds",
+          "type": 6
+        },
+        {
+          "id": "6:5383499281862025341",
+          "name": "receivedAtEpochMillis",
+          "type": 6
+        },
+        {
+          "id": "7:8071552540597241773",
+          "name": "state",
+          "type": 5
+        },
+        {
+          "id": "8:8044926785274142570",
+          "name": "temperatureCode",
+          "type": 5
+        },
+        {
+          "id": "9:2989684064230181641",
+          "name": "glucoseSignalNanoAmp",
+          "type": 5
+        },
+        {
+          "id": "10:857779622183867533",
+          "name": "currentNanoAmp",
+          "type": 5
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "34:7570676786948297390",
-  "lastIndexId": "6:8670197050320643670",
+  "lastEntityId": "35:9048354809337594530",
+  "lastIndexId": "8:3796060740030199342",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

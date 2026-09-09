@@ -8,5 +8,6 @@ data class ActiveDeviceItem(
     val name: String,
     val address: String,
     val serial: String,
-    val isPrimary: Boolean
+    val isPrimary: Boolean,
+    val isNmg: Boolean = false
 ) : ListItem
