@@ -333,7 +333,7 @@ class HomeFlowPm @Inject constructor(
                                 showHelpBottomSheetCommand.consumer.accept(Unit)
                             } else {
                                 appMetric.trackEvent(AppMetricEvent.SynchronizationDeviceClick)
-                                startSyncAction.consumer.accept(Unit)
+                                requestManualDeviceSync()
                             }
                         }
                     }
@@ -380,7 +380,7 @@ class HomeFlowPm @Inject constructor(
 
         bus.events<Events.ManualGlucometerSyncRequested>()
             .map { Unit }
-            .subscribe(startSyncAction.consumer)
+            .subscribe { requestManualDeviceSync() }
             .untilDestroy()
 
         firstSyncAction.observable
@@ -653,6 +653,19 @@ class HomeFlowPm @Inject constructor(
                     }
                 }
             }
+
+    /**
+     * NMG uses its own continuous monitoring transport and is not a legacy glucometer.
+     * Guard the legacy sync entry point because a dashboard can be rendered before its NMG
+     * summary arrives.
+     */
+    private fun requestManualDeviceSync() {
+        if (nmgRepository.activeSensorId() != null) {
+            nmgRepository.resumeMonitoring()
+        } else {
+            startSyncAction.consumer.accept(Unit)
+        }
+    }
 
     private fun syncWithGlucometer(isAuto: Boolean): Observable<com.elta.android.domain.features.devices.model.GlucometerSyncResult> =
         syncWithGlucometerUseCase.execute(SyncWithGlucometerUseCase.Params())

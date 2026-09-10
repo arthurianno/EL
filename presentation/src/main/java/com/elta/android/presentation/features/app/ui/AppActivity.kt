@@ -152,9 +152,7 @@ class AppActivity : BaseActivity<AppPm>() {
             "AppActivity.onResume(localeDefault=${Locale.getDefault().language}, appLanguage=${LocaleHelper.getLanguage(this)})"
         )
         syncOneSignalPermissionOnce()
-        KeyboardEventListener(this) { isKeyboardOpen ->
-            connectionStatusView.isVisible = !isKeyboardOpen
-        }
+
     }
 
     private fun syncOneSignalPermissionOnce() {

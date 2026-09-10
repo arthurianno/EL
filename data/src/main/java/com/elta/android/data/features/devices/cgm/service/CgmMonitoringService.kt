@@ -207,7 +207,10 @@ class CgmMonitoringService : DaggerService() {
         val shouldRecoverHistory = previousAdvertisementAt > 0 &&
             receivedAt - previousAdvertisementAt >= HISTORY_RECOVERY_GAP_MILLIS &&
             lastKnownUptimeSeconds != null &&
-            advertisement.uptimeSeconds > lastKnownUptimeSeconds
+            NmgHistoryRecoveryPolicy.hasMissingHistoryBucket(
+                lastStoredUptimeSeconds = lastKnownUptimeSeconds,
+                currentUptimeSeconds = advertisement.uptimeSeconds
+            )
 
         // Capture the last point before writing the returning live packet. Otherwise the
         // history request would start after the gap and could not fill it.
