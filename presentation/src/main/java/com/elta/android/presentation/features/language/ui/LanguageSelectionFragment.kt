@@ -32,7 +32,7 @@ class LanguageSelectionFragment :
     override val classToken: Class<LanguageSelectionPm> = LanguageSelectionPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
     override val applyPlatformSystemWindowFitting: Boolean = false
-    override val applyBottomSystemInsets: Boolean = false
+    override val applyBottomSystemInsets: Boolean = true
 
     private val isFirstLaunch: Boolean by lazy {
         arguments?.getBoolean(EXTRA_IS_FIRST_LAUNCH, false) == true
