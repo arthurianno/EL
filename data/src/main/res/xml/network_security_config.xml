@@ -6,6 +6,8 @@
             <!-- Добавляем промежуточный и корневой CA -->
             <certificates src="@raw/alphassl_intermediate" />
             <certificates src="@raw/globalsign_root" />
+            <certificates src="@raw/globalsign_r46_alphassl_intermediate" />
+            <certificates src="@raw/globalsign_root_r46" />
             <!-- Или если используешь chain: <certificates src="@raw/vdiabete_chain" /> (после конвертации p7b в PEM) -->
             <certificates src="system" /> <!-- Доверять системным CA -->
         </trust-anchors>
@@ -18,6 +20,8 @@
             <!-- То же: intermediate и root -->
             <certificates src="@raw/alphassl_intermediate" />
             <certificates src="@raw/globalsign_root" />
+            <certificates src="@raw/globalsign_r46_alphassl_intermediate" />
+            <certificates src="@raw/globalsign_root_r46" />
             <!-- Или chain: <certificates src="@raw/vdiabete_chain" /> -->
             <certificates src="system" /> <!-- Для безопасности -->
         </trust-anchors>
