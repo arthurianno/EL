@@ -79,15 +79,15 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
         )
 
         locationPermissionDialog.initDialog(
-            title = getString(R.string.settings_dialog_title),
-            message = getString(R.string.location_dialog_message),
+            title = getString(R.string.device_permission_explanation_title),
+            message = getString(R.string.device_location_permission_settings_explanation),
             positiveButtonText = getString(R.string.settings_dialog_positive),
             negativeButtonText = getString(R.string.settings_dialog_negative)
         )
 
         bluetoothPermissionDialog.initDialog(
-            title = getString(R.string.settings_dialog_title),
-            message = getString(R.string.bluetooth_dialog_message),
+            title = getString(R.string.device_permission_explanation_title),
+            message = getString(R.string.device_bluetooth_permission_settings_explanation),
             positiveButtonText = getString(R.string.settings_dialog_positive),
             negativeButtonText = getString(R.string.settings_dialog_negative)
         )
