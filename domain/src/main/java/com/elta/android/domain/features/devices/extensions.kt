@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.devices
 
+import android.os.Build
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.BluetoothPermissionNotGrantedError
 import com.elta.android.common.errors.GlucometerSyncError
@@ -27,12 +28,15 @@ fun BluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(
     isLocationNeeded: Boolean = false,
     crashlyticsReport: CrashlyticsReport?
 ) {
+    val requiresLocationForBluetooth =
+        isLocationNeeded && Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+
     when {
         !isBluetoothPermissionGranted() -> {
             crashlyticsReport?.writeException(BluetoothPermissionNotGrantedError)
             throw BluetoothPermissionNotGrantedError
         }
-        !isLocationPermissionGranted() && isLocationNeeded -> {
+        !isLocationPermissionGranted() && requiresLocationForBluetooth -> {
             crashlyticsReport?.writeException(LocationPermissionNotGrantedError)
             throw LocationPermissionNotGrantedError
         }
@@ -40,7 +44,7 @@ fun BluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(
             crashlyticsReport?.writeException(BluetoothNotEnabledError)
             throw BluetoothNotEnabledError
         }
-        !isLocationEnabled() && isLocationNeeded -> {
+        !isLocationEnabled() && requiresLocationForBluetooth -> {
             crashlyticsReport?.writeException(LocationNotEnabledError)
             throw  LocationNotEnabledError
         }
@@ -58,6 +62,5 @@ suspend fun DeviceRepository.connectWithTimeout(address: String, pinCode: String
         throw exception
     }
 }
-
 
 

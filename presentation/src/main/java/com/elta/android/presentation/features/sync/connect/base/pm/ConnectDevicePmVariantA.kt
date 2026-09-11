@@ -518,7 +518,7 @@ abstract class ConnectDevicePmVariantA constructor(
     }
 
     private fun isLocationPermissionMissing(): Boolean =
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S &&
                 ContextCompat.checkSelfPermission(
                     context,
                     Manifest.permission.ACCESS_FINE_LOCATION

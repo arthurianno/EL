@@ -362,7 +362,13 @@ abstract class ConnectDevicePm constructor(
     private fun bindStartScanAction() {
         startScanAction.observable
             .doOnNext {
-                if (androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                if (
+                    Build.VERSION.SDK_INT < Build.VERSION_CODES.S &&
+                    androidx.core.content.ContextCompat.checkSelfPermission(
+                        context,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                ) {
                     locationNecessaryState.consumer.accept(true)
                 }
             }

@@ -20,7 +20,7 @@ class BluetoothStateDataRepositoryVariantA @Inject constructor(
 ) : BluetoothStateRepositoryVariantA {
 
     private fun checkLocationPermissions(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) return true
         val accessFineLocationIsGranted =
             context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
@@ -63,7 +63,7 @@ class BluetoothStateDataRepositoryVariantA @Inject constructor(
     }
 
     override fun isLocationEnabledPre34Api(): Boolean {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) return true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) return true
         val locationIsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 
         crashlyticsReport.log("Location is enabled: $locationIsEnabled")

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
+import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.compose.foundation.Image
@@ -45,12 +46,15 @@ import com.elta.android.presentation.utils.openSettingsIntent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
-private val requiredPermissions = listOf(
-    Manifest.permission.CAMERA,
-    Manifest.permission.ACCESS_FINE_LOCATION,
-    Manifest.permission.BLUETOOTH_SCAN,
-    Manifest.permission.BLUETOOTH_CONNECT
-)
+private fun requiredPermissions(): List<String> = buildList {
+    add(Manifest.permission.CAMERA)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        add(Manifest.permission.BLUETOOTH_SCAN)
+        add(Manifest.permission.BLUETOOTH_CONNECT)
+    } else {
+        add(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+}
 
 // fixme Variant A : improved_enabling_location
 @ExperimentalCameraProviderConfiguration
@@ -102,7 +106,7 @@ class HowToConnectFragmentVariantA : BaseComposeFragment<HowToConnectViewModelVa
     @Composable
     override fun Content(viewModel: HowToConnectViewModelVariantA) {
         val permissions =
-            rememberMultiplePermissionsState(permissions = requiredPermissions)
+            rememberMultiplePermissionsState(permissions = requiredPermissions())
         val event = viewModel.event.collectAsState(initial = null).value
         LaunchedEffect(key1 = event) {
             when (event) {

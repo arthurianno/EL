@@ -98,8 +98,13 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
                     is GlucometerSearchEvent.Location.RequestPermission ->
                         context.checkSelfPermissionByName(
                             permissionName = Manifest.permission.ACCESS_FINE_LOCATION,
-                            onRequestPermission = { permissionName ->
-                                locationPermissionLauncher.launch(permissionName)
+                            onRequestPermission = {
+                                locationPermissionLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                    )
+                                )
                             },
                             showPermissionRationale = {
                                 // тут можно открыть settings dialog, если добавишь его во VM
@@ -287,9 +292,9 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
         )
     }
     private val locationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        val action = if (isGranted) {
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val action = if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
             GlucometerSearchAction.Location.AllowPermission
         } else {
             GlucometerSearchAction.Location.DeniedPermission

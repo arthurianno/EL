@@ -365,13 +365,13 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
     private val permissionsLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
-        if (isRequiredPermissionsGranted()) requestEnableLocation()
+        if (isRequiredPermissionsGranted()) onPermissionsGranted()
         else viewModel sendAction ConnectAction.ScannerError
     }
 
     private fun requestLocationPermission() {
         val permissions = buildList {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S &&
                 !isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)
             ) {
                 add(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -387,20 +387,28 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
         }
 
         if (permissions.isEmpty()) {
-            requestEnableLocation()
+            onPermissionsGranted()
         } else {
             permissionsLauncher.launch(permissions.toTypedArray())
         }
     }
 
     private fun isRequiredPermissionsGranted(): Boolean =
-        (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ||
+        (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ||
                 isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) &&
                 (Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
                         (
                                 isPermissionGranted(Manifest.permission.BLUETOOTH_SCAN) &&
                                         isPermissionGranted(Manifest.permission.BLUETOOTH_CONNECT)
                                 ))
+
+    private fun onPermissionsGranted() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            requestEnableLocation()
+        } else {
+            viewModel sendAction ConnectAction.RepeatSearch
+        }
+    }
 
     private fun isPermissionGranted(permission: String): Boolean =
         requireContext().checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED

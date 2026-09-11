@@ -436,10 +436,8 @@ class FirmwarePmVariantA @Inject constructor(
                 btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
 
             is LocationPermissionNotGrantedErrorVariantA ->
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     btControl.requestBluetoothPermissionCommand.consumer.accept(Unit)
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    btControl.requestCombinedPermissionsCommand.consumer.accept(Unit)
                 } else {
                     btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
                 }

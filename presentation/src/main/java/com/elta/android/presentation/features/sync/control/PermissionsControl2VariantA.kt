@@ -57,15 +57,10 @@ class PermissionsControl2VariantA {
             .firstElement()
 
     fun requestLocationPermissions(): Maybe<Boolean> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             bluetoothPermissionsRequestResultRelay
                 .doOnSubscribe { bluetoothPermissionsRequestRelay.accept(Unit) }
                 .firstElement()
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            combinedPermissionsRequestResultRelay
-                .doOnSubscribe { combinedPermissionsRequestRelay.accept(Unit) }
-                .firstElement()
-
         } else {
             locationPermissionsRequestResultRelay
                 .doOnSubscribe { locationPermissionsRequestRelay.accept(Unit) }
@@ -193,8 +188,7 @@ fun checkPermissionsVariantA(activity: Activity) {
     if (androidVersion >= Build.VERSION_CODES.S) {
         permissionsList.add(Manifest.permission.BLUETOOTH_SCAN)
         permissionsList.add(Manifest.permission.BLUETOOTH_CONNECT)
-    }
-    if (androidVersion < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+    } else {
         permissionsList.add(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 

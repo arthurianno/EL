@@ -130,8 +130,13 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                     is ConnectingViewEvent.Location.RequestPermission -> {
                         context.checkSelfPermissionByName(
                             permissionName = Manifest.permission.ACCESS_FINE_LOCATION,
-                            onRequestPermission = { permissionName ->
-                                locationPermissionLauncher.launch(permissionName)
+                            onRequestPermission = {
+                                locationPermissionLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                    )
+                                )
                             },
                             showPermissionRationale = {
                                 viewModel sendAction ConnectingViewAction.Location.ShowPermissionRationale
@@ -431,9 +436,11 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
     }
 
     private val locationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        val action = if (isGranted) ConnectingViewAction.Location.AllowPermission
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val action = if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
+            ConnectingViewAction.Location.AllowPermission
+        }
         else ConnectingViewAction.Location.DeniedPermission
 
         viewModel sendAction action

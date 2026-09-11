@@ -152,8 +152,13 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         pm.checkLocationPermissionCommand.bindTo {
             context?.checkSelfPermissionByName(
                 permissionName = Manifest.permission.ACCESS_FINE_LOCATION,
-                onRequestPermission = { permissionName ->
-                    locationPermissionLauncher.launch(permissionName)
+                onRequestPermission = {
+                    locationPermissionLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        )
+                    )
                 },
                 showPermissionRationale = {
                     pm.showLocationPermissionRationaleAction.consumer.accept(Unit)
@@ -231,9 +236,11 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
     }
 
     private val locationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        presentationModel.receivedLocationPermissionGrantedAction.consumer.accept(isGranted)
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        presentationModel.receivedLocationPermissionGrantedAction.consumer.accept(
+            permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+        )
     }
 
     private fun hideActivityStatusViews() {

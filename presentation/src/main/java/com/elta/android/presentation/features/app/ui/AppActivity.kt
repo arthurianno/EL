@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
@@ -18,8 +17,6 @@ import com.elta.android.presentation.core.ui.activity.BaseActivity
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
-import com.elta.android.presentation.features.sync.control.checkPermissions
-import com.elta.android.presentation.features.sync.control.checkPermissionsVariantA
 import com.elta.android.presentation.utils.LocaleHelper
 import com.elta.android.presentation.features.version.optional.ui.OptionalUpdateDialogFragment
 import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkProcessor
@@ -27,9 +24,6 @@ import com.elta.android.presentation.utils.keyboard.KeyboardEventListener
 import com.elta.android.presentation.widgets.TwoStateStatusView
 import com.elta.android.presentation.widgets.status.StatusView
 import com.nullgr.core.ui.fragments.showDialog
-import com.onesignal.OneSignal
-import com.tbruyelle.rxpermissions2.RxPermissions
-import kotlinx.coroutines.launch
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import javax.inject.Inject
@@ -56,9 +50,7 @@ class AppActivity : BaseActivity<AppPm>() {
         findViewById<TwoStateStatusView>(R.id.connectionStatusView)
     }
     private var isAppReady = false
-    private var isOneSignalPermissionSynced = false
 
-    private val rxPermissions by lazy { RxPermissions(this) }
     private val splashFallbackRunnable = Runnable {
         Log.w(TAG, "splashFallbackRunnable fired after timeout")
         isAppReady = true
@@ -114,10 +106,6 @@ class AppActivity : BaseActivity<AppPm>() {
             window.decorView.postDelayed(splashFallbackRunnable, 12_000L)
         }
 
-        // fixme Variant A : improved_enabling_location
-        val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
-        if (improvedEnablingLocation) checkPermissions(this)
-        else checkPermissionsVariantA(this)
         DynamicLinkProcessor.from(intent)
             .ignoreColdStart(false)
             .withSavedState(savedInstanceState)
@@ -137,28 +125,8 @@ class AppActivity : BaseActivity<AppPm>() {
             TAG,
             "AppActivity.onResume(localeDefault=${Locale.getDefault().language}, appLanguage=${LocaleHelper.getLanguage(this)})"
         )
-        syncOneSignalPermissionOnce()
         KeyboardEventListener(this) { isKeyboardOpen ->
             connectionStatusView.isVisible = !isKeyboardOpen
-        }
-    }
-
-    private fun syncOneSignalPermissionOnce() {
-        if (isOneSignalPermissionSynced) return
-
-        if (OneSignal.Notifications.permission) {
-            isOneSignalPermissionSynced = true
-            return
-        }
-
-        isOneSignalPermissionSynced = true
-        lifecycleScope.launch {
-            runCatching {
-                val accepted = OneSignal.Notifications.requestPermission(false)
-                Log.i("OneSignal", "Permission sync from AppActivity accepted=$accepted")
-            }.onFailure {
-                Log.e("OneSignal", "Permission sync from AppActivity failed: ${it.message}")
-            }
         }
     }
 

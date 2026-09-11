@@ -135,7 +135,9 @@ class HowToConnectViewModel @Inject constructor(
     private suspend fun checkLocationEnabled() {
         val isLocationNeeded = getLocationNeededUseCase.execute().await()
 
-        if (isLocationNeeded) sendEvent(HowToConnectEvent.Location.Enable)
+        if (requiresLocationForBluetooth(isLocationNeeded)) {
+            sendEvent(HowToConnectEvent.Location.Enable)
+        }
         else navigateToCameraScreen()
     }
 
@@ -150,13 +152,18 @@ class HowToConnectViewModel @Inject constructor(
         val isLocationNeeded = getLocationNeededUseCase.execute().await()
 
         val event =
-            if (isLocationNeeded) HowToConnectEvent.Location.RequestPermission
+            if (requiresLocationForBluetooth(isLocationNeeded)) {
+                HowToConnectEvent.Location.RequestPermission
+            }
             else {
                 appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
                 HowToConnectEvent.Bluetooth.Enable
             }
         sendEvent(event)
     }
+
+    private fun requiresLocationForBluetooth(isLocationNeeded: Boolean): Boolean =
+        isLocationNeeded && Build.VERSION.SDK_INT < Build.VERSION_CODES.S
 
     private fun navigateToCameraScreen() {
         router.navigateTo(Screens.ScannerDmcScreen(state.value.isOnBoarding))

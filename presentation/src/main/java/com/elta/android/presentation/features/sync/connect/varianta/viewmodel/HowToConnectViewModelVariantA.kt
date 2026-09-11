@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.sync.connect.viewmodel
 
+import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
@@ -96,13 +97,15 @@ class HowToConnectViewModelVariantA @Inject constructor(
     }
 
     private fun checkPermissions(permissionStates: List<PermissionState>) {
-        val cameraPermission = permissionStates.component1()
-        val locationPermission = permissionStates.component2()
+        val permissionsByName = permissionStates.associateBy { it.permission }
+        val cameraPermission = requireNotNull(permissionsByName[Manifest.permission.CAMERA])
+        val locationPermission = permissionsByName[Manifest.permission.ACCESS_FINE_LOCATION]
             .takeIf { isLocationPermissionNeeded() }
 
-        val bluetoothPermission =
-            listOf(permissionStates.component3(), permissionStates.component4())
-                .takeIf { isBlePermissionsNeeded() }
+        val bluetoothPermission = listOfNotNull(
+            permissionsByName[Manifest.permission.BLUETOOTH_SCAN],
+            permissionsByName[Manifest.permission.BLUETOOTH_CONNECT]
+        ).takeIf { isBlePermissionsNeeded() }
 
         val commonPermissions = listOf(cameraPermission)
         val permissions = bluetoothPermission?.let {
@@ -143,7 +146,7 @@ class HowToConnectViewModelVariantA @Inject constructor(
     }
 
     private fun isLocationPermissionNeeded(): Boolean =
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S
 
     private fun isBlePermissionsNeeded(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 

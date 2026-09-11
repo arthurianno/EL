@@ -3,8 +3,8 @@ package com.elta.android.presentation.features.googlefit
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BloodGlucoseRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
@@ -27,10 +27,9 @@ import timber.log.Timber
 class HealthConnectAuthActivity : ComponentActivity() {
 
     private val requestPermissions = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val allGranted = permissions.values.all { it }
-        sendResult(allGranted)
+        PermissionController.createRequestPermissionResultContract()
+    ) { grantedPermissions ->
+        sendResult(grantedPermissions.containsAll(requiredPermissions))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,18 +45,6 @@ class HealthConnectAuthActivity : ComponentActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             try {
-                val requiredPermissions = setOf(
-                    // Activity & Steps
-                    HealthPermission.getReadPermission(ExerciseSessionRecord::class),
-                    HealthPermission.getReadPermission(StepsRecord::class),
-                    // Health metrics
-                    HealthPermission.getReadPermission(BloodGlucoseRecord::class),
-                    // REMOVED: BloodPressureRecord - not required by Google Play policy
-                    // REMOVED: HeartRateRecord - not required by Google Play policy
-                    HealthPermission.getReadPermission(WeightRecord::class),
-                    HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
-                )
-
                 val grantedPermissions = healthConnectClient.permissionController.getGrantedPermissions()
                 val permissionsToRequest = requiredPermissions - grantedPermissions
 
@@ -66,13 +53,23 @@ class HealthConnectAuthActivity : ComponentActivity() {
                     sendResult(true)
                 } else {
                     Timber.d("Requesting Health Connect permissions: $permissionsToRequest")
-                    requestPermissions.launch(permissionsToRequest.toTypedArray())
+                    requestPermissions.launch(permissionsToRequest)
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Error requesting Health Connect permissions")
                 sendResult(false)
             }
         }
+    }
+
+    private companion object {
+        val requiredPermissions = setOf(
+            HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+            HealthPermission.getReadPermission(StepsRecord::class),
+            HealthPermission.getReadPermission(BloodGlucoseRecord::class),
+            HealthPermission.getReadPermission(WeightRecord::class),
+            HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
+        )
     }
 
     private fun sendResult(granted: Boolean) {
@@ -87,4 +84,3 @@ class HealthConnectAuthActivity : ComponentActivity() {
         overridePendingTransition(0, 0)
     }
 }
-
