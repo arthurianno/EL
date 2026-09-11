@@ -1007,9 +1007,9 @@
     <!-- Device permission explanation -->
     <string name="device_permission_explanation_title">Подключение глюкометра</string>
     <string name="device_bluetooth_permission_explanation">Разрешите доступ к устройствам поблизости, чтобы найти и подключить глюкометр по Bluetooth.</string>
-    <string name="device_location_permission_explanation">Чтобы найти и подключить глюкометр по Bluetooth, Android требует разрешение на геолокацию. Во время подключения приложение не определяет и не сохраняет ваше местоположение.</string>
+    <string name="device_location_permission_explanation">Android требует разрешение на геолокацию для поиска глюкометра по Bluetooth. Мы не определяем и не сохраняем ваше точное местоположение: разрешение используется только для работы Bluetooth.</string>
     <string name="device_bluetooth_permission_settings_explanation">Чтобы найти и подключить глюкометр по Bluetooth, разрешите доступ к устройствам поблизости в настройках телефона.</string>
-    <string name="device_location_permission_settings_explanation">Чтобы найти и подключить глюкометр по Bluetooth, разрешите доступ к геолокации в настройках телефона. Во время подключения приложение не определяет и не сохраняет ваше местоположение.</string>
+    <string name="device_location_permission_settings_explanation">Разрешите доступ к геолокации в настройках телефона, чтобы найти глюкометр по Bluetooth. Мы не определяем и не сохраняем ваше точное местоположение: разрешение используется только для работы Bluetooth.</string>
     <string name="device_permission_explanation_positive">Продолжить</string>
     <string name="device_permission_explanation_negative">Не сейчас</string>
 

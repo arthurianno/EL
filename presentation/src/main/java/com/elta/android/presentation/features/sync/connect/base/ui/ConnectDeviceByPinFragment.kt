@@ -123,6 +123,7 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
             childFragmentManager.showDialog(PinDialogFragment.newInstance(it))
         }
         pm.settingsDialog.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.permissionExplanationDialog.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.settingsIsVisible.bindTo {
             if (it) {
                 openSettingsIntent(requireContext())

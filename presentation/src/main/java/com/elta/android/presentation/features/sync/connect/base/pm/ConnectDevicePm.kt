@@ -112,10 +112,16 @@ abstract class ConnectDevicePm constructor(
     private val syncProgressState = state(false)
 
     private val settingsLocationDialogData: DialogData by lazy {
-        Dialogs.SettingsLocationDialogData(resources)
+        Dialogs.DeviceLocationPermissionSettingsDialogData(resources)
     }
     private val settingsBluetoothDialogData: DialogData by lazy {
-        Dialogs.SettingsBluetoothDialogData(resources)
+        Dialogs.DeviceBluetoothPermissionSettingsDialogData(resources)
+    }
+    private val locationPermissionExplanationDialogData: DialogData by lazy {
+        Dialogs.DeviceLocationPermissionExplanationDialogData(resources)
+    }
+    private val bluetoothPermissionExplanationDialogData: DialogData by lazy {
+        Dialogs.DeviceBluetoothPermissionExplanationDialogData(resources)
     }
     private val deviceAlreadyConnectedDialogData: DialogData by lazy {
         Dialogs.DeviceAlreadyConnectedDialogData(resources)
@@ -125,6 +131,7 @@ abstract class ConnectDevicePm constructor(
     }
 
     val settingsDialog = dialogControl<DialogData, DialogResult>()
+    val permissionExplanationDialog = dialogControl<DialogData, DialogResult>()
     val settingsIsVisible = state(false)
     val openSettingsCloseAction = action<Unit>()
     val showHomeButtonCommand = command<Unit>()
@@ -522,12 +529,16 @@ abstract class ConnectDevicePm constructor(
     }
 
     private fun requestBluetoothPermission() {
-        checkBluetoothPermissionCommand.consumer.accept(Unit)
+        showPermissionExplanation(bluetoothPermissionExplanationDialogData) {
+            checkBluetoothPermissionCommand.consumer.accept(Unit)
+        }
         appMetric.trackEvent(AppMetricEvent.Permission.Alert.Bluetooth)
     }
 
     private fun requestLocationPermission() {
-        checkLocationPermissionCommand.consumer.accept(Unit)
+        showPermissionExplanation(locationPermissionExplanationDialogData) {
+            checkLocationPermissionCommand.consumer.accept(Unit)
+        }
         appMetric.trackEvent(AppMetricEvent.Permission.Alert.Location)
     }
 
@@ -668,6 +679,14 @@ abstract class ConnectDevicePm constructor(
         settingsDialog.showForResult(dialogData)
             .map { it == DialogResult.POSITIVE }
             .subscribe(settingsIsVisible.consumer)
+            .untilDestroy()
+    }
+
+    private fun showPermissionExplanation(dialogData: DialogData, onContinue: () -> Unit) {
+        connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+        permissionExplanationDialog.showForResult(dialogData)
+            .filter { it == DialogResult.POSITIVE }
+            .subscribe { onContinue() }
             .untilDestroy()
     }
 

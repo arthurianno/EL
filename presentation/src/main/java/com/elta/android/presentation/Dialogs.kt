@@ -160,6 +160,42 @@ sealed class Dialogs : DialogData {
         override val neural: String? = null
     ) : Dialogs()
 
+    data class DeviceLocationPermissionExplanationDialogData(
+        val resourceProvider: ResourceProvider,
+        override val title: String = resourceProvider.getString(R.string.device_permission_explanation_title),
+        override val message: String = resourceProvider.getString(R.string.device_location_permission_explanation),
+        override val negative: String = resourceProvider.getString(R.string.device_permission_explanation_negative),
+        override val positive: String = resourceProvider.getString(R.string.device_permission_explanation_positive),
+        override val neural: String? = null
+    ) : Dialogs()
+
+    data class DeviceBluetoothPermissionExplanationDialogData(
+        val resourceProvider: ResourceProvider,
+        override val title: String = resourceProvider.getString(R.string.device_permission_explanation_title),
+        override val message: String = resourceProvider.getString(R.string.device_bluetooth_permission_explanation),
+        override val negative: String = resourceProvider.getString(R.string.device_permission_explanation_negative),
+        override val positive: String = resourceProvider.getString(R.string.device_permission_explanation_positive),
+        override val neural: String? = null
+    ) : Dialogs()
+
+    data class DeviceLocationPermissionSettingsDialogData(
+        val resourceProvider: ResourceProvider,
+        override val title: String = resourceProvider.getString(R.string.device_permission_explanation_title),
+        override val message: String = resourceProvider.getString(R.string.device_location_permission_settings_explanation),
+        override val negative: String = resourceProvider.getString(R.string.settings_dialog_negative),
+        override val positive: String = resourceProvider.getString(R.string.settings_dialog_positive),
+        override val neural: String? = null
+    ) : Dialogs()
+
+    data class DeviceBluetoothPermissionSettingsDialogData(
+        val resourceProvider: ResourceProvider,
+        override val title: String = resourceProvider.getString(R.string.device_permission_explanation_title),
+        override val message: String = resourceProvider.getString(R.string.device_bluetooth_permission_settings_explanation),
+        override val negative: String = resourceProvider.getString(R.string.settings_dialog_negative),
+        override val positive: String = resourceProvider.getString(R.string.settings_dialog_positive),
+        override val neural: String? = null
+    ) : Dialogs()
+
     data class DeviceAlreadyConnectedDialogData(
         val resourceProvider: ResourceProvider,
         override val title: String? = null,
