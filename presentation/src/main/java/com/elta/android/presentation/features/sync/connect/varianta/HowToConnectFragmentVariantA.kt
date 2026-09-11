@@ -93,6 +93,20 @@ class HowToConnectFragmentVariantA : BaseComposeFragment<HowToConnectViewModelVa
             positiveButtonText = getString(R.string.settings_dialog_positive),
             negativeButtonText = getString(R.string.settings_dialog_negative)
         )
+
+        locationPermissionExplanationDialog.initDialog(
+            title = getString(R.string.device_permission_explanation_title),
+            message = getString(R.string.device_location_permission_explanation),
+            positiveButtonText = getString(R.string.device_permission_explanation_positive),
+            negativeButtonText = getString(R.string.device_permission_explanation_negative)
+        )
+
+        bluetoothPermissionExplanationDialog.initDialog(
+            title = getString(R.string.device_permission_explanation_title),
+            message = getString(R.string.device_bluetooth_permission_explanation),
+            positiveButtonText = getString(R.string.device_permission_explanation_positive),
+            negativeButtonText = getString(R.string.device_permission_explanation_negative)
+        )
     }
 
     @Composable
@@ -100,6 +114,8 @@ class HowToConnectFragmentVariantA : BaseComposeFragment<HowToConnectViewModelVa
         BaseDialog(widgetModel = viewModel.cameraPermissionDialog)
         BaseDialog(widgetModel = viewModel.locationPermissionDialog)
         BaseDialog(widgetModel = viewModel.bluetoothPermissionDialog)
+        BaseDialog(widgetModel = viewModel.locationPermissionExplanationDialog)
+        BaseDialog(widgetModel = viewModel.bluetoothPermissionExplanationDialog)
     }
 
     @OptIn(ExperimentalPermissionsApi::class)

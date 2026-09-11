@@ -237,18 +237,22 @@ fun Context.checkBluetoothSelfPermission(
     showPermissionRationale: () -> Unit = {},
     onGranted: () -> Unit = {}
 ) {
-    if (
-        ContextCompat.checkSelfPermission(
-            this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
-        && ContextCompat.checkSelfPermission(
-            this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
-    ) {
-        if (
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                this as ComponentActivity, Manifest.permission.BLUETOOTH_SCAN)
-            && ActivityCompat.shouldShowRequestPermissionRationale(
-                this as ComponentActivity, Manifest.permission.BLUETOOTH_CONNECT)
-        ) {
+    val scanPermissionGranted = ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.BLUETOOTH_SCAN
+    ) == PackageManager.PERMISSION_GRANTED
+    val connectPermissionGranted = ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.BLUETOOTH_CONNECT
+    ) == PackageManager.PERMISSION_GRANTED
+
+    if (!scanPermissionGranted || !connectPermissionGranted) {
+        val activity = this as ComponentActivity
+        val shouldShowRationale =
+            ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.BLUETOOTH_SCAN) ||
+                ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.BLUETOOTH_CONNECT)
+
+        if (shouldShowRationale) {
             showPermissionRationale()
         } else {
             onRequestPermission()

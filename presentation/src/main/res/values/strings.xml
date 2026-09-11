@@ -1004,6 +1004,13 @@
     <!-- Bluetooth Dialog -->
     <string name="bluetooth_dialog_message">Для подключения к глюкометру приложению необходим доступ к устройствам поблизости</string>
 
+    <!-- Device permission explanation -->
+    <string name="device_permission_explanation_title">Подключение глюкометра</string>
+    <string name="device_bluetooth_permission_explanation">Разрешите доступ к устройствам поблизости, чтобы найти и подключить глюкометр по Bluetooth.</string>
+    <string name="device_location_permission_explanation">Чтобы найти и подключить глюкометр по Bluetooth, Android требует разрешение на геолокацию. Во время подключения приложение не определяет и не сохраняет ваше местоположение.</string>
+    <string name="device_permission_explanation_positive">Продолжить</string>
+    <string name="device_permission_explanation_negative">Не сейчас</string>
+
     <!-- Device Dialog -->
     <string name="device_connected_dialog_message">Данное устройство уже добавлено в список моих устройств. Выберите, пожалуйста, новый глюкометр</string>
     <string name="device_need_location_dialog_message">Некоторые устройства не могут определить глюкометр без данных о местоположении устройства. Разрешите доступ к геолокации</string>

@@ -52,6 +52,14 @@ class HowToConnectViewModelVariantA @Inject constructor(
         positiveOnCLick = { sendEvent(PermissionEvent.OpenSettings) }
     )
 
+    val locationPermissionExplanationDialog = BaseDialogWidgetModel<Nothing>(
+        positiveOnCLick = { sendEvent(PermissionEvent.RequestPermissions) }
+    )
+
+    val bluetoothPermissionExplanationDialog = BaseDialogWidgetModel<Nothing>(
+        positiveOnCLick = { sendEvent(PermissionEvent.RequestPermissions) }
+    )
+
     override val widgets = listOf(
         appTopBar,
         downButton
@@ -108,9 +116,11 @@ class HowToConnectViewModelVariantA @Inject constructor(
         ).takeIf { isBlePermissionsNeeded() }
 
         val commonPermissions = listOf(cameraPermission)
-        val permissions = bluetoothPermission?.let {
-            it.toMutableList() + commonPermissions
-        } ?: commonPermissions
+        val permissions = when {
+            bluetoothPermission != null -> bluetoothPermission + commonPermissions
+            locationPermission != null -> listOf(locationPermission) + commonPermissions
+            else -> commonPermissions
+        }
 
         appMetric.trackEvent(cameraPermission.getMetricName(AlertType.Camera))
         bluetoothPermission?.first()?.getMetricName(AlertType.Camera)
@@ -129,6 +139,12 @@ class HowToConnectViewModelVariantA @Inject constructor(
                 bluetoothPermissionDialog.dialogOpen()
 
             permissions.all { it.status.isGranted } -> checkLocationAndBluetoothState()
+
+            bluetoothPermission?.any { !it.status.isGranted } == true ->
+                bluetoothPermissionExplanationDialog.dialogOpen()
+
+            locationPermission?.status?.isGranted == false ->
+                locationPermissionExplanationDialog.dialogOpen()
 
             else -> sendEvent(PermissionEvent.RequestPermissions)
         }

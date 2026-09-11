@@ -63,6 +63,14 @@ class HowToConnectViewModel @Inject constructor(
         positiveOnCLick = { sendEvent(HowToConnectEvent.OpenSettings) }
     )
 
+    val locationPermissionExplanationDialog = BaseDialogWidgetModel<Nothing>(
+        positiveOnCLick = { sendEvent(HowToConnectEvent.Location.RequestSystemPermission) }
+    )
+
+    val bluetoothPermissionExplanationDialog = BaseDialogWidgetModel<Nothing>(
+        positiveOnCLick = { sendEvent(HowToConnectEvent.Bluetooth.RequestSystemPermission) }
+    )
+
     override val widgets = listOf(
         appTopBar,
         downButton

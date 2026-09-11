@@ -91,6 +91,20 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
             positiveButtonText = getString(R.string.settings_dialog_positive),
             negativeButtonText = getString(R.string.settings_dialog_negative)
         )
+
+        locationPermissionExplanationDialog.initDialog(
+            title = getString(R.string.device_permission_explanation_title),
+            message = getString(R.string.device_location_permission_explanation),
+            positiveButtonText = getString(R.string.device_permission_explanation_positive),
+            negativeButtonText = getString(R.string.device_permission_explanation_negative)
+        )
+
+        bluetoothPermissionExplanationDialog.initDialog(
+            title = getString(R.string.device_permission_explanation_title),
+            message = getString(R.string.device_bluetooth_permission_explanation),
+            positiveButtonText = getString(R.string.device_permission_explanation_positive),
+            negativeButtonText = getString(R.string.device_permission_explanation_negative)
+        )
     }
 
     @Composable
@@ -98,6 +112,8 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
         BaseDialog(widgetModel = viewModel.cameraPermissionDialog)
         BaseDialog(widgetModel = viewModel.locationPermissionDialog)
         BaseDialog(widgetModel = viewModel.bluetoothPermissionDialog)
+        BaseDialog(widgetModel = viewModel.locationPermissionExplanationDialog)
+        BaseDialog(widgetModel = viewModel.bluetoothPermissionExplanationDialog)
     }
 
     @OptIn(ExperimentalPermissionsApi::class)
@@ -128,13 +144,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                     is HowToConnectEvent.Bluetooth.RequestPermission ->
                         context.checkBluetoothSelfPermission(
                             onRequestPermission = {
-                                viewModel sendAction HowToConnectAction.Bluetooth.AppearPermission
-                                bluetoothPermissionLauncher.launch(
-                                    arrayOf(
-                                        Manifest.permission.BLUETOOTH_SCAN,
-                                        Manifest.permission.BLUETOOTH_CONNECT
-                                    )
-                                )
+                                viewModel.bluetoothPermissionExplanationDialog.dialogOpen()
                             },
                             showPermissionRationale = {
                                 viewModel sendAction  HowToConnectAction.Bluetooth.ShowPermissionRationale
@@ -143,17 +153,20 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                                 viewModel sendAction HowToConnectAction.Bluetooth.AllowPermission(isAlreadyGranted = true)
                             }
                         )
+                    is HowToConnectEvent.Bluetooth.RequestSystemPermission -> {
+                        viewModel sendAction HowToConnectAction.Bluetooth.AppearPermission
+                        bluetoothPermissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.BLUETOOTH_SCAN,
+                                Manifest.permission.BLUETOOTH_CONNECT
+                            )
+                        )
+                    }
                     is HowToConnectEvent.Location.RequestPermission ->
                         context.checkSelfPermissionByName(
                             permissionName = Manifest.permission.ACCESS_FINE_LOCATION,
                             onRequestPermission = {
-                                viewModel sendAction HowToConnectAction.Location.AppearPermission
-                                locationPermissionLauncher.launch(
-                                    arrayOf(
-                                        Manifest.permission.ACCESS_FINE_LOCATION,
-                                        Manifest.permission.ACCESS_COARSE_LOCATION
-                                    )
-                                )
+                                viewModel.locationPermissionExplanationDialog.dialogOpen()
                             },
                             showPermissionRationale = {
                                 viewModel sendAction HowToConnectAction.Location.ShowPermissionRationale
@@ -162,6 +175,16 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                                 viewModel sendAction HowToConnectAction.Location.AllowPermission(isAlreadyGranted = true)
                             },
                         )
+
+                    is HowToConnectEvent.Location.RequestSystemPermission -> {
+                        viewModel sendAction HowToConnectAction.Location.AppearPermission
+                        locationPermissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
+                        )
+                    }
 
                     is HowToConnectEvent.Location.Enable ->
                         locationEnableResultLauncher.requestEnableLocation(context) {

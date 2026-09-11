@@ -6,11 +6,13 @@ sealed interface HowToConnectEvent : Event {
 
     object Location {
         data object RequestPermission : HowToConnectEvent
+        data object RequestSystemPermission : HowToConnectEvent
         data object Enable : HowToConnectEvent
     }
 
     object Bluetooth {
         data object RequestPermission : HowToConnectEvent
+        data object RequestSystemPermission : HowToConnectEvent
         data object Enable : HowToConnectEvent
     }
 

@@ -864,6 +864,11 @@
     <string name="location_dialog_message">To connect to the glucose meter, the app requires access to your location</string>
     <string name="map_location_dialog_message">The app requires access to your location</string>
     <string name="bluetooth_dialog_message">To connect to the glucose meter, the app requires access to nearby devices</string>
+    <string name="device_permission_explanation_title">Connect a glucose meter</string>
+    <string name="device_bluetooth_permission_explanation">Allow access to nearby devices to find and connect your glucose meter via Bluetooth.</string>
+    <string name="device_location_permission_explanation">To find and connect your glucose meter via Bluetooth, Android requires location permission. During connection, the app does not determine or store your location.</string>
+    <string name="device_permission_explanation_positive">Continue</string>
+    <string name="device_permission_explanation_negative">Not now</string>
     <string name="device_connected_dialog_message">This device is already added to my devices list. Please select a new glucose meter</string>
     <string name="device_need_location_dialog_message">Some devices cannot detect the glucose meter without device location data. Allow access to geolocation</string>
     <string name="device_need_location_dialog_positive_button">Allow</string>
