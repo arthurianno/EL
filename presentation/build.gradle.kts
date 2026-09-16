@@ -188,5 +188,6 @@ dependencies {
 
     testBaseDependencies()
     testImplementation(Dependencies.Test.kotlinJUnit)
+    testImplementation(Dependencies.Test.coroutinesTest)
     androidTestImplementation(Dependencies.Jetpack.WorkManager.test)
 }

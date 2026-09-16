@@ -220,6 +220,7 @@ object Dependencies {
         const val coreKtx = "androidx.test:core-ktx:$coreTestVersion"
         const val jsr310 = "org.threeten:threetenbp:$java310Version"
         const val kotlinJUnit = "org.jetbrains.kotlin:kotlin-test-junit:${Kotlin.version}"
+        const val coroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test-jvm:1.8.1"
         const val mockito = "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion"
         const val robolectric = "org.robolectric:robolectric:$robolectricVersion"
         const val mockitoAndroid = "org.mockito:mockito-android:$mockitoAndroidVersion"

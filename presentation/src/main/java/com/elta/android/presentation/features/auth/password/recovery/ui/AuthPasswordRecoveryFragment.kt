@@ -2,69 +2,88 @@ package com.elta.android.presentation.features.auth.password.recovery.ui
 
 import android.os.Bundle
 import android.view.View
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.dialog.createDialog
-import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import com.elta.android.presentation.Screens
+import com.elta.android.presentation.core.compose.common.BaseComposeFragment
+import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
-import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
-import com.elta.android.presentation.databinding.FragmentAuthPasswordRecoveryBinding
-import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
-import com.elta.android.presentation.utils.applyStatusBarInsetsPadding
-import com.elta.android.presentation.utils.error
-import com.elta.android.presentation.utils.isKeyboardOpen
-import com.jakewharton.rxbinding2.view.clicks
-import me.dmdev.rxpm.bindTo
-import me.dmdev.rxpm.widget.bindTo
+import com.elta.android.presentation.features.auth.password.recovery.model.PasswordRecoveryEffect
+import com.elta.android.presentation.features.auth.password.recovery.viewmodel.PasswordRecoveryViewModel
+import com.elta.android.presentation.messages.SnackBarMessageData
+import com.elta.android.presentation.utils.hideKeyboardFun
+import com.elta.android.presentation.utils.makeSnackBar
+import com.nullgr.core.ui.extensions.setStatusBarColor
+import kotlinx.coroutines.launch
 
-class AuthPasswordRecoveryFragment :
-    BaseFragment<AuthPasswordRecoveryPm, FragmentAuthPasswordRecoveryBinding>(
-        FragmentAuthPasswordRecoveryBinding::inflate
-    ) {
+class AuthPasswordRecoveryFragment : BaseComposeFragment<PasswordRecoveryViewModel>() {
+    override val viewModel: PasswordRecoveryViewModel by viewModels { viewModelFactory }
 
-    override val screenLayout: Int = R.layout.fragment_auth_password_recovery
-    override val classToken: Class<AuthPasswordRecoveryPm> = AuthPasswordRecoveryPm::class.java
-    override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
+    override fun PasswordRecoveryViewModel.init() {
+        initialize(requireContext())
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.root.applyStatusBarInsetsPadding(
-            onApplyInsets = ::clearFocusesFromInputs,
-            applyNavigationBarInset = true,
-            applyImeInset = true
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.effects.collect { effect ->
+                    view.hideKeyboardFun()
+                    when (effect) {
+                        is PasswordRecoveryEffect.LinkSent -> {
+                            showMessage(getString(R.string.registration_email_sent))
+                            viewModel.router.navigateTo(
+                                if (effect.useNewLogin) Screens.Login else Screens.LoginVariantA
+                            )
+                            viewModel.onLinkSentHandled()
+                        }
+                        is PasswordRecoveryEffect.ShowMessage ->
+                            showMessage(effect.text ?: getString(effect.resource))
+                        PasswordRecoveryEffect.AuthenticationRequired ->
+                            (viewModel.router as FlowRouter).newRootFlow(Screens.AuthFlow)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        with(LightStatusBarConfigProvider) {
+            requireActivity().window.setStatusBarColor(statusBarColor, lightStatusBar)
+        }
+    }
+
+    override fun onPause() {
+        view?.hideKeyboardFun()
+        super.onPause()
+    }
+
+    @Composable
+    override fun Content(viewModel: PasswordRecoveryViewModel) {
+        val lifecycle = viewLifecycleOwner.lifecycle
+        val state = remember(viewModel, lifecycle) {
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+        }.collectAsState(initial = viewModel.state.value)
+        PasswordRecoveryScreen(
+            state = state.value,
+            onAction = viewModel.actionReceiver,
+            onClose = viewModel::backClick
         )
-        binding.toolbar.homeButtonView.setImageResource(R.drawable.ic_dialog_close)
     }
 
-
-
-    private fun clearFocusesFromInputs(view: View) {
-        if (!requireActivity().isKeyboardOpen(view)) {
-            binding.emailInputView.clearFocus()
-
-        }else {
-            binding.scrollView4.postDelayed({
-                binding.scrollView4.fullScroll(View.FOCUS_DOWN)
-            }, 150)
-        }
-
-    }
-
-    override fun onBindPresentationModel(pm: AuthPasswordRecoveryPm) {
-        super.onBindPresentationModel(pm)
-        bindScreenConfig(pm){
-            withBackgroundImage(binding.backgroundImageView, R.drawable.ic_welcome)  // Другая картинка!
-            withTitle(binding.authPasswordRecoveryTitle, R.string.auth_password_recovery_title)
-            withDescription(binding.authPasswordRecoverySubTitle, R.string.auth_password_recovery_subtitle)
-            withRootView(binding.root)
-        }
-        pm.emailInput.bindTo(binding.emailInputView)
-        pm.emailInput.error.observable
-            .distinctUntilChanged()
-            .subscribe(binding.emailInputView.error())
-        pm.continueEnabledState.bindTo { binding.sendLinkButtonView.isEnabled = it }
-        binding.sendLinkButtonView.clicks().bindTo(pm.continueAction)
-        pm.profileIsDeletedDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
-        bindProgressDialog(pm)
+    private fun showMessage(message: String) {
+        makeSnackBar(
+            requireActivity().findViewById(android.R.id.content),
+            SnackBarMessageData.SimpleTextMessage(message)
+        ).show()
     }
 
     companion object {

@@ -11,6 +11,9 @@ private val appBaseFontMedium = FontFamily(Font(R.font.roboto_medium))
 private val appBaseFontRegular = FontFamily(Font(R.font.roboto_regular))
 private val appBaseFontBold = FontFamily(Font(R.font.roboto_bold))
 private val appBaseFontLight = FontFamily(Font(R.font.roboto_light))
+private val appBaseGothamBold = FontFamily(Font(R.font.gothampro_bold))
+private val appBaseGothamMedium = FontFamily(Font(R.font.gothampro_medium))
+
 
 private val title1 = TextStyle(
     fontFamily = appBaseFontBold,
@@ -41,10 +44,18 @@ private val subtitle1 = TextStyle(
     fontFamily = appBaseFontRegular,
     fontSize = 15.sp
 )
+private val subtitle2 = TextStyle(
+    fontFamily = appBaseFontRegular,
+    fontSize = 17.sp
+)
 
 private val h1 = TextStyle(
     fontFamily = appBaseFontBold,
     fontSize = 24.sp
+)
+private val h0 = TextStyle(
+    fontFamily = appBaseGothamMedium,
+    fontSize = 32.sp
 )
 
 private val h2 = TextStyle(
@@ -140,6 +151,8 @@ data class EltaTypes(
     val body1: TextStyle,
     val body2: TextStyle,
     val subtitle1: TextStyle,
+    val subtitle2: TextStyle,
+    val h0: TextStyle,
     val h1: TextStyle,
     val h2: TextStyle,
     val h3: TextStyle,
@@ -167,6 +180,8 @@ internal val eltaTypes = EltaTypes(
     body1 = body1,
     body2 = body2,
     subtitle1 = subtitle1,
+    subtitle2 = subtitle2,
+    h0 = h0,
     h1 = h1,
     h2 = h2,
     h3 = h3,

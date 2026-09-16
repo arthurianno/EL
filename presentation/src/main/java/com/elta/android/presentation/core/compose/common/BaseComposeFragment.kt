@@ -39,9 +39,7 @@ abstract class BaseComposeFragment<VM : BaseViewModel<*>> :
         view.findViewById<ComposeView>(R.id.main_view)
             .apply {
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnLifecycleDestroyed(
-                        lifecycle = this@BaseComposeFragment.lifecycle
-                    )
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
                 )
             }
             .setContent {
@@ -63,9 +61,8 @@ abstract class BaseComposeFragment<VM : BaseViewModel<*>> :
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
-        if (viewModel.routerIsNotSet()) {
-            viewModel.setRouter(((parentFragment ?: requireActivity()) as RouterProvider).router)
-        }
+        // The ViewModel can survive recreation, while its host router may change.
+        viewModel.setRouter(((parentFragment ?: requireActivity()) as RouterProvider).router)
         super.onAttach(context)
     }
 
