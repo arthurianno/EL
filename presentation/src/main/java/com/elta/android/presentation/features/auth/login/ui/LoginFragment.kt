@@ -1,44 +1,24 @@
 package com.elta.android.presentation.features.auth.login.ui
 
-import android.os.Bundle
-import android.util.Log
-import android.view.View
-import coil.load
-import coil.request.CachePolicy
-import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.features.auth.login.pm.LoginPm
-import com.elta.android.presentation.features.registration.main.ui.BaseRegistrationFragment
-import com.nullgr.core.ui.extensions.hide
-import com.nullgr.core.ui.extensions.show
-import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
 
-class LoginFragment : BaseRegistrationFragment<LoginPm>() {
+class LoginFragment : BaseLoginComposeFragment<LoginPm>() {
 
-    override val menuButtonText: Int = R.string.auth_toolbar_button_text
-    override val continueButtonText: Int = R.string.auth_button_continue
-    override val authTitleText: Int = R.string.auth_title
-    override val authSubtitleText: Int = R.string.auth_subtitle
     override val classToken: Class<LoginPm> = LoginPm::class.java
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        with(binding) {
-            privacyPolicyView.hide()
-            authTitleIconView.show()
-        }
-    }
 
     override fun onBindPresentationModel(pm: LoginPm) {
         super.onBindPresentationModel(pm)
-        pm.profileRestoredDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
-        bindScreenConfig(pm){
-            withBackgroundImage(binding.backgroundImageView, R.drawable.ic_welcome)  // Другая картинка!
-            withTitle(binding.authTitleView, R.string.auth_title)
-            withDescription(binding.authSubtitleView, R.string.auth_subtitle)
-            withRootView(binding.root)
-        }
+        bindLoginForm(
+            emailInput = pm.emailInput,
+            passwordInput = pm.passwordInput,
+            onSubmit = { pm.continueAction.consumer.accept(Unit) },
+            onBack = { pm.backHandleAction.consumer.accept(Unit) },
+            onForgotPassword = { pm.menuAction.consumer.accept(Unit) }
+        )
+        pm.profileIsDeletedDialogControl.bindTo { data, control -> createDialog(this, control, data) }
+        pm.profileRestoredDialogControl.bindTo { data, control -> createDialog(this, control, data) }
     }
 
     companion object {

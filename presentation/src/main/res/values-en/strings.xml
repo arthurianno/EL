@@ -45,7 +45,8 @@
     <string name="registration_personal_data">https://stage2.vdiabete.com/personal_data.html</string>
     <string name="registration_privacy_policy_toolbar_title">Privacy policy terms of use</string>
     <string name="registration_activate_title">Activate Your Profile</string>
-    <string name="registration_activate_description">Click the link to confirm your account registration. If you haven\'t received this email, check your \"Spam\" folder.</string>
+    <string name="registration_activate_description">An email has been sent to the address you provided. Open it and follow the link to activate your profile.\n\nIf you haven\'t received the email, check your spam folder.</string>
+    <string name="registration_activation_check">I have activated my profile</string>
     <string name="registration_send_again">Resend Email</string>
     <string name="registration_error_input_email">Please enter a valid email address.</string>
     <string name="registration_error_email_already_registered">Attention! The specified email already exists.</string>
@@ -947,4 +948,7 @@
     <string name="splash_loading_message">Don\'t worry, component installation only happens during updates!</string>
     <string name="splash_loading_progress">Loading components: %1$d/%2$d</string>
 
+    <string name="auth_password_create_invalid_link">The recovery code is missing. Open the link from your email or request a new one.</string>
+    <string name="auth_show_password">Show password</string>
+    <string name="auth_hide_password">Hide password</string>
 </resources>

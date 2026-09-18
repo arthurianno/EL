@@ -7,7 +7,6 @@ import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.features.auth.flow.pm.AuthFlowPm
 import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.auth.login.pm.LoginPmVariantA
-import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
 import com.elta.android.presentation.features.devices.all.pm.DevicesPm
 import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePm
 import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePmVariantA
@@ -136,11 +135,6 @@ abstract class PmModule {
     @IntoMap
     @PmKey(LoginPmVariantA::class)
     abstract fun bindLoginPmVariantA(pm: LoginPmVariantA): PresentationModel
-
-    @Binds
-    @IntoMap
-    @PmKey(AuthPasswordCreatePm::class)
-    abstract fun bindAuthPasswordCreatePm(pm: AuthPasswordCreatePm): PresentationModel
 
     @Binds
     @IntoMap

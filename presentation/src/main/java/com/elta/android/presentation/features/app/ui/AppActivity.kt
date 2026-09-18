@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.BuildConfig
@@ -24,7 +23,6 @@ import com.elta.android.presentation.features.sync.control.checkPermissionsVaria
 import com.elta.android.presentation.utils.LocaleHelper
 import com.elta.android.presentation.features.version.optional.ui.OptionalUpdateDialogFragment
 import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkProcessor
-import com.elta.android.presentation.utils.keyboard.KeyboardEventListener
 import com.elta.android.presentation.widgets.TwoStateStatusView
 import com.elta.android.presentation.widgets.status.StatusView
 import com.nullgr.core.ui.fragments.showDialog
@@ -41,6 +39,7 @@ class AppActivity : BaseActivity<AppPm>() {
        // const val OPEN_CONSULTANT_CHAT = "open_consultant_chat"
         private const val TAG = "LangFlow"
         private const val DEBUG_OPEN_HOW_TO_CONNECT = "debug_open_how_to_connect"
+        private const val DEBUG_OPEN_ACTIVATION = "debug_open_activation"
     }
 
     @Inject
@@ -86,7 +85,7 @@ class AppActivity : BaseActivity<AppPm>() {
             !isAppReady
         }
 
-        if (openDebugHowToConnectIfRequested(intent)) return
+        if (openDebugActivationIfRequested(intent) || openDebugHowToConnectIfRequested(intent)) return
 
         val shouldOpenGreetingAfterLanguageSelection =
             LocaleHelper.consumePendingGreetingAfterLanguageSelection(this)
@@ -152,9 +151,6 @@ class AppActivity : BaseActivity<AppPm>() {
             "AppActivity.onResume(localeDefault=${Locale.getDefault().language}, appLanguage=${LocaleHelper.getLanguage(this)})"
         )
         syncOneSignalPermissionOnce()
-        KeyboardEventListener(this) { isKeyboardOpen ->
-            connectionStatusView.isVisible = !isKeyboardOpen
-        }
     }
 
     private fun syncOneSignalPermissionOnce() {
@@ -199,7 +195,7 @@ class AppActivity : BaseActivity<AppPm>() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (openDebugHowToConnectIfRequested(intent)) return
+        if (openDebugActivationIfRequested(intent) || openDebugHowToConnectIfRequested(intent)) return
 
         DynamicLinkProcessor.from(intent)
             .deepLinkStartPassTo(presentationModel.deepLinkAction)
@@ -208,6 +204,15 @@ class AppActivity : BaseActivity<AppPm>() {
             .notificationStartPassTo(presentationModel.notificationStartAction)
             .build()
             .process()
+    }
+
+    private fun openDebugActivationIfRequested(intent: Intent?): Boolean {
+        if (!BuildConfig.DEBUG) return false
+        if (intent?.getBooleanExtra(DEBUG_OPEN_ACTIVATION, false) != true) return false
+
+        router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile)
+        isAppReady = true
+        return true
     }
 
     private fun openDebugHowToConnectIfRequested(intent: Intent?): Boolean {

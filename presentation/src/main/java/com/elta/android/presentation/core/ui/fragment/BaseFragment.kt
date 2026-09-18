@@ -75,6 +75,12 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
      */
     protected open val applyBottomSystemInsets: Boolean = true
 
+    /**
+     * XML screens which manage system-bar padding themselves must not receive the platform
+     * fitsSystemWindows inset a second time.
+     */
+    protected open val applyPlatformSystemWindowFitting: Boolean = true
+
     protected open val backgroundColor: Int? = R.color.color_window_background
 
     open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
@@ -163,7 +169,9 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
     protected fun StatusBarConfigProvider?.applyStatusBarConfig() {
         this?.let {
-            view?.applyInsetsToContentView(!it.drawUnderStatusBar)
+            view?.applyInsetsToContentView(
+                applyPlatformSystemWindowFitting && !it.drawUnderStatusBar
+            )
             activity?.window?.setStatusBarColor(it.statusBarColor, it.lightStatusBar)
         }
     }

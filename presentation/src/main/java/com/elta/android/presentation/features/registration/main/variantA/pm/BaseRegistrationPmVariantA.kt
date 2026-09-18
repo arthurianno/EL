@@ -17,7 +17,7 @@ abstract class BaseRegistrationPmVariantA(services: ServiceFacade) : BaseAuthPmV
     val openPrivacyPolicyCommand = command<Unit>()
     val openPersonalDataCommand = command<Unit>()
 
-    protected val privacyPolicyAcceptedState = state<Boolean>()
+    val privacyPolicyAcceptedState = state(false)
 
     override fun onCreate() {
         super.onCreate()

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
@@ -49,6 +50,7 @@ class ConnectTypeFragment : BaseComposeFragment<ConnectTypeViewModel>() {
                     .fillMaxSize()
                     .background(color = colors.white)
                     .statusBarsPadding()
+                    .navigationBarsPadding()
             ) {
                 TopAppBar(viewModel)
                 MainImage(imageId = R.drawable.ic_connect_dev)

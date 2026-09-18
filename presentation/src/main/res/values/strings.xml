@@ -34,9 +34,9 @@
 
     <string name="error_something_went_wrong">Что-по пошло не так, попробуйте позже</string>
 
-    <string name="greeting_registration">Зарегистрироваться</string>
-    <string name="greeting_title">Добро пожаловать</string>
-    <string name="greeting_message">Управляйте диабетом вместе с глюкометром Сателлит Online</string>
+    <string name="greeting_registration">Регистрация</string>
+    <string name="greeting_title">Добро\nпожаловать!</string>
+    <string name="greeting_message">Управляй диабетом вместе\nС устройствами Сателлит</string>
     <string name="greeting_menu_action">У вас уже есть аккаунт?</string>
 
     <!--REGISTRATION FLOW -->
@@ -52,8 +52,9 @@
     <string name="registration_privacy_policy">https://stage2.vdiabete.com/privacy_policy.html</string>
     <string name="registration_personal_data">https://stage2.vdiabete.com/personal_data.html</string>
     <string name="registration_privacy_policy_toolbar_title">Privacy policy terms of use</string>
-    <string name="registration_activate_title">Активируйте ваш профиль</string>
-    <string name="registration_activate_description">Пройдите по ссылке, чтобы подтвердить\nрегистрацию вашего аккаунта. Если вы\nне получили данное письмо, проверьте\nпапки «Спам»</string>
+    <string name="registration_activate_title">Активируйте\nпрофиль</string>
+    <string name="registration_activate_description">Письмо отправлено на указанный адрес электронной почты. Откройте его и перейдите по ссылке для активации.\n\nЕсли вы не получили данное письмо, проверьте папки «Спам»</string>
+    <string name="registration_activation_check">Активировал</string>
     <string name="registration_send_again">Отправить письмо повторно</string>
     <string name="registration_error_input_email">Введите, пожалуйста, корректный email</string>
     <string name="registration_error_email_already_registered">Внимание! Указанный email уже существует.</string>
@@ -94,6 +95,9 @@
     <string name="auth_password_create_error_input_password">Некорректный пароль</string>
     <string name="auth_password_create_password_pattern">Не менее 8 символов (A–Z, a–z, 0–9)</string>
     <string name="auth_password_create_message_changed_success">Пароль успешно изменен</string>
+    <string name="auth_password_create_invalid_link">В ссылке отсутствует код восстановления. Откройте ссылку из письма или запросите новую.</string>
+    <string name="auth_show_password">Показать пароль</string>
+    <string name="auth_hide_password">Скрыть пароль</string>
 
     <!-- ON BOARDING FLOW -->
     <string name="on_boarding_toolbar_menu_button">Пропустить этот шаг</string>

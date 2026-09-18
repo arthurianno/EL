@@ -45,7 +45,8 @@ internal fun AuthEmailField(
     error: String?,
     enabled: Boolean,
     onSubmit: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    imeAction: ImeAction = ImeAction.Done
 ) {
     val colors = LocalColors.current
     val types = LocalTypes.current
@@ -75,10 +76,11 @@ internal fun AuthEmailField(
             cursorBrush = SolidColor(colors.gGreenB),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Done
+                imeAction = imeAction
             ),
             keyboardActions = KeyboardActions(
-                onDone = { onSubmit() }
+                onDone = { onSubmit() },
+                onNext = { onSubmit() }
             ),
             modifier = Modifier
                 .fillMaxWidth()
