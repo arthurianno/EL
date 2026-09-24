@@ -5,6 +5,8 @@ import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 
 /** Immutable input for the dashboard UI. */
 data class GlucoseDashboardUiState(
+    val device: DashboardDevice? = null,
+    val sensor: DashboardSensor? = null,
     val glucoseValue: String = "—",
     val deltaText: String = "—",
     val glucoseTrend: GlucoseTrend? = null,
@@ -35,14 +37,38 @@ data class DetailedChartData(
 data class DashboardSyncUiState(
     val displayedTime: String,
     val statusMessage: String? = null,
-    val isSyncing: Boolean = false
+    val isSyncing: Boolean = false,
+    val isError: Boolean = false,
+    val retryTarget: DashboardSyncTarget = DashboardSyncTarget.METER
 )
 
 sealed class GlucoseDashboardAction {
     data object RequestSync : GlucoseDashboardAction()
+    data object ConnectDevice : GlucoseDashboardAction()
+    data object DismissSyncMessage : GlucoseDashboardAction()
+    data class RetrySync(val target: DashboardSyncTarget) : GlucoseDashboardAction()
+    data class OpenDevice(val device: DashboardDevice) : GlucoseDashboardAction()
     data class SelectCategory(val category: String) : GlucoseDashboardAction()
     data class RequestDetailedRange(
         val start: org.threeten.bp.LocalDate,
         val end: org.threeten.bp.LocalDate
     ) : GlucoseDashboardAction()
 }
+
+/** The primary paired meter; Bluetooth availability is checked when synchronization starts. */
+data class DashboardDevice(
+    val address: String,
+    val name: String,
+    val serialNumber: String?,
+    val lastSyncAtMillis: Long?
+)
+
+data class DashboardSensor(
+    val id: String,
+    val remainingPercent: Int,
+    val remainingDays: Int,
+    val isActive: Boolean,
+    val lastSyncAtMillis: Long? = null
+)
+
+enum class DashboardSyncTarget { METER, SERVER }

@@ -52,9 +52,9 @@ object GlucoseDashboardTheme {
     }
 
     fun getSelectedTabTextColor(state: GlucoseState): Color = when (state) {
-        GlucoseState.NORMAL -> Color(0xFF3FDC96)
+        GlucoseState.NORMAL -> Color(0xFF00837D)
         GlucoseState.LOW -> Color(0xFFD2381A)
-        GlucoseState.HIGH -> Color(0xFFF8B610)
+        GlucoseState.HIGH -> Color(0xFFB36100)
     }
 
     val MaxBadgeColor = Color(0xFFEE9C17)

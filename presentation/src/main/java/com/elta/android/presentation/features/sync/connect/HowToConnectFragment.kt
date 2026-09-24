@@ -299,7 +299,7 @@ private fun PreviewHowToConnectScreen() {
 }
 
 @Composable
-private fun HowToConnectPreviewContent() {
+internal fun HowToConnectPreviewContent() {
     val topBarModel = remember {
         BaseAppTopBarWidgetModel().apply {
             setStartIconAction(AppAction.BackPressure)

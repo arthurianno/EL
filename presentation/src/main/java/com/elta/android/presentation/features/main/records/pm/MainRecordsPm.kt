@@ -1,8 +1,11 @@
 package com.elta.android.presentation.features.main.records.pm
 
 import android.content.Context
-import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
+import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
+import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.diary.events.interactor.GetEventsByPeriodUseCase
+import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
@@ -21,16 +24,19 @@ import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.features.main.records.mapper.MainRecordsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
+import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
+import com.elta.android.presentation.features.main.records.ui.compose.DashboardDevice
 import com.nullgr.core.adapter.items.ListItem
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
+import javax.inject.Inject
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
-import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
     private val getHomeModelUseCase: GetHomeModelUseCase,
+    private val getGlucometers: GetGlucometersUseCase,
     private val getEventsByPeriodUseCase: GetEventsByPeriodUseCase,
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val recordsMapper: MainRecordsMapper,
@@ -78,7 +84,8 @@ class MainRecordsPm @Inject constructor(
                 getHomeModelUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnNext(::handleSuccess)
+                    .flatMapSingle { model -> getGlucometers.execute().map { model to it } }
+                    .doOnNext { (model, devices) -> handleSuccess(model, devices) }
                     .doOnError(::handleError)
             }
             .retry()
@@ -86,12 +93,27 @@ class MainRecordsPm @Inject constructor(
             .untilDestroy()
 
         Observable.merge(
-            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
-            bus.events<Events.ProfileUpdated>().map { Unit },
-            bus.events<Events.EventsChanged>().map { Unit },
-            bus.events<DateChangedEvent>().map { Unit }
+            listOf(
+                lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
+                bus.events<Events.ProfileUpdated>().map { Unit },
+                bus.events<Events.EventsChanged>().map { Unit },
+                bus.events<DateChangedEvent>().map { Unit },
+                bus.events<Events.DeviceChanged>().map { Unit },
+                bus.events<Events.Sync.Glucometer>().filter {
+                    it is Events.Sync.Glucometer.Success ||
+                        it is Events.Sync.Glucometer.NoNewEvents ||
+                        it is Events.Sync.Glucometer.InvalidTime
+                }.map { Unit }
+            )
         )
             .subscribe(loadScreenAction.consumer)
+            .untilDestroy()
+
+        bus.events<Events.DashboardConnectDeviceRequested>()
+            .subscribe { router.startFlow(Screens.ConnectTypeScreen(isOnBoarding = false)) }
+            .untilDestroy()
+        bus.events<Events.DashboardDeviceInfoRequested>()
+            .subscribe { router.navigateTo(Screens.DeviceInfo(it.name, it.address)) }
             .untilDestroy()
 
         bus.events<Events.DetailedChartRangeRequested>()
@@ -158,10 +180,25 @@ class MainRecordsPm @Inject constructor(
         router.startFlow(Screens.EditEventScreen(record.id as String, record.eventType))
     }
 
-    private fun handleSuccess(model: HomeModel) {
+    private fun handleSuccess(
+        model: HomeModel,
+        devices: List<Pair<Glucometer, GlucometerInfo>>
+    ) {
+        val device = devices.firstOrNull { it.first.isPrimary }?.let { (meter, info) ->
+            DashboardDevice(
+                address = meter.address,
+                name = meter.name.orEmpty(),
+                serialNumber = info.glucometerSerialNumber,
+                lastSyncAtMillis = info.syncDate?.toInstant()?.toEpochMilli()
+            )
+        }
         bus.event(Events.HomeModelChanged(model))
         model.launchState()
-        listItems.consumer.accept(recordsMapper.mapFromObject(model))
+        listItems.consumer.accept(recordsMapper.mapFromObject(model).map { item ->
+            if (item is RecordsHeaderItem) {
+                item.copy(device = device)
+            } else item
+        })
     }
 
     private fun HomeModel.launchState() {

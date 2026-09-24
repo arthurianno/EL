@@ -1097,4 +1097,53 @@
     <string name="splash_loading_message">Не беспокойтесь, установка компонентов происходит только при обновлении!</string>
     <string name="splash_loading_progress">Загрузка компонентов: %1$d/%2$d</string>
 
+    <string name="dashboard_connect_device">Подключить глюкометр/датчик</string>
+    <string name="dashboard_connect_choose">Что хотите подключить?</string>
+    <string name="dashboard_sync_choose">Что хотите синхронизировать?</string>
+    <string name="dashboard_meter">Глюкометр</string>
+    <string name="dashboard_sensor">Датчик</string>
+    <string name="dashboard_sync_source">%1$s (%2$s)</string>
+    <string name="dashboard_sync">Синхронизация</string>
+    <string name="dashboard_close">Закрыть</string>
+    <string name="dashboard_retry">Повторить</string>
+    <string name="dashboard_device_details">Подробнее об устройстве</string>
+    <string name="dashboard_serial_number">Серийный номер: %1$s</string>
+    <string name="dashboard_sensor_inactive">Датчик не активен!</string>
+    <string name="dashboard_sensor_replace">Добавьте новый или закройте</string>
+    <string name="dashboard_sensor_resource">Ресурс датчика: %1$d%%</string>
+    <string name="dashboard_sensor_percent">Датчик · %1$d%%</string>
+    <string name="dashboard_sensor_days">Осталось дней: %1$d</string>
+    <string name="dashboard_sensor_unavailable">Подключение датчика пока недоступно</string>
+    <string name="dashboard_sync_never">Ещё не синхронизирован</string>
+    <string name="dashboard_sync_now">Только что</string>
+    <string name="dashboard_sync_minutes">%1$d мин назад</string>
+    <string name="dashboard_sync_hours">%1$d ч назад</string>
+    <string name="dashboard_sync_days">%1$d дн назад</string>
+    <plurals name="dashboard_sensor_remaining_days">
+        <item quantity="one">Осталось примерно %1$d день</item>
+        <item quantity="few">Осталось примерно %1$d дня</item>
+        <item quantity="many">Осталось примерно %1$d дней</item>
+        <item quantity="other">Осталось примерно %1$d дней</item>
+    </plurals>
+    <plurals name="dashboard_elapsed_minutes">
+        <item quantity="one">%1$d минуту назад</item>
+        <item quantity="few">%1$d минуты назад</item>
+        <item quantity="many">%1$d минут назад</item>
+        <item quantity="other">%1$d минут назад</item>
+    </plurals>
+    <plurals name="dashboard_elapsed_hours">
+        <item quantity="one">%1$d час назад</item>
+        <item quantity="few">%1$d часа назад</item>
+        <item quantity="many">%1$d часов назад</item>
+        <item quantity="other">%1$d часов назад</item>
+    </plurals>
+    <plurals name="dashboard_elapsed_days">
+        <item quantity="one">%1$d день назад</item>
+        <item quantity="few">%1$d дня назад</item>
+        <item quantity="many">%1$d дней назад</item>
+        <item quantity="other">%1$d дней назад</item>
+    </plurals>
+    <string name="dashboard_sync_error_short">Ошибка синхронизации</string>
+    <string name="dashboard_sync_retry_hint">Нажмите, чтобы повторить</string>
+    <string name="dashboard_sync_in_progress">Получаем данные устройства…</string>
 </resources>

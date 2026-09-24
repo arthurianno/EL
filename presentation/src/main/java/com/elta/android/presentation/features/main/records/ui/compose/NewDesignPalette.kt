@@ -26,12 +26,12 @@ object NewDesignPaletteController {
     val colors: NewDesignPaletteColors
         get() = when (activePalette) {
             NewDesignPalette.A -> NewDesignPaletteColors(
-                lowStart = Color(0xFFFFA669),
-                lowEnd = Color(0xFFF2557A),
-                normalStart = Color(0xFFCEEA96),
-                normalEnd = Color(0xFF1FBFD2),
-                highStart = Color(0xFFFFE471),
-                highEnd = Color(0xFFFFA669),
+                lowStart = Color(0xFFE64B35),
+                lowEnd = Color(0xFFD43B29),
+                normalStart = Color(0xFF29B7A2),
+                normalEnd = Color(0xFF26AD9C),
+                highStart = Color(0xFFF39A22),
+                highEnd = Color(0xFFE78017),
                 normalBadge = Color(0xFF77D5B4),
                 highBadge = Color(0xFFFFC56D),
                 lowBadge = Color(0xFFF97E71)

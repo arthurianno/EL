@@ -472,6 +472,7 @@ class AppPm @Inject constructor(
         bus.events<Events.Sync>()
             // Keep an immediately readable value for screens that open after this event.
             .doOnNext(BackendSyncStatusStore::handle)
+            .filter { it !is Events.Sync.Server }
             .concatMap { event ->
                 val delay = when {
                     !syncStatusState.hasValue() -> EMPTY_STATUS_DELAY_MILLIS // first start add delay to make smoooth

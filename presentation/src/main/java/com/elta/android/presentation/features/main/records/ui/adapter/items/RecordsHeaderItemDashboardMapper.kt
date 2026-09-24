@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.items
 
-import android.content.Context
 import com.elta.android.domain.features.diary.events.model.glucoseValue
 import com.elta.android.presentation.features.main.records.mapper.DetailedChartItemsBuilder
 import com.elta.android.presentation.features.main.records.ui.compose.DetailedChartData
@@ -9,23 +8,23 @@ import com.elta.android.presentation.features.main.records.ui.compose.GlucoseSta
 import com.elta.android.presentation.features.main.records.ui.compose.GlucoseTrend
 import com.elta.android.presentation.features.main.records.ui.compose.GlucoseTrendDirection
 import com.elta.android.presentation.features.main.records.ui.compose.GlucosePoint
-import com.elta.android.presentation.utils.SyncAttemptTimeStore
 import java.util.Locale
 import kotlin.math.abs
 
 /** Maps the legacy adapter item to a Compose-specific, immutable UI model. */
-internal fun RecordsHeaderItem.toGlucoseDashboardUiState(context: Context): GlucoseDashboardUiState {
+internal fun RecordsHeaderItem.toGlucoseDashboardUiState(): GlucoseDashboardUiState {
     val glucoseValue = glucoseLevel?.format()?.takeIf { it.isNotBlank() } ?: "—"
     val numericValue = glucoseValue.replace(',', '.').toFloatOrNull()
     val model = dailyGlucoseModel
     val detailedPoints = model?.let { DetailedChartItemsBuilder.buildPoints(it, allEvents) }.orEmpty()
 
     return GlucoseDashboardUiState(
+        device = device,
         glucoseValue = glucoseValue,
         deltaText = glucoseLevelIndex?.format()?.takeIf { it.isNotBlank() } ?: "—",
         glucoseTrend = calculateGlucoseTrend(),
         tirPercentage = calculateTimeInRange(),
-        syncTimeText = SyncAttemptTimeStore.getLastAttemptText(context),
+        syncTimeText = "",
         breadUnitsText = breadLevel?.let { "$it ХЕ" } ?: "0,0 ХЕ",
         insulinText = insulinLevel?.let { "$it Ед." } ?: "0,0 Ед.",
         glucoseState = resolveGlucoseState(numericValue),

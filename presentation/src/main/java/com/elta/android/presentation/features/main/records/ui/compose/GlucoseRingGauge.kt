@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -107,6 +108,7 @@ fun GlucoseRingGauge(
     ringTopOffset: Dp,
     lowerControlsExtraOffset: Dp = 0.dp,
     onSyncClick: () -> Unit = {},
+    showSyncControl: Boolean = true,
     onStatePillLongClick: (() -> Unit)? = null
 ) {
     val mainColor = GlucoseDashboardTheme.getMainTextColor(state)
@@ -164,7 +166,7 @@ fun GlucoseRingGauge(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(gaugeBoxHeight)
+                    .height(if (showSyncControl) gaugeBoxHeight else syncRowTop)
             ) {
                 Canvas(modifier = Modifier.matchParentSize()) {
                     val centerX = size.width / 2f
@@ -358,7 +360,7 @@ fun GlucoseRingGauge(
                     )
                 }
 
-                SyncDeviceButton(
+                if (showSyncControl) SyncDeviceButton(
                     actionText = syncActionText,
                     syncTimeText = syncTimeText,
                     isSyncing = isSyncing,
@@ -390,7 +392,8 @@ fun NoMeasurementsGlucoseGauge(
     isSyncing: Boolean,
     statusText: String,
     isStatusVisible: Boolean,
-    onSyncClick: () -> Unit
+    onSyncClick: () -> Unit,
+    showSyncControl: Boolean = true
 ) {
     val layoutMetrics = emptyGaugeLayoutMetrics(ringSize)
     val emptyRingSize = layoutMetrics.ringSize
@@ -416,12 +419,13 @@ fun NoMeasurementsGlucoseGauge(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(availableHeight)
+            .heightIn(min = if (showSyncControl) availableHeight else
+                (availableHeight - layoutMetrics.contentBottomInset).coerceAtLeast(0.dp))
     ) {
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = layoutMetrics.contentBottomInset),
+                .padding(bottom = if (showSyncControl) layoutMetrics.contentBottomInset else 0.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -493,7 +497,7 @@ fun NoMeasurementsGlucoseGauge(
             )
         }
 
-        SyncDeviceButton(
+        if (showSyncControl) SyncDeviceButton(
             actionText = actionText,
             syncTimeText = null,
             isSyncing = isSyncing,

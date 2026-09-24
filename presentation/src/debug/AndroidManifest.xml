@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name="com.elta.android.presentation.features.main.records.ui.compose.DashboardPreviewActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:label="Dashboard preview" />
+    </application>
+</manifest>

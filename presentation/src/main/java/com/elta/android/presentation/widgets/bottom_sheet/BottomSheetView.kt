@@ -9,6 +9,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnAttach
+import androidx.core.view.updatePadding
 import com.elta.android.presentation.R
 import com.elta.android.presentation.databinding.LayoutBottomSheetViewBinding
 import com.elta.android.presentation.widgets.animation.AnimatorEvent
@@ -65,6 +69,22 @@ class BottomSheetView @JvmOverloads constructor(
         val sheetView = inflater.inflate(bottomSheetLayout, binding.bottomSheetContainer, false)
 
         binding.bottomSheetContainer.addView(sheetView)
+        val initialBottomPadding = sheetView.paddingBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(sheetView) { view, insets ->
+            val navigationBars = insets.getInsets(
+                WindowInsetsCompat.Type.navigationBars()
+            )
+
+            view.updatePadding(
+                bottom = initialBottomPadding + navigationBars.bottom
+            )
+            insets
+        }
+
+        sheetView.doOnAttach {
+            ViewCompat.requestApplyInsets(it)
+        }
 
         behavior = BottomSheetBehavior.from(binding.bottomSheetContainer)
         behavior.peekHeight = 0

@@ -4,6 +4,10 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.ui.Modifier
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -45,7 +49,9 @@ abstract class BaseComposeFragment<VM : BaseViewModel<*>> :
             .setContent {
                 EltaTheme {
                     Dialogs(viewModel = viewModel)
-                    Content(viewModel = viewModel)
+                    Box(Modifier.fillMaxSize().navigationBarsPadding()) {
+                        Content(viewModel = viewModel)
+                    }
                 }
             }
     }

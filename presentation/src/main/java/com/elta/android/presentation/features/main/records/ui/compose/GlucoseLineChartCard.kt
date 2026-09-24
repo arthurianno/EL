@@ -12,6 +12,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -56,6 +61,7 @@ data class GlucosePoint(
 
 private const val CHART_MAX_GLUCOSE_VALUE = 40f
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun GlucoseLineChartCard(
     isDarkTheme: Boolean = false,
@@ -68,6 +74,8 @@ fun GlucoseLineChartCard(
     emptyStateText: String = "Нет измерений за выбранный период",
     showDetailHint: Boolean = false
 ) {
+    val fontScale = LocalDensity.current.fontScale
+    val largeText = fontScale > 1.3f
     var activePeriod by remember { mutableStateOf(selectedPeriod) }
     val periods = listOf("3 ч", "6 ч", "12 ч", "24 ч")
 
@@ -84,7 +92,8 @@ fun GlucoseLineChartCard(
         filterPointsAndLabelsForPeriod(points, activePeriod)
     }
     val displayPoints = filteredPoints
-    val displayTimeLabels = filteredTimeLabels
+    val displayTimeLabels = if (largeText && filteredTimeLabels.size > 2)
+        listOf(filteredTimeLabels.first(), filteredTimeLabels.last()) else filteredTimeLabels
 
     val maxPointVal = displayPoints.maxOfOrNull { it.value } ?: 0f
     val maxVal = if (maxPointVal > 16f) 20f else 16f
@@ -99,7 +108,7 @@ fun GlucoseLineChartCard(
                     end = ChartCardHorizontalInset * designScale
                 )
                 .fillMaxWidth()
-                .height(cardHeight)
+                .height(if (largeText) (cardHeight * fontScale).coerceAtLeast(380.dp) else cardHeight)
                 .clip(RoundedCornerShape(13.dp * designScale))
                 .border(
                     width = 1.dp,
@@ -115,13 +124,13 @@ fun GlucoseLineChartCard(
                 )
         ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // Header Row: Date Dropdown & Time Filter Chips
-            Row(
+            // Wrap the period selector under the date when either text or screen width needs it.
+            FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 6.dp * designScale),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 // Date Picker Dropdown Button
                 Row(
@@ -149,7 +158,8 @@ fun GlucoseLineChartCard(
                 // Time Filter Segmented Switcher (149x24 dp in Figma reference)
                 Row(
                     modifier = Modifier
-                        .height(24.dp * designScale)
+                        .heightIn(min = 24.dp * designScale)
+                        .horizontalScroll(rememberScrollState())
                         .clip(RoundedCornerShape(7.dp * designScale))
                         .border(
                             width = 0.5.dp,
@@ -163,7 +173,7 @@ fun GlucoseLineChartCard(
                         val isSelected = period == activePeriod || period.replace(" ", "") == activePeriod.replace(" ", "")
                         Box(
                             modifier = Modifier
-                                .height(20.dp * designScale)
+                                .heightIn(min = 20.dp * designScale)
                                 .clip(RoundedCornerShape(7.dp * designScale))
                                 .background(
                                     if (isSelected) {
@@ -201,7 +211,7 @@ fun GlucoseLineChartCard(
                 // Y-Axis Scale Labels
                 Column(
                     modifier = Modifier
-                        .width(16.dp * designScale)
+                        .width((if (largeText) 24.dp else 16.dp) * designScale * fontScale)
                         .fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.End
@@ -210,6 +220,9 @@ fun GlucoseLineChartCard(
                         Text(
                             text = yVal,
                             fontSize = 12.sp,
+                            lineHeight = 16.sp,
+                            maxLines = 1,
+                            softWrap = false,
                             color = axisLabelColor,
                             fontWeight = FontWeight.Medium
                         )
@@ -377,7 +390,7 @@ fun GlucoseLineChartCard(
                     }
 
                     // Dynamic Max Peak Badge
-                    if (hasDistinctExtremes) maxPt?.let { maxItem ->
+                    if (hasDistinctExtremes && !largeText) maxPt?.let { maxItem ->
                         PeakBadge(
                             text = "max ${String.format(Locale.US, "%.1f", maxItem.value).replace('.', ',')}",
                             bgColor = GlucoseDashboardTheme.MaxBadgeColor,
@@ -389,7 +402,7 @@ fun GlucoseLineChartCard(
                     }
 
                     // Dynamic Min Peak Badge
-                    if (hasDistinctExtremes) minPt?.let { minItem ->
+                    if (hasDistinctExtremes && !largeText) minPt?.let { minItem ->
                         if (minPt != maxPt) {
                             PeakBadge(
                                 text = "min ${String.format(Locale.US, "%.1f", minItem.value).replace('.', ',')}",
@@ -427,12 +440,28 @@ fun GlucoseLineChartCard(
 
         }
 
+        if (largeText && displayPoints.size > 1) {
+            FlowRow(
+                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                displayPoints.minOfOrNull { it.value }?.let {
+                    PeakBadge("min ${String.format(Locale.US, "%.1f", it).replace('.', ',')}", GlucoseDashboardTheme.MinBadgeColor)
+                }
+                displayPoints.maxOfOrNull { it.value }?.let {
+                    PeakBadge("max ${String.format(Locale.US, "%.1f", it).replace('.', ',')}", GlucoseDashboardTheme.MaxBadgeColor)
+                }
+            }
+        }
+
         if (showDetailHint) {
             Spacer(modifier = Modifier.height(ChartDetailHintTopInset * designScale))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(ChartDetailHintHeight * designScale),
+                    .heightIn(min = ChartDetailHintHeight * designScale)
+                    .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {

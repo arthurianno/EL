@@ -23,7 +23,7 @@ class ItemRecordsHeaderViewHolder(
         binding.composeHeaderView.setContent {
             GlucoseDashboardScreen(
                 bus = bus,
-                uiState = item.toGlucoseDashboardUiState(binding.root.context)
+                uiState = item.toGlucoseDashboardUiState()
             )
         }
     }

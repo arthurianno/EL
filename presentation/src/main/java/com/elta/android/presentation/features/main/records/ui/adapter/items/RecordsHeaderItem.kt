@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.items
 
 import android.graphics.drawable.Drawable
+import com.elta.android.presentation.features.main.records.ui.compose.DashboardDevice
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
@@ -9,6 +10,7 @@ import com.nullgr.core.adapter.items.ListItem
 
 data class RecordsHeaderItem(
     val background: Drawable?,
+    val device: DashboardDevice? = null,
     val glucoseLevel: String?,
     val glucoseLevelIndex: String?,
     val glucoseLevelIndexIcon: Int?,
