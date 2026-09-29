@@ -2,24 +2,17 @@ package com.elta.android.presentation.features.sync.connect.viewmodel
 
 import android.os.Bundle
 import android.os.CountDownTimer
-import androidx.compose.ui.unit.DpSize
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytic.core.analytics.Analytics
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
-import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
-import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
-import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
-import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.features.sync.connect.IS_ON_BOARDING_ARGUMENT_NAME
 import com.elta.android.presentation.features.sync.connect.model.ConnectAction
-import com.elta.android.presentation.features.sync.connect.model.ConnectMainEvent
 import com.elta.android.presentation.features.sync.connect.varianta.model.ScannerDmcViewStateVariantA
 import com.elta.android.presentation.features.sync.connect.varianta.model.ScannerStateVariantA
 import kotlinx.coroutines.Job
@@ -31,27 +24,17 @@ private const val CLOSE_TIMER_DELAY_MILLIS = 60000L
 // fixme Variant A : improved_enabling_location
 
 class ScannerDmcViewModelVariantA @Inject constructor(
-    private val analytics: Analytics,
     private val appMetric: AppMetricTracker
 ) : BaseViewModel<ScannerDmcViewStateVariantA>(), LifecycleEventObserver {
     override fun createInitState(): ScannerDmcViewStateVariantA =
         ScannerDmcViewStateVariantA(
             scannerState = ScannerStateVariantA.Info,
-            isOnBoarding = false,
-            cropRect = DpSize.Zero
+            isOnBoarding = false
         )
 
     private var closeTimer: CountDownTimer? = null
 
     private var scannerJob: Job? = null
-
-    internal val connectByPinButton = DownButtonWidgetModel()
-    internal val appTopBar = BaseAppTopBarWidgetModel()
-
-    override val widgets = listOf(
-        connectByPinButton,
-        appTopBar
-    ).actionObserve()
 
     init {
         appMetric.trackEvent(AppMetricEvent.CameraScanningScreen)
@@ -69,7 +52,6 @@ class ScannerDmcViewModelVariantA @Inject constructor(
 
     override fun handleUserAction(action: Action) {
         when (action) {
-            is ConnectAction.ConnectByPin -> connectByPin()
             is AppAction.BackPressure -> backClick()
             is ConnectAction.StartConnecting -> startConnecting(action.pin, action.name)
             is ConnectAction.ScannerError -> setScannerError()
@@ -90,10 +72,6 @@ class ScannerDmcViewModelVariantA @Inject constructor(
     override fun backClick() {
         scannerJob?.cancel()
         super.backClick()
-    }
-
-    fun setCropSize(cropRect: DpSize) {
-        reduceState { state.value.copy(cropRect = cropRect) }
     }
 
     private fun setScannerError() {
@@ -144,19 +122,6 @@ class ScannerDmcViewModelVariantA @Inject constructor(
     }
 
     private fun reloadSheetContent(newContentType: ScannerStateVariantA): ScannerDmcViewStateVariantA = run {
-        sendEvent(ConnectMainEvent.ShowSheet())
         state.value.copy(scannerState = newContentType)
-    }
-
-    private fun connectByPin() {
-        sendEvent(ConnectMainEvent.HideSheet())
-        analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.PIN_CONNECTION))
-        router.navigateTo(
-            if (state.value.isOnBoarding) {
-                Screens.FromOnBoardingConnectDeviceByPinVariantA
-            } else {
-                Screens.FromOtherConnectDeviceByPinVariantA
-            }
-        )
     }
 }

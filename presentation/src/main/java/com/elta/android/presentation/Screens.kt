@@ -335,6 +335,10 @@ object Screens {
         override fun getFragment() = ConnectingFragmentVariantA.newInstance(isOnBoarding, pin, name)
     }
 
+    data class DmcGlucoseFormat(val isOnBoarding: Boolean, val isVariantA: Boolean) : SupportAppScreen() {
+        override fun getFragment() = GlucoseFormatFragment.newDmcInstance(isOnBoarding, isVariantA)
+    }
+
     // DIARY FLOW
     object MainDiaryScreen : SupportAppScreen() {
         override fun getFragment() = MainDiaryFragment.newInstance()

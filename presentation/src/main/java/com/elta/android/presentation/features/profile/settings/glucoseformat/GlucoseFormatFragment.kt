@@ -28,9 +28,25 @@ import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.features.profile.settings.glucoseformat.model.GlucoseFormatAction
 import com.elta.android.presentation.features.profile.settings.glucoseformat.viewmodel.GlucoseFormatViewModel
+import com.elta.android.presentation.features.sync.connect.DmcGlucoseFormatScreen
 import com.elta.android.presentation.theme.GetLocalProperties
+import com.elta.android.presentation.utils.bundle
+
+internal const val DMC_FORMAT_ARGUMENT_NAME = "dmc_format"
+internal const val DMC_FORMAT_ON_BOARDING_ARGUMENT_NAME = "dmc_format_on_boarding"
+internal const val DMC_FORMAT_VARIANT_A_ARGUMENT_NAME = "dmc_format_variant_a"
 
 class GlucoseFormatFragment : BaseComposeFragment<GlucoseFormatViewModel>() {
+    companion object {
+        fun newDmcInstance(isOnBoarding: Boolean, isVariantA: Boolean) = GlucoseFormatFragment().apply {
+            arguments = bundle(
+                DMC_FORMAT_ARGUMENT_NAME to true,
+                DMC_FORMAT_ON_BOARDING_ARGUMENT_NAME to isOnBoarding,
+                DMC_FORMAT_VARIANT_A_ARGUMENT_NAME to isVariantA
+            )
+        }
+    }
+
     override val viewModel: GlucoseFormatViewModel by viewModels { viewModelFactory }
 
     override fun GlucoseFormatViewModel.init() {
@@ -40,6 +56,17 @@ class GlucoseFormatFragment : BaseComposeFragment<GlucoseFormatViewModel>() {
 
     @Composable
     override fun Content(viewModel: GlucoseFormatViewModel) {
+        val state = viewModel.state.collectAsState().value
+        if (state.isFromDmc) {
+            DmcGlucoseFormatScreen(
+                selected = state.profile.glucoseFormat.takeIf { state.selectionMade },
+                canSave = state.selectionMade && state.isProfileLoaded && !state.isSaving,
+                isSaving = state.isSaving,
+                onSelect = { viewModel.sendAction(GlucoseFormatAction.SelectFormat(it)) },
+                onSave = { viewModel.sendAction(GlucoseFormatAction.Save) }
+            )
+            return
+        }
         GetLocalProperties { dimens, _, _, _, _ ->
             Box(
                 modifier = Modifier

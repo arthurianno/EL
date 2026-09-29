@@ -28,7 +28,7 @@ class DashboardPreviewActivity : ComponentActivity() {
                 if (scenario == "connection_help") {
                     com.elta.android.presentation.theme.EltaTheme {
                         Box(Modifier.fillMaxSize().navigationBarsPadding()) {
-                            com.elta.android.presentation.features.sync.connect.HowToConnectPreviewContent()
+                            com.elta.android.presentation.features.sync.connect.DmcConnectionIntroPreviewContent()
                         }
                     }
                     return@setContent

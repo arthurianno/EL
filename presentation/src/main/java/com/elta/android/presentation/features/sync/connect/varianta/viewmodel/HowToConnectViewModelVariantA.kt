@@ -13,8 +13,6 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.PermissionEvent
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
-import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
-import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.features.sync.connect.IS_ON_BOARDING_ARGUMENT_NAME
 import com.elta.android.presentation.features.sync.connect.model.ConnectAction
@@ -36,9 +34,6 @@ class HowToConnectViewModelVariantA @Inject constructor(
             isOnBoarding = false
         )
 
-    val appTopBar = BaseAppTopBarWidgetModel()
-    val downButton = DownButtonWidgetModel()
-
     val cameraPermissionDialog = BaseDialogWidgetModel<Nothing>(
         positiveOnCLick = { sendEvent(PermissionEvent.OpenSettings) }
     )
@@ -50,11 +45,6 @@ class HowToConnectViewModelVariantA @Inject constructor(
     val bluetoothPermissionDialog = BaseDialogWidgetModel<Nothing>(
         positiveOnCLick = { sendEvent(PermissionEvent.OpenSettings) }
     )
-
-    override val widgets = listOf(
-        appTopBar,
-        downButton
-    ).actionObserve()
 
     override fun handleFragmentArguments(arguments: Bundle) {
         reduceState {

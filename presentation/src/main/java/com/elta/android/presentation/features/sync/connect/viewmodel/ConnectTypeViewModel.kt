@@ -14,7 +14,6 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.viewmodel.ComposeScreenConfigurable
-import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.features.sync.connect.IS_ON_BOARDING_ARGUMENT_NAME
 import com.elta.android.presentation.features.sync.connect.model.ConnectAction
 import com.elta.android.presentation.features.sync.connect.model.ConnectTypeViewState
@@ -34,14 +33,9 @@ class ConnectTypeViewModel @Inject constructor(
     override val screenConfigKey = "device-screen"
     override val getScreenConfigUseCase = getScreenCacheConfigUseCase
 
-    val appTopBar = BaseAppTopBarWidgetModel()
-
-    override val widgets = listOf(
-        appTopBar
-    ).actionObserve()
-
     override fun handleFragmentArguments(arguments: Bundle) {
         appMetric.trackEvent(AppMetricEvent.DeviceConnectingScreen)
+        appMetric.trackEvent(AppMetricEvent.ConnectingOptionClick(ConnectingTypeParam.DMC_SCAN))
         reduceState {
             state.value.copy(
                 isOnBoarding = arguments.getBoolean(
@@ -49,19 +43,23 @@ class ConnectTypeViewModel @Inject constructor(
                 )
             )
         }
+        val isOnBoarding = arguments.getBoolean(IS_ON_BOARDING_ARGUMENT_NAME)
+        val screen = if (getFeatureConfigUseCase.invoke().improvedEnablingLocation) {
+            Screens.HowToConnectScreen(isOnBoarding)
+        } else {
+            Screens.HowToConnectScreenVariantA(isOnBoarding)
+        }
+        router.replaceScreen(screen)
     }
 
     override fun handleUserAction(action: Action) {
         when (action) {
             is AppAction.BackPressure -> backClick()
-            is ConnectAction.ConnectByPin -> connectByPin()
             is ConnectAction.ConnectByDmc -> connectByDmc()
-            is ConnectAction.NeedHelp -> router.navigateTo(Screens.ConnectHelpScreen)
         }
     }
 
     private fun connectByDmc() {
-        appMetric.trackEvent(AppMetricEvent.ConnectingOptionClick(ConnectingTypeParam.DMC_SCAN))
         analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.SCAN_DMC))
         // fixme Variant A : improved_enabling_location
         val screen = if (getFeatureConfigUseCase.invoke().improvedEnablingLocation) Screens.HowToConnectScreen(state.value.isOnBoarding)
@@ -69,21 +67,4 @@ class ConnectTypeViewModel @Inject constructor(
         router.navigateTo(screen)
     }
 
-    private fun connectByPin() {
-        appMetric.trackEvent(AppMetricEvent.ConnectingOptionClick(ConnectingTypeParam.PIN_ENTER))
-        analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.PIN_CONNECTION))
-            // fixme variant a improved_enabling_location
-        val (fromOnboardingScreen, fromOtherConnectScreen) = if (getFeatureConfigUseCase.invoke().improvedEnablingLocation) {
-            Screens.FromOnBoardingConnectDeviceByPin to Screens.FromOtherConnectDeviceByPin
-        } else {
-            Screens.FromOnBoardingConnectDeviceByPinVariantA to Screens.FromOtherConnectDeviceByPinVariantA
-        }
-        router.navigateTo(
-            if (state.value.isOnBoarding) {
-                fromOnboardingScreen
-            } else {
-                fromOtherConnectScreen
-            }
-        )
-    }
 }

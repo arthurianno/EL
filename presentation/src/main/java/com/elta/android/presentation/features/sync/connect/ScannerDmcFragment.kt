@@ -6,64 +6,32 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.view.View
-import androidx.annotation.StringRes
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.BottomSheetScaffold
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import com.elta.android.common.constants.GLUCOMETER_MODEL
-import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
-import com.elta.android.presentation.core.compose.widgets.HSpacerMedium
-import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
-import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.features.sync.connect.model.ConnectAction
-import com.elta.android.presentation.features.sync.connect.model.ConnectMainEvent
 import com.elta.android.presentation.features.sync.connect.model.ScannerState
 import com.elta.android.presentation.features.sync.connect.viewmodel.ScannerDmcViewModel
-import com.elta.android.presentation.features.sync.connect.widgets.AppTopBar
-import com.elta.android.presentation.features.sync.connect.widgets.HelpBottomSheet
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.extractPinCode
@@ -82,13 +50,6 @@ private const val NUMBER_SUFFIX = "D"
 private const val NUMBER_SUFFIX_2 = "E"
 private const val NUMBERS_COUNT_FOR_NAME = 4
 
-private enum class CropCornerType(val degrees: Float, val align: Alignment) {
-    TopLeft(degrees = 0f, align = Alignment.TopStart),
-    TopRight(degrees = 90f, align = Alignment.TopEnd),
-    BottomRight(degrees = 180f, align = Alignment.BottomEnd),
-    BottomLeft(degrees = 270f, align = Alignment.BottomStart),
-}
-
 @ExperimentalGetImage
 class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
     companion object {
@@ -104,12 +65,6 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
         .build()
     private var scanner: BarcodeScanner? = null
 
-    override fun ScannerDmcViewModel.init() {
-        connectByPinButton.setText(getString(R.string.sync_connect_by_pin_boton_text))
-        appTopBar.setStartIconAction(AppAction.BackPressure)
-        appTopBar.setEndIconAction(ConnectAction.NeedHelp)
-    }
-    
     private lateinit var cameraExecutor: ExecutorService
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -117,88 +72,23 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content(viewModel: ScannerDmcViewModel) {
-        val event = viewModel.event.collectAsState(initial = null).value
         val state = viewModel.state.collectAsState().value
-        val cropSize = state.cropRect
-        val sheetState =
-            rememberBottomSheetScaffoldState()
-        LaunchedEffect(key1 = event) {
-            if (event is ConnectMainEvent.HideSheet) {
-                sheetState.bottomSheetState.collapse()
-            } else {
-                sheetState.bottomSheetState.expand()
-            }
-        }
         DisposableEffect(Unit) {
-            onDispose {
-                scanner?.close()
-            }
+            onDispose { scanner?.close() }
         }
-        GetLocalProperties { _, _, colors, shapes, _ ->
-            Box(Modifier.fillMaxSize()) {
-                BottomSheetScaffold(
-                    scaffoldState = sheetState,
-                    topBar = {
-                        AppTopBar(
-                            appTopBarModel = viewModel.appTopBar,
-                            backgroundColor = colors.black,
-                            iconColor = colors.white,
-                            textColor = colors.white
-                        )
-                    },
-                    sheetGesturesEnabled = false,
-                    sheetShape = shapes.sheet,
-                    sheetContent = { BottomSheet(viewModel, state.scannerState) },
-                    modifier = Modifier.statusBarsPadding()
-                ) {
-                    CameraPreView(viewModel)
-                }
-                PreviewCropRect(cropSize, state.scannerState)
-            }
-        }
-    }
-
-    @Composable
-    private fun BoxScope.PreviewCropRect(
-        cropSize: DpSize,
-        scannerState: ScannerState
-    ) {
-        GetLocalProperties { _, _, colors, shapes, _ ->
-            val borderColor = if (scannerState == ScannerState.Error) {
-                colors.red
-            } else {
-                colors.shadeGGreenA
-            }
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(cropSize)
-                    .background(color = Color.Transparent)
-                    .clip(shapes.dishCard)
-            ) {
-                BorderCorner(borderColor, CropCornerType.TopLeft)
-                BorderCorner(borderColor, CropCornerType.TopRight)
-                BorderCorner(borderColor, CropCornerType.BottomLeft)
-                BorderCorner(borderColor, CropCornerType.BottomRight)
-            }
-        }
-    }
-
-    @Composable
-    private fun BoxScope.BorderCorner(
-        borderColor: Color,
-        cornerType: CropCornerType
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.img_border_corner),
-            modifier = Modifier.Companion
-                .align(cornerType.align)
-                .rotate(cornerType.degrees),
-            colorFilter = ColorFilter.tint(color = borderColor),
-            contentDescription = null
+        DmcScannerScreen(
+            state = when (state.scannerState) {
+                ScannerState.Info -> DmcScannerUiState.Scanning
+                ScannerState.Error -> DmcScannerUiState.Error
+                ScannerState.AlreadyConnected -> DmcScannerUiState.AlreadyConnected
+                ScannerState.Help -> DmcScannerUiState.Help
+            },
+            onBack = { viewModel sendAction AppAction.BackPressure },
+            onHelp = { viewModel sendAction ConnectAction.NeedHelp },
+            onCloseHelp = { viewModel sendAction ConnectAction.CloseHelp },
+            camera = { CameraPreView(viewModel) }
         )
     }
 
@@ -219,7 +109,6 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                         dimens.scannerPreviewLeftPadding.value.toInt().times(2)
                     ).dp
                 val cropSize = density.run { cropSizeDp.toPx() }.toInt()
-                viewModel.setCropSize(DpSize(width = cropSizeDp, height = cropSizeDp))
                 val cropRect = Rect(left, top, left.plus(cropSize), top.plus(cropSize))
                 val preview = Preview.Builder().build()
                 val cameraSelector = CameraSelector.Builder()
@@ -256,21 +145,26 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
     ) =
         ImageAnalysis.Analyzer { imageProxy ->
             imageProxy.setCropRect(cropRect)
+            val barcodeScanner = scanner
+            if (barcodeScanner == null) {
+                imageProxy.close()
+                return@Analyzer
+            }
             imageProxy.image?.let { image ->
-                scanner?.process(
+                barcodeScanner.process(
                     InputImage.fromMediaImage(
                         image,
                         imageProxy.imageInfo.rotationDegrees
                     )
                 )
-                    ?.addOnSuccessListener { barcodes ->
+                    .addOnSuccessListener { barcodes ->
                         handleBarcodes(barcodes, viewModel)
                     }
-                    ?.addOnFailureListener { exception ->
+                    .addOnFailureListener { exception ->
                         viewModel sendAction ConnectAction.ScannerError
                         Log.e("ScannerDMC Fragment", "Barcode scanning failed", exception)
                     }
-                    ?.addOnCompleteListener {
+                    .addOnCompleteListener {
                         imageProxy.close()
                     }
             } ?: imageProxy.close()
@@ -320,68 +214,6 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                 }, ContextCompat.getMainExecutor(this))
             }
         }
-
-    @Composable
-    private fun BottomSheet(viewModel: ScannerDmcViewModel, sheetType: ScannerState) {
-        when (sheetType) {
-            ScannerState.Info -> InfoSheet()
-            ScannerState.Error -> ErrorSheet(
-                title = R.string.sync_connection_scanner_sheet_error_title,
-                description = R.string.sync_connection_scanner_sheet_error_text
-            )
-
-            ScannerState.AlreadyConnected -> ErrorSheet(
-                title = R.string.sync_connection_scanner_sheet_already_connected_title,
-                description = R.string.sync_connection_scanner_sheet_already_connected_text
-            )
-
-            ScannerState.Help -> HelpBottomSheet(
-                downButtonModel = viewModel.connectByPinButton,
-                closeOnClick = {
-                    viewModel sendAction ConnectAction.CloseHelp
-                }
-            )
-        }
-    }
-
-    @Composable
-    private fun InfoSheet() {
-        GetLocalProperties { dimens, _, _, _, _ ->
-            Row(
-                modifier = Modifier.padding(dimens.scannerInfoSheetPadding),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_qr_code),
-                    contentDescription = null
-                )
-                HSpacerMedium()
-                Text(text = stringResource(id = R.string.sync_connection_scanner_sheet_info_text))
-            }
-        }
-    }
-
-    @Composable
-    private fun ErrorSheet(@StringRes title: Int, @StringRes description: Int) {
-        GetLocalProperties { dimens, _, colors, _, types ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(dimens.contentPadding),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(id = title),
-                    style = types.h3
-                )
-                VSpacerVerySmall()
-                Text(
-                    text = stringResource(id = description),
-                    color = colors.shadeBlack0
-                )
-            }
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

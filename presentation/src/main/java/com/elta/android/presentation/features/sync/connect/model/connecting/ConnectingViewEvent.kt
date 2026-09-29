@@ -9,7 +9,5 @@ sealed interface ConnectingViewEvent : Event {
     }
 
     data object EnableBluetooth : ConnectingViewEvent
-    data object ShowSheet : ConnectingViewEvent
-    data object HideSheet : ConnectingViewEvent
     data object OpenSettings : ConnectingViewEvent
 }

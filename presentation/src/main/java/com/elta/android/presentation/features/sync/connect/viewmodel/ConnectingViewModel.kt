@@ -20,10 +20,7 @@ import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytic.core.analytics.Analytics
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
-import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
-import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.analytic.model.appmetric.params.SynchronizedStatusParam
 import com.elta.android.presentation.core.bus.event
@@ -31,8 +28,6 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.viewmodel.ComposeScreenConfigurable
-import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
-import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.features.sync.connect.GLUCOMETER_NAME_ARGUMENT_NAME
 import com.elta.android.presentation.features.sync.connect.IS_ON_BOARDING_ARGUMENT_NAME
@@ -68,7 +63,6 @@ class ConnectingViewModel @Inject constructor(
     private val getLocationNeededUseCase: GetLocationNeededUseCase,
     private val updateUserInfo: UpdateUserInfoUseCase,
     private val bus: RxBus,
-    private val analytics: Analytics,
     private val appMetric: AppMetricTracker,
     private val getScreenFromCacheUseCase: GetScreenConfigFromCache,
     private val context: Context
@@ -86,13 +80,6 @@ class ConnectingViewModel @Inject constructor(
             glucometerName = "",
             connectDevice = null
         )
-
-    internal val appTopBar: BaseAppTopBarWidgetModel = BaseAppTopBarWidgetModel()
-    val connectByPinButton: DownButtonWidgetModel = DownButtonWidgetModel()
-    val connectRepeatButton: DownButtonWidgetModel = DownButtonWidgetModel()
-    val syncRepeatButton: DownButtonWidgetModel = DownButtonWidgetModel()
-    val searchRepeatButton: DownButtonWidgetModel = DownButtonWidgetModel()
-    val completeButton: DownButtonWidgetModel = DownButtonWidgetModel()
 
     val exitDialogFromConnecting = BaseDialogWidgetModel<Nothing>(
         positiveOnCLick = { exitFromScreen() }
@@ -116,15 +103,7 @@ class ConnectingViewModel @Inject constructor(
     private var attempts: Int = 0
     private var needEnableLocation: Boolean = false
     private var deviceConnected: Boolean = false
-
-    override val widgets = listOf(
-        appTopBar,
-        connectByPinButton,
-        connectRepeatButton,
-        syncRepeatButton,
-        searchRepeatButton,
-        completeButton
-    ).actionObserve()
+    private var isCompleting: Boolean = false
 
     init {
         launch {
@@ -189,9 +168,6 @@ class ConnectingViewModel @Inject constructor(
     override fun handleUserAction(action: Action) {
         when (action) {
             is AppAction.BackPressure -> backClick()
-            is ConnectingViewAction.OpenHelp -> sendEvent(ConnectingViewEvent.ShowSheet)
-            is ConnectingViewAction.CloseHelp -> sendEvent(ConnectingViewEvent.HideSheet)
-            is ConnectingViewAction.OnConnectClick -> connectByPin()
             is ConnectingViewAction.ClickRepeatSyncButton -> repeatSyncDevice()
             is ConnectingViewAction.ClickCompleteButton -> completeConnect()
             is ConnectingViewAction.Location.AllowPermission -> sendEvent(ConnectingViewEvent.Location.Enable)
@@ -221,6 +197,8 @@ class ConnectingViewModel @Inject constructor(
     }
 
     private fun completeConnect() {
+        if (isCompleting) return
+        isCompleting = true
         launch {
             try {
                 updateUserInfo.execute(UpdateUserInfoUseCase.Params(UserInfo(isFirstSync = true)))
@@ -228,10 +206,10 @@ class ConnectingViewModel @Inject constructor(
 
                 bus.event(Events.DeviceChanged)
                 bus.event(Events.EventsChanged(true))
-                if (state.value.isOnBoarding) router.newRootScreen(Screens.HomeFlow)
-                else router.backTo(Screens.Devices)
+                router.replaceScreen(Screens.DmcGlucoseFormat(state.value.isOnBoarding, isVariantA = false))
 
             } catch (e: Exception) {
+                isCompleting = false
                 handleError(e)
             }
         }
@@ -252,7 +230,7 @@ class ConnectingViewModel @Inject constructor(
         when (state.value.stageType) {
             ConnectingStageType.Connecting -> exitDialogFromConnecting.dialogOpen()
             ConnectingStageType.Sync -> exitDialogFromSync.dialogOpen()
-            ConnectingStageType.Complete -> router.newRootScreen(Screens.HomeFlow)
+            ConnectingStageType.Complete -> completeConnect()
             else -> super.backClick()
         }
     }
@@ -314,18 +292,6 @@ class ConnectingViewModel @Inject constructor(
     private fun repeatConnectDevice() {
         reduceState { state.value.copy(stageType = ConnectingStageType.Connecting) }
         connectDevice()
-    }
-
-    private fun connectByPin() {
-        sendEvent(ConnectingViewEvent.HideSheet)
-        analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.PIN_CONNECTION))
-        router.navigateTo(
-            if (state.value.isOnBoarding) {
-                Screens.FromOnBoardingConnectDeviceByPin
-            } else {
-                Screens.FromOtherConnectDeviceByPin
-            }
-        )
     }
 
     private fun syncDevice() {

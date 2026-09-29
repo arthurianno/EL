@@ -1,18 +1,9 @@
 package com.elta.android.presentation.features.sync.connect.viewmodel
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
-import androidx.lifecycle.viewModelScope
-import coil.imageLoader
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.elta.android.domain.features.diary.home.interactor.GetLocationNeededUseCase
-import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
-import com.elta.android.domain.features.multiLangsConfig.model.Resource
-import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
@@ -20,9 +11,6 @@ import com.elta.android.presentation.analytic.model.appmetric.params.TurningResu
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
-import com.elta.android.presentation.core.compose.viewmodel.ComposeScreenConfigurable
-import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
-import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.features.sync.connect.IS_ON_BOARDING_ARGUMENT_NAME
 import com.elta.android.presentation.features.sync.connect.model.howtoconnect.HowToConnectAction
@@ -35,21 +23,12 @@ import javax.inject.Inject
 class HowToConnectViewModel @Inject constructor(
     private val getLocationNeededUseCase: GetLocationNeededUseCase,
     private val appMetric: AppMetricTracker,
-    private val getScreenFromCacheUseCase: GetScreenConfigFromCache,
-    private val context: Context,
-) : BaseViewModel<HowToConnectViewState>(), ComposeScreenConfigurable {
-
-    override val screenConfigKey = "connect-start-onboarding"
-    override val getScreenConfigUseCase = getScreenFromCacheUseCase
-
+) : BaseViewModel<HowToConnectViewState>() {
 
     override fun createInitState(): HowToConnectViewState =
         HowToConnectViewState(
             isOnBoarding = false
         )
-
-    val appTopBar = BaseAppTopBarWidgetModel()
-    val downButton = DownButtonWidgetModel()
 
     val cameraPermissionDialog = BaseDialogWidgetModel<Nothing>(
         positiveOnCLick = { sendEvent(HowToConnectEvent.OpenSettings) }
@@ -62,24 +41,6 @@ class HowToConnectViewModel @Inject constructor(
     val bluetoothPermissionDialog = BaseDialogWidgetModel<Nothing>(
         positiveOnCLick = { sendEvent(HowToConnectEvent.OpenSettings) }
     )
-
-    override val widgets = listOf(
-        appTopBar,
-        downButton
-    ).actionObserve()
-
-
-    init {
-        loadScreenConfig(
-            context = context,
-            updateState = { screenEntity, isContentReady ->
-                state.value.copy(
-                    screenConfig = screenEntity,
-                    isContentReady = isContentReady
-                )
-            }
-        )
-    }
 
     override fun handleFragmentArguments(arguments: Bundle) {
         reduceState {

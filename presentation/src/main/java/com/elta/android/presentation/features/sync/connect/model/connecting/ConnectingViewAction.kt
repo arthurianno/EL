@@ -15,12 +15,9 @@ sealed interface ConnectingViewAction : Action {
         data object Reject : ConnectingViewAction
     }
 
-    data object CloseHelp : ConnectingViewAction
-    data object OpenHelp : ConnectingViewAction
     data object ClickCompleteButton : ConnectingViewAction
     data object ClickRepeatSyncButton : ConnectingViewAction
     data object ClickRepeatButton : ConnectingViewAction
     data object ClickSearchButton : ConnectingViewAction
-    data object OnConnectClick : ConnectingViewAction
 
 }
