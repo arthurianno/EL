@@ -7,6 +7,7 @@ import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinT
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import com.elta.android.domain.features.user.interactor.round
 import org.threeten.bp.LocalDate
+import org.threeten.bp.ZoneId
 import kotlin.math.roundToInt
 
 internal fun Double.average(total: Int): Double = if (total == 0) 0.0 else (this / total).round(1)
@@ -40,7 +41,9 @@ internal fun DailyStatisticModel.checkMax(max: DailyStatisticModel): DailyStatis
 internal fun DailyStatisticModel.checkMin(min: DailyStatisticModel): DailyStatisticModel =
     if (min.glucose.minLevel > this.glucose.minLevel) this else min
 
-internal fun List<EventV2>.toEventsContainer(): EventsContainer {
+internal fun List<EventV2>.toEventsContainer(
+    zoneId: ZoneId = ZoneId.systemDefault()
+): EventsContainer {
     val byType = hashMapOf<EventType, List<EventV2>>()
     val byTypePerDay = hashMapOf<LocalDate, Map<EventType, List<EventV2>>>()
 
@@ -55,7 +58,7 @@ internal fun List<EventV2>.toEventsContainer(): EventsContainer {
         (destinationByType as MutableList).add(element)
 
         // split by type per day
-        val day = element.additionTime.toLocalDate()
+        val day = element.localDateAt(zoneId)
         var destinationByDay1 = byTypePerDay[day]
         if (destinationByDay1 == null) {
             destinationByDay1 = hashMapOf()
@@ -72,6 +75,9 @@ internal fun List<EventV2>.toEventsContainer(): EventsContainer {
 
     return EventsContainer(byType = byType, byTypePerDay = byTypePerDay)
 }
+
+internal fun EventV2.localDateAt(zoneId: ZoneId): LocalDate =
+    additionTime.withZoneSameInstant(zoneId).toLocalDate()
 
 data class EventsContainer(
     val byType: Map<EventType, List<EventV2>>,

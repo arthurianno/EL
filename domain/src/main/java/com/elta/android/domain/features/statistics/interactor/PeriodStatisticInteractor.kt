@@ -17,6 +17,7 @@ import com.elta.android.domain.features.statistics.model.StatisticPeriod
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import org.threeten.bp.LocalDate
+import org.threeten.bp.ZoneId
 import timber.log.Timber
 
 fun buildStatisticModel(
@@ -25,9 +26,10 @@ fun buildStatisticModel(
     settings: GlucoseLevelSettings,
     glucoseFormat: GlucoseFormat,
     insulinMedicamentStatistic: InsulinMedicamentStatistic,
-    calculatorFlow: CalculatorFlow
+    calculatorFlow: CalculatorFlow,
+    zoneId: ZoneId = ZoneId.systemDefault()
 ): StatisticByPeriodModel {
-    val eventsContainer = events.toEventsContainer()
+    val eventsContainer = events.toEventsContainer(zoneId)
 
     val eventsByType = eventsContainer.byType
     val eventsByTypePerDay = eventsContainer.byTypePerDay
@@ -72,9 +74,13 @@ fun buildStatisticModel(
         ),
         insulin = buildInsulinStatisticModelByPeriod(
             eventsByType[EventType.Insulin],
-            insulinMedicamentStatistic
+            insulinMedicamentStatistic,
+            zoneId
         ),
-        food = buildBreadStatisticModelByPeriod(eventsByType[EventType.Bread(calculatorFlow)]),
+        food = buildBreadStatisticModelByPeriod(
+            eventsByType[EventType.Bread(calculatorFlow)],
+            zoneId
+        ),
         activity = buildActivityStatisticModel(eventsByType[EventType.Activity])
     )
 }
@@ -184,7 +190,8 @@ fun buildGlucoseStatisticModel(
 
 fun buildInsulinStatisticModelByPeriod(
     insulinEventsPerPeriod: List<EventV2>?,
-    insulinMedicamentStatistic: InsulinMedicamentStatistic
+    insulinMedicamentStatistic: InsulinMedicamentStatistic,
+    zoneId: ZoneId = ZoneId.systemDefault()
 ): InsulinStatisticModelByPeriod {
     var totalBolusLevel = 0.0
     var totalBasalLevel = 0.0
@@ -199,17 +206,17 @@ fun buildInsulinStatisticModelByPeriod(
         if (value != null && value != 0.0) {
             if (event.isBolusInsulin(insulinMedicamentStatistic)) {
                 totalBolusLevel += value
-                daysWithBolusEvents.add(event.additionTime.toLocalDate())
+                daysWithBolusEvents.add(event.localDateAt(zoneId))
             }
 
             if (event.isBasalInsulin(insulinMedicamentStatistic)) {
                 totalBasalLevel += value
-                daysWithBasalEvents.add(event.additionTime.toLocalDate())
+                daysWithBasalEvents.add(event.localDateAt(zoneId))
             }
 
             if (event.isBasalOrBolus(insulinMedicamentStatistic)) {
                 totalLevel += value
-                daysWithEvents.add(event.additionTime.toLocalDate())
+                daysWithEvents.add(event.localDateAt(zoneId))
             }
         }
     }
@@ -240,7 +247,10 @@ private fun List<MedicamentInsulinType>.convertToStatistic() =
 //        ?.distinct()
 //        .orEmpty()
 
-fun buildBreadStatisticModelByPeriod(breadEventsPerPeriod: List<EventV2>?): BreadStatisticModelByPeriod {
+fun buildBreadStatisticModelByPeriod(
+    breadEventsPerPeriod: List<EventV2>?,
+    zoneId: ZoneId = ZoneId.systemDefault()
+): BreadStatisticModelByPeriod {
     var totalLevel = 0.0
     val daysWithEvents = mutableSetOf<LocalDate>()
 
@@ -248,7 +258,7 @@ fun buildBreadStatisticModelByPeriod(breadEventsPerPeriod: List<EventV2>?): Brea
         val value = event.value
         if (value != null && value != 0.0) {
             totalLevel += value
-            daysWithEvents.add(event.additionTime.toLocalDate())
+            daysWithEvents.add(event.localDateAt(zoneId))
         }
     }
 
