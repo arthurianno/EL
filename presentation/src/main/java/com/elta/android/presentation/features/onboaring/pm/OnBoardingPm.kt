@@ -42,6 +42,7 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.main.events.base.initializer.WeightFormInitializer
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.EmiasUi
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingDiabetesItem
+import com.elta.android.presentation.features.onboaring.ui.adapter.items.DiabetesChoice
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingEmiasProfileItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGenderItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGlucoseFormatItem
@@ -300,6 +301,7 @@ class OnBoardingPm @Inject constructor(
         hideKeyBoardCommand.consumer.accept(Unit)
         val currentPage = currentPageState.value
         val currentItem = items.value[currentPage] as OnBoardingItem
+        if (currentItem is OnBoardingDiabetesItem) currentItem.choice = null
         params[currentItem::class.java] = null
         stepForward()
     }
@@ -323,6 +325,16 @@ class OnBoardingPm @Inject constructor(
         val item = event.item
         savePageData(item)
         updateNextButtonState(item)
+    }
+
+    fun selectDiabetes(choice: DiabetesChoice) {
+        val item = items.value.filterIsInstance<OnBoardingDiabetesItem>().first()
+        item.choice = choice
+        onBoardingPageSelected(Events.OnBoardingPageSelected(item))
+    }
+
+    fun continueDiabetes() {
+        nextPageAction.consumer.accept(Unit)
     }
 
     private fun savePageData(item: OnBoardingItem) {
@@ -361,7 +373,7 @@ class OnBoardingPm @Inject constructor(
     private fun createUseCaseParams(i: Unit): UpdateProfileUseCase.Params {
         val gender = params[OnBoardingGenderItem::class.java] as? Gender
         val weight = params[OnBoardingWeightItem::class.java] as? Double
-        val diabetes = params[OnBoardingDiabetesItem::class.java] as? Diabetes
+        val diabetes = (params[OnBoardingDiabetesItem::class.java] as? DiabetesChoice)?.diabetes
         val glucoseFormat = params[OnBoardingGlucoseFormatItem::class.java] as? GlucoseFormat
         val emiasUi = params[OnBoardingEmiasProfileItem::class.java] as? EmiasUi
         val profile = Profile(
@@ -435,7 +447,8 @@ class OnBoardingPm @Inject constructor(
     private fun createOnBoardingEvent(): AnalyticsEvent? {
         val item = items.value[currentPageState.value] as OnBoardingItem
         return params[item::class.java]?.let {
-            val data = it.toString()
+            val data = (if (it is DiabetesChoice) it.diabetes?.toString() else it.toString())
+                ?: return@let null
             when (item) {
                 is OnBoardingGenderItem ->
                     AnalyticsEvent(

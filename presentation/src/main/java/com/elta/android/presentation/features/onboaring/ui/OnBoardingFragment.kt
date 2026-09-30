@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -18,6 +22,10 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentOnboardingBinding
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
+import com.elta.android.presentation.features.onboaring.ui.adapter.items.DiabetesChoice
+import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingDiabetesItem
+import com.elta.android.presentation.features.onboaring.ui.compose.DiabetesSelectionScreen
+import com.elta.android.presentation.theme.EltaTheme
 import com.elta.android.presentation.features.onboaring.ui.adapter.OnBoardingAdapter
 import com.elta.android.presentation.utils.animateText
 import com.elta.android.presentation.utils.fadeVisibility
@@ -46,6 +54,7 @@ class OnBoardingFragment :
     private val snapHelper = PagerSnapHelper()
 
     private var lastX: Float = 0F
+    private var diabetesChoice by mutableStateOf<DiabetesChoice?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +63,21 @@ class OnBoardingFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.diabetesComposeView.setViewCompositionStrategy(
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+        )
+        binding.diabetesComposeView.setContent {
+            EltaTheme {
+                DiabetesSelectionScreen(
+                    selected = diabetesChoice,
+                    onSelect = {
+                        diabetesChoice = it
+                        presentationModel.selectDiabetes(it)
+                    },
+                    onContinue = { presentationModel.continueDiabetes() }
+                )
+            }
+        }
         with(binding.toolbar) {
             homeButtonView.hide()
             menuButtonView.text = getString(R.string.on_boarding_toolbar_menu_button)
@@ -76,7 +100,12 @@ class OnBoardingFragment :
 
     override fun onBindPresentationModel(pm: OnBoardingPm) {
         super.onBindPresentationModel(pm)
-        pm.currentPageState.bindTo { page -> itemsView?.smoothScrollToPosition(page) }
+        pm.currentPageState.bindTo { page ->
+            itemsView?.smoothScrollToPosition(page)
+            val item = pm.items.value.getOrNull(page)
+            binding.diabetesComposeView.isVisible = item is OnBoardingDiabetesItem
+            if (item is OnBoardingDiabetesItem) diabetesChoice = item.choice
+        }
         pm.titleState.observable.skip(1)
             .subscribe { binding.onBoardingHeaderTextView.animateText(it) }
         pm.titleState.observable.take(1).subscribe(binding.onBoardingHeaderTextView.text())

@@ -111,6 +111,8 @@
     <string name="on_boarding_next_button_title">Далее</string>
 
     <string name="diabetes_type_first">1 тип</string>
+    <string name="onboarding_diabetes_unknown">Не знаю</string>
+    <string name="onboarding_diabetes_none">Нет диабета</string>
     <string name="diabetes_type_second">2 тип (лечение инсулином)</string>
     <string name="diabetes_type_second_tablets">2 тип (лечение таблетками)</string>
     <string name="diabetes_type_second_short">2 тип (Инсулин)</string>
@@ -1090,6 +1092,13 @@
     <string name="language_settings_title">Язык интерфейса</string>
     <string name="language_settings_subtitle">Изменение языка интерфейса приложения Сателлит Online</string>
     <string name="language_russian">Русский</string>
+    <string name="onboarding_language_title">Язык приложения</string>
+    <string name="onboarding_language_subtitle">Выберите язык, на котором вам удобно пользоваться приложением</string>
+    <string name="onboarding_choose_other_language">Выбрать другой язык</string>
+    <string name="onboarding_region_title">Страна проживания</string>
+    <string name="onboarding_region_subtitle">В какой стране вы живёте?</string>
+    <string name="onboarding_region_notice">Названия и дозировки лекарств могут различаться в разных странах. Укажите страну проживания, чтобы мы показывали подходящую вам информацию</string>
+    <string name="onboarding_choose_other_region">Выбрать другой регион</string>
     <string name="language_english">Английский</string>
     <string name="region_section_title">Регион</string>
     <string name="region_section_subtitle">Изменение региона прибывания</string>

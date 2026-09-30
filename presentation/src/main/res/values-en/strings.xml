@@ -92,6 +92,8 @@
     <string name="on_boarding_prev_button_title">Back</string>
     <string name="on_boarding_next_button_title">Next</string>
     <string name="diabetes_type_first">Type 1</string>
+    <string name="onboarding_diabetes_unknown">I don’t know</string>
+    <string name="onboarding_diabetes_none">I don’t have diabetes</string>
     <string name="diabetes_type_second">Type 2 (Insulin Therapy)</string>
     <string name="diabetes_type_second_tablets">Type 2 (Tablet Therapy)</string>
     <string name="diabetes_type_second_short">Type 2 (Insulin)</string>
@@ -933,6 +935,13 @@
     <string name="language_settings_subtitle">Change the interface language of the Satellite Online app</string>
 
     <string name="language_russian">Русский</string>
+    <string name="onboarding_language_title">App language</string>
+    <string name="onboarding_language_subtitle">Choose the language you prefer to use in the app</string>
+    <string name="onboarding_choose_other_language">Choose another language</string>
+    <string name="onboarding_region_title">Country of residence</string>
+    <string name="onboarding_region_subtitle">Which country do you live in?</string>
+    <string name="onboarding_region_notice">Medicine names and dosages may vary by country. Choose your country of residence to see relevant information.</string>
+    <string name="onboarding_choose_other_region">Choose another region</string>
     <string name="language_english">English</string>
     <string name="region_section_title">Region</string>
     <string name="region_section_subtitle">Change your region of residence</string>

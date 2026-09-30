@@ -80,6 +80,12 @@
 
     </LinearLayout>
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/diabetesComposeView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
     <FrameLayout
         android:id="@+id/progressView"
         android:layout_width="match_parent"
