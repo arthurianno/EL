@@ -29,6 +29,8 @@ abstract class BaseComposeFragment<VM : BaseViewModel<*>> :
 
     abstract val viewModel: VM
 
+    protected open val padContentForNavigationBar: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.init()
@@ -49,7 +51,11 @@ abstract class BaseComposeFragment<VM : BaseViewModel<*>> :
             .setContent {
                 EltaTheme {
                     Dialogs(viewModel = viewModel)
-                    Box(Modifier.fillMaxSize().navigationBarsPadding()) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .then(if (padContentForNavigationBar) Modifier.navigationBarsPadding() else Modifier)
+                    ) {
                         Content(viewModel = viewModel)
                     }
                 }

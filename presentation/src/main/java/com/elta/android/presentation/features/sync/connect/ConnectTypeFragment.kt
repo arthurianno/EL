@@ -18,6 +18,8 @@ class ConnectTypeFragment : BaseComposeFragment<ConnectTypeViewModel>() {
 
     override val viewModel: ConnectTypeViewModel by viewModels { viewModelFactory }
 
+    override val padContentForNavigationBar = false
+
     @Composable
     override fun Content(viewModel: ConnectTypeViewModel) {
         DmcConnectionIntroScreen(

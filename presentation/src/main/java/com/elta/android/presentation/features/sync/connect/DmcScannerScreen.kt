@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.sync.connect
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,9 +30,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -38,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.compose.widgets.buttons.GradientActionButton
 import com.elta.android.presentation.theme.EltaTheme
 import com.elta.android.presentation.theme.LocalColors
 import com.elta.android.presentation.theme.LocalTypes
@@ -55,11 +63,10 @@ internal fun DmcScannerScreen(
     onBack: () -> Unit,
     onHelp: () -> Unit,
     onCloseHelp: () -> Unit,
+    onConnectByPin: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     camera: @Composable () -> Unit
 ) {
-    val mask = Color.Black.copy(alpha = 0.42f)
-
     BoxWithConstraints(modifier.fillMaxSize().background(Color.Black)) {
         camera()
 
@@ -67,22 +74,25 @@ internal fun DmcScannerScreen(
         val frameTop = minOf(190.dp, maxHeight * 0.24f)
         val sideWidth = (maxWidth - frameSize) / 2
 
-        Box(Modifier.fillMaxWidth().height(frameTop).background(mask))
-        Box(
-            Modifier
-                .offset(y = frameTop + frameSize)
-                .fillMaxWidth()
-                .height(maxHeight - frameTop - frameSize)
-                .background(mask)
-        )
-        Box(Modifier.offset(y = frameTop).width(sideWidth).height(frameSize).background(mask))
-        Box(
-            Modifier
-                .offset(x = sideWidth + frameSize, y = frameTop)
-                .width(sideWidth)
-                .height(frameSize)
-                .background(mask)
-        )
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val frameSizePx = frameSize.toPx()
+            val frameTopPx = frameTop.toPx()
+            val sideWidthPx = (size.width - frameSizePx) / 2f
+            val cutoutPath = Path().apply {
+                fillType = PathFillType.EvenOdd
+                addRect(Rect(0f, 0f, size.width, size.height))
+                addRoundRect(
+                    RoundRect(
+                        left = sideWidthPx,
+                        top = frameTopPx,
+                        right = sideWidthPx + frameSizePx,
+                        bottom = frameTopPx + frameSizePx,
+                        cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
+                    )
+                )
+            }
+            drawPath(cutoutPath, color = Color(0x9917191F))
+        }
 
         ScannerFrame(
             isError = state == DmcScannerUiState.Error,
@@ -100,6 +110,7 @@ internal fun DmcScannerScreen(
         ScannerStatusPanel(
             state = state,
             onCloseHelp = onCloseHelp,
+            onConnectByPin = onConnectByPin,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
@@ -111,9 +122,9 @@ private fun ScannerHeader(onBack: () -> Unit, onHelp: () -> Unit, modifier: Modi
     Row(
         modifier
             .fillMaxWidth()
-            .background(Color(0xC9111216))
+            .background(Color(0x9917191F))
             .statusBarsPadding()
-            .padding(start = 8.dp, end = 12.dp),
+            .padding(start = 16.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onBack) {
@@ -166,6 +177,7 @@ private fun BoxScope.ScannerCorner(
 private fun ScannerStatusPanel(
     state: DmcScannerUiState,
     onCloseHelp: () -> Unit,
+    onConnectByPin: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalColors.current
@@ -173,8 +185,9 @@ private fun ScannerStatusPanel(
     Column(
         modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             .background(colors.white)
+            .navigationBarsPadding()
     ) {
         when (state) {
             DmcScannerUiState.Scanning -> Row(
@@ -202,11 +215,11 @@ private fun ScannerStatusPanel(
 
             DmcScannerUiState.Help -> {
                 Row(
-                    Modifier.fillMaxWidth().padding(start = 20.dp, end = 8.dp, top = 12.dp),
+                    Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = stringResource(R.string.sync_connect_type_button_any_difficulties),
+                        text = stringResource(R.string.sync_connection_help_sheet_title),
                         style = types.h3,
                         modifier = Modifier.weight(1f)
                     )
@@ -214,16 +227,26 @@ private fun ScannerStatusPanel(
                         Icon(
                             painter = painterResource(R.drawable.ic_dialog_close_profile),
                             contentDescription = stringResource(R.string.content_description_close_button),
-                            tint = colors.blackBlue
+                            tint = colors.shadeBlack1
                         )
                     }
                 }
                 Text(
-                    text = stringResource(R.string.sync_dmc_scanner_help),
-                    style = types.body1,
+                    text = stringResource(R.string.sync_connection_help_sheet_text),
+                    style = types.body1.copy(lineHeight = 20.sp),
                     color = colors.shadeBlack0,
-                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 24.dp)
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp)
                 )
+                if (onConnectByPin != null) {
+                    GradientActionButton(
+                        text = stringResource(R.string.sync_connect_by_pin_boton_text),
+                        enabled = true,
+                        isLoading = false,
+                        shape = 10,
+                        onClick = onConnectByPin,
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    )
+                }
             }
         }
     }

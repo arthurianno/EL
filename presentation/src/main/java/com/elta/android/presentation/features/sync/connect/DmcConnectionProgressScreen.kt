@@ -4,8 +4,8 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -15,29 +15,34 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import kotlinx.coroutines.launch
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -51,8 +56,9 @@ import com.elta.android.presentation.features.sync.connect.model.connecting.Conn
 import com.elta.android.presentation.theme.EltaTheme
 import com.elta.android.presentation.theme.LocalColors
 import com.elta.android.presentation.theme.LocalTypes
+import kotlin.math.roundToInt
 
-private val progressColor = Color(0xFF39C7C8)
+private val progressColor = Color(0xFF3EC1C5)
 private val errorColor = Color(0xFFCA2F2F)
 
 private data class StagePresentation(
@@ -124,109 +130,173 @@ private fun ConnectingStageType.presentation() = when (this) {
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun DmcConnectionProgressScreen(
     stage: ConnectingStageType,
     onBack: () -> Unit,
     onAction: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onConnectByPin: (() -> Unit)? = null
 ) {
     val colors = LocalColors.current
     val types = LocalTypes.current
     val presentation = stage.presentation()
-    var helpVisible by rememberSaveable { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true
+    )
+    val scope = rememberCoroutineScope()
 
-    BoxWithConstraints(
-        modifier
-            .fillMaxSize()
-            .background(colors.white)
-            .statusBarsPadding()
-    ) {
-        val phoneHeight = minOf(370.dp, maxHeight * if (stage == ConnectingStageType.DeviceNotFound) 0.43f else 0.48f)
-
-        Column(Modifier.fillMaxSize()) {
-            Row(
-                Modifier.fillMaxWidth().padding(start = 8.dp, end = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (stage != ConnectingStageType.Complete) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_back),
-                            contentDescription = stringResource(R.string.content_description_back_button),
-                            tint = colors.blackBlue,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                } else {
-                    Spacer(Modifier.size(48.dp))
-                }
-                Spacer(Modifier.weight(1f))
-                if (stage != ConnectingStageType.Complete) {
-                    TextButton(onClick = { helpVisible = true }) {
-                        Text(
-                            text = stringResource(R.string.sync_connect_type_button_need_help),
-                            style = types.caption1,
-                            color = colors.shadeBlack1
-                        )
-                    }
-                }
-            }
-
+    ModalBottomSheetLayout(
+        sheetState = sheetState,
+        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        sheetBackgroundColor = colors.white,
+        sheetContent = {
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 20.dp)
+                    .navigationBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 20.dp)
             ) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.sync_connection_help_sheet_title),
+                        style = types.h2.copy(fontSize = 18.sp, lineHeight = 22.sp),
+                        color = colors.black,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(
+                        onClick = { scope.launch { sheetState.hide() } },
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_dialog_close_profile),
+                            contentDescription = stringResource(R.string.content_description_close_button),
+                            tint = Color(0xFF878B93)
+                        )
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
                 Text(
-                    text = stringResource(presentation.title),
-                    style = types.h0.copy(lineHeight = 32.sp),
-                    color = colors.black
-                )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = stringResource(presentation.description),
-                    style = types.body1.copy(lineHeight = 20.sp),
+                    text = stringResource(R.string.sync_connection_help_sheet_text),
+                    style = types.body1.copy(fontSize = 15.sp, lineHeight = 20.sp),
                     color = colors.shadeBlack0
                 )
-                if (stage == ConnectingStageType.DeviceNotFound) {
-                    Spacer(Modifier.height(8.dp))
-                    DmcReason("1.", R.string.profile_device_search_not_found_disable_ble)
-                    DmcReason("2.", R.string.profile_device_search_not_found_low_energy)
-                    DmcReason("3.", R.string.profile_device_search_not_found_out_of_range)
+                Spacer(Modifier.height(24.dp))
+                if (onConnectByPin != null) {
+                    GradientActionButton(
+                        text = stringResource(R.string.sync_connect_by_pin_boton_text),
+                        enabled = true,
+                        isLoading = false,
+                        shape = 10,
+                        onClick = {
+                            scope.launch { sheetState.hide() }
+                            onConnectByPin()
+                        }
+                    )
                 }
             }
+        },
+        modifier = modifier
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(colors.white)
+                .statusBarsPadding()
+                .navigationBarsPadding()
+        ) {
+            Column(Modifier.fillMaxSize()) {
+                Row(
+                    Modifier.fillMaxWidth().padding(start = 8.dp, end = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (stage != ConnectingStageType.Complete) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_back),
+                                contentDescription = stringResource(R.string.content_description_back_button),
+                                tint = colors.blackBlue,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    } else {
+                        Spacer(Modifier.size(48.dp))
+                    }
+                    Spacer(Modifier.weight(1f))
+                    if (stage != ConnectingStageType.Complete) {
+                        TextButton(onClick = { scope.launch { sheetState.show() } }) {
+                            Text(
+                                text = stringResource(
+                                    if (presentation.isError) R.string.sync_connect_type_button_any_difficulties
+                                    else R.string.sync_connect_type_button_need_help
+                                ),
+                                style = types.caption1,
+                                color = colors.shadeBlack1
+                            )
+                        }
+                    }
+                }
 
-            Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-                DmcPhoneStage(stage, presentation, phoneHeight)
-            }
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                ) {
+                    Text(
+                        text = stringResource(presentation.title),
+                        style = types.h0.copy(lineHeight = 28.sp),
+                        color = colors.black
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(presentation.description),
+                        style = types.body1.copy(lineHeight = 20.sp),
+                        color = colors.shadeBlack0
+                    )
+                    if (stage == ConnectingStageType.DeviceNotFound) {
+                        Spacer(Modifier.height(8.dp))
+                        DmcReason("1.", R.string.profile_device_search_not_found_disable_ble)
+                        DmcReason("2.", R.string.profile_device_search_not_found_low_energy)
+                        DmcReason("3.", R.string.profile_device_search_not_found_out_of_range)
+                    }
+                }
 
-            if (presentation.button != null) {
-                GradientActionButton(
-                    text = stringResource(presentation.button),
-                    enabled = true,
-                    isLoading = false,
-                    shape = 8,
-                    onClick = onAction,
-                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
-                )
-            } else {
-                Spacer(Modifier.height(20.dp))
+                BoxWithConstraints(
+                    Modifier.fillMaxWidth().weight(1f),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    val availableHeight = maxHeight
+                    if (availableHeight > 100.dp) {
+                        Box(Modifier.padding(bottom = 32.dp)) {
+                            DmcPhoneStage(
+                                stage = stage,
+                                presentation = presentation,
+                                height = minOf(376.dp, availableHeight - 32.dp)
+                            )
+                        }
+                    }
+                }
+
+                if (presentation.button != null) {
+                    GradientActionButton(
+                        text = stringResource(presentation.button),
+                        enabled = true,
+                        isLoading = false,
+                        shape = 10,
+                        onClick = onAction,
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    )
+                } else {
+                    Spacer(Modifier.height(68.dp))
+                }
             }
         }
-    }
-
-    if (helpVisible) {
-        AlertDialog(
-            onDismissRequest = { helpVisible = false },
-            title = { Text(stringResource(R.string.sync_connect_type_button_need_help)) },
-            text = { Text(stringResource(R.string.sync_dmc_progress_help)) },
-            confirmButton = {
-                TextButton(onClick = { helpVisible = false }) {
-                    Text(stringResource(android.R.string.ok))
-                }
-            }
-        )
     }
 }
 
@@ -241,46 +311,56 @@ private fun DmcReason(number: String, @StringRes text: Int) {
 
 @Composable
 private fun DmcPhoneStage(stage: ConnectingStageType, presentation: StagePresentation, height: Dp) {
-    val colors = LocalColors.current
-    val phoneShape = RoundedCornerShape(24.dp)
+    val phoneWidth = height * (198f / 376f)
+    val phoneImage = ImageBitmap.imageResource(R.drawable.img_dmc_phone_mockup)
+    val cropOffset = IntOffset(
+        (phoneImage.width * 205f / 941f).roundToInt(),
+        (phoneImage.height * 250f / 1672f).roundToInt()
+    )
+    val cropSize = IntSize(
+        (phoneImage.width * 530f / 941f).roundToInt(),
+        (phoneImage.height * 1090f / 1672f).roundToInt()
+    )
     Box(
         Modifier
-            .width(height * 0.52f)
-            .height(height)
-            .border(2.dp, Color(0xFFCFCFCF), phoneShape)
-            .padding(4.dp)
-            .border(1.dp, Color(0xFFE4E4E4), RoundedCornerShape(20.dp))
-            .background(colors.white, RoundedCornerShape(20.dp))
+            .width(phoneWidth)
+            .height(height),
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 10.dp)
-                .size(4.dp)
-                .background(Color(0xFF343434), CircleShape)
-        )
+        Canvas(Modifier.fillMaxSize()) {
+            // The source PNG has wide blank margins around the phone.
+            drawImage(
+                image = phoneImage,
+                srcOffset = cropOffset,
+                srcSize = cropSize,
+                dstSize = IntSize(size.width.roundToInt(), size.height.roundToInt())
+            )
+        }
         DmcLottie(
             stage = stage,
             animation = presentation.animation,
             repeat = presentation.isLoading,
-            modifier = Modifier.align(Alignment.Center).size(100.dp)
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = height * 0.21f)
+                .size(minOf(80.dp, height * 0.22f))
         )
         Column(
-            Modifier.align(Alignment.BottomCenter).padding(start = 8.dp, end = 8.dp, bottom = 22.dp),
+            Modifier.align(Alignment.BottomCenter).padding(start = 12.dp, end = 12.dp, bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             val textColor = if (presentation.isError) errorColor else progressColor
             Text(
                 text = stringResource(presentation.phoneTitle),
-                style = LocalTypes.current.caption1,
+                style = LocalTypes.current.h2.copy(fontSize = 16.sp, lineHeight = 20.sp),
                 color = textColor,
                 textAlign = TextAlign.Center
             )
             presentation.phoneSubtitle?.let {
                 Text(
                     text = stringResource(it),
-                    style = LocalTypes.current.caption1,
+                    style = LocalTypes.current.caption1.copy(fontSize = 13.sp, lineHeight = 18.sp),
                     color = textColor,
                     textAlign = TextAlign.Center
                 )

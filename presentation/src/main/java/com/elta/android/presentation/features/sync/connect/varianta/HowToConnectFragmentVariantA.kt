@@ -42,6 +42,8 @@ class HowToConnectFragmentVariantA : BaseComposeFragment<HowToConnectViewModelVa
 
     override val viewModel: HowToConnectViewModelVariantA by viewModels { viewModelFactory }
 
+    override val padContentForNavigationBar = false
+
     override fun HowToConnectViewModelVariantA.init() {
         cameraPermissionDialog.initDialog(
             title = getString(R.string.settings_dialog_title),

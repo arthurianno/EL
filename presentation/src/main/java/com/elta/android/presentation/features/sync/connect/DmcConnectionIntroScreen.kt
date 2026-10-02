@@ -3,16 +3,15 @@ package com.elta.android.presentation.features.sync.connect
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -48,93 +47,94 @@ internal fun DmcConnectionIntroScreen(
     onBack: () -> Unit,
     onScan: () -> Unit,
     modifier: Modifier = Modifier,
-    @DrawableRes illustrationRes: Int? = null,
+    @DrawableRes illustrationRes: Int? = R.drawable.img_dmc_connect,
 ) {
     val colors = LocalColors.current
     val types = LocalTypes.current
     var helpVisible by rememberSaveable { mutableStateOf(false) }
 
-    BoxWithConstraints(
+    Box(
         modifier
             .fillMaxSize()
             .background(colors.white)
-            .statusBarsPadding()
     ) {
-        val horizontalPadding = if (maxWidth < 340.dp) 20.dp else 24.dp
-        val illustrationHeight = minOf(maxHeight * 0.62f, 500.dp)
+        val horizontalPadding = 16.dp
+
+        if (illustrationRes != null) {
+            Image(
+                painter = painterResource(illustrationRes),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .aspectRatio(941f / 1672f)
+            )
+        }
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
+                .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
-                .heightIn(min = maxHeight),
-            verticalArrangement = Arrangement.SpaceBetween
+                .navigationBarsPadding()
+                .padding(bottom = 84.dp)
         ) {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_back),
-                            contentDescription = stringResource(R.string.content_description_back_button),
-                            tint = colors.blackBlue,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Spacer(Modifier.weight(1f))
-                    TextButton(onClick = { helpVisible = true }) {
-                        Text(
-                            text = stringResource(R.string.sync_connect_type_button_need_help),
-                            style = types.caption1,
-                            color = colors.shadeBlack1
-                        )
-                    }
-                }
-
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = horizontalPadding, end = horizontalPadding, top = 22.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.sync_dmc_intro_title),
-                        style = types.h0.copy(lineHeight = 32.sp),
-                        color = colors.black
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    DmcInstructionStep("1.", stringResource(R.string.sync_dmc_intro_step_bluetooth))
-                    Spacer(Modifier.height(16.dp))
-                    DmcInstructionStep("2.", stringResource(R.string.sync_dmc_intro_step_scan))
-                }
-            }
-
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(illustrationHeight)
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                if (illustrationRes != null) {
-                    Image(
-                        painter = painterResource(illustrationRes),
-                        contentDescription = null,
-                        contentScale = ContentScale.Fit,
-                        alignment = Alignment.BottomCenter,
-                        modifier = Modifier.fillMaxSize()
+                IconButton(onClick = onBack) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_back),
+                        contentDescription = stringResource(R.string.content_description_back_button),
+                        tint = colors.blackBlue,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
-                GradientActionButton(
-                    text = stringResource(R.string.sync_how_to_connect_button),
-                    enabled = true,
-                    isLoading = false,
-                    shape = 10,
-                    onClick = onScan,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(horizontal = horizontalPadding, vertical = 16.dp)
-                )
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = { helpVisible = true }) {
+                    Text(
+                        text = stringResource(R.string.sync_connect_type_button_need_help),
+                        style = types.caption1.copy(fontSize = 14.sp),
+                        color = colors.shadeBlack1
+                    )
+                }
             }
+
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = horizontalPadding, end = horizontalPadding, top = 16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.sync_dmc_intro_title),
+                    style = types.h0.copy(lineHeight = 28.sp),
+                    color = colors.black
+                )
+                Spacer(Modifier.height(12.dp))
+                DmcInstructionStep("1.", stringResource(R.string.sync_dmc_intro_step_bluetooth))
+                Spacer(Modifier.height(16.dp))
+                DmcInstructionStep("2.", stringResource(R.string.sync_dmc_intro_step_scan))
+            }
+        }
+
+        Box(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = horizontalPadding, vertical = 16.dp)
+        ) {
+            GradientActionButton(
+                text = stringResource(R.string.sync_how_to_connect_button),
+                enabled = true,
+                isLoading = false,
+                shape = 10,
+                onClick = onScan
+            )
         }
     }
 
@@ -156,7 +156,7 @@ internal fun DmcConnectionIntroScreen(
 private fun DmcInstructionStep(number: String, description: String) {
     val colors = LocalColors.current
     val style = LocalTypes.current.subtitle2.copy(lineHeight = 20.sp)
-    Row(Modifier.fillMaxWidth().padding(start = 4.dp, end = 24.dp)) {
+    Row(Modifier.fillMaxWidth().padding(end = 8.dp)) {
         Text(number, style = style, color = colors.shadeBlack0, modifier = Modifier.width(20.dp))
         Text(description, style = style, color = colors.shadeBlack0, modifier = Modifier.weight(1f))
     }

@@ -103,6 +103,15 @@ class ConnectingViewModelVariantA @Inject constructor(
         when (action) {
             is AppAction.BackPressure -> backClick()
             is ConnectAction.Complete -> completeConnect()
+            is ConnectAction.ConnectByPin -> connectByPin()
+        }
+    }
+
+    private fun connectByPin() {
+        if (state.value.isOnBoarding) {
+            router.navigateTo(Screens.FromOnBoardingConnectDeviceByPinVariantA)
+        } else {
+            router.navigateTo(Screens.FromOtherConnectDeviceByPinVariantA)
         }
     }
 

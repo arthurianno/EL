@@ -19,5 +19,5 @@ sealed interface ConnectingViewAction : Action {
     data object ClickRepeatSyncButton : ConnectingViewAction
     data object ClickRepeatButton : ConnectingViewAction
     data object ClickSearchButton : ConnectingViewAction
-
+    data object ConnectByPin : ConnectingViewAction
 }

@@ -36,6 +36,8 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
 
     override val viewModel: ConnectingViewModel by viewModels { viewModelFactory }
 
+    override val padContentForNavigationBar = false
+
     override fun ConnectingViewModel.init() {
         exitDialogFromConnecting.initDialog(
             message = getString(R.string.sync_connection_exit_from_connecting_dialog_text),
@@ -102,6 +104,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
         DmcConnectionProgressScreen(
             stage = stage,
             onBack = { viewModel sendAction AppAction.BackPressure },
+            onConnectByPin = { viewModel sendAction ConnectingViewAction.ConnectByPin },
             onAction = {
                 val action = when (stage) {
                     ConnectingStageType.Complete -> ConnectingViewAction.ClickCompleteButton

@@ -55,7 +55,18 @@ class ScannerDmcViewModelVariantA @Inject constructor(
             is AppAction.BackPressure -> backClick()
             is ConnectAction.StartConnecting -> startConnecting(action.pin, action.name)
             is ConnectAction.ScannerError -> setScannerError()
+            is ConnectAction.ConnectByPin -> connectByPin()
         }
+    }
+
+    private fun connectByPin() {
+        router.navigateTo(
+            if (state.value.isOnBoarding) {
+                Screens.FromOnBoardingConnectDeviceByPinVariantA
+            } else {
+                Screens.FromOtherConnectDeviceByPinVariantA
+            }
+        )
     }
 
     override fun reduceStateByAction(

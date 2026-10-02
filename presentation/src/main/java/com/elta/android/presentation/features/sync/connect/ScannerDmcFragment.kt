@@ -88,6 +88,7 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
             onBack = { viewModel sendAction AppAction.BackPressure },
             onHelp = { viewModel sendAction ConnectAction.NeedHelp },
             onCloseHelp = { viewModel sendAction ConnectAction.CloseHelp },
+            onConnectByPin = { viewModel sendAction ConnectAction.ConnectByPin },
             camera = { CameraPreView(viewModel) }
         )
     }

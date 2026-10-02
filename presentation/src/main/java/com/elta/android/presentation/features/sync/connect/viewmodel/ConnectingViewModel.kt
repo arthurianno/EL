@@ -168,6 +168,7 @@ class ConnectingViewModel @Inject constructor(
     override fun handleUserAction(action: Action) {
         when (action) {
             is AppAction.BackPressure -> backClick()
+            is ConnectingViewAction.ConnectByPin -> connectByPin()
             is ConnectingViewAction.ClickRepeatSyncButton -> repeatSyncDevice()
             is ConnectingViewAction.ClickCompleteButton -> completeConnect()
             is ConnectingViewAction.Location.AllowPermission -> sendEvent(ConnectingViewEvent.Location.Enable)
@@ -180,6 +181,14 @@ class ConnectingViewModel @Inject constructor(
                 if (deviceConnected) repeatSyncDevice()
                 else repeatConnectDevice()
             }
+        }
+    }
+
+    private fun connectByPin() {
+        if (state.value.isOnBoarding) {
+            router.navigateTo(Screens.FromOnBoardingConnectDeviceByPin)
+        } else {
+            router.navigateTo(Screens.FromOtherConnectDeviceByPin)
         }
     }
 
