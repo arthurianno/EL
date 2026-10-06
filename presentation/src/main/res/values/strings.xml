@@ -434,6 +434,8 @@
     <string name="sync_device_invalid_time_subtitle">Дата и время сохраненных измерений уровня глюкозы могут быть неверными в связи с неактуальными данными, сохраненными в устройстве. Текущая синхронизация обновила дату и время в устройстве.</string>
     <string name="sync_device_invalid_time_button">Продолжить</string>
     <string name="event_invalid_time_warning">Невалидная дата измерения уровня глюкозы!</string>
+    <string name="record_invalid_time">⚠ %1$s</string>
+    <string name="record_invalid_time_description">Время измерения может быть неверным: %1$s</string>
 
     <string name="sync_connection_scanner_sheet_info_text">Расположите DMC-код внутри выделенной области сверху</string>
     <string name="sync_connection_scanner_sheet_error_title">Ошибка чтения</string>
@@ -470,6 +472,9 @@
     <!-- DIARY FLOR -->
     <string name="diary_empty_state_title">За этот день у вас нет ни одной записи</string>
     <string name="diary_screen_title">Дневник событий</string>
+    <string name="diary_invalid_time_button">Измерения с неточным временем</string>
+    <string name="diary_invalid_time_close">Вернуться к календарю</string>
+    <string name="diary_invalid_time_title">Измерения с неточным временем</string>
     <string name="diary_button_today">Сегодня</string>
 
     <string name="date_picker_day_of_week_1">Пн</string>

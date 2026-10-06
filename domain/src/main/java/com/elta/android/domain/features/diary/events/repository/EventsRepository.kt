@@ -16,6 +16,8 @@ interface EventsRepository {
 
     fun getEvents(): Observable<List<EventV2>>
 
+    fun getEventsWithInvalidTime(): Observable<List<EventV2>>
+
     fun getEvents(start: LocalDateTime, end: LocalDateTime): Observable<List<EventV2>>
 
     fun getEventById(id: String): Single<EventV2>

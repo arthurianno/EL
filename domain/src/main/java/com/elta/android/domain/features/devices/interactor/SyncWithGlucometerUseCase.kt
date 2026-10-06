@@ -21,8 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.rx2.rxObservable
 import timber.log.Timber
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -116,32 +114,18 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 glucometerName
             )
             Timber.d("⏰ SyncWithGlucometer: glucometerInfo.isTimeOutOfSync=${glucometerInfo.isTimeOutOfSync}, rawEvents.size=${rawEvents.size}")
-            var invalidIndex = 0L
-            val syncTime = ZonedDateTime.now(ZoneOffset.UTC)
-            val events = rawEvents.map { event ->
-                val isInvalid = event.isTimeInvalid || glucometerInfo.isTimeOutOfSync
-                if (isInvalid) {
-                    val adjustedDate = syncTime.minusMinutes(invalidIndex++)
-                    event.copy(
-                        date = adjustedDate,
-                        isTimeInvalid = true
-                    )
-                } else {
-                    event
-                }
-            }
+            val events = rawEvents.markInvalidTimeForOutOfSyncClock(glucometerInfo.isTimeOutOfSync)
             events.forEach { event ->
                 Timber.d("⏰ SyncWithGlucometer event: id=${event.id}, date=${event.date}, isTimeInvalid=${event.isTimeInvalid}")
             }
-            deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
-
             resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
-            if (measurements.isNotEmpty()) {
+            if (events.isNotEmpty()) {
                 crashlyticsReport.log("Started sending measurements to the backend and saving to local storage")
                 eventsRepository.addEventFromGlucometer(events)
 
                 resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
             }
+            deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
 
             val hasInvalidTime = events.any { it.isTimeInvalid } || (measurements.isNotEmpty() && glucometerInfo.isTimeOutOfSync)
             scope.channel.send(GlucometerSyncResult(count = measurements.size, hasInvalidTime = hasInvalidTime))

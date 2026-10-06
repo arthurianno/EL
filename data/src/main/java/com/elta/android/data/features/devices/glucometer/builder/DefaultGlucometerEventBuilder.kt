@@ -79,11 +79,9 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         val rawValue = match.groupValues[3].toInt()
         val date = extractDate(dateToken)
         val isInvalid = isDateInvalid(date)
-        val actualDate = if (isInvalid) ZonedDateTime.now(ZoneOffset.UTC) else date
-
         return ParsedMeasurement(
             idToken = dateToken,
-            date = actualDate,
+            date = date,
             temperature = extractTemperature(rawTemperature),
             value = extractValue(rawValue),
             mealTag = extractMealTag(rawTemperature).takeIf { supportsMealTags },
@@ -106,11 +104,9 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         val isInvalid = isDateInvalid(date, statusWord)
         val isTempInvalid = (statusWord and MEM_INVALID_TEMPERATURE_BIT_MASK) != 0
 
-        val actualDate = if (isInvalid) ZonedDateTime.now(ZoneOffset.UTC) else date
-
         return ParsedMeasurement(
             idToken = "$unixHex$glucoseHex",
-            date = actualDate,
+            date = date,
             temperature = null,
             value = glucoseValue,
             mealTag = if (supportsMealTags) {

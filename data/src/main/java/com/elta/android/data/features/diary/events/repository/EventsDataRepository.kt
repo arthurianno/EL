@@ -46,6 +46,10 @@ class EventsDataRepository @Inject constructor(
     private val crashlyticsReport: CrashlyticsReport
 ) : EventsRepository {
 
+    override fun getEventsWithInvalidTime(): Observable<List<EventV2>> =
+        cacheSource.getEventsWithInvalidTime()
+            .map { events -> events.map { it.toDomain() } }
+
     override fun getEvents(): Observable<List<EventV2>> =
         cacheSource.getEvents()
             .map{ events ->
@@ -154,7 +158,7 @@ class EventsDataRepository @Inject constructor(
                     state = existingEvent.state,
                     isTimeInvalid = if (existingEvent.modificationTime != null) existingEvent.isTimeInvalid else (newEvent.isTimeInvalid || existingEvent.isTimeInvalid)
                 )
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
                 newEvent
             }
         }

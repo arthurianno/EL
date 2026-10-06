@@ -21,10 +21,18 @@ class ItemRecordViewHolder(
             recordTypeView.text = item.type
             recordCountView.text = item.count
             if (item.isInvalid) {
-                recordDateView.text = "Время не настроено"
+                recordDateView.text = root.context.getString(
+                    com.elta.android.presentation.R.string.record_invalid_time,
+                    item.date
+                )
+                recordDateView.contentDescription = root.context.getString(
+                    com.elta.android.presentation.R.string.record_invalid_time_description,
+                    item.date
+                )
                 recordDateView.setTextColor(androidx.core.content.ContextCompat.getColor(root.context, com.elta.android.presentation.R.color.red))
             } else {
                 recordDateView.text = item.date
+                recordDateView.contentDescription = item.date
                 recordDateView.setTextColor(androidx.core.content.ContextCompat.getColor(root.context, com.elta.android.presentation.R.color.shade_black2))
             }
 

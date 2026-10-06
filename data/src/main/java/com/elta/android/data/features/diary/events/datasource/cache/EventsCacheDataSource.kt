@@ -9,6 +9,8 @@ import io.reactivex.Single
 
 interface EventsCacheDataSource: EventsDataSource {
 
+    fun getEventsWithInvalidTime(): Observable<List<EventV2Dto>>
+
     fun getEventById(id: String): Single<EventV2Dto>
 
     fun getEventsById(ids: List<Long>): Observable<List<EventV2Dto>>

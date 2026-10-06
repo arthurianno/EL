@@ -71,6 +71,19 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
             android:layout_marginBottom="8dp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/invalidTimeButtonView"
+            style="@style/New.Body1.BlackBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="12dp"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="4dp"
+            android:text="@string/diary_invalid_time_button" />
     </LinearLayout>
 
     <FrameLayout

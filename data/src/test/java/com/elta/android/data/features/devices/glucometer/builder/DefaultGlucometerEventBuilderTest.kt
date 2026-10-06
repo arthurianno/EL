@@ -5,6 +5,7 @@ import com.elta.android.domain.features.diary.events.model.MealTag
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
 
@@ -109,6 +110,27 @@ class DefaultGlucometerEventBuilderTest {
         )
 
         assertEquals(true, event.isTimeInvalid)
+        assertEquals(
+            ZonedDateTime.ofInstant(Instant.ofEpochSecond(0x690B559EL), ZoneOffset.UTC),
+            event.date
+        )
+    }
+
+    @Test
+    fun `buildFrom keeps an old rd timestamp while marking it invalid`() {
+        val deviceDate = ZonedDateTime.of(2019, 2, 22, 4, 0, 0, 0, ZoneOffset.UTC)
+        val oldDateBuilder = TestableDefaultGlucometerEventBuilder(FakeGenerator(), deviceDate)
+
+        val event = oldDateBuilder.buildFrom(
+            userId = "user",
+            glucometerId = "device",
+            response = "rd190222040000245044",
+            glucometerSerialNumber = "D2204001234",
+            glucometerName = "SatelliteOnline0001"
+        )
+
+        assertEquals(true, event.isTimeInvalid)
+        assertEquals(deviceDate, event.date)
     }
 
     @Test
@@ -137,6 +159,10 @@ class DefaultGlucometerEventBuilderTest {
         )
 
         assertEquals(true, event.isTimeInvalid)
+        assertEquals(
+            ZonedDateTime.ofInstant(Instant.ofEpochSecond(futureUnixHex.toLong(16)), ZoneOffset.UTC),
+            event.date
+        )
     }
 }
 
@@ -146,8 +172,9 @@ private class FakeGenerator : GlucometerEventIdGenerator {
 }
 
 private class TestableDefaultGlucometerEventBuilder(
-    generator: GlucometerEventIdGenerator
+    generator: GlucometerEventIdGenerator,
+    private val parsedDate: ZonedDateTime = ZonedDateTime.of(2024, 2, 22, 4, 0, 0, 0, ZoneOffset.UTC)
 ) : DefaultGlucometerEventBuilder(generator) {
     override fun extractDate(token: String): ZonedDateTime =
-        ZonedDateTime.of(2024, 2, 22, 4, 0, 0, 0, ZoneOffset.UTC)
+        parsedDate
 }
