@@ -34,7 +34,7 @@
             app:bnm_title="@string/bottom_navigation_menu_notes_title" />
 
         <Space
-            android:layout_width="96dp"
+            android:layout_width="80dp"
             android:layout_height="match_parent" />
 
         <com.elta.android.presentation.widgets.BottomNavigationMenuItem

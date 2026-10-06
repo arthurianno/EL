@@ -51,6 +51,9 @@ class PeriodFragment :
                         (parentFragment as? StatisticFlowFragment)?.selectPeriod(period)
                     },
                     onBack = { router.exit() },
+                    onExport = {
+                        (parentFragment as? StatisticFlowFragment)?.openReportChooser()
+                    },
                 )
             }
         }

@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.items
 
 import com.elta.android.domain.features.diary.events.model.glucoseValue
+import com.elta.android.domain.features.diary.home.model.DoubleRange
 import com.elta.android.presentation.features.main.records.mapper.DetailedChartItemsBuilder
 import com.elta.android.presentation.features.main.records.ui.compose.DetailedChartData
 import com.elta.android.presentation.features.main.records.ui.compose.GlucoseDashboardUiState
@@ -55,11 +56,11 @@ private fun RecordsHeaderItem.resolveGlucoseState(value: Float?): GlucoseState {
 private fun RecordsHeaderItem.calculateTimeInRange(): String {
     val model = dailyGlucoseModel ?: return "—"
     val values = model.glucoseEvents.map { it.glucoseValue(model.glucoseFormat) }
-    return values.takeIf { it.size >= 2 }
-        ?.let { values.count { value -> value in model.glucoseLevelSettings.normal } * 100 / it.size }
-        ?.let { "$it%" }
-        ?: "—"
+    return formatTimeInRange(values, model.glucoseLevelSettings.normal)
 }
+
+internal fun formatTimeInRange(values: List<Double>, normalRange: DoubleRange): String =
+    if (values.isEmpty()) "—" else "${values.count { it in normalRange } * 100 / values.size}%"
 
 private fun RecordsHeaderItem.calculateGlucoseTrend(): GlucoseTrend? {
     val model = dailyGlucoseModel ?: return null

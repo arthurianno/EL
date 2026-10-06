@@ -1,7 +1,5 @@
 package com.elta.android.presentation.features.main.records.mapper
 
-import com.elta.android.common.utils.CommonFormats
-import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.glucoseValue
@@ -10,12 +8,16 @@ import com.elta.android.presentation.features.main.records.ui.compose.DetailedFo
 import com.elta.android.presentation.features.main.records.ui.compose.DetailedGlucosePoint
 import com.elta.android.presentation.features.main.records.ui.compose.DetailedInsulinEntry
 import org.threeten.bp.Duration
+import org.threeten.bp.format.DateTimeFormatter
 import java.util.Locale
 
 object DetailedChartItemsBuilder {
 
+    private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.US)
+
     private const val MAX_EVENT_CHART_VALUE = 150.0
-    private const val MAX_ACTIVITY_DURATION_MINUTES = 12L * 60L
+    // EventV2.duration is stored in seconds; chart coordinates use minutes.
+    private const val MAX_ACTIVITY_DURATION_SECONDS = 12L * 60L * 60L
     private const val ACTIVITY_RELEVANCE_WINDOW_MINUTES = 6L * 60L
 
     fun buildPoints(
@@ -26,7 +28,7 @@ object DetailedChartItemsBuilder {
         if (glucoseEvents.isEmpty()) return emptyList()
 
         return glucoseEvents.mapIndexed { index, event ->
-            val timeStr = event.additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME)
+            val timeStr = event.additionTime.format(timeFormatter)
             val glucoseVal = event.glucoseValue(dailyGlucoseModel.glucoseFormat).toFloat()
 
             // Calculate trend relative to previous measurement
@@ -68,11 +70,11 @@ object DetailedChartItemsBuilder {
                 .filter { it.type is EventType.Activity && it.duration != null }
                 .filter { it.additionTime.toLocalDate() == event.additionTime.toLocalDate() }
                 .filter { activity ->
-                    val duration = activity.duration?.toLong() ?: return@filter false
-                    duration in 1..MAX_ACTIVITY_DURATION_MINUTES && !activity.additionTime.isAfter(event.additionTime)
+                    val duration = activity.duration ?: return@filter false
+                    duration in 1..MAX_ACTIVITY_DURATION_SECONDS && !activity.additionTime.isAfter(event.additionTime)
                 }
                 .filter { activity ->
-                    val end = activity.additionTime.plusMinutes(activity.duration?.toLong() ?: 0L)
+                    val end = activity.additionTime.plusSeconds(activity.duration ?: 0L)
                     Duration.between(end, event.additionTime).toMinutes() <= ACTIVITY_RELEVANCE_WINDOW_MINUTES
                 }
                 .maxByOrNull { it.additionTime }
@@ -103,7 +105,7 @@ object DetailedChartItemsBuilder {
                 insulinTimeAgo = insulinTimeAgoStr,
                 insulinUnits = insulinEvent?.value?.let { "${String.format(Locale.US, "%.1f", it)} Ед." },
                 activityTimeAgo = activityTimeAgoStr,
-                activityDuration = activityEvent?.duration?.let { "$it мин." }
+                activityDuration = activityEvent?.duration?.let { "${it.toChartMinutes()} мин." }
             )
         }
     }
@@ -112,11 +114,10 @@ object DetailedChartItemsBuilder {
         glucosePoints: List<DetailedGlucosePoint>,
         allDayEvents: List<EventV2>
     ): List<DetailedInsulinEntry> {
-        if (glucosePoints.isEmpty()) return emptyList()
         val insulinEvents = allDayEvents.filter { it.type is EventType.Insulin && it.value != null }
 
         return insulinEvents.map { ins ->
-            val timeStr = ins.additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME)
+            val timeStr = ins.additionTime.format(timeFormatter)
             val closestIdx = (0 until glucosePoints.size).minByOrNull { idx ->
                 val ptTime = glucosePoints[idx].timeLabel
                 Math.abs(timeStr.toMinutes() - ptTime.toMinutes())
@@ -142,11 +143,10 @@ object DetailedChartItemsBuilder {
         glucosePoints: List<DetailedGlucosePoint>,
         allDayEvents: List<EventV2>
     ): List<DetailedFoodEntry> {
-        if (glucosePoints.isEmpty()) return emptyList()
         val foodEvents = allDayEvents.filter { it.type is EventType.Bread && it.breadUnitsValue() != null }
 
         return foodEvents.map { food ->
-            val timeStr = food.additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME)
+            val timeStr = food.additionTime.format(timeFormatter)
             val closestIdx = (0 until glucosePoints.size).minByOrNull { idx ->
                 val ptTime = glucosePoints[idx].timeLabel
                 Math.abs(timeStr.toMinutes() - ptTime.toMinutes())
@@ -173,20 +173,24 @@ object DetailedChartItemsBuilder {
         allDayEvents: List<EventV2>
     ): List<com.elta.android.presentation.features.main.records.ui.compose.DetailedActivityEntry> {
         val activityEvents = allDayEvents.filter {
-            it.type is EventType.Activity && (it.duration?.toLong() ?: 0L) in 1..MAX_ACTIVITY_DURATION_MINUTES
+            it.type is EventType.Activity && (it.duration ?: 0L) in 1..MAX_ACTIVITY_DURATION_SECONDS
         }
         return activityEvents.map { act ->
-            val startStr = act.additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME)
-            val endStr = act.additionTime.plusMinutes(act.duration?.toLong() ?: 0L).toStringWithFormat(CommonFormats.FORMAT_TIME)
+            val startStr = act.additionTime.format(timeFormatter)
+            val durationSeconds = act.duration ?: 0L
+            val endTime = act.additionTime.plusSeconds(durationSeconds)
+            val endStr = endTime.format(timeFormatter)
             com.elta.android.presentation.features.main.records.ui.compose.DetailedActivityEntry(
                 startTimeLabel = startStr,
                 endTimeLabel = endStr,
-                durationMins = act.duration?.toLong() ?: 0L,
+                durationMins = durationSeconds.toChartMinutes(),
                 startDate = act.additionTime.toLocalDate(),
-                endDate = act.additionTime.plusMinutes(act.duration?.toLong() ?: 0L).toLocalDate()
+                endDate = endTime.toLocalDate()
             )
         }
     }
+
+    private fun Long.toChartMinutes(): Long = (this + 59L) / 60L
 
     private fun formatTimeAgo(minutes: Long): String {
         val hours = minutes / 60

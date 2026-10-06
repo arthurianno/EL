@@ -14,6 +14,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -37,6 +39,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -50,6 +53,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,6 +89,7 @@ import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
+import com.elta.android.domain.features.statistics.model.glucoseManagementIndicatorPercent
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.main.records.mapper.DetailedChartItemsBuilder
 import org.threeten.bp.LocalDate
@@ -107,6 +112,7 @@ private const val MAX_GLUCOSE = 16f
 private const val TREND_LINE_DASH_GAP_MINUTES = DAY_MINUTES
 private const val TREND_LINE_PREFERENCES = "glucose_chart_preferences"
 private const val TREND_LINE_STYLE_KEY = "continuous_trend_line_style"
+private const val ZOOM_HINT_SHOWN_KEY = "continuous_zoom_hint_shown"
 
 private val ContinuousBackground get() = NewDesignPaletteController.colors.normalEnd
 private val ContinuousPrimary = Color(0xFF3D4556)
@@ -159,6 +165,7 @@ internal fun ContinuousDetailedGlucoseChartScreen(
     }
     var isDatePickerVisible by remember { mutableStateOf(false) }
     var selectedPoint by remember { mutableStateOf<DetailedGlucosePoint?>(null) }
+    var selectedEvent by remember { mutableStateOf<ContinuousEvent?>(null) }
     var insulinVisible by remember { mutableStateOf(true) }
     var foodVisible by remember { mutableStateOf(true) }
     var activityVisible by remember { mutableStateOf(true) }
@@ -176,6 +183,9 @@ internal fun ContinuousDetailedGlucoseChartScreen(
         )
     }
     var isTrendLineMenuVisible by remember { mutableStateOf(false) }
+    var showZoomHint by remember {
+        mutableStateOf(!trendLinePreferences.getBoolean(ZOOM_HINT_SHOWN_KEY, false))
+    }
     val maxViewportDuration = MAX_VIEWPORT_MINUTES.coerceAtMost(historyDuration)
 
     fun updateViewport(start: Long, duration: Long) {
@@ -183,6 +193,7 @@ internal fun ContinuousDetailedGlucoseChartScreen(
         viewportDuration = safeDuration
         viewportStart = start.coerceIn(0L, (historyDuration - safeDuration).coerceAtLeast(0L))
         selectedPoint = null
+        selectedEvent = null
     }
 
     val viewportEnd = viewportStart + viewportDuration
@@ -265,6 +276,7 @@ internal fun ContinuousDetailedGlucoseChartScreen(
         SideEffect {
             (view.parent as? DialogWindowProvider)?.window?.let { window ->
                 window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 window.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
                     window.attributes.layoutInDisplayCutoutMode =
@@ -290,24 +302,37 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                 }
         ) {
             val isShort = maxHeight < 420.dp
-            val bottomHeight = if (isShort) 74.dp else 80.dp
+            val topPadding = max(topInset, if (isShort) 8.dp else 12.dp)
+            val bottomPadding = max(bottomInset, if (isShort) 8.dp else 12.dp)
+            val layout = continuousChartLayout(
+                screenWidth = maxWidth,
+                screenHeight = maxHeight,
+                sideMargin = maxSideMargin,
+                topPadding = topPadding,
+                bottomPadding = bottomPadding,
+                fontScale = LocalDensity.current.fontScale
+            )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .then(if (layout.scrollContent) Modifier.verticalScroll(rememberScrollState()) else Modifier)
                     .padding(
                         start = maxSideMargin,
                         end = maxSideMargin,
-                        top = max(topInset, if (isShort) 8.dp else 12.dp),
-                        bottom = max(bottomInset, if (isShort) 8.dp else 12.dp)
+                        top = topPadding,
+                        bottom = bottomPadding
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(modifier = Modifier.fillMaxWidth().height(22.dp)) {
+                Row(modifier = Modifier.fillMaxWidth().heightIn(min = 36.dp)) {
                     Row(
-                        modifier = Modifier.clip(RoundedCornerShape(6.dp)).clickable(onClick = onBackClick).padding(horizontal = 4.dp),
+                        modifier = Modifier.heightIn(min = 36.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .clickable(onClick = onBackClick)
+                            .padding(horizontal = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(painterResource(R.drawable.ic_arrow_left), "Назад", tint = Color.White, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(R.drawable.ic_arrow_left), "Назад", tint = Color.White, modifier = Modifier.size(20.dp).rotate(180f))
                         Spacer(Modifier.width(6.dp))
                         Text("Назад", fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Color.White)
                     }
@@ -316,7 +341,7 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
+                        .height(layout.chartCardHeight)
                         .clip(RoundedCornerShape(13.dp))
                         .border(1.dp, ContinuousBorder, RoundedCornerShape(13.dp))
                         .background(Color.White)
@@ -330,15 +355,18 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                             else -> "Месячная статистика"
                         }
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().heightIn(min = 22.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 text = periodTitle,
+                                modifier = Modifier.weight(1f),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = ContinuousPrimary
+                                color = ContinuousPrimary,
+                                maxLines = 2,
+                                lineHeight = 18.sp
                             )
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Row(
@@ -348,6 +376,9 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                                     Text("Количество измерений:", fontSize = 12.sp, color = ContinuousSecondary)
                                     Spacer(Modifier.width(4.dp))
                                     Text("${statistics.count}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ContinuousPrimary)
+                                }
+                                if (layout.inlineLegend) {
+                                    ContinuousLegend(Modifier.padding(end = 12.dp))
                                 }
                                 Box {
                                     Icon(
@@ -397,53 +428,70 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                             Text("ммоль/л", fontSize = 11.sp, color = ContinuousSecondary)
                             Text("хлебных ед./инсулин", fontSize = 11.sp, color = ContinuousSecondary, modifier = Modifier.padding(end = 36.dp))
                         }
-                        Spacer(Modifier.height(4.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth().weight(1f)
-                        ) {
-                            ContinuousAxisLabels(Modifier.width(20.dp).fillMaxHeight().padding(bottom = 20.dp))
-                            ContinuousTimelineGraph(
-                                modifier = Modifier.weight(1f).fillMaxHeight(),
-                                origin = historyStartDate,
-                                viewportStart = viewportStart,
-                                viewportDuration = viewportDuration,
-                                maxViewportDuration = maxViewportDuration,
-                                timelineDuration = historyDuration,
-                                pointLevels = pointLevels,
-                                insulinEntries = if (insulinVisible) insulinEntries else emptyList(),
-                                foodEntries = if (foodVisible) foodEntries else emptyList(),
-                                activityEntries = if (activityVisible) activityEntries else emptyList(),
-                                transparentBars = insulinVisible && foodVisible && activityVisible,
-                                selectedPoint = selectedPoint,
-                                trendLineStyle = trendLineStyle,
-                                onPointSelected = { selectedPoint = it },
-                                onViewportChanged = ::updateViewport
-                            )
-                            ContinuousAxisLabels(Modifier.width(20.dp).fillMaxHeight().padding(bottom = 20.dp), textAlign = TextAlign.End)
-                            Spacer(Modifier.width(8.dp))
-                            Column(
-                                modifier = Modifier.width(24.dp).fillMaxHeight().padding(bottom = 20.dp),
-                                verticalArrangement = Arrangement.SpaceEvenly,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_syringe_blue),
-                                    contentDescription = "Инсулин",
-                                    tint = if (insulinVisible) Color(0xFF2E7BE6) else Color(0xFFB0B3BA),
-                                    modifier = Modifier.size(18.dp).clickable { insulinVisible = !insulinVisible }
+                        if (!layout.inlineLegend) {
+                            ContinuousLegend(Modifier.padding(start = 20.dp, top = 2.dp))
+                            Spacer(Modifier.height(4.dp))
+                        }
+                        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                            Row(modifier = Modifier.fillMaxSize()) {
+                                ContinuousAxisLabels(Modifier.width(20.dp).fillMaxHeight().padding(bottom = 20.dp))
+                                ContinuousTimelineGraph(
+                                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                                    origin = historyStartDate,
+                                    viewportStart = viewportStart,
+                                    viewportDuration = viewportDuration,
+                                    maxViewportDuration = maxViewportDuration,
+                                    timelineDuration = historyDuration,
+                                    pointLevels = pointLevels,
+                                    insulinEntries = if (insulinVisible) insulinEntries else emptyList(),
+                                    foodEntries = if (foodVisible) foodEntries else emptyList(),
+                                    activityEntries = if (activityVisible) activityEntries else emptyList(),
+                                    selectedPoint = selectedPoint,
+                                    selectedEvent = selectedEvent,
+                                    trendLineStyle = trendLineStyle,
+                                    onPointSelected = { selectedPoint = it; selectedEvent = null },
+                                    onEventSelected = { selectedEvent = it; selectedPoint = null },
+                                    onViewportChanged = ::updateViewport
                                 )
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_spoon_and_fork_orange),
-                                    contentDescription = "Еда",
-                                    tint = if (foodVisible) Color(0xFFEE9C17) else Color(0xFFB0B3BA),
-                                    modifier = Modifier.size(18.dp).clickable { foodVisible = !foodVisible }
-                                )
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_walking_blue),
-                                    contentDescription = "Активность",
-                                    tint = if (activityVisible) Color(0xFF8B5CF6) else Color(0xFFB0B3BA),
-                                    modifier = Modifier.size(18.dp).clickable { activityVisible = !activityVisible }
-                                )
+                                ContinuousAxisLabels(Modifier.width(20.dp).fillMaxHeight().padding(bottom = 20.dp), textAlign = TextAlign.End)
+                                Spacer(Modifier.width(8.dp))
+                                Column(
+                                    modifier = Modifier.width(32.dp).fillMaxHeight().padding(bottom = 20.dp),
+                                    verticalArrangement = Arrangement.SpaceEvenly,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    ContinuousLayerButton(R.drawable.ic_syringe_blue, "Инсулин", insulinVisible, Color(0xFF2E7BE6)) {
+                                        insulinVisible = !insulinVisible
+                                        selectedEvent = null
+                                    }
+                                    ContinuousLayerButton(R.drawable.ic_spoon_and_fork_orange, "Еда", foodVisible, ContinuousHigh) {
+                                        foodVisible = !foodVisible
+                                        selectedEvent = null
+                                    }
+                                    ContinuousLayerButton(R.drawable.ic_walking_blue, "Активность", activityVisible, Color(0xFF8B5CF6)) {
+                                        activityVisible = !activityVisible
+                                        selectedEvent = null
+                                    }
+                                }
+                            }
+                            if (showZoomHint) {
+                                Row(
+                                    modifier = Modifier.align(Alignment.TopCenter)
+                                        .padding(top = 8.dp)
+                                        .fillMaxWidth(0.95f)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(ContinuousPrimary)
+                                        .clickable {
+                                            showZoomHint = false
+                                            trendLinePreferences.edit().putBoolean(ZOOM_HINT_SHOWN_KEY, true).apply()
+                                        }
+                                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("Сведите или разведите два пальца для изменения периода", modifier = Modifier.weight(1f), color = Color.White, fontSize = 11.sp, lineHeight = 12.sp)
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("Понятно", color = Color(0xFF8FE5D8), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
                         Column(
@@ -451,52 +499,12 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                                 .fillMaxWidth()
                                 .padding(start = 20.dp, end = 32.dp, top = 2.dp)
                         ) {
-                            BoxWithConstraints(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(10.dp)
-                                    .pointerInput(historyDuration, viewportDuration) {
-                                        detectTapGestures { offset ->
-                                            if (historyDuration > 0) {
-                                                val fraction = (offset.x / size.width).coerceIn(0f, 1f)
-                                                val targetMinute = (fraction * historyDuration).toLong()
-                                                updateViewport(targetMinute - viewportDuration / 2L, viewportDuration)
-                                            }
-                                        }
-                                    }
-                                    .pointerInput(historyDuration, viewportDuration) {
-                                        detectDragGestures { change, _ ->
-                                            change.consume()
-                                            if (historyDuration > 0) {
-                                                val fraction = (change.position.x / size.width).coerceIn(0f, 1f)
-                                                val targetMinute = (fraction * historyDuration).toLong()
-                                                updateViewport(targetMinute - viewportDuration / 2L, viewportDuration)
-                                            }
-                                        }
-                                    },
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(1.5.dp)
-                                        .clip(RoundedCornerShape(0.75.dp))
-                                        .background(Color(0xFFDCE1E5))
-                                )
-                                if (historyDuration > 0) {
-                                    val fractionStart = (viewportStart.toFloat() / historyDuration).coerceIn(0f, 1f)
-                                    val fractionWidth = (viewportDuration.toFloat() / historyDuration).coerceIn(0.02f, 1f)
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth(fractionWidth)
-                                            .offset(x = (maxWidth * fractionStart))
-                                            .height(5.dp)
-                                            .clip(RoundedCornerShape(2.5.dp))
-                                            .border(1.dp, Color(0xFF878B93), RoundedCornerShape(2.5.dp))
-                                            .background(Color.White)
-                                    )
-                                }
-                            }
+                            ContinuousViewportSlider(
+                                start = viewportStart,
+                                duration = viewportDuration,
+                                timelineDuration = historyDuration,
+                                onViewportChanged = ::updateViewport
+                            )
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
@@ -519,12 +527,20 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                 }
                 Spacer(Modifier.height(if (isShort) 4.dp else 8.dp))
                 Box(
-                    modifier = Modifier.fillMaxWidth().height(bottomHeight).clip(RoundedCornerShape(13.dp))
+                    modifier = Modifier.fillMaxWidth().height(layout.summaryHeight).clip(RoundedCornerShape(13.dp))
                         .border(1.dp, ContinuousBorder, RoundedCornerShape(13.dp)).background(Color.White)
                         .padding(horizontal = 20.dp, vertical = 6.dp)
                 ) {
-                    if (selectedPoint != null) ContinuousSelectedPointSummary(selectedPoint!!)
-                    else ContinuousStatisticsSummary(viewportTitle, statistics, viewportDuration)
+                    when {
+                        selectedEvent != null -> ContinuousSelectedEventSummary(selectedEvent!!, historyStartDate)
+                        selectedPoint != null -> ContinuousSelectedPointSummary(
+                            selectedPoint!!, layout.compactSummary, layout.denseMetrics
+                        )
+                        else -> ContinuousStatisticsSummary(
+                            viewportTitle, statistics, viewportDuration,
+                            layout.compactSummary, layout.denseMetrics
+                        )
+                    }
                 }
             }
         }
@@ -547,6 +563,84 @@ internal fun ContinuousDetailedGlucoseChartScreen(
 }
 
 @Composable
+private fun ContinuousViewportSlider(
+    start: Long,
+    duration: Long,
+    timelineDuration: Long,
+    onViewportChanged: (Long, Long) -> Unit
+) {
+    val currentStart by rememberUpdatedState(start)
+    val currentDuration by rememberUpdatedState(duration)
+    val currentUpdate by rememberUpdatedState(onViewportChanged)
+    Canvas(
+        modifier = Modifier.fillMaxWidth().height(28.dp)
+            .pointerInput(timelineDuration) {
+                fun seek(x: Float) {
+                    val selectedDuration = currentDuration
+                    currentUpdate(sliderViewportStart(x, size.width.toFloat(), selectedDuration, timelineDuration, 24.dp.toPx()), selectedDuration)
+                }
+                detectTapGestures { seek(it.x) }
+            }
+            .pointerInput(timelineDuration) {
+                var dragGrabOffset = 0f
+                fun seek(x: Float) {
+                    val selectedDuration = currentDuration
+                    currentUpdate(sliderViewportStart(x, size.width.toFloat(), selectedDuration, timelineDuration, 24.dp.toPx()), selectedDuration)
+                }
+                detectDragGestures(onDragStart = { touch ->
+                    val selectedDuration = currentDuration
+                    val knob = sliderKnobWidth(size.width.toFloat(), selectedDuration, timelineDuration, 24.dp.toPx())
+                    val travel = (size.width - knob).coerceAtLeast(0f)
+                    val currentLeft = currentStart.toFloat() / (timelineDuration - selectedDuration).coerceAtLeast(1L) * travel
+                    dragGrabOffset = if (touch.x in currentLeft..(currentLeft + knob)) {
+                        touch.x - currentLeft - knob / 2f
+                    } else {
+                        seek(touch.x)
+                        0f
+                    }
+                }) { change, _ ->
+                    seek(change.position.x - dragGrabOffset)
+                    change.consume()
+                }
+            }
+    ) {
+        val middle = size.height / 2f
+        drawLine(Color(0xFFDCE1E5), Offset(0f, middle), Offset(size.width, middle), strokeWidth = 2.dp.toPx())
+        if (timelineDuration > 0) {
+            val knob = sliderKnobWidth(size.width, duration, timelineDuration, 24.dp.toPx())
+            val travel = (size.width - knob).coerceAtLeast(0f)
+            val left = start.toFloat() / (timelineDuration - duration).coerceAtLeast(1L) * travel
+            drawRoundRect(
+                color = ContinuousPrimary,
+                topLeft = Offset(left, middle - 5.dp.toPx()),
+                size = Size(knob, 10.dp.toPx()),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(5.dp.toPx())
+            )
+        }
+    }
+}
+
+internal fun sliderViewportStart(
+    touchX: Float,
+    width: Float,
+    duration: Long,
+    timelineDuration: Long,
+    minimumKnobWidth: Float
+): Long {
+    if (width <= 0f || timelineDuration <= duration) return 0L
+    val knob = sliderKnobWidth(width, duration, timelineDuration, minimumKnobWidth)
+    val travel = (width - knob).coerceAtLeast(1f)
+    val fraction = ((touchX - knob / 2f) / travel).coerceIn(0f, 1f)
+    return ((timelineDuration - duration) * fraction).toLong()
+}
+
+private fun sliderKnobWidth(width: Float, duration: Long, timelineDuration: Long, minimum: Float): Float {
+    if (width <= 0f || timelineDuration <= 0L) return 0f
+    return (width * duration.toFloat() / timelineDuration)
+        .coerceIn(minimum.coerceAtMost(width), width)
+}
+
+@Composable
 private fun ContinuousTimelineGraph(
     modifier: Modifier,
     origin: LocalDate,
@@ -558,10 +652,11 @@ private fun ContinuousTimelineGraph(
     insulinEntries: List<DetailedInsulinEntry>,
     foodEntries: List<DetailedFoodEntry>,
     activityEntries: List<DetailedActivityEntry>,
-    transparentBars: Boolean,
     selectedPoint: DetailedGlucosePoint?,
+    selectedEvent: ContinuousEvent?,
     trendLineStyle: ContinuousTrendLineStyle,
     onPointSelected: (DetailedGlucosePoint?) -> Unit,
+    onEventSelected: (ContinuousEvent?) -> Unit,
     onViewportChanged: (Long, Long) -> Unit
 ) {
     val density = LocalDensity.current
@@ -569,6 +664,8 @@ private fun ContinuousTimelineGraph(
     // model and statistics are committed only after the gesture pauses.
     var visualViewportStart by remember { mutableStateOf(viewportStart) }
     var visualViewportDuration by remember { mutableStateOf(viewportDuration) }
+    val currentVisualStart by rememberUpdatedState(visualViewportStart)
+    val currentVisualDuration by rememberUpdatedState(visualViewportDuration)
     LaunchedEffect(viewportStart, viewportDuration) {
         if (visualViewportStart != viewportStart || visualViewportDuration != viewportDuration) {
             visualViewportStart = viewportStart
@@ -597,31 +694,63 @@ private fun ContinuousTimelineGraph(
     val visualRealPoints = remember(pointLevels, visualViewportStart, visualViewportDuration, origin) {
         pointLevels.raw.visibleIn(origin, visualViewportStart, visualViewportStart + visualViewportDuration)
     }
+    val visibleEvents = remember(foodEntries, insulinEntries, activityEntries, origin, visualViewportStart, visualViewportDuration) {
+        continuousEvents(foodEntries, insulinEntries, activityEntries, origin, visualViewportStart, visualViewportDuration)
+    }
     BoxWithConstraints(modifier) {
         val widthPx = with(density) { maxWidth.toPx() }
         val labelAreaWidth = maxWidth
+        val visibleLabels = remember(labels, maxWidth) {
+            val minimumGap = 50f / maxWidth.value.coerceAtLeast(1f)
+            val lastFraction = labels.lastOrNull()?.fraction ?: 1f
+            buildList<ContinuousTimelineLabel> {
+                labels.forEachIndexed { index, label ->
+                    if (index == 0 || index == labels.lastIndex ||
+                        (label.fraction - last().fraction >= minimumGap && lastFraction - label.fraction >= minimumGap)
+                    ) add(label)
+                }
+            }
+        }
         val hitRadius = with(density) { 24.dp.toPx() }
+        val eventHitRadius = with(density) { 36.dp.toPx() }
         Column(Modifier.fillMaxSize()) {
             Canvas(
                 modifier = Modifier.weight(1f).fillMaxWidth()
-                    .pointerInput(visualRealPoints, visualViewportStart, visualViewportDuration) {
+                    .pointerInput(visualRealPoints, visibleEvents, visualViewportStart, visualViewportDuration, selectedPoint, selectedEvent) {
                         detectTapGestures { offset ->
+                            val chartHeight = size.height - with(density) { 18.dp.toPx() }
+                            val horizontalInset = with(density) { 7.dp.toPx() }.coerceAtMost(widthPx / 2f)
+                            fun eventDistanceSquared(event: ContinuousEvent): Float {
+                                val x = ((event.centerMinute - visualViewportStart).toFloat() / visualViewportDuration * widthPx +
+                                    with(density) { event.horizontalOffsetDp.dp.toPx() }).coerceIn(horizontalInset, widthPx - horizontalInset)
+                                val y = if (event.kind == ContinuousEventKind.ACTIVITY) chartHeight + with(density) { 8.dp.toPx() }
+                                    else chartHeight - (chartHeight * event.height).coerceAtLeast(with(density) { 7.dp.toPx() }) - with(density) { 10.dp.toPx() }
+                                return (x - offset.x) * (x - offset.x) + (y - offset.y) * (y - offset.y)
+                            }
+                            val nearestEvent = visibleEvents.minByOrNull(::eventDistanceSquared)
+                            if (nearestEvent != null && eventDistanceSquared(nearestEvent) <= eventHitRadius * eventHitRadius) {
+                                onEventSelected(nearestEvent.takeIf { it != selectedEvent })
+                                return@detectTapGestures
+                            }
                             if (visualResolution != ContinuousGlucoseResolution.RAW) return@detectTapGestures
                             val nearest = visualRealPoints.minByOrNull { point ->
-                                abs(point.continuousMinute(origin) - (visualViewportStart + offset.x / widthPx * visualViewportDuration)).toFloat()
+                                val x = (point.continuousMinute(origin) - visualViewportStart).toFloat() / visualViewportDuration * widthPx
+                                val y = chartHeight * (1f - (point.value / MAX_GLUCOSE).coerceIn(0f, 1f))
+                                (x - offset.x) * (x - offset.x) + (y - offset.y) * (y - offset.y)
                             }
-                            val distance = nearest?.let { point ->
-                                abs(point.continuousMinute(origin) - (visualViewportStart + offset.x / widthPx * visualViewportDuration)) /
-                                    visualViewportDuration.toFloat() * widthPx
-                            } ?: Float.MAX_VALUE
-                            onPointSelected(nearest?.takeIf { distance <= hitRadius && it != selectedPoint })
+                            val hit = nearest?.takeIf { point ->
+                                val x = (point.continuousMinute(origin) - visualViewportStart).toFloat() / visualViewportDuration * widthPx
+                                val y = chartHeight * (1f - (point.value / MAX_GLUCOSE).coerceIn(0f, 1f))
+                                (x - offset.x) * (x - offset.x) + (y - offset.y) * (y - offset.y) <= hitRadius * hitRadius
+                            }
+                            onPointSelected(hit?.takeIf { it != selectedPoint })
                         }
                     }
                     .pointerInput(widthPx) {
                         detectTransformGestures { centroid, pan, zoom, _ ->
-                            val nextDuration = (visualViewportDuration / zoom).roundToLong()
+                            val nextDuration = (currentVisualDuration / zoom).roundToLong()
                             val focusFraction = (centroid.x / widthPx).coerceIn(0f, 1f)
-                            val focusMinute = visualViewportStart + (visualViewportDuration * focusFraction).roundToLong()
+                            val focusMinute = currentVisualStart + (currentVisualDuration * focusFraction).roundToLong()
                             val startAfterZoom = focusMinute - (nextDuration * focusFraction).roundToLong()
                             val panMinutes = (pan.x / widthPx * nextDuration).roundToLong()
                             val safeDuration = nextDuration.coerceIn(MIN_VIEWPORT_MINUTES, maxViewportDuration)
@@ -631,7 +760,7 @@ private fun ContinuousTimelineGraph(
                         }
                     }
             ) {
-                val activityTrackHeight = 9.dp.toPx()
+                val activityTrackHeight = 18.dp.toPx()
                 val chartHeight = size.height - activityTrackHeight
                 val xForMinute: (Long) -> Float = { minute ->
                     ((minute - visualViewportStart).toFloat() / visualViewportDuration * size.width)
@@ -643,18 +772,20 @@ private fun ContinuousTimelineGraph(
                     drawLine(Color(0xFFDCE1E5), Offset(0f, y), Offset(size.width, y), pathEffect = dash, strokeWidth = 1.dp.toPx())
                 }
                 drawLine(Color(0xFFDCE1E5), Offset(0f, chartHeight), Offset(size.width, chartHeight), strokeWidth = 1.dp.toPx())
-                val events = continuousEvents(foodEntries, insulinEntries, origin, visualViewportStart, visualViewportDuration, size.width, density.density)
-                events.forEach { event ->
+                visibleEvents.filter { it.kind != ContinuousEventKind.ACTIVITY }.forEach { event ->
+                    val horizontalInset = minOf(7.dp.toPx(), size.width / 2f)
+                    val x = (xForMinute(event.centerMinute) + event.horizontalOffsetDp.dp.toPx())
+                        .coerceIn(horizontalInset, size.width - horizontalInset)
                     val barHeight = chartHeight * event.height.coerceIn(0f, 1f)
                     drawRoundRect(
-                        color = event.color.copy(alpha = if (transparentBars) .45f else 1f),
-                        topLeft = Offset(event.x - event.barWidth / 2f, chartHeight - barHeight),
-                        size = Size(event.barWidth, barHeight),
+                        color = event.color,
+                        topLeft = Offset(x - 7.dp.toPx(), chartHeight - barHeight),
+                        size = Size(14.dp.toPx(), barHeight.coerceAtLeast(7.dp.toPx())),
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(3.dp.toPx(), 3.dp.toPx())
                     )
-                    drawCircle(event.color, 2.5.dp.toPx(), Offset(event.x, chartHeight + 3.dp.toPx()))
+                    drawCircle(event.color, 3.dp.toPx(), Offset(x, chartHeight + 8.dp.toPx()))
                     if (visualResolution == ContinuousGlucoseResolution.RAW) {
-                        drawContinuousEventLabel(event, chartHeight - barHeight)
+                        drawContinuousEventLabel(event, x, chartHeight - barHeight)
                     }
                 }
                 val offsets = visualPoints.map { point -> point to Offset(
@@ -714,18 +845,20 @@ private fun ContinuousTimelineGraph(
                             pathEffect = dash, strokeWidth = 1.dp.toPx())
                     }
                 }
-                activityEntries.forEach { entry ->
-                    val start = entry.continuousStartMinute(origin)
-                    val end = entry.continuousEndMinute(origin)
-                    if (end >= visualViewportStart && start <= visualViewportStart + visualViewportDuration) {
-                        drawLine(ContinuousBackground, Offset(xForMinute(start), chartHeight + 7.dp.toPx()),
-                            Offset(xForMinute(end).coerceAtLeast(xForMinute(start) + 18.dp.toPx()), chartHeight + 7.dp.toPx()),
-                            strokeWidth = 3.dp.toPx(), cap = StrokeCap.Round)
-                    }
+                visibleEvents.filter { it.kind == ContinuousEventKind.ACTIVITY }.forEach { event ->
+                    val left = xForMinute(event.startMinute).coerceIn(0f, size.width)
+                    val right = xForMinute(event.endMinute).coerceIn(0f, size.width)
+                    drawLine(
+                        color = event.color,
+                        start = Offset(left, chartHeight + 8.dp.toPx()),
+                        end = Offset((right).coerceAtLeast(left + 10.dp.toPx()).coerceAtMost(size.width), chartHeight + 8.dp.toPx()),
+                        strokeWidth = 7.dp.toPx(),
+                        cap = StrokeCap.Round
+                    )
                 }
             }
             Box(Modifier.fillMaxWidth().height(24.dp)) {
-                labels.forEach { label ->
+                visibleLabels.forEach { label ->
                     Text(label.text, fontSize = 11.sp, color = ContinuousSecondary, fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(top = 3.dp).width(48.dp)
                             .offset(x = (labelAreaWidth * label.fraction - 18.dp).coerceIn(0.dp, labelAreaWidth - 48.dp)),
@@ -783,13 +916,18 @@ private fun List<DetailedGlucosePoint>.bucketAverages(
     .toList()
 
 private data class ContinuousTimelineLabel(val fraction: Float, val text: String)
+private enum class ContinuousEventKind { FOOD, INSULIN, ACTIVITY }
+
 private data class ContinuousEvent(
-    val x: Float,
-    val barWidth: Float,
-    val labelCenterX: Float,
+    val kind: ContinuousEventKind,
+    val startMinute: Long,
+    val endMinute: Long,
+    val centerMinute: Long,
     val height: Float,
     val color: Color,
-    val label: String
+    val label: String,
+    val timeLabel: String,
+    val horizontalOffsetDp: Float = 0f
 )
 
 private fun continuousTimeLabels(origin: LocalDate, start: Long, duration: Long): List<ContinuousTimelineLabel> {
@@ -814,106 +952,84 @@ private fun continuousTimeLabels(origin: LocalDate, start: Long, duration: Long)
 private fun continuousEvents(
     food: List<DetailedFoodEntry>,
     insulin: List<DetailedInsulinEntry>,
+    activity: List<DetailedActivityEntry>,
     origin: LocalDate,
     start: Long,
-    duration: Long,
-    width: Float,
-    density: Float
-): List<ContinuousEvent> {
-    val foodByHour = food.groupBy { it.continuousMinute(origin) / 60L }
-    val insulinByHour = insulin.groupBy { it.continuousMinute(origin) / 60L }
-    val allHours = (foodByHour.keys + insulinByHour.keys).distinct().sorted()
-
-    val result = mutableListOf<ContinuousEvent>()
-
-    for (hour in allHours) {
-        val eventMinute = hour * 60L + 30L
-        if (eventMinute !in start..(start + duration)) continue
-
-        val centerX = (eventMinute - start).toFloat() / duration * width
-        val foodList = foodByHour[hour]
-        val insulinList = insulinByHour[hour]
-
-        val hasFood = !foodList.isNullOrEmpty()
-        val hasInsulin = !insulinList.isNullOrEmpty()
-
-        if (hasFood && hasInsulin) {
-            val foodTotal = foodList!!.sumOf { it.continuousValue().toDouble() }.toFloat()
-            val insulinTotal = insulinList!!.sumOf { it.continuousValue().toDouble() }.toFloat()
-
-            val barW = 8.5f * density
-            val gap = 3f * density
-            val foodX = centerX - (barW / 2f + gap / 2f)
-            val insulinX = centerX + (barW / 2f + gap / 2f)
-
-            result.add(
-                ContinuousEvent(
-                    x = foodX,
-                    barWidth = barW,
-                    labelCenterX = foodX,
-                    height = foodTotal / 150f,
-                    color = ContinuousHigh,
-                    label = "${String.format(Locale.US, "%.1f", foodTotal)} ХЕ"
-                )
+    duration: Long
+): List<ContinuousEvent> = buildList {
+    val end = start + duration
+    val foodMinutes = food.map { it.continuousMinute(origin) }.toSet()
+    val insulinMinutes = insulin.map { it.continuousMinute(origin) }.toSet()
+    food.forEach { entry ->
+        val minute = entry.continuousMinute(origin)
+        if (minute in start..end) add(
+            ContinuousEvent(
+                kind = ContinuousEventKind.FOOD,
+                startMinute = minute,
+                endMinute = minute,
+                centerMinute = minute,
+                height = entry.heightRatio,
+                color = ContinuousHigh,
+                label = entry.breadUnits,
+                timeLabel = entry.timeLabel,
+                horizontalOffsetDp = if (minute in insulinMinutes) -32f else 0f
             )
-            result.add(
-                ContinuousEvent(
-                    x = insulinX,
-                    barWidth = barW,
-                    labelCenterX = insulinX,
-                    height = insulinTotal / 150f,
-                    color = ContinuousNormal,
-                    label = "${String.format(Locale.US, "%.1f", insulinTotal)} Ед."
-                )
-            )
-        } else if (hasFood) {
-            val foodTotal = foodList!!.sumOf { it.continuousValue().toDouble() }.toFloat()
-            val barW = 14f * density
-            result.add(
-                ContinuousEvent(
-                    x = centerX,
-                    barWidth = barW,
-                    labelCenterX = centerX,
-                    height = foodTotal / 150f,
-                    color = ContinuousHigh,
-                    label = "${String.format(Locale.US, "%.1f", foodTotal)} ХЕ"
-                )
-            )
-        } else if (hasInsulin) {
-            val insulinTotal = insulinList!!.sumOf { it.continuousValue().toDouble() }.toFloat()
-            val barW = 14f * density
-            result.add(
-                ContinuousEvent(
-                    x = centerX,
-                    barWidth = barW,
-                    labelCenterX = centerX,
-                    height = insulinTotal / 150f,
-                    color = ContinuousNormal,
-                    label = "${String.format(Locale.US, "%.1f", insulinTotal)} Ед."
-                )
-            )
-        }
+        )
     }
-    return result
+    insulin.forEach { entry ->
+        val minute = entry.continuousMinute(origin)
+        if (minute in start..end) add(
+            ContinuousEvent(
+                kind = ContinuousEventKind.INSULIN,
+                startMinute = minute,
+                endMinute = minute,
+                centerMinute = minute,
+                height = entry.heightRatio,
+                color = Color(0xFF2E7BE6),
+                label = entry.units,
+                timeLabel = entry.timeLabel,
+                horizontalOffsetDp = if (minute in foodMinutes) 32f else 0f
+            )
+        )
+    }
+    activity.forEach { entry ->
+        val eventStart = entry.continuousStartMinute(origin)
+        val eventEnd = entry.continuousEndMinute(origin)
+        if (eventEnd >= start && eventStart <= end) add(
+            ContinuousEvent(
+                kind = ContinuousEventKind.ACTIVITY,
+                startMinute = eventStart,
+                endMinute = eventEnd,
+                centerMinute = (maxOf(eventStart, start) + minOf(eventEnd, end)) / 2,
+                height = 0f,
+                color = Color(0xFF8B5CF6),
+                label = "${entry.durationMins} мин",
+                timeLabel = entry.startTimeLabel
+            )
+        )
+    }
 }
 
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawContinuousEventLabel(event: ContinuousEvent, top: Float) {
-    val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.WHITE; textSize = 10.sp.toPx(); textAlign = Paint.Align.CENTER }
-    val width = paint.measureText(event.label) + 12.dp.toPx()
-    val left = (event.labelCenterX - width / 2f).coerceIn(0f, size.width - width)
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawContinuousEventLabel(
+    event: ContinuousEvent,
+    centerX: Float,
+    top: Float
+) {
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = android.graphics.Color.WHITE
+        textSize = 10.sp.toPx()
+        textAlign = Paint.Align.CENTER
+    }
+    val badgeWidth = paint.measureText(event.label) + 12.dp.toPx()
+    val left = (centerX - badgeWidth / 2f).coerceIn(0f, (size.width - badgeWidth).coerceAtLeast(0f))
     val labelTop = (top - 22.dp.toPx()).coerceAtLeast(2.dp.toPx())
     drawRoundRect(
         color = event.color,
         topLeft = Offset(left, labelTop),
-        size = Size(width, 18.dp.toPx()),
+        size = Size(badgeWidth, 18.dp.toPx()),
         cornerRadius = androidx.compose.ui.geometry.CornerRadius(4.dp.toPx(), 4.dp.toPx())
     )
-    drawContext.canvas.nativeCanvas.drawText(
-        event.label,
-        left + width / 2f,
-        labelTop + 13.dp.toPx(),
-        paint
-    )
+    drawContext.canvas.nativeCanvas.drawText(event.label, left + badgeWidth / 2f, labelTop + 13.dp.toPx(), paint)
 }
 
 private data class ContinuousStatistics(
@@ -928,7 +1044,7 @@ private data class ContinuousStatistics(
             val low = points.count { settings?.low?.contains(it.value.toDouble()) ?: (it.value < 3.9f) }
             val sd = if (points.size >= 2) average?.let { mean -> sqrt(points.map { (it.value - mean) * (it.value - mean) }.average()).toFloat() } else null
             val cv = if (average != null && average > 0f && sd != null) (sd / average * 100).roundToLong().toInt() else null
-            val gmi = average?.let { 12.71f + .091f * (it * 18.0182f) }
+            val gmi = average?.let { glucoseManagementIndicatorPercent(it.toDouble()).toFloat() }
             return ContinuousStatistics(points, points.size, average, normal, high, low, sd, cv, gmi)
         }
     }
@@ -950,12 +1066,29 @@ private fun ContinuousAxisLabels(modifier: Modifier, textAlign: TextAlign = Text
         )
     }
 }
-@Composable private fun ContinuousEventAxis(modifier: Modifier) = Column(modifier, verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.End) {
-    listOf("16", "12", "8", "4", "0").forEach { Text(it, fontSize = 11.sp, color = ContinuousSecondary, fontWeight = FontWeight.Medium, textAlign = TextAlign.End, modifier = Modifier.fillMaxWidth()) }
+@Composable
+private fun ContinuousLayerButton(
+    icon: Int,
+    description: String,
+    active: Boolean,
+    color: Color,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier.size(32.dp)
+            .clip(CircleShape)
+            .background(if (active) color.copy(alpha = 0.16f) else Color(0xFFF3F4F6))
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = description,
+            tint = if (active) color else Color(0xFFB0B3BA),
+            modifier = Modifier.size(18.dp)
+        )
+    }
 }
-@Composable private fun ContinuousLayerButton(icon: Int, active: Boolean, color: Color, onClick: () -> Unit) = Box(
-    Modifier.size(32.dp).clip(CircleShape).background(if (active) color.copy(alpha = .16f) else Color(0xFFF3F4F6)).clickable(onClick = onClick), contentAlignment = Alignment.Center
-) { Icon(painterResource(icon), "Переключить слой", tint = if (active) color else Color(0xFFB0B3BA), modifier = Modifier.size(18.dp)) }
 
 @Composable private fun ContinuousLegendItem(color: Color, label: String) = Row(verticalAlignment = Alignment.CenterVertically) {
     Box(Modifier.size(8.dp).clip(CircleShape).background(color))
@@ -963,110 +1096,92 @@ private fun ContinuousAxisLabels(modifier: Modifier, textAlign: TextAlign = Text
     Text(label, fontSize = 11.sp, color = ContinuousSecondary)
 }
 
-@Composable private fun ContinuousExtremes(statistics: ContinuousStatistics) {
-    val min = statistics.points.minByOrNull { it.value }
-    val max = statistics.points.maxByOrNull { it.value }
-    if (min != null && max != null && min != max) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            ContinuousExtremeChip("min ${continuousFormat(min.value)}", ContinuousLow)
-            Spacer(Modifier.width(6.dp))
-            ContinuousExtremeChip("max ${continuousFormat(max.value)}", ContinuousHigh)
-        }
+@Composable
+private fun ContinuousLegend(modifier: Modifier = Modifier) {
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        ContinuousLegendItem(ContinuousLow, "Низкий")
+        ContinuousLegendItem(ContinuousNormal, "Норма")
+        ContinuousLegendItem(ContinuousHigh, "Высокий")
     }
 }
-
-@Composable private fun ContinuousExtremeChip(text: String, color: Color) = Text(
-    text = text,
-    color = Color.White,
-    fontSize = 11.sp,
-    fontWeight = FontWeight.SemiBold,
-    modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(color).padding(horizontal = 7.dp, vertical = 3.dp)
-)
 
 @Composable
 private fun ContinuousStatisticsSummary(
     title: String,
-    s: ContinuousStatistics,
-    viewportDuration: Long
-) = Row(
-    modifier = Modifier.fillMaxSize(),
-    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically
+    statistics: ContinuousStatistics,
+    viewportDuration: Long,
+    compact: Boolean,
+    denseMetrics: Boolean
 ) {
-    // 1. Column 1: Date
-    Box(
-        modifier = Modifier.padding(horizontal = 8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = title,
-            fontSize = 15.sp,
-            color = ContinuousPrimary,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            lineHeight = 18.sp
-        )
-    }
-
-    // Divider 1
-    Box(Modifier.width(1.dp).height(50.dp).background(Color(0xFFE3E7EB)))
-
-    // 2. Column 2: Average Glucose (Orange)
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 10.dp)
-    ) {
-        Text(
-            text = continuousFormat(s.average),
-            fontSize = 32.sp,
-            color = Color(0xFFEE7300),
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "ммоль/л",
-            fontSize = 11.sp,
-            color = Color(0xFFEE7300),
-            fontWeight = FontWeight.Medium
-        )
-        Text(
-            text = if (viewportDuration <= DAY_MINUTES) "средний за день" else "средний за период",
-            fontSize = 10.sp,
-            color = ContinuousSecondary
-        )
-    }
-
-    // Divider 2
-    Box(Modifier.width(1.dp).height(50.dp).background(Color(0xFFE3E7EB)))
-
-    // 3. Column 3: TIR (3 sub-columns)
     val isSingleDay = viewportDuration <= DAY_MINUTES
-    val totalMins = if (isSingleDay) 24 * 60L else viewportDuration
-    val normMins = if (s.count > 0) (s.normal.toFloat() / s.count * totalMins).toLong() else 0L
-    val highMins = if (s.count > 0) (s.high.toFloat() / s.count * totalMins).toLong() else 0L
-    val lowMins = if (s.count > 0) (s.low.toFloat() / s.count * totalMins).toLong() else 0L
+    val totalMinutes = if (isSingleDay) DAY_MINUTES else viewportDuration
+    val normalMinutes = if (statistics.count == 0) 0L else statistics.normal * totalMinutes / statistics.count
+    val highMinutes = if (statistics.count == 0) 0L else statistics.high * totalMinutes / statistics.count
+    val lowMinutes = if (statistics.count == 0) 0L else statistics.low * totalMinutes / statistics.count
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(horizontal = 6.dp)
-    ) {
-        ContinuousTirColumn(ContinuousNormal, percent(s.normal, s.count), formatDuration(normMins, isSingleDay))
-        ContinuousTirColumn(ContinuousHigh, percent(s.high, s.count), formatDuration(highMins, isSingleDay))
-        ContinuousTirColumn(ContinuousLow, percent(s.low, s.count), formatDuration(lowMins, isSingleDay))
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val compactRowHeight = maxHeight / 2f
+        if (compact) {
+            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                Row(Modifier.fillMaxWidth().heightIn(min = compactRowHeight), verticalAlignment = Alignment.CenterVertically) {
+                    ContinuousDateMetric(title, Modifier.weight(1.1f))
+                    ContinuousAverageMetric(statistics, isSingleDay, Modifier.weight(0.9f), compact = true)
+                    ContinuousTirMetrics(statistics, normalMinutes, highMinutes, lowMinutes, isSingleDay, Modifier.weight(1.7f), compact = true)
+                }
+                ContinuousVariabilityMetrics(statistics, Modifier.fillMaxWidth().heightIn(min = compactRowHeight), compact = true)
+            }
+        } else {
+            Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+                ContinuousDateMetric(title, Modifier.weight(1.1f))
+                ContinuousAverageMetric(statistics, isSingleDay, Modifier.weight(0.9f), compact = denseMetrics)
+                ContinuousTirMetrics(statistics, normalMinutes, highMinutes, lowMinutes, isSingleDay, Modifier.weight(1.6f), compact = denseMetrics)
+                ContinuousVariabilityMetrics(statistics, Modifier.weight(1.3f), compact = denseMetrics)
+            }
+        }
     }
+}
 
-    // Divider 3
-    Box(Modifier.width(1.dp).height(50.dp).background(Color(0xFFE3E7EB)))
+@Composable
+private fun ContinuousDateMetric(title: String, modifier: Modifier) {
+    Text(title, modifier = modifier, fontSize = 13.sp, lineHeight = 15.sp,
+        color = ContinuousPrimary, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+}
 
-    // 4. Column 4: Variability metrics (CV, SD, GMI)
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(horizontal = 8.dp)
-    ) {
-        ContinuousMetric(s.cv?.let { "$it%" } ?: "-", "", "CV")
-        ContinuousMetric(s.sd?.let(::continuousFormat) ?: "-", "", "SD")
-        ContinuousMetric(s.gmi?.let { "${continuousFormat(it)}%" } ?: "-", "", "GMI")
+@Composable
+private fun ContinuousAverageMetric(s: ContinuousStatistics, isSingleDay: Boolean, modifier: Modifier, compact: Boolean) {
+    ContinuousMetric(
+        value = continuousFormat(s.average),
+        subtitle = if (isSingleDay) "средний за день" else "средний за период",
+        label = "ммоль/л",
+        modifier = modifier,
+        color = Color(0xFFEE7300),
+        compact = compact
+    )
+}
+
+@Composable
+private fun ContinuousTirMetrics(
+    s: ContinuousStatistics,
+    normalMinutes: Long,
+    highMinutes: Long,
+    lowMinutes: Long,
+    isSingleDay: Boolean,
+    modifier: Modifier,
+    compact: Boolean
+) {
+    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+        ContinuousTirColumn(ContinuousNormal, percent(s.normal, s.count), formatDuration(normalMinutes, isSingleDay), Modifier.weight(1f), compact)
+        ContinuousTirColumn(ContinuousHigh, percent(s.high, s.count), formatDuration(highMinutes, isSingleDay), Modifier.weight(1f), compact)
+        ContinuousTirColumn(ContinuousLow, percent(s.low, s.count), formatDuration(lowMinutes, isSingleDay), Modifier.weight(1f), compact)
+    }
+}
+
+@Composable
+private fun ContinuousVariabilityMetrics(s: ContinuousStatistics, modifier: Modifier, compact: Boolean) {
+    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+        ContinuousMetric(s.cv?.let { "$it%" } ?: "-", "", "CV", Modifier.weight(1f), compact = compact)
+        ContinuousMetric(s.sd?.let(::continuousFormat) ?: "-", "", "SD", Modifier.weight(1f), compact = compact)
+        ContinuousMetric(s.gmi?.let { "${continuousFormat(it)}%" } ?: "-", "", "GMI", Modifier.weight(1f), compact = compact)
     }
 }
 
@@ -1074,26 +1189,19 @@ private fun ContinuousStatisticsSummary(
 private fun ContinuousTirColumn(
     dotColor: Color,
     percentText: String,
-    timeText: String
-) = Column(
-    horizontalAlignment = Alignment.CenterHorizontally
-) {
+    timeText: String,
+    modifier: Modifier,
+    compact: Boolean
+) = Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(6.dp).clip(CircleShape).background(dotColor))
-        Spacer(Modifier.width(4.dp))
-        Text("TIR", fontSize = 11.sp, color = ContinuousSecondary)
+        Spacer(Modifier.width(3.dp))
+        Text("TIR", fontSize = 10.sp, color = ContinuousSecondary)
     }
-    Text(
-        text = percentText,
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Bold,
-        color = ContinuousPrimary
-    )
-    Text(
-        text = timeText,
-        fontSize = 11.sp,
-        color = ContinuousSecondary
-    )
+    Text(percentText, fontSize = if (compact) 16.sp else 20.sp,
+        fontWeight = FontWeight.Bold, color = ContinuousPrimary, maxLines = 1)
+    Text(timeText, fontSize = if (compact) 9.sp else 11.sp,
+        color = ContinuousSecondary, maxLines = 1)
 }
 
 private fun formatDuration(mins: Long, isSingleDay: Boolean): String {
@@ -1113,14 +1221,86 @@ private fun formatDuration(mins: Long, isSingleDay: Boolean): String {
     }
 }
 
-@Composable private fun ContinuousMetric(value: String, subtitle: String, label: String) = Column(horizontalAlignment = Alignment.CenterHorizontally) { Text(if (label.isBlank()) subtitle else label, fontSize = 11.sp, color = ContinuousSecondary); Text(value, fontSize = 20.sp, color = ContinuousPrimary, fontWeight = FontWeight.Bold); Text(if (label.isBlank()) "" else subtitle, fontSize = 10.sp, color = ContinuousSecondary) }
-@Composable private fun ContinuousSelectedPointSummary(point: DetailedGlucosePoint) = Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-    ContinuousMetric(point.timeLabel, "время", "")
-    ContinuousMetric(continuousFormat(point.value), "ммоль/л", "")
-    ContinuousMetric("${point.trendValue}", point.trendText, "Тренд")
-    ContinuousMetric(point.foodUnits ?: "-", point.foodTimeAgo ?: "", "Еда")
-    ContinuousMetric(point.insulinUnits ?: "-", point.insulinTimeAgo ?: "", "Инсулин")
-    ContinuousMetric(point.activityDuration ?: "-", point.activityTimeAgo ?: "", "Активность")
+@Composable
+private fun ContinuousMetric(
+    value: String,
+    subtitle: String,
+    label: String,
+    modifier: Modifier = Modifier,
+    color: Color = ContinuousPrimary,
+    icon: Int? = null,
+    compact: Boolean = false
+) = Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        if (icon != null) {
+            Icon(painterResource(icon), contentDescription = null, tint = color, modifier = Modifier.size(12.dp))
+            Spacer(Modifier.width(3.dp))
+        }
+        Text(label, fontSize = if (compact) 10.sp else 11.sp, color = ContinuousSecondary, maxLines = 1)
+    }
+    Text(value, fontSize = if (compact) 16.sp else 20.sp, color = color,
+        fontWeight = FontWeight.Bold, maxLines = 1)
+    if (subtitle.isNotEmpty()) Text(subtitle, fontSize = if (compact) 9.sp else 10.sp,
+        color = ContinuousSecondary, maxLines = 2, lineHeight = if (compact) 10.sp else 11.sp)
+}
+
+@Composable
+private fun ContinuousSelectedPointSummary(
+    point: DetailedGlucosePoint,
+    compact: Boolean,
+    denseMetrics: Boolean
+) {
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val compactRowHeight = maxHeight / 2f
+        val trendColor = when {
+            point.trendValue.startsWith("+") -> ContinuousHigh
+            point.trendValue.startsWith("-") -> ContinuousLow
+            else -> ContinuousNormal
+        }
+        if (compact) {
+            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                Row(Modifier.fillMaxWidth().heightIn(min = compactRowHeight), verticalAlignment = Alignment.CenterVertically) {
+                    ContinuousMetric(point.timeLabel, "", "Время", Modifier.weight(1f), compact = true)
+                    ContinuousMetric(continuousFormat(point.value), "ммоль/л", "Глюкоза", Modifier.weight(1f), continuousPointColor(point.value), compact = true)
+                    ContinuousMetric(point.trendValue, point.trendText, "Тренд", Modifier.weight(1f), trendColor, compact = true)
+                }
+                Row(Modifier.fillMaxWidth().heightIn(min = compactRowHeight), verticalAlignment = Alignment.CenterVertically) {
+                    ContinuousMetric(point.foodUnits ?: "-", point.foodTimeAgo ?: "", "Еда", Modifier.weight(1f), ContinuousHigh, R.drawable.ic_spoon_and_fork_orange, true)
+                    ContinuousMetric(point.insulinUnits ?: "-", point.insulinTimeAgo ?: "", "Инсулин", Modifier.weight(1f), Color(0xFF2E7BE6), R.drawable.ic_syringe_blue, true)
+                    ContinuousMetric(point.activityDuration ?: "-", point.activityTimeAgo ?: "", "Активность", Modifier.weight(1f), Color(0xFF8B5CF6), R.drawable.ic_walking_blue, true)
+                }
+            }
+        } else {
+            Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+                ContinuousMetric(point.timeLabel, "", "Время", Modifier.weight(1f), compact = denseMetrics)
+                ContinuousMetric(continuousFormat(point.value), "ммоль/л", "Глюкоза", Modifier.weight(1f), continuousPointColor(point.value), compact = denseMetrics)
+                ContinuousMetric(point.trendValue, point.trendText, "Тренд", Modifier.weight(1f), trendColor, compact = denseMetrics)
+                ContinuousMetric(point.foodUnits ?: "-", point.foodTimeAgo ?: "", "Еда", Modifier.weight(1f), ContinuousHigh, R.drawable.ic_spoon_and_fork_orange, denseMetrics)
+                ContinuousMetric(point.insulinUnits ?: "-", point.insulinTimeAgo ?: "", "Инсулин", Modifier.weight(1f), Color(0xFF2E7BE6), R.drawable.ic_syringe_blue, denseMetrics)
+                ContinuousMetric(point.activityDuration ?: "-", point.activityTimeAgo ?: "", "Активность", Modifier.weight(1f), Color(0xFF8B5CF6), R.drawable.ic_walking_blue, denseMetrics)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ContinuousSelectedEventSummary(event: ContinuousEvent, origin: LocalDate) {
+    val title = when (event.kind) {
+        ContinuousEventKind.FOOD -> "Еда"
+        ContinuousEventKind.INSULIN -> "Инсулин"
+        ContinuousEventKind.ACTIVITY -> "Активность"
+    }
+    val icon = when (event.kind) {
+        ContinuousEventKind.FOOD -> R.drawable.ic_spoon_and_fork_orange
+        ContinuousEventKind.INSULIN -> R.drawable.ic_syringe_blue
+        ContinuousEventKind.ACTIVITY -> R.drawable.ic_walking_blue
+    }
+    val date = origin.plusDays(event.startMinute / DAY_MINUTES)
+    Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+        ContinuousMetric(event.timeLabel, "${date.dayOfMonth}.${date.monthValue}", "Время", Modifier.weight(1f), compact = true)
+        ContinuousMetric(title, "", "Событие", Modifier.weight(1f), event.color, icon, true)
+        ContinuousMetric(event.label, "", "Значение", Modifier.weight(1f), event.color, compact = true)
+    }
 }
 
 private val RUSSIAN_MONTHS = listOf(

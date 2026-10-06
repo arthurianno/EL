@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,6 +38,7 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,15 +47,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -62,25 +67,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.statistic.period.ui.Period
+import com.elta.android.presentation.features.main.records.ui.compose.NewDesignPaletteController
 import com.elta.android.presentation.utils.NumberFormatter
+import kotlin.math.roundToInt
 
-private val Cyan = Color(0xFF1FBFD2)
 private val ScreenBackground = Color(0xFFF4F4F4)
 private val TextPrimary = Color(0xFF3D4556)
 private val TextSecondary = Color(0x8C3D4556)
-private val Green = Color(0xFF43E695)
-private val GreenDark = Color(0xFF29AF99)
-private val Orange = Color(0xFFF2A515)
-private val Red = Color(0xFFD93B17)
+private val Green get() = NewDesignPaletteController.colors.normalStart
+private val GreenDark get() = NewDesignPaletteController.colors.normalEnd
+private val Orange get() = NewDesignPaletteController.colors.highStart
+private val Red get() = NewDesignPaletteController.colors.lowStart
 private val Divider = Color(0xFFBBC0CA)
 private val ContentMaxWidth = 480.dp
 private val CompactScreenWidth = 360.dp
 // The Figma card starts shortly after the period picker. Keeping 171dp left a
-// conspicuous empty cyan band on Android devices with a 24dp status inset.
+// conspicuous empty header band on Android devices with a 24dp status inset.
 private val DashboardSurfaceTop = 151.dp
 private val HomeBottomNavigationHeight = 72.dp
 private val DEMO_CURRENT_SERIES = listOf(
@@ -92,7 +100,7 @@ private val DEMO_PREVIOUS_SERIES = listOf(
     9.1, 8.0, 4.1, 3.5, 5.1, 9.3, 7.8
 )
 
-private enum class StatisticsBlock(
+internal enum class StatisticsBlock(
     val title: String,
     val subtitle: String
 ) {
@@ -104,7 +112,7 @@ private enum class StatisticsBlock(
     FOOD("Питание", "Подсчёт БЖУ и ХЕ.")
 }
 
-private val DEFAULT_VISIBLE_STATISTICS_BLOCKS = listOf(
+internal val DEFAULT_VISIBLE_STATISTICS_BLOCKS = listOf(
     StatisticsBlock.PERIOD,
     StatisticsBlock.DAILY,
     StatisticsBlock.KEY_METRICS,
@@ -182,13 +190,20 @@ private fun StatisticsSettingsDialog(
                         modifier = Modifier.padding(top = 14.dp, bottom = 7.dp)
                     )
                     selectedBlocks.forEach { block ->
-                        StatisticsSettingsRow(
-                            block = block,
-                            isVisible = true,
-                            canReorder = true,
-                            onToggleVisibility = { selectedBlocks = selectedBlocks - block },
-                            onMove = { direction -> selectedBlocks = selectedBlocks.move(block, direction) }
-                        )
+                        key(block) {
+                            StatisticsSettingsRow(
+                                block = block,
+                                isVisible = true,
+                                canReorder = true,
+                                onToggleVisibility = { selectedBlocks = selectedBlocks - block },
+                                onMove = { direction ->
+                                    val moved = selectedBlocks.move(block, direction)
+                                    val didMove = moved !== selectedBlocks
+                                    selectedBlocks = moved
+                                    didMove
+                                }
+                            )
+                        }
                     }
                     Spacer(
                         modifier = Modifier
@@ -205,13 +220,15 @@ private fun StatisticsSettingsDialog(
                         modifier = Modifier.padding(bottom = 7.dp)
                     )
                     hiddenBlocks.forEach { block ->
-                        StatisticsSettingsRow(
-                            block = block,
-                            isVisible = false,
-                            canReorder = false,
-                            onToggleVisibility = { selectedBlocks = selectedBlocks + block },
-                            onMove = {}
-                        )
+                        key(block) {
+                            StatisticsSettingsRow(
+                                block = block,
+                                isVisible = false,
+                                canReorder = false,
+                                onToggleVisibility = { selectedBlocks = selectedBlocks + block },
+                                onMove = { false }
+                            )
+                        }
                     }
                 }
                 Row(
@@ -252,11 +269,20 @@ private fun StatisticsSettingsRow(
     isVisible: Boolean,
     canReorder: Boolean,
     onToggleVisibility: () -> Unit,
-    onMove: (Int) -> Unit
+    onMove: (Int) -> Boolean
 ) {
     var accumulatedDrag by remember(block, isVisible) { mutableStateOf(0f) }
+    var isDragging by remember(block, isVisible) { mutableStateOf(false) }
+    val rowHeightPx = with(LocalDensity.current) { 48.dp.toPx() }
     Row(
-        modifier = Modifier.fillMaxWidth().height(48.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .zIndex(if (isDragging) 1f else 0f)
+            .offset { IntOffset(0, if (isDragging) accumulatedDrag.roundToInt() else 0) }
+            .shadow(if (isDragging) 8.dp else 0.dp, RoundedCornerShape(8.dp))
+            .background(if (isDragging) Color(0xFFE9F7F3) else Color.Transparent)
+            .padding(horizontal = if (isDragging) 6.dp else 0.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         StatisticsBlockIcon(block = block, modifier = Modifier.size(24.dp))
@@ -278,18 +304,32 @@ private fun StatisticsSettingsRow(
                     .size(24.dp)
                     .pointerInput(block) {
                         detectDragGesturesAfterLongPress(
-                            onDragStart = { accumulatedDrag = 0f },
+                            onDragStart = {
+                                accumulatedDrag = 0f
+                                isDragging = true
+                            },
+                            onDragEnd = {
+                                accumulatedDrag = 0f
+                                isDragging = false
+                            },
+                            onDragCancel = {
+                                accumulatedDrag = 0f
+                                isDragging = false
+                            },
                             onDrag = { change, dragAmount ->
+                                change.consume()
                                 accumulatedDrag += dragAmount.y
                                 when {
-                                    accumulatedDrag <= -24f -> {
-                                        onMove(-1)
-                                        accumulatedDrag = 0f
+                                    accumulatedDrag <= -rowHeightPx / 2f -> {
+                                        accumulatedDrag = if (onMove(-1)) {
+                                            accumulatedDrag + rowHeightPx
+                                        } else 0f
                                     }
 
-                                    accumulatedDrag >= 24f -> {
-                                        onMove(1)
-                                        accumulatedDrag = 0f
+                                    accumulatedDrag >= rowHeightPx / 2f -> {
+                                        accumulatedDrag = if (onMove(1)) {
+                                            accumulatedDrag - rowHeightPx
+                                        } else 0f
                                     }
                                 }
                             }
@@ -514,8 +554,17 @@ fun StatisticsDashboardScreen(
     uiState: StatisticsDashboardUiState,
     onPeriodSelected: (Period) -> Unit,
     onBack: () -> Unit,
+    onExport: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val blockPreferences = remember(context) { StatisticsBlockPreferences(context) }
+    var visibleBlockNames by rememberSaveable {
+        mutableStateOf(blockPreferences.read().map(StatisticsBlock::name))
+    }
+    val visibleBlocks = visibleBlockNames.mapNotNull { name ->
+        StatisticsBlock.entries.firstOrNull { it.name == name }
+    }
     var isDemoMode by rememberSaveable { mutableStateOf(false) }
     var showDemoModePicker by remember { mutableStateOf(false) }
     val displayedState = remember(uiState, isDemoMode) {
@@ -524,17 +573,18 @@ fun StatisticsDashboardScreen(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
-            .background(Cyan)
+            .background(Brush.verticalGradient(
+                listOf(
+                    NewDesignPaletteController.colors.normalStart,
+                    NewDesignPaletteController.colors.normalEnd
+                )
+            ))
             .pointerInput(Unit) {
                 detectTapGestures(onLongPress = { showDemoModePicker = true })
             }
     ) {
         val isCompact = maxWidth <= CompactScreenWidth
         var showSettings by remember { mutableStateOf(false) }
-        var visibleBlockNames by rememberSaveable {
-            mutableStateOf(DEFAULT_VISIBLE_STATISTICS_BLOCKS.map(StatisticsBlock::name))
-        }
-        val visibleBlocks = visibleBlockNames.map(StatisticsBlock::valueOf)
         val navigationBottomPadding = WindowInsets.navigationBars
             .asPaddingValues()
             .calculateBottomPadding()
@@ -542,7 +592,7 @@ fun StatisticsDashboardScreen(
             uiState = displayedState,
             onPeriodSelected = onPeriodSelected,
             onBack = onBack,
-            onSettingsClick = { showSettings = true },
+            onExportClick = onExport,
             modifier = Modifier
                 .fillMaxWidth()
                 .widthIn(max = ContentMaxWidth)
@@ -569,7 +619,13 @@ fun StatisticsDashboardScreen(
                     ),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    item { MainIndicatorsSection(displayedState, isCompact) }
+                    item {
+                        MainIndicatorsSection(
+                            state = displayedState,
+                            isCompact = isCompact,
+                            onSettingsClick = { showSettings = true }
+                        )
+                    }
                     visibleBlocks.forEach { block ->
                         item(key = block) {
                             when (block) {
@@ -608,6 +664,7 @@ fun StatisticsDashboardScreen(
                 onDismiss = { showSettings = false },
                 onSave = { blocks ->
                     visibleBlockNames = blocks.map(StatisticsBlock::name)
+                    blockPreferences.save(blocks)
                     showSettings = false
                 }
             )
@@ -620,7 +677,7 @@ private fun StatisticsTopBar(
     uiState: StatisticsDashboardUiState,
     onPeriodSelected: (Period) -> Unit,
     onBack: () -> Unit,
-    onSettingsClick: () -> Unit,
+    onExportClick: () -> Unit,
     modifier: Modifier,
     isCompact: Boolean
 ) {
@@ -635,7 +692,7 @@ private fun StatisticsTopBar(
                 painter = painterResource(R.drawable.ic_arrow_left),
                 contentDescription = "Назад",
                 tint = Color.White,
-                modifier = Modifier.size(24.dp).rotate(180f).clickable(onClick = onBack)
+                modifier = Modifier.size(40.dp).clickable(onClick = onBack).padding(8.dp).rotate(180f)
             )
             Text(
                 text = "Статистика",
@@ -646,10 +703,10 @@ private fun StatisticsTopBar(
                 fontSize = 17.sp
             )
             androidx.compose.material.Icon(
-                painter = painterResource(R.drawable.ic_chart_settings),
-                contentDescription = "Настройки статистики",
+                painter = painterResource(R.drawable.ic_download_normal),
+                contentDescription = "Выгрузить статистику",
                 tint = Color.White,
-                modifier = Modifier.size(24.dp).clickable(onClick = onSettingsClick)
+                modifier = Modifier.size(40.dp).clickable(onClick = onExportClick).padding(8.dp)
             )
         }
         Box(modifier = Modifier.padding(horizontal = 13.dp)) {
@@ -703,14 +760,26 @@ private fun StatisticsTopBar(
 @Composable
 private fun MainIndicatorsSection(
     state: StatisticsDashboardUiState,
-    isCompact: Boolean
+    isCompact: Boolean,
+    onSettingsClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth().padding(horizontal = if (isCompact) 12.dp else 14.dp)
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            androidx.compose.material.Icon(
+                painter = painterResource(R.drawable.ic_chart_settings),
+                contentDescription = "Настройки статистики",
+                tint = TextSecondary,
+                modifier = Modifier.size(40.dp).clickable(onClick = onSettingsClick).padding(8.dp)
+            )
+        }
         BoxWithConstraints(
-            modifier = Modifier.fillMaxWidth().height(if (isCompact) 292.dp else 306.dp)
+            modifier = Modifier.fillMaxWidth().height(if (isCompact) 276.dp else 290.dp)
         ) {
             val gaugeSize = minOf(maxWidth * 0.54f, 184.dp).coerceAtLeast(164.dp)
             val pillWidth = if (isCompact) 84.dp else 102.dp
@@ -871,6 +940,18 @@ private fun niceAxisMaximum(maxValue: Int): Int {
 
 @Composable
 private fun DailyVariationSection(state: StatisticsDashboardUiState) {
+    var weeksBack by remember(state.hourlyRanges) { mutableStateOf(0) }
+    val maxWeeksBack = state.hourlyRanges.lastWeekOffset
+    val visibleDays = state.hourlyRanges.weekFromLatest(weeksBack)
+    val rangeTitle = if (weeksBack == 0) {
+        state.dailyRangeTitle
+    } else {
+        val first = visibleDays.firstOrNull()?.date
+        val last = visibleDays.lastOrNull()?.date
+        if (first != null && last != null) {
+            "${first.dayOfMonth}.${first.monthValue} – ${last.dayOfMonth}.${last.monthValue}"
+        } else ""
+    }
     SectionCard(title = "Суточные колебания") {
         Box(
             modifier = Modifier
@@ -878,32 +959,48 @@ private fun DailyVariationSection(state: StatisticsDashboardUiState) {
                 .padding(top = 12.dp, bottom = 8.dp)
         ) {
             Text(
-                text = state.dailyRangeTitle,
+                text = rangeTitle,
                 color = TextPrimary,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.align(Alignment.Center)
             )
-            androidx.compose.material.Icon(
-                painter = painterResource(R.drawable.ic_arrow_left),
-                contentDescription = "Следующая неделя",
-                tint = TextPrimary,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(18.dp)
-            )
+            if (weeksBack < maxWeeksBack) {
+                androidx.compose.material.Icon(
+                    painter = painterResource(R.drawable.ic_arrow_left),
+                    contentDescription = "Предыдущая неделя",
+                    tint = TextPrimary,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .size(32.dp)
+                        .rotate(180f)
+                        .clickable { weeksBack++ }
+                        .padding(7.dp)
+                )
+            }
+            if (weeksBack > 0) {
+                androidx.compose.material.Icon(
+                    painter = painterResource(R.drawable.ic_arrow_left),
+                    contentDescription = "Следующая неделя",
+                    tint = TextPrimary,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .size(32.dp)
+                        .clickable { weeksBack-- }
+                        .padding(7.dp)
+                )
+            }
         }
         if (state.hourlyRanges.isEmpty()) {
             EmptyChart("Недостаточно измерений для построения графика")
         } else {
-            Heatmap(state.hourlyRanges)
+            Heatmap(visibleDays)
         }
     }
 }
 
 @Composable
 private fun Heatmap(days: List<HourlyRange>) {
-    val visibleDays = days.takeLast(7)
     BoxWithConstraints(modifier = Modifier.fillMaxWidth().height(205.dp)) {
         val timeAxisWidth = if (maxWidth <= CompactScreenWidth) 44.dp else 54.dp
         // The reference deliberately keeps the heatmap narrow instead of stretching its
@@ -925,7 +1022,7 @@ private fun Heatmap(days: List<HourlyRange>) {
                 modifier = Modifier.width(gridWidth),
                 horizontalArrangement = Arrangement.spacedBy(7.dp)
             ) {
-                visibleDays.forEach { day ->
+                days.forEach { day ->
                     Column(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally

@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.statistic.period.ui.compose
 
 import com.elta.android.domain.features.diary.events.model.glucoseValue
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
+import com.elta.android.domain.features.statistics.model.glucoseManagementIndicatorPercent
 import com.elta.android.presentation.features.statistic.period.ui.Period
 import com.elta.android.presentation.utils.NumberFormatter
 import org.threeten.bp.LocalDate
@@ -137,7 +138,7 @@ fun StatisticByPeriodModel?.toStatisticsDashboardUiState(
         maxLabel = NumberFormatter.format(glucose.maxLevel),
         coefficientOfVariation = glucose.averageLevel.coefficientOfVariation(standardDeviation),
         standardDeviation = NumberFormatter.format(standardDeviation),
-        gmi = NumberFormatter.format(GMI_BASELINE + glucose.averageLevel * GMI_AVERAGE_MULTIPLIER),
+        gmi = NumberFormatter.format(glucoseManagementIndicatorPercent(glucose.averageLevel)),
         nightHypoEpisodes = glucoseEvents.count { event ->
             event.additionTime.hour in NIGHT_HYPO_HOURS &&
                 event.glucoseValue(glucose.glucoseFormat) in glucose.settings.low
@@ -267,8 +268,6 @@ private fun Int.toRussianMonthName() = RUSSIAN_MONTH_NAMES[this - 1]
 
 private const val DISTRIBUTION_BUCKETS_COUNT = 6
 private const val DAYS_IN_HEATMAP = 7
-private const val GMI_BASELINE = 3.31
-private const val GMI_AVERAGE_MULTIPLIER = 0.431
 private val NIGHT_HYPO_HOURS = 2..4
 private val HOURS = 0..23
 private val RUSSIAN_MONTH_NAMES = arrayOf(

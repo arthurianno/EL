@@ -52,11 +52,15 @@ import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
+import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.glucoseValue
 import com.nullgr.core.rx.RxBus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.threeten.bp.YearMonth
+import org.threeten.bp.LocalDate
+import java.util.Locale
 
 /**
  * Production entry point. RxBus integration is kept at this boundary;
@@ -74,8 +78,27 @@ fun GlucoseDashboardScreen(
         mutableStateOf(emptyMap<YearMonth, List<com.elta.android.domain.features.diary.events.model.EventV2>>())
     }
     var requestedMonths by remember { mutableStateOf(emptySet<YearMonth>()) }
+    var selectedChartDate by remember { mutableStateOf(LocalDate.now()) }
     val detailedEvents = remember(uiState.detailedChartData.events, loadedEventsByMonth) {
         (uiState.detailedChartData.events + loadedEventsByMonth.values.flatten()).distinct()
+    }
+    val chartPoints = remember(selectedChartDate, uiState.chartPoints, uiState.detailedChartData.dailyGlucoseModel, loadedEventsByMonth) {
+        if (selectedChartDate == LocalDate.now()) {
+            uiState.chartPoints
+        } else {
+            val model = uiState.detailedChartData.dailyGlucoseModel
+            if (model == null) emptyList() else loadedEventsByMonth[YearMonth.from(selectedChartDate)].orEmpty()
+                .asSequence()
+                .filter { it.type is EventType.Glucose && it.additionTime.toLocalDate() == selectedChartDate }
+                .sortedBy { it.additionTime }
+                .map { event ->
+                    GlucosePoint(
+                        timeLabel = String.format(Locale.US, "%02d:%02d", event.additionTime.hour, event.additionTime.minute),
+                        value = event.glucoseValue(model.glucoseFormat).toFloat()
+                    )
+                }
+                .toList()
+        }
     }
 
     LaunchedEffect(uiState.syncTimeText) {
@@ -123,6 +146,16 @@ fun GlucoseDashboardScreen(
     ) {
         GlucoseDashboardContent(
             uiState = uiState,
+            selectedChartDate = selectedChartDate,
+            chartPoints = chartPoints,
+            onChartDateSelected = { date ->
+                selectedChartDate = date
+                val month = YearMonth.from(date)
+                if (date != LocalDate.now() && month !in loadedEventsByMonth && month !in requestedMonths) {
+                    requestedMonths = requestedMonths + month
+                    bus?.event(Events.DetailedChartRangeRequested(month.atDay(1), month.atEndOfMonth()))
+                }
+            },
             syncState = syncState.asUiState(),
             detailedEvents = detailedEvents,
             onAction = { action ->
@@ -164,7 +197,7 @@ fun GlucoseDashboardScreen(
             },
             onDetailedChartClosed = {
                 requestedMonths = emptySet()
-                loadedEventsByMonth = emptyMap()
+                loadedEventsByMonth = loadedEventsByMonth.filterKeys { it == YearMonth.from(selectedChartDate) }
             },
             onDebugPaletteLongClick = if (BuildConfig.DEBUG) {
                 { scope.launch { paletteSheetState.show() } }
@@ -179,6 +212,9 @@ fun GlucoseDashboardScreen(
 @Composable
 internal fun GlucoseDashboardContent(
     uiState: GlucoseDashboardUiState,
+    selectedChartDate: LocalDate = LocalDate.now(),
+    chartPoints: List<GlucosePoint> = uiState.chartPoints,
+    onChartDateSelected: (LocalDate) -> Unit = {},
     syncState: DashboardSyncUiState,
     detailedEvents: List<com.elta.android.domain.features.diary.events.model.EventV2> = uiState.detailedChartData.events,
     modifier: Modifier = Modifier,
@@ -223,7 +259,9 @@ internal fun GlucoseDashboardContent(
                     chart = { chartHeight ->
                         GlucoseLineChartCard(
                             isDarkTheme = uiState.isDarkTheme,
-                            points = uiState.chartPoints,
+                            points = chartPoints,
+                            selectedDate = selectedChartDate,
+                            onDateSelected = onChartDateSelected,
                             designScale = layout.horizontalScale,
                             cardHeight = chartHeight,
                             showDetailHint = uiState.hasMeasurements,
@@ -249,6 +287,7 @@ internal fun GlucoseDashboardContent(
 
                 if (isDetailedChartVisible) {
                     DetailedGlucoseChartScreen(
+                        initialDate = selectedChartDate.toString(),
                         onBackClick = {
                             isDetailedChartVisible = false
                             onDetailedChartClosed()

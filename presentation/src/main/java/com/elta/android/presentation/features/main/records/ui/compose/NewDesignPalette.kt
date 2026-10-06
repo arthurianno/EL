@@ -20,7 +20,7 @@ data class NewDesignPaletteColors(
 )
 
 object NewDesignPaletteController {
-    var activePalette by mutableStateOf(NewDesignPalette.A)
+    var activePalette by mutableStateOf(NewDesignPalette.B)
         private set
 
     val colors: NewDesignPaletteColors
@@ -39,7 +39,7 @@ object NewDesignPaletteController {
             NewDesignPalette.B -> NewDesignPaletteColors(
                 lowStart = Color(0xFFD93B17),
                 lowEnd = Color(0xFFAF2A2A),
-                normalStart = Color(0xFF43E695),
+                normalStart = Color(0xFF3AE39D),
                 normalEnd = Color(0xFF26A69A),
                 highStart = Color(0xFFFCC30D),
                 highEnd = Color(0xFFDF7122),
