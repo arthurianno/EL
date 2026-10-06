@@ -36,7 +36,6 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
             glucometerSerialNumber = glucometerSerialNumber,
             originalResponse = response,
             mealTag = parsedMeasurement.mealTag,
-            isTimeInvalid = parsedMeasurement.isTimeInvalid,
             isTemperatureInvalid = parsedMeasurement.isTemperatureInvalid
         )
     }
@@ -70,16 +69,13 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         val rawTemperature = match.groupValues[2].toInt()
         val rawValue = match.groupValues[3].toInt()
         val date = extractDate(dateToken)
-        val isInvalid = isDateInvalid(date)
-        val actualDate = if (isInvalid) ZonedDateTime.now(ZoneOffset.UTC) else date
 
         return ParsedMeasurement(
             idToken = dateToken,
-            date = actualDate,
+            date = date,
             temperature = extractTemperature(rawTemperature),
             value = extractValue(rawValue),
-            mealTag = extractMealTag(rawTemperature),
-            isTimeInvalid = isInvalid
+            mealTag = extractMealTag(rawTemperature)
         )
     }
 
@@ -95,29 +91,16 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         val statusWord = statusHex.toInt(HEX_RADIX)
         val glucoseValue = glucoseHex.toInt(HEX_RADIX).toDouble() / TEN_DIVISOR
         val date = ZonedDateTime.ofInstant(Instant.ofEpochSecond(unixSeconds), ZoneOffset.UTC)
-        val isInvalid = isDateInvalid(date, statusWord)
         val isTempInvalid = (statusWord and MEM_INVALID_TEMPERATURE_BIT_MASK) != 0
-        
-        val actualDate = if (isInvalid) ZonedDateTime.now(ZoneOffset.UTC) else date
 
         return ParsedMeasurement(
             idToken = "$unixHex$glucoseHex",
-            date = actualDate,
+            date = date,
             temperature = null,
             value = glucoseValue,
             mealTag = if (statusWord and MEM_AFTER_MEAL_BIT_MASK != 0) MealTag.AFTERMEAL else MealTag.BEFOREMEAL,
-            isTimeInvalid = isInvalid,
             isTemperatureInvalid = isTempInvalid
         )
-    }
-
-    protected open fun isDateInvalid(date: ZonedDateTime?, statusWord: Int = 0): Boolean {
-        if (date == null) return true
-        if (date.year < MIN_VALID_YEAR) return true
-        if ((statusWord and MEM_INVALID_TIME_BIT_MASK) != 0) return true
-        val now = ZonedDateTime.now(ZoneOffset.UTC)
-        if (date.isAfter(now.plusMinutes(FUTURE_TIME_TOLERANCE_MINUTES))) return true
-        return false
     }
 
     protected open fun extractDate(token: String): ZonedDateTime {
@@ -154,7 +137,6 @@ private data class ParsedMeasurement(
     val temperature: Double?,
     val value: Double?,
     val mealTag: MealTag?,
-    val isTimeInvalid: Boolean = false,
     val isTemperatureInvalid: Boolean = false
 )
 
@@ -163,9 +145,6 @@ private const val TEN_DIVISOR = 10.0
 private const val AFTER_MEAL_TEMPERATURE_SHIFT = 500
 private const val MEM_AFTER_MEAL_BIT_MASK = 0x0004
 private const val MEM_INVALID_TEMPERATURE_BIT_MASK = 0x0002
-private const val MEM_INVALID_TIME_BIT_MASK = 0x0001
-private const val MIN_VALID_YEAR = 2020
-private const val FUTURE_TIME_TOLERANCE_MINUTES = 1L
 private const val MEM_EMPTY_EVENT = "mem.empty"
 
 private val BEFORE_MEAL_TEMPERATURE_RANGE = 100..350
