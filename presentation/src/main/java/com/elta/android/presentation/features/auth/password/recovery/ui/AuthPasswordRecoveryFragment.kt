@@ -28,6 +28,7 @@ class AuthPasswordRecoveryFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.root.applyStatusBarInsetsPadding(
+
             onApplyInsets = ::clearFocusesFromInputs,
             applyNavigationBarInset = true,
             applyImeInset = true
