@@ -1,0 +1,40 @@
+package com.elta.android.domain.features.diary.events.interactor
+
+import com.elta.android.domain.features.diary.events.model.addTag
+import com.elta.android.domain.features.diary.events.model.modifyValues
+import com.elta.android.domain.features.diary.events.repository.EventsRepository
+import com.elta.android.domain.features.diary.home.interactor.getEventsBlocks
+import com.elta.android.domain.features.diary.home.interactor.sortAndFilter
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
+import com.elta.android.domain.features.diary.home.model.EventsBlock
+import com.elta.android.domain.features.diary.tags.repository.TagsRepository
+import com.elta.android.domain.features.user.repository.ProfileRepository
+import com.nullgr.core.interactor.ObservableListUseCase
+import com.nullgr.core.rx.applyScheduler
+import com.nullgr.core.rx.schedulers.SchedulersFacade
+import io.reactivex.Observable
+import io.reactivex.rxkotlin.Observables
+import javax.inject.Inject
+
+class GetEventsWithInvalidTimeUseCase @Inject constructor(
+    private val eventsRepo: EventsRepository,
+    private val profileRepo: ProfileRepository,
+    private val tagsRepo: TagsRepository,
+    private val schedulers: SchedulersFacade
+) : ObservableListUseCase<EventsBlock, Unit>(schedulers) {
+
+    override fun buildUseCaseObservable(params: Unit?): Observable<List<EventsBlock>> =
+        Observables.zip(
+            eventsRepo.getEventsWithInvalidTime(),
+            tagsRepo.getTags(),
+            profileRepo.getProfile().toObservable()
+        )
+            .map { (events, tags, profile) ->
+                val sortedEvents = events
+                    .modifyValues(profile.glucoseFormat)
+                    .map { it.addTag(tags) }
+                    .sortAndFilter()
+                getEventsBlocks(sortedEvents, tags, profile.diabetes.toCalculatorFlow(sortedEvents))
+            }
+            .applyScheduler(schedulers)
+}
