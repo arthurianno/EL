@@ -2,8 +2,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
     <string name="app_name">Satellite Online</string>
-    <string name="record_invalid_time">⚠ %1$s</string>
-    <string name="record_invalid_time_description">The measurement time may be incorrect: %1$s</string>
     <string name="input_font_name">roboto_regular.ttf</string>
     <string name="title_connection_lost">No Internet Connection</string>
     <string name="title_connection_found">Connection Restored</string>
@@ -408,9 +406,6 @@
     <string name="sync_how_to_connect_text_2">Turn your device over — there should be a sticker on the back with an image similar to a QR code. This is the DMC code that needs to be scanned.</string>
     <string name="diary_empty_state_title">You don\'t have any entries for this day</string>
     <string name="diary_screen_title">Event Diary</string>
-    <string name="diary_invalid_time_button">Measurements with uncertain time</string>
-    <string name="diary_invalid_time_close">Back to calendar</string>
-    <string name="diary_invalid_time_title">Measurements with uncertain time</string>
     <string name="diary_button_today">Today</string>
     <string name="date_picker_day_of_week_1">Mon</string>
     <string name="date_picker_day_of_week_2">Tue</string>

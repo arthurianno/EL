@@ -2,7 +2,6 @@ package com.elta.android.presentation.features.diary.main.pm
 
 import com.elta.android.common.utils.isToday
 import com.elta.android.domain.features.diary.events.interactor.GetEventsByDateUseCase
-import com.elta.android.domain.features.diary.events.interactor.GetEventsWithInvalidTimeUseCase
 import com.elta.android.domain.features.diary.home.model.EventsBlock
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
@@ -28,12 +27,11 @@ import javax.inject.Inject
 class MainDiaryPm @Inject constructor(
     private val mapper: DiaryEventsMapper,
     private val getEventsByDateUseCase: GetEventsByDateUseCase,
-    private val getEventsWithInvalidTimeUseCase: GetEventsWithInvalidTimeUseCase,
     services: ServiceFacade
 ) : ExpandableListPm(services) {
 
     private val monthNames: Array<String> by lazy {
-        resources.getStringArray(R.array.month_names)
+        services.resources.getStringArray(R.array.month_names)
     }
 
     override val isEmptyScreen = false
@@ -46,10 +44,8 @@ class MainDiaryPm @Inject constructor(
     val monthTitleState = state<String>()
     val todayButtonVisibilityState = state<Boolean>()
     val todayClickedAction = action<Unit>()
-    val invalidTimeModeState = state(false)
-    val toggleInvalidTimeModeAction = action<Unit>()
 
-    private val loadScreenAction = action<Unit>()
+    private val loadScreenAction = action<LocalDate>()
     private val selectedDateState = state(LocalDate.now())
 
     override fun onCreate() {
@@ -74,10 +70,10 @@ class MainDiaryPm @Inject constructor(
     private fun observeEvents() {
         Observable.merge(
             selectedDateState.observable.map { Unit },
-            invalidTimeModeState.observable.map { Unit },
             bus.events<Events.EventsChanged>().map { Unit },
             bus.events<Events.ProfileUpdated>().map { Unit }
         )
+            .map { selectedDateState.value }
             .subscribe(loadScreenAction.consumer)
             .untilDestroy()
     }
@@ -106,13 +102,9 @@ class MainDiaryPm @Inject constructor(
 
     private fun observeActions() {
         loadScreenAction.observable
+            .map(::createUseCaseParams)
             .switchMap {
-                val events = if (invalidTimeModeState.value) {
-                    getEventsWithInvalidTimeUseCase.execute(Unit)
-                } else {
-                    getEventsByDateUseCase.execute(createUseCaseParams(selectedDateState.value))
-                }
-                events
+                getEventsByDateUseCase.execute(it)
                     .hideErrorContainer()
                     .bindProgress()
                     .bindEmpty(emptyControl.visibilityState.consumer)
@@ -152,22 +144,6 @@ class MainDiaryPm @Inject constructor(
             .subscribe(monthTitleState.consumer)
             .untilDestroy()
 
-        toggleInvalidTimeModeAction.observable
-            .map { !invalidTimeModeState.value }
-            .subscribe(invalidTimeModeState.consumer)
-            .untilDestroy()
-
-        invalidTimeModeState.observable
-            .subscribe { isInvalidTimeMode ->
-                if (isInvalidTimeMode) {
-                    monthTitleState.consumer.accept(resources.getString(R.string.diary_invalid_time_title))
-                } else {
-                    val date = selectedDateState.value
-                    monthTitleState.consumer.accept("${monthNames[date.monthValue - 1]} ${date.year}")
-                }
-            }
-            .untilDestroy()
-
         todayClickedAction.observable
             .map { LocalDate.now() }
             .doOnNext(::passSelectedDate)
@@ -184,7 +160,6 @@ class MainDiaryPm @Inject constructor(
     }
 
     private fun passSelectedDate(date: LocalDate) {
-        if (invalidTimeModeState.value) invalidTimeModeState.consumer.accept(false)
         selectedDateState.consumer.accept(date)
     }
 

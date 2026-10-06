@@ -21,11 +21,6 @@ class EventsCachedCacheDataSource @Inject constructor(
     private val cache: Cache<EventV2CachedDto>
 ) : EventsCacheDataSource {
 
-    override fun getEventsWithInvalidTime(): Observable<List<EventV2Dto>> =
-        Observable.fromCallable {
-            cache.getAll(EventsConditions.InvalidTime)
-        }.map(fromCacheMapper::mapFromObjects)
-
     override fun getEvents(): Observable<List<EventV2Dto>> =
         Observable.fromCallable {
             cache.getAll(CommonConditions.All)

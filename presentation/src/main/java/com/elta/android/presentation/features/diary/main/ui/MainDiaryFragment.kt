@@ -65,13 +65,6 @@ class MainDiaryFragment @Inject constructor() :
         }
         pm.todayButtonVisibilityState.bindTo(binding.todayButtonView.visibility())
         binding.todayButtonView.clicks().bindTo(pm.todayClickedAction)
-        binding.invalidTimeButtonView.clicks().bindTo(pm.toggleInvalidTimeModeAction)
-        pm.invalidTimeModeState.bindTo { isInvalidTimeMode ->
-            binding.invalidTimeButtonView.setText(
-                if (isInvalidTimeMode) R.string.diary_invalid_time_close
-                else R.string.diary_invalid_time_button
-            )
-        }
         pm.items.bindTo {
             itemsView?.toggleVisibilityState(
                 state = it.isNotEmpty(),

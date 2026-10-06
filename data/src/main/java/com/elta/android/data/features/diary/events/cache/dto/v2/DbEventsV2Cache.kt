@@ -21,7 +21,6 @@ class DbEventsV2Cache @Inject constructor(
 
     override fun getAll(condition: Condition): List<EventV2CachedDto> =
         when (condition) {
-            EventsConditions.InvalidTime -> getInvalidTimeEvents()
             is EventsConditions.ByPeriod -> getAllForPeriod(condition.start, condition.end)
             is EventsConditions.ByTypeAndIds -> getAllByTypeAndIds(condition.type, condition.ids)
             else -> super.getAll(condition)
@@ -42,12 +41,6 @@ class DbEventsV2Cache @Inject constructor(
     private fun getAllForPeriod(start: LocalDateTime, end: LocalDateTime): List<EventV2CachedDto> =
         box.query {
             between(EventV2CachedDto_.additionTime, start.toQueryMillis(), end.toQueryMillis())
-        }.find()
-
-    private fun getInvalidTimeEvents(): List<EventV2CachedDto> =
-        box.query {
-            equal(EventV2CachedDto_.isTimeInvalid, true)
-            order(EventV2CachedDto_.additionTimeString, QueryBuilder.DESCENDING)
         }.find()
 
     private fun getAllByTypeAndIds(type: EventTypeDto, ids: LongArray): List<EventV2CachedDto> =

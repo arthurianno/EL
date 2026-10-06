@@ -100,7 +100,7 @@ class DefaultGlucometerEventBuilderTest {
     }
 
     @Test
-    fun `buildFrom parses mem event with invalid time status flag`() {
+    fun `buildFrom keeps device date and does not mark mem invalid time status`() {
         val event = builder.buildFrom(
             userId = "user",
             glucometerId = "device",
@@ -109,28 +109,11 @@ class DefaultGlucometerEventBuilderTest {
             glucometerName = "SatelliteVoice0001"
         )
 
-        assertEquals(true, event.isTimeInvalid)
+        assertEquals(false, event.isTimeInvalid)
         assertEquals(
             ZonedDateTime.ofInstant(Instant.ofEpochSecond(0x690B559EL), ZoneOffset.UTC),
             event.date
         )
-    }
-
-    @Test
-    fun `buildFrom keeps an old rd timestamp while marking it invalid`() {
-        val deviceDate = ZonedDateTime.of(2019, 2, 22, 4, 0, 0, 0, ZoneOffset.UTC)
-        val oldDateBuilder = TestableDefaultGlucometerEventBuilder(FakeGenerator(), deviceDate)
-
-        val event = oldDateBuilder.buildFrom(
-            userId = "user",
-            glucometerId = "device",
-            response = "rd190222040000245044",
-            glucometerSerialNumber = "D2204001234",
-            glucometerName = "SatelliteOnline0001"
-        )
-
-        assertEquals(true, event.isTimeInvalid)
-        assertEquals(deviceDate, event.date)
     }
 
     @Test
@@ -147,7 +130,7 @@ class DefaultGlucometerEventBuilderTest {
     }
 
     @Test
-    fun `buildFrom marks future date measurement as invalid`() {
+    fun `buildFrom keeps future device date without marking it invalid`() {
         val futureBuilder = DefaultGlucometerEventBuilder(generator = FakeGenerator())
         val futureUnixHex = (ZonedDateTime.now(ZoneOffset.UTC).toEpochSecond() + 3600).toString(16).uppercase()
         val event = futureBuilder.buildFrom(
@@ -158,11 +141,28 @@ class DefaultGlucometerEventBuilderTest {
             glucometerName = "SatelliteVoice0001"
         )
 
-        assertEquals(true, event.isTimeInvalid)
+        assertEquals(false, event.isTimeInvalid)
         assertEquals(
             ZonedDateTime.ofInstant(Instant.ofEpochSecond(futureUnixHex.toLong(16)), ZoneOffset.UTC),
             event.date
         )
+    }
+
+    @Test
+    fun `buildFrom keeps old rd date without marking it invalid`() {
+        val deviceDate = ZonedDateTime.of(2019, 2, 22, 4, 0, 0, 0, ZoneOffset.UTC)
+        val oldDateBuilder = TestableDefaultGlucometerEventBuilder(FakeGenerator(), deviceDate)
+
+        val event = oldDateBuilder.buildFrom(
+            userId = "user",
+            glucometerId = "device",
+            response = "rd190222040000245044",
+            glucometerSerialNumber = "D2204001234",
+            glucometerName = "SatelliteOnline0001"
+        )
+
+        assertEquals(deviceDate, event.date)
+        assertEquals(false, event.isTimeInvalid)
     }
 }
 

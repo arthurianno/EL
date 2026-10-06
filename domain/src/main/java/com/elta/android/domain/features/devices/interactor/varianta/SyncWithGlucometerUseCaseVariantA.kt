@@ -20,7 +20,6 @@ import io.reactivex.Observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.rx2.rxObservable
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -104,18 +103,13 @@ class SyncWithGlucometerUseCaseVariantA @Inject constructor(
 
             resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
             crashlyticsReport.log("Started saving device data to local storage")
-            val rawEvents = deviceRepository.buildEvents(
+            val events = deviceRepository.buildEvents(
                 deviceAddress,
                 userEmail,
                 glucometerInfo.glucometerSerialNumber,
                 measurements,
                 glucometerName
             )
-            Timber.d("⏰ SyncWithGlucometerVariantA: glucometerInfo.isTimeOutOfSync=${glucometerInfo.isTimeOutOfSync}, rawEvents.size=${rawEvents.size}")
-            val events = rawEvents.markInvalidTimeForOutOfSyncClock(glucometerInfo.isTimeOutOfSync)
-            events.forEach { event ->
-                Timber.d("⏰ SyncWithGlucometerVariantA event: id=${event.id}, date=${event.date}, isTimeInvalid=${event.isTimeInvalid}")
-            }
             resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
             if (events.isNotEmpty()) {
                 crashlyticsReport.log("Started sending measurements to the backend and saving to local storage")
@@ -125,8 +119,7 @@ class SyncWithGlucometerUseCaseVariantA @Inject constructor(
             }
             deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
 
-            val hasInvalidTime = events.any { it.isTimeInvalid } || (measurements.isNotEmpty() && glucometerInfo.isTimeOutOfSync)
-            scope.channel.send(GlucometerSyncResult(count = measurements.size, hasInvalidTime = hasInvalidTime))
+            scope.channel.send(GlucometerSyncResult(count = measurements.size))
         } finally {
             crashlyticsReport.log("The procedure for disconnecting the connection and stopping the timers has begun")
             deviceRepository.disconnect()

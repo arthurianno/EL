@@ -134,12 +134,7 @@ open class BaseRecordsMapper(
         return try {
             val time = additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME)
             val offset = additionTime.offset?.toString().orEmpty()
-            val formattedTime = resources.getString(R.string.main_records_event_time_mask, time, offset)
-            if (isTimeInvalid) {
-                "${additionTime.toStringWithFormat(CommonFormats.FORMAT_SIMPLE_DATE)} $formattedTime"
-            } else {
-                formattedTime
-            }
+            resources.getString(R.string.main_records_event_time_mask, time, offset)
         } catch (e: Exception) {
             ""
         }
