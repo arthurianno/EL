@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.ExperimentalMaterialApi
@@ -122,12 +124,14 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
             ModalBottomSheetLayout(
                 sheetState = sheetState,
                 sheetContent = {
-                    HelpBottomSheetVariantA(
-                        downButtonModel = viewModel.connectByPinButton,
-                        closeOnClick = {
-                            viewModel sendAction ConnectAction.CloseHelp
-                        }
-                    )
+                    Column(Modifier.fillMaxWidth().navigationBarsPadding()) {
+                        HelpBottomSheetVariantA(
+                            downButtonModel = viewModel.connectByPinButton,
+                            closeOnClick = {
+                                viewModel sendAction ConnectAction.CloseHelp
+                            }
+                        )
+                    }
                 },
                 sheetShape = shapes.sheet,
                 modifier = Modifier
@@ -137,6 +141,7 @@ class ConnectingFragmentVariantA : BaseComposeFragment<ConnectingViewModelVarian
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .navigationBarsPadding()
                 ) {
                     Header(viewModel, state.stageType)
                     Footer(

@@ -11,9 +11,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -202,7 +201,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                     modifier = Modifier
                         .fillMaxSize()
                         .background(color = colors.white)
-                        .statusBarsPadding()
+                        .systemBarsPadding()
                 ) {
                     TopAppBar(viewModel)
                     MainImage(
@@ -346,7 +345,7 @@ private fun HowToConnectPreviewContent() {
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = colors.white)
-                .statusBarsPadding()
+                .systemBarsPadding()
         ) {
             BaseAppTopBar(
                 widgetModel = topBarModel,

@@ -65,6 +65,8 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
     @Inject
     lateinit var bus: RxBus
 
+    private val statusViewBottomPaddings = mutableListOf<Pair<View, Int>>()
+
     // Используем lazy для безопасной инициализации RxPermissions
     private val rxPermissions: RxPermissions by lazy {
         RxPermissions(requireActivity())
@@ -78,6 +80,15 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
             ?.getInt(KEY_SELECTED_MENU_ID)
             ?.passTo(presentationModel.menuItemRestoredAction)
         initBottomSheetItemsView()
+    }
+
+    override fun onDestroyView() {
+        statusViewBottomPaddings.forEach { (view, originalBottomPadding) ->
+            ViewCompat.setOnApplyWindowInsetsListener(view, null)
+            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, originalBottomPadding)
+        }
+        statusViewBottomPaddings.clear()
+        super.onDestroyView()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -279,30 +290,21 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
     }
 
     private fun setupBottomNavigationInsets() {
-        val syncStatusView = requireActivity().findViewById<View>(R.id.syncStatusView)
-        syncStatusView?.let { view ->
-            ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-                val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-                v.setPadding(
-                    v.paddingLeft,
-                    v.paddingTop,
-                    v.paddingRight,
-                    navigationBarsInsets.bottom
-                )
-                insets
-            }
-        }
-        val connectionStatusView = requireActivity().findViewById<View>(R.id.connectionStatusView)
-        connectionStatusView?.let { view ->
-            ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-                val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-                v.setPadding(
-                    v.paddingLeft,
-                    v.paddingTop,
-                    v.paddingRight,
-                    navigationBarsInsets.bottom
-                )
-                insets
+        listOf(R.id.syncStatusView, R.id.connectionStatusView).forEach { viewId ->
+            requireActivity().findViewById<View>(viewId)?.let { statusView ->
+                val originalBottomPadding = statusView.paddingBottom
+                statusViewBottomPaddings += statusView to originalBottomPadding
+                ViewCompat.setOnApplyWindowInsetsListener(statusView) { view, insets ->
+                    val navigationBarBottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+                    view.setPadding(
+                        view.paddingLeft,
+                        view.paddingTop,
+                        view.paddingRight,
+                        originalBottomPadding + navigationBarBottom
+                    )
+                    insets
+                }
+                ViewCompat.requestApplyInsets(statusView)
             }
         }
     }
