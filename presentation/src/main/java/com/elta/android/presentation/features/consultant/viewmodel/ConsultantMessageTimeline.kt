@@ -19,9 +19,6 @@ class ConsultantMessageTimeline @Inject constructor(
     suspend fun prepare(messages: List<MessageUiEntity>): List<MessageUiEntity> =
         withContext(Dispatchers.IO) { decorate(attachCachedFilesOnIo(messages)) }
 
-    suspend fun attachCachedFiles(messages: List<MessageUiEntity>): List<MessageUiEntity> =
-        withContext(Dispatchers.IO) { attachCachedFilesOnIo(messages) }
-
     private fun attachCachedFilesOnIo(messages: List<MessageUiEntity>): List<MessageUiEntity> =
         messages.map { message ->
             val document = message.document
@@ -48,7 +45,7 @@ class ConsultantMessageTimeline @Inject constructor(
             )
         }
 
-    fun decorate(messages: List<MessageUiEntity>): List<MessageUiEntity> =
+    private fun decorate(messages: List<MessageUiEntity>): List<MessageUiEntity> =
         ChatMessagesAnalyzer.defineChangingDateMessages(
             ChatMessagesAnalyzer.defineMessagesInSequence(messages)
         )

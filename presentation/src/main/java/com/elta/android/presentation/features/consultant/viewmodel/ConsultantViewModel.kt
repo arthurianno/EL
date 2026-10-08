@@ -16,8 +16,6 @@ import com.elta.android.domain.features.consultant.model.WebimUser
 import com.elta.android.domain.features.consultant.usecase.DeleteMessageUseCase
 import com.elta.android.domain.features.consultant.usecase.EditMessageUseCase
 import com.elta.android.domain.features.consultant.usecase.GetMessagesUseCase
-import com.elta.android.domain.features.consultant.usecase.LoadLastMessagesUseCase
-import com.elta.android.domain.features.consultant.usecase.LoadNextCachedMessagesUseCase
 import com.elta.android.domain.features.consultant.usecase.SendMessageUseCase
 import com.elta.android.domain.features.consultant.usecase.SendRateUseCase
 import com.elta.android.domain.features.consultant.usecase.WebimChatStateUseCase
@@ -58,7 +56,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
@@ -76,11 +74,9 @@ class ConsultantViewModel @Inject constructor(
     private val chatState: WebimChatStateUseCase,
     private val messageSender: ConsultantMessageSender,
     private val getMessages: GetMessagesUseCase,
-    private val loadLastMessages: LoadLastMessagesUseCase,
-    private val loadNextCachedMessages: LoadNextCachedMessagesUseCase,
+    private val messageStore: ConsultantMessageStore,
     private val editMessage: EditMessageUseCase,
     private val deleteMessage: DeleteMessageUseCase,
-    private val messageTimeline: ConsultantMessageTimeline,
     private val fileController: ConsultantFileController,
     private val photoCreate: PhotoCreateUseCase,
     private val voiceRecorder: ConsultantVoiceRecorder,
@@ -129,8 +125,6 @@ class ConsultantViewModel @Inject constructor(
             isLoadingNextMessagesPage = false
         )
 
-    private var messageFromCache: List<MessageUiEntity> = emptyList()
-
     private val ratingScheduler by lazy { ConsultantRatingScheduler { sendRate(it) } }
 
     val cameraDialog = BaseDialogWidgetModel<Unit>(
@@ -174,11 +168,13 @@ class ConsultantViewModel @Inject constructor(
                 .catch { handleError(it) }
                 .map { it.messages.toUi() to it.hasNewMessage }
                 .collectLatest { (messages, hasNewMessages) ->
-                    val preparedMessages = messageTimeline.prepare(messageFromCache + messages)
+                    val preparedMessages = messageStore.updateLive(messages)
                     reduceState {
                         state.value.copy(
                             chat = ChatUiEntity(
-                                messages = preparedMessages,
+                                messages = preserveMessageInteractionState(
+                                    preparedMessages, state.value.chat.messages
+                                ),
                                 ratingEntity = RatingUiEntity(
                                     isRatingMessageShowing = false,
                                     starsCount = null
@@ -202,25 +198,25 @@ class ConsultantViewModel @Inject constructor(
                 .filter { it.connectState == ConnectState.Connect }
                 .take(1)
                 .collect {
-                    launch {
-                        val messagesFromHistory =
-                            loadLastMessages(COUNT_MESSAGES_FROM_HISTORY).toUi()
-                        if (messagesFromHistory.isNotEmpty()) {
-                            val preparedHistory = messageTimeline.attachCachedFiles(messagesFromHistory)
-                            messageFromCache = messagesFromHistory
+                    try {
+                        val preparedHistory = messageStore.loadInitial(COUNT_MESSAGES_FROM_HISTORY)
+                        if (preparedHistory != null) {
                             reduceState {
                                 state.value.copy(
                                     chat = state.value.chat.copy(
-                                        messages = messageTimeline.decorate(
-                                            preparedHistory + state.value.chat.messages
-                                        ),
+                                        messages = preserveMessageInteractionState(
+                                            preparedHistory, state.value.chat.messages
+                                        )
                                     ),
                                     hasNewMessages = true
                                 )
                             }
                         }
+                    } catch (error: CancellationException) {
+                        throw error
+                    } catch (error: Exception) {
+                        handleError(error)
                     }
-
                 }
         }
     }
@@ -587,27 +583,29 @@ class ConsultantViewModel @Inject constructor(
     }
 
     private fun loadNextCachedMessages() {
+        if (state.value.isLoadingNextMessagesPage) return
+        reduceState { state.value.copy(isLoadingNextMessagesPage = true) }
         launch {
-            reduceState {
-                state.value.copy(isLoadingNextMessagesPage = true)
-            }
-            val nextMessagesFromCache =
-                loadNextCachedMessages(COUNT_MESSAGES_FROM_HISTORY).toUi()
-            val preparedHistory = messageTimeline.attachCachedFiles(nextMessagesFromCache)
-            // PullRefreshIndicator на версии Compose 1.3.1 имеет баг: индикатор загрузки не исчезает
-            // мгновенной загрузки. С помощью делея можно решить его
-            delay(1_000)
-            reduceState {
-                state.value.copy(
-                    isLoadingNextMessagesPage = false,
-                    chat = state.value.chat.copy(
-                        messages = messageTimeline.decorate(
-                            preparedHistory + state.value.chat.messages
+            try {
+                val preparedHistory = messageStore.loadNext(COUNT_MESSAGES_FROM_HISTORY)
+                if (preparedHistory != null) {
+                    reduceState {
+                        state.value.copy(
+                            chat = state.value.chat.copy(
+                                messages = preserveMessageInteractionState(
+                                    preparedHistory, state.value.chat.messages
+                                )
+                            )
                         )
-                    )
-                )
+                    }
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                handleError(error)
+            } finally {
+                reduceState { state.value.copy(isLoadingNextMessagesPage = false) }
             }
-            messageFromCache = messageFromCache + nextMessagesFromCache
         }
     }
 
