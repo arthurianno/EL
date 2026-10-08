@@ -39,9 +39,7 @@ import com.elta.android.presentation.analytic.getMetricAttributes
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
-import com.elta.android.presentation.analytic.model.appmetric.params.AlertResultParam
 import com.elta.android.presentation.analytic.model.appmetric.params.SnackStatusParam
-import com.elta.android.presentation.analytic.model.appmetric.params.TurningResultParam
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -668,34 +666,13 @@ class HomeFlowPm @Inject constructor(
     }
 
     private fun bindAppMetricEvents() {
-        btControl.bluetoothPermissionsRequestResultRelay
-            .subscribe {
-                val eventParam = if (it) AlertResultParam.ALLOW else AlertResultParam.PROHIBIT
-                appMetric.trackEvent(AppMetricEvent.Permission.AlertClick.Bluetooth(eventParam))
-            }
-            .untilDestroy()
-        btControl.combinedPermissionsRequestResultRelay
-            .subscribe { result ->
-                val eventParam = if (result) AlertResultParam.ALLOW else AlertResultParam.PROHIBIT
-                listOf(
-                    AppMetricEvent.Permission.AlertClick.Bluetooth(eventParam),
-                    AppMetricEvent.Permission.AlertClick.Location(eventParam)
-                ).forEach { event ->
-                    appMetric.trackEvent(event)
-                }
-            }
-            .untilDestroy()
-        btControl.locationPermissionsRequestResultRelay
-            .subscribe {
-                val eventParam = if (it) AlertResultParam.ALLOW else AlertResultParam.PROHIBIT
-                appMetric.trackEvent(AppMetricEvent.Permission.AlertClick.Location(eventParam))
-            }
-            .untilDestroy()
-        btControl.bluetoothRequestResultRelay
-            .subscribe {
-                val eventParam = if (it) TurningResultParam.ALLOW else TurningResultParam.REJECT
-                appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlertClick(eventParam))
-            }
+        HomePermissionMetrics(appMetric)
+            .bind(
+                bluetoothPermissions = btControl.bluetoothPermissionsRequestResultRelay,
+                combinedPermissions = btControl.combinedPermissionsRequestResultRelay,
+                locationPermissions = btControl.locationPermissionsRequestResultRelay,
+                bluetoothEnabled = btControl.bluetoothRequestResultRelay
+            )
             .untilDestroy()
     }
 
