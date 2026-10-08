@@ -172,6 +172,13 @@ class HomeFlowPm @Inject constructor(
             }
         )
     }
+    private val statusUpdates by lazy {
+        HomeStatusUpdates(
+            loadGlucoseFormat = { getGlucoseFormat.execute() },
+            loadFirstSync = { getUserInfoUseCase.execute().map { it.isFirstSync == true } },
+            onError = { Timber.e(it) }
+        )
+    }
 
     val googlePlayDialogControl = dialogControl<DialogData, DialogResult>()
     val feedbackDialogControl = dialogControl<DialogData, DialogResult>()
@@ -260,10 +267,11 @@ class HomeFlowPm @Inject constructor(
                     .doOnSuccess { profile ->
                         appMetric.setProfileAttributes(profile.getMetricAttributes())
                     }
-                    .doOnError(::handleError)
             }
-            .doOnNext { appMetric.trackEvent(AppMetricEvent.MainScreen) }
-            .subscribe()
+            .subscribe(
+                { appMetric.trackEvent(AppMetricEvent.MainScreen) },
+                ::handleError
+            )
             .untilDestroy()
 
         bus.events<Events.EventsChanged>()
@@ -272,21 +280,15 @@ class HomeFlowPm @Inject constructor(
             .subscribe(feedbackAction.consumer)
             .untilDestroy()
 
-        bus.events<Events.EventsChanged>()
-            .flatMap {
-                getGlucoseFormat.execute()
-                    .toObservable()
-            }
-            .doOnError { Log.d("error", "bus.events<Events.EventsChanged> error") }
+        statusUpdates.glucoseFormatOn(
+            bus.events<Events.EventsChanged>().map { Unit }
+        )
             .subscribe(glucoseFormat.consumer)
             .untilDestroy()
 
-        bus.events<Events.DeviceChanged>()
-            .flatMapSingle {
-                getUserInfoUseCase.execute()
-                    .map { it.isFirstSync == true }
-            }
-            .doOnError { Log.d("error", "bus.events<Events.DeviceChanged> error") }
+        statusUpdates.firstSyncOn(
+            bus.events<Events.DeviceChanged>().map { Unit }
+        )
             .subscribe(isFirstSync.consumer)
             .untilDestroy()
 
@@ -307,7 +309,7 @@ class HomeFlowPm @Inject constructor(
             .untilDestroy()
 
         getGlucoseFormat.execute()
-            .subscribe(glucoseFormat.consumer)
+            .subscribe(glucoseFormat.consumer, { Timber.e(it) })
             .untilDestroy()
     }
 
