@@ -134,6 +134,14 @@ class HomeFlowFragmentVariantA :
     }
 
     private fun bindHelpBottomSheet(pm: HomeFlowPmVariantA) {
+        with(binding.syncErrorBottomSheetView) {
+            findViewById<AppCompatTextView>(R.id.confirmButtonView)
+                .clicks()
+                .bindTo(pm.manualSyncErrorAction)
+            findViewById<AppCompatImageView>(R.id.dialogCloseButtonView)
+                .clicks()
+                .bindTo(pm.closeBottomSheetErrorAction)
+        }
         pm.closeHelpBottomSheetCommand.bindTo { binding.helpBottomSheetView.hide() }
         pm.showHelpBottomSheetCommand.bindTo {
             binding.homeActionView.hide()
@@ -170,8 +178,6 @@ class HomeFlowFragmentVariantA :
                 findViewById<TextView>(R.id.title).setText(title)
                 findViewById<TextView>(R.id.error_sync_text).isVisible = !errorIsNotFound
                 findViewById<TextView>(R.id.not_found_text).isVisible = errorIsNotFound
-                findViewById<AppCompatTextView>(R.id.confirmButtonView).clicks().bindTo(pm.manualSyncErrorAction)
-                findViewById<AppCompatImageView>(R.id.dialogCloseButtonView).clicks().bindTo(pm.closeBottomSheetErrorAction)
             }
         }
 
