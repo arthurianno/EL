@@ -146,6 +146,22 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
     }
 
     private fun bindHelpBottomSheet(pm: HomeFlowPm) {
+        val syncErrorSheet = binding.syncErrorBottomSheetView
+        syncErrorSheet.findViewById<AppCompatTextView>(R.id.confirmButtonView)
+            .clicks()
+            .withLatestFrom(pm.manualSyncError.observable) { _, error -> error }
+            .subscribe { error ->
+                if (error is ManualSyncError.PermissionNotGranted) {
+                    pm.permissionSyncErrorAction.consumer.accept(Unit)
+                } else {
+                    pm.manualSyncErrorAction.consumer.accept(Unit)
+                }
+            }
+            .addTo(compositeDestroy)
+        syncErrorSheet.findViewById<AppCompatImageView>(R.id.dialogCloseButtonView)
+            .clicks()
+            .bindTo(pm.closeBottomSheetErrorAction)
+
         pm.closeHelpBottomSheetCommand.bindTo { binding.helpBottomSheetView.hide() }
         pm.showHelpBottomSheetCommand.bindTo {
             binding.homeActionView.hide()
@@ -181,18 +197,16 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
                 val errorTextView = findViewById<TextView>(R.id.error_sync_text)
                 val confirmButton = findViewById<AppCompatTextView>(R.id.confirmButtonView)
 
-                val (errorMessageId, buttonMessageId, action) =
+                val (errorMessageId, buttonMessageId) =
                     if (error is ManualSyncError.PermissionNotGranted)
-                        Triple(
+                        Pair(
                             R.string.sync_connection_permission_not_granted_description,
-                            R.string.sync_connection_permission_not_granted_button,
-                            pm.permissionSyncErrorAction
+                            R.string.sync_connection_permission_not_granted_button
                         )
                     else
-                        Triple(
+                        Pair(
                             R.string.sync_connection_error_text,
-                            R.string.repeat_sync_button_text,
-                            pm.manualSyncErrorAction
+                            R.string.repeat_sync_button_text
                         )
 
                 errorTextView.isVisible = error is ManualSyncError.ErrorSync || error is ManualSyncError.PermissionNotGranted
@@ -202,9 +216,6 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
                 findViewById<TextView>(R.id.not_found_text).isVisible = error is ManualSyncError.NotFound
 
                 confirmButton.text = resources.getString(buttonMessageId)
-                confirmButton.clicks().bindTo(action)
-                findViewById<AppCompatImageView>(R.id.dialogCloseButtonView).clicks()
-                    .bindTo(pm.closeBottomSheetErrorAction)
             }
         }
 

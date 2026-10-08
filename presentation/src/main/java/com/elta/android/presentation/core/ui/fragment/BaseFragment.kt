@@ -109,8 +109,13 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
     }
 
     override fun onDestroyView() {
-        _binding = null
+        compositeUnbind.clear()
         compositeDestroy.clear()
+        errorStateView = null
+        emptyStateView = null
+        progressView = null
+        homeButtonView = null
+        _binding = null
         super.onDestroyView()
     }
 
@@ -150,7 +155,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        homeButtonView?.clicks()?.subscribe { router.exit() }
+        homeButtonView?.clicks()?.subscribe { router.exit() }?.let(compositeDestroy::add)
         pm.showSnackBarCommand.bindTo { showSnackbar(it) }
         pm.showToastCommand.bindTo { showToast(it) }
         pm.hideKeyBoardCommand.bindTo { requireActivity().hideKeyboard() }
@@ -177,9 +182,9 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
     }
 
     protected fun bindProgressDialog(pm: T) {
-        pm.progressState.observable
+        compositeDestroy.add(pm.progressState.observable
             .throttleLast(DEBOUNCE_MILLIS, TimeUnit.MILLISECONDS)
-            .subscribe(progressDialog.visibility(childFragmentManager)) {}
+            .subscribe(progressDialog.visibility(childFragmentManager)) {})
     }
 
     private fun showToast(messageId: Int, showTime: Int = Toast.LENGTH_LONG) {

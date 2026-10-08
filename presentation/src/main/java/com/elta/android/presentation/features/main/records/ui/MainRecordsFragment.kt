@@ -2,70 +2,66 @@ package com.elta.android.presentation.features.main.records.ui
 
 import android.os.Bundle
 import android.view.View
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.widgets.bind
-import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
+import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentMainRecordsBinding
-import com.elta.android.presentation.features.diary.main.ui.adapter.OutlineItemDecoration
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
-import com.elta.android.presentation.features.main.records.ui.adapter.MainRecordsAdapter
+import com.elta.android.presentation.features.main.records.ui.compose.GlucoseDashboardScreen
+import com.elta.android.presentation.features.main.records.ui.compose.GlucoseDashboardUiState
 import com.elta.android.presentation.features.main.records.ui.status_bar.MainScreenLightStatusBarConfigProvider
 import com.elta.android.presentation.features.main.records.ui.status_bar.MainScreenTransparentStatusBarConfigProvider
-import com.elta.android.presentation.widgets.FixedLinearLayoutManager
-import com.elta.android.presentation.widgets.decoration.MainScreenMarginItemDecoration
 import com.jakewharton.rxrelay2.BehaviorRelay
-import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.bindTo
+import org.threeten.bp.YearMonth
 import javax.inject.Inject
 
 class MainRecordsFragment :
-    BaseRecyclerViewFragment<MainRecordsPm, FragmentMainRecordsBinding>(FragmentMainRecordsBinding::inflate) {
+    BaseFragment<MainRecordsPm, FragmentMainRecordsBinding>(FragmentMainRecordsBinding::inflate) {
+
     @Inject
     lateinit var bus: RxBus
-
-    @Inject
-    lateinit var mainRecordsAdapter: MainRecordsAdapter
-
-    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder>
-        get() = mainRecordsAdapter
 
     override val screenLayout: Int = R.layout.fragment_main_records
     override val classToken: Class<MainRecordsPm> = MainRecordsPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider =
         MainScreenTransparentStatusBarConfigProvider
-
     override val backgroundColor: Int = R.color.white
+
     private val secondaryProvider: StatusBarConfigProvider = MainScreenLightStatusBarConfigProvider
     private val bottomSheetState = BehaviorRelay.createDefault(false)
     private val headerState = BehaviorRelay.createDefault(true)
     private var lastMainScreenConfig: ScreenEntity? = null
-
-    // MainRecordsMapper supplies one full-screen dashboard item. Scrolling it would allow
-    // the footer to move underneath the app navigation on devices with tall system insets.
-    override fun provideLayoutManager(): RecyclerView.LayoutManager =
-        FixedLinearLayoutManager(requireContext(), isScrollEnabled = false)
+    private var dashboardUiState by mutableStateOf<GlucoseDashboardUiState?>(null)
+    private var detailedEventsByMonth by mutableStateOf<Map<YearMonth, List<EventV2>>>(emptyMap())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (itemsView?.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
-        itemsView?.addItemDecoration(
-            MainScreenMarginItemDecoration(
-                requireContext(),
-                R.dimen.overlap_first_item_margin
-            )
+        binding.dashboardView.setViewCompositionStrategy(
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
         )
-        itemsView?.addItemDecoration(OutlineItemDecoration(requireContext()))
+        binding.dashboardView.setContent {
+            dashboardUiState?.let { uiState ->
+                GlucoseDashboardScreen(
+                    uiState = uiState,
+                    loadedEventsByMonth = detailedEventsByMonth,
+                    bus = bus
+                )
+            }
+        }
     }
 
     override fun onBindPresentationModel(pm: MainRecordsPm) {
@@ -80,54 +76,52 @@ class MainRecordsFragment :
             )
         }
 
-        // Биндим конфигурацию main screen
+        pm.dashboardState.bindTo { dashboardUiState = it }
+        pm.detailedEventsByMonth.bindTo { detailedEventsByMonth = it }
         pm.mainScreenConfig.bindTo { config ->
             lastMainScreenConfig = config
             applyMainScreenConfig(config)
         }
-
         pm.mainScreenState.bind(binding.mainScreenStateView, compositeUnbind)
         compositeUnbind.add(
-            pm.mainScreenState
-                .dataState
-                .observable
+            pm.mainScreenState.dataState.observable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ applyMainScreenConfig(lastMainScreenConfig) }, {})
+        )
+        compositeDestroy.add(
+            pm.mainScreenState.visibilityState.observable
+                .map { !it }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                    {
-                        applyMainScreenConfig(lastMainScreenConfig)
-                    },
+                    { binding.dashboardView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE) },
                     {}
                 )
         )
-        pm.mainScreenState
-            .visibilityState
-            .observable.map { !it }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                {
-                    itemsView?.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
-                },
-                {}
-            )
-
-        bus.events<Events.HomeBottomSheetStateChanged>().map { it.opened }
-            .subscribe(bottomSheetState)
-
-        bus.events<Events.RecordsAttachedStateChanged>().map { it.attached }
-            .subscribe(headerState)
-
-        Observables.combineLatest(bottomSheetState, headerState)
-            .subscribe {
-                val bottomSheetVisible = it.first
-                val headerVisible = it.second
-                if (bottomSheetVisible) {
-                    statusBarConfigProvider.applyStatusBarConfig()
-                } else if (!headerVisible) {
-                    secondaryProvider.applyStatusBarConfig()
-                } else {
-                    statusBarConfigProvider.applyStatusBarConfig()
+        compositeDestroy.add(
+            bus.events<Events.HomeBottomSheetStateChanged>()
+                .map { it.opened }
+                .subscribe(bottomSheetState)
+        )
+        compositeDestroy.add(
+            bus.events<Events.RecordsAttachedStateChanged>()
+                .map { it.attached }
+                .subscribe(headerState)
+        )
+        compositeDestroy.add(
+            Observables.combineLatest(bottomSheetState, headerState).subscribe { (bottomSheetVisible, headerVisible) ->
+                when {
+                    bottomSheetVisible -> statusBarConfigProvider.applyStatusBarConfig()
+                    !headerVisible -> secondaryProvider.applyStatusBarConfig()
+                    else -> statusBarConfigProvider.applyStatusBarConfig()
                 }
             }
+        )
+    }
+
+    override fun onDestroyView() {
+        dashboardUiState = null
+        detailedEventsByMonth = emptyMap()
+        super.onDestroyView()
     }
 
     companion object {

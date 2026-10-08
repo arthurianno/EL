@@ -3,12 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/itemsView"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/dashboardView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:overScrollMode="never" />
+        android:layout_height="match_parent" />
 
     <com.elta.android.presentation.widgets.MainScreenStateView
         android:id="@+id/mainScreenStateView"

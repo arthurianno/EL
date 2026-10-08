@@ -1,29 +1,15 @@
 package com.elta.android.presentation.features.main.records.ui.compose
 
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -35,31 +21,26 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.glucoseValue
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
-import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.glucoseValue
 import com.nullgr.core.rx.RxBus
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.threeten.bp.YearMonth
 import org.threeten.bp.LocalDate
+import org.threeten.bp.YearMonth
 import java.util.Locale
 
 /**
@@ -69,15 +50,12 @@ import java.util.Locale
 @Composable
 fun GlucoseDashboardScreen(
     uiState: GlucoseDashboardUiState,
+    loadedEventsByMonth: Map<YearMonth, List<EventV2>> = emptyMap(),
     bus: RxBus? = null,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
     val syncState = rememberDashboardSyncState(uiState.syncTimeText)
-    var loadedEventsByMonth by remember {
-        mutableStateOf(emptyMap<YearMonth, List<com.elta.android.domain.features.diary.events.model.EventV2>>())
-    }
-    var requestedMonths by remember { mutableStateOf(emptySet<YearMonth>()) }
     var selectedChartDate by remember { mutableStateOf(LocalDate.now()) }
     val detailedEvents = remember(uiState.detailedChartData.events, loadedEventsByMonth) {
         (uiState.detailedChartData.events + loadedEventsByMonth.values.flatten()).distinct()
@@ -105,21 +83,21 @@ fun GlucoseDashboardScreen(
         syncState.updateDisplayedTime(uiState.syncTimeText)
     }
 
+    LaunchedEffect(selectedChartDate, loadedEventsByMonth, bus) {
+        val month = YearMonth.from(selectedChartDate)
+        if (selectedChartDate != LocalDate.now() && month !in loadedEventsByMonth) {
+            bus?.event(Events.DetailedChartRangeRequested(month.atDay(1), month.atEndOfMonth()))
+        }
+    }
+
     DisposableEffect(bus) {
         if (bus == null) return@DisposableEffect onDispose { }
 
         val syncDisposable = bus.events<Events.Sync>().subscribe { event ->
             syncState.handle(event, scope)
         }
-        val rangeDisposable = bus.events<Events.DetailedChartRangeLoaded>().subscribe { event ->
-            val month = YearMonth.from(event.start)
-            loadedEventsByMonth = loadedEventsByMonth + (month to event.events)
-            requestedMonths = requestedMonths - month
-        }
-
         onDispose {
             syncDisposable.dispose()
-            rangeDisposable.dispose()
         }
     }
 
@@ -151,8 +129,7 @@ fun GlucoseDashboardScreen(
             onChartDateSelected = { date ->
                 selectedChartDate = date
                 val month = YearMonth.from(date)
-                if (date != LocalDate.now() && month !in loadedEventsByMonth && month !in requestedMonths) {
-                    requestedMonths = requestedMonths + month
+                if (date != LocalDate.now() && month !in loadedEventsByMonth) {
                     bus?.event(Events.DetailedChartRangeRequested(month.atDay(1), month.atEndOfMonth()))
                 }
             },
@@ -183,21 +160,14 @@ fun GlucoseDashboardScreen(
                         var month = YearMonth.from(action.start)
                         val lastMonth = YearMonth.from(action.end)
                         while (!month.isAfter(lastMonth)) {
-                            if (month !in loadedEventsByMonth && month !in requestedMonths) {
-                                requestedMonths = requestedMonths + month
-                                bus?.event(
-                                    Events.DetailedChartRangeRequested(month.atDay(1), month.atEndOfMonth())
-                                )
-                            }
+                            bus?.event(
+                                Events.DetailedChartRangeRequested(month.atDay(1), month.atEndOfMonth())
+                            )
                             month = month.plusMonths(1)
                         }
                     }
                     is GlucoseDashboardAction.SelectCategory -> Unit
                 }
-            },
-            onDetailedChartClosed = {
-                requestedMonths = emptySet()
-                loadedEventsByMonth = loadedEventsByMonth.filterKeys { it == YearMonth.from(selectedChartDate) }
             },
             onDebugPaletteLongClick = if (BuildConfig.DEBUG) {
                 { scope.launch { paletteSheetState.show() } }
@@ -216,10 +186,9 @@ internal fun GlucoseDashboardContent(
     chartPoints: List<GlucosePoint> = uiState.chartPoints,
     onChartDateSelected: (LocalDate) -> Unit = {},
     syncState: DashboardSyncUiState,
-    detailedEvents: List<com.elta.android.domain.features.diary.events.model.EventV2> = uiState.detailedChartData.events,
+    detailedEvents: List<EventV2> = uiState.detailedChartData.events,
     modifier: Modifier = Modifier,
     onAction: (GlucoseDashboardAction) -> Unit = {},
-    onDetailedChartClosed: () -> Unit = {},
     onDebugPaletteLongClick: (() -> Unit)? = null
 ) {
     var selectedCategory by rememberSaveable { mutableStateOf(DashboardCategories.first()) }
@@ -290,7 +259,6 @@ internal fun GlucoseDashboardContent(
                         initialDate = selectedChartDate.toString(),
                         onBackClick = {
                             isDetailedChartVisible = false
-                            onDetailedChartClosed()
                         },
                         glucosePoints = uiState.detailedChartData.glucosePoints,
                         insulinEntries = uiState.detailedChartData.insulinEntries,
@@ -306,394 +274,6 @@ internal fun GlucoseDashboardContent(
             }
         }
     }
-}
-
-@Composable
-private fun DashboardHeader(
-    uiState: GlucoseDashboardUiState,
-    syncState: DashboardSyncUiState,
-    selectedCategory: String,
-    layout: GlucoseDashboardLayout,
-    onCategorySelected: (String) -> Unit,
-    onSyncClick: () -> Unit,
-    onDebugPaletteLongClick: (() -> Unit)?,
-    onAction: (GlucoseDashboardAction) -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(GlucoseDashboardTheme.getHeaderGradient(uiState.glucoseState, uiState.isDarkTheme))
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Spacer(modifier = Modifier.height(layout.navigationTopSpacing))
-            DashboardCategoryTabs(
-                selectedCategory = selectedCategory,
-                glucoseState = uiState.glucoseState,
-                horizontalScale = layout.horizontalScale,
-                onCategorySelected = onCategorySelected
-            )
-            Spacer(modifier = Modifier.height(layout.gaugeTopSpacing))
-
-            if (LocalDensity.current.fontScale > 1.3f) {
-                AccessibleGlucoseSummary(uiState)
-            } else if (uiState.hasMeasurements) {
-                GlucoseRingGauge(
-                    glucoseValue = uiState.glucoseValue,
-                    deltaText = uiState.deltaText,
-                    glucoseTrend = uiState.glucoseTrend,
-                    tirPercentage = uiState.tirPercentage,
-                    syncTimeText = syncState.displayedTime,
-                    breadUnitsText = uiState.breadUnitsText,
-                    insulinText = uiState.insulinText,
-                    state = uiState.glucoseState,
-                    statusText = syncState.statusMessage.orEmpty(),
-                    isStatusVisible = syncState.statusMessage != null,
-                    isSyncing = syncState.isSyncing,
-                    ringSize = layout.ringSize,
-                    ringTopOffset = layout.ringTopOffset,
-                    lowerControlsExtraOffset = layout.lowerControlsExtraOffset,
-                    onSyncClick = onSyncClick,
-                    showSyncControl = false,
-                    onStatePillLongClick = onDebugPaletteLongClick
-                )
-            } else {
-                NoMeasurementsGlucoseGauge(
-                    ringSize = layout.ringSize,
-                    availableHeight = layout.headerHeight -
-                        layout.navigationTopSpacing -
-                        33.dp * layout.horizontalScale -
-                        layout.gaugeTopSpacing,
-                    state = uiState.glucoseState,
-                    isSyncing = syncState.isSyncing,
-                    statusText = syncState.statusMessage.orEmpty(),
-                    isStatusVisible = syncState.statusMessage != null,
-                    onSyncClick = onSyncClick,
-                    showSyncControl = false
-                )
-            }
-            DashboardDevicePanel(
-                device = uiState.device,
-                sensor = uiState.sensor,
-                syncState = syncState,
-                glucoseState = uiState.glucoseState,
-                onSync = onSyncClick,
-                onConnect = { onAction(GlucoseDashboardAction.ConnectDevice) },
-                onDismissMessage = { onAction(GlucoseDashboardAction.DismissSyncMessage) },
-                onRetry = { onAction(GlucoseDashboardAction.RetrySync(it)) },
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun DashboardCategoryTabs(
-    selectedCategory: String,
-    glucoseState: GlucoseState,
-    horizontalScale: Float,
-    onCategorySelected: (String) -> Unit
-) {
-    val largeText = LocalDensity.current.fontScale > 1.3f
-    Row(
-        Modifier.fillMaxWidth().padding(horizontal = 14.dp * horizontalScale)
-            .clip(RoundedCornerShape(24.dp))
-            .background(Color.White.copy(alpha = 0.2f))
-            .then(if (largeText) Modifier.horizontalScroll(rememberScrollState()) else Modifier)
-            .padding(2.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        DashboardCategories.forEach { category ->
-            val selected = category == selectedCategory
-            Box(
-                modifier = (if (largeText) Modifier else Modifier.weight(1f))
-                    .heightIn(min = 33.dp * horizontalScale)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(if (selected) GlucoseDashboardTheme.IndicatorPillBackground else Color.Transparent)
-                    .clickable { onCategorySelected(category) }
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    category, fontSize = 14.sp,
-                    color = if (selected) GlucoseDashboardTheme.getSelectedTabTextColor(glucoseState)
-                    else GlucoseDashboardTheme.TabUnselectedText,
-                    maxLines = 1
-                )
-            }
-        }
-    }
-}
-
-/** The graphic gauge uses absolute coordinates; large system text needs a flowing summary. */
-@Composable
-private fun AccessibleGlucoseSummary(uiState: GlucoseDashboardUiState) {
-    Column(
-        Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            text = if (!uiState.hasMeasurements) "Нет измерений" else when (uiState.glucoseState) {
-                GlucoseState.NORMAL -> "Норма"
-                GlucoseState.LOW -> "Низкий"
-                GlucoseState.HIGH -> "Высокий"
-            },
-            color = Color.White, fontSize = 20.sp
-        )
-        Text(uiState.glucoseValue, color = Color.White, fontSize = 40.sp, fontWeight = FontWeight.Bold)
-        if (uiState.hasMeasurements) {
-            Text("ммоль/л", color = Color.White, fontSize = 16.sp)
-            uiState.glucoseTrend?.let { trend ->
-                val direction = when (trend.direction) {
-                    GlucoseTrendDirection.UP -> "↑"
-                    GlucoseTrendDirection.DOWN -> "↓"
-                    GlucoseTrendDirection.STABLE -> "→"
-                }
-                Text("$direction ${trend.valueText}", color = Color.White, fontSize = 16.sp)
-            }
-            listOf("TIR" to uiState.tirPercentage, "Хлебных ед." to uiState.breadUnitsText, "Инсулина" to uiState.insulinText)
-                .forEach { (title, value) ->
-                    Column(Modifier.fillMaxWidth().background(Color.White.copy(alpha = 0.13f), RoundedCornerShape(12.dp)).padding(12.dp)) {
-                        Text(title, color = Color.White, fontSize = 14.sp)
-                        Text(value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-        } else Text("Добавьте показатели вручную через «+» или синхронизируйте их с устройством", color = Color.White, fontSize = 16.sp)
-    }
-}
-
-internal class DashboardSyncState(
-    initialTime: String
-) {
-    var displayedTime by mutableStateOf(initialTime)
-        private set
-    var statusMessage by mutableStateOf<String?>(null)
-        private set
-    var isSyncing by mutableStateOf(false)
-        private set
-    var isError by mutableStateOf(false)
-        private set
-    private var retryTarget = DashboardSyncTarget.METER
-    private var hideJob: Job? = null
-
-    fun updateDisplayedTime(value: String) {
-        if (!isSyncing) displayedTime = value
-    }
-
-    fun handle(event: Events.Sync, scope: kotlinx.coroutines.CoroutineScope) {
-        if (event is Events.Sync.Server) return
-        when (event) {
-            is Events.Sync.Glucometer.Started -> start(
-                scope,
-                "Подключение к устройству...",
-                "Ошибка синхронизации с устройством"
-            )
-            is Events.Sync.Glucometer.Success,
-            is Events.Sync.Glucometer.NoNewEvents,
-            is Events.Sync.Glucometer.InvalidTime -> completed(scope, "Устройство синхронизировано")
-            is Events.Sync.Glucometer.Error,
-            is Events.Sync.Glucometer.ErrorWithMessage,
-            is Events.Sync.Glucometer.Nothing -> showMessage(
-                scope,
-                "Ошибка синхронизации с устройством",
-                4_000L, isError = true
-            )
-            is Events.Sync.Server -> Unit
-        }
-    }
-
-    fun dismiss() {
-        if (isSyncing) return
-        hideJob?.cancel()
-        statusMessage = null
-        isError = false
-    }
-
-    fun showMessage(
-        scope: kotlinx.coroutines.CoroutineScope,
-        message: String,
-        timeoutMillis: Long,
-        isError: Boolean = false
-    ) {
-        hideJob?.cancel()
-        isSyncing = false
-        statusMessage = message
-        this.isError = isError
-        if (isError) return
-        hideJob = scope.launch {
-            delay(timeoutMillis)
-            statusMessage = null
-        }
-    }
-
-    fun asUiState(): DashboardSyncUiState = DashboardSyncUiState(
-        displayedTime = displayedTime,
-        statusMessage = statusMessage,
-        isSyncing = isSyncing,
-        isError = isError,
-        retryTarget = retryTarget
-    )
-
-    private fun start(
-        scope: kotlinx.coroutines.CoroutineScope,
-        message: String,
-        fallbackMessage: String
-    ) {
-        hideJob?.cancel()
-        isSyncing = true
-        isError = false
-        statusMessage = message
-        hideJob = scope.launch {
-            delay(SyncFallbackTimeoutMillis)
-            if (isSyncing) showMessage(scope, fallbackMessage, 3_000L, isError = true)
-        }
-    }
-
-    private fun completed(scope: kotlinx.coroutines.CoroutineScope, message: String) {
-        showMessage(scope, message, 3_000L)
-    }
-}
-
-@Composable
-private fun rememberDashboardSyncState(initialTime: String): DashboardSyncState =
-    remember {
-        DashboardSyncState(
-            initialTime = initialTime
-        )
-    }
-
-@Composable
-private fun PaletteSelectionSheet(onPaletteSelected: (NewDesignPalette) -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(GlucoseDashboardTheme.LightCardBackground)
-            .padding(horizontal = 24.dp, vertical = 20.dp)
-    ) {
-        Text(
-            text = "Палитра интерфейса",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF353B4B)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            NewDesignPalette.entries.forEach { palette ->
-                val isSelected = NewDesignPaletteController.activePalette == palette
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(44.dp)
-                        .clip(RoundedCornerShape(22.dp))
-                        .background(
-                            if (isSelected) GlucoseDashboardTheme.NormalChartColor else Color(0xFFF1F3F5)
-                        )
-                        .clickable { onPaletteSelected(palette) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Палитра ${palette.name}",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = if (isSelected) Color.White else Color(0xFF353B4B)
-                    )
-                }
-            }
-        }
-    }
-}
-
-private val DashboardCategories = listOf("Глюкоза", "Давление", "Инсулин")
-private const val SyncFallbackTimeoutMillis = 60_000L
-
-private val PreviewChartPoints = listOf(
-    GlucosePoint("06:00", 5.3f),
-    GlucosePoint("09:00", 6.1f),
-    GlucosePoint("12:00", 7.4f),
-    GlucosePoint("15:00", 5.8f),
-    GlucosePoint("18:00", 6.7f)
-)
-
-private val PopulatedPreviewState = GlucoseDashboardUiState(
-    glucoseValue = "6,7",
-    deltaText = "0,5",
-    glucoseTrend = GlucoseTrend(GlucoseTrendDirection.UP, "0,5"),
-    tirPercentage = "73%",
-    syncTimeText = "Сегодня, 10:42",
-    breadUnitsText = "2,5 ХЕ",
-    insulinText = "4,0 Ед.",
-    chartPoints = PreviewChartPoints,
-    detailedChartData = DetailedChartData(glucosePoints = PreviewChartPoints.map {
-        DetailedGlucosePoint(timeLabel = it.timeLabel, value = it.value)
-    })
-)
-
-@Preview(name = "Данные — норма", widthDp = 360, heightDp = 760, showBackground = true)
-@Composable
-private fun GlucoseDashboardNormalPreview() {
-    GlucoseDashboardContent(
-        uiState = PopulatedPreviewState,
-        syncState = DashboardSyncUiState(displayedTime = PopulatedPreviewState.syncTimeText)
-    )
-}
-
-@Preview(name = "Данные — высокий уровень", widthDp = 360, heightDp = 760, showBackground = true)
-@Composable
-private fun GlucoseDashboardHighPreview() {
-    GlucoseDashboardContent(
-        uiState = PopulatedPreviewState.copy(
-            glucoseValue = "12,4",
-            glucoseState = GlucoseState.HIGH,
-            isDarkTheme = true
-        ),
-        syncState = DashboardSyncUiState(displayedTime = "Только что")
-    )
-}
-
-@Preview(name = "Данные — низкий уровень", widthDp = 360, heightDp = 760, showBackground = true)
-@Composable
-private fun GlucoseDashboardLowPreview() {
-    GlucoseDashboardContent(
-        uiState = PopulatedPreviewState.copy(
-            glucoseValue = "3,2",
-            glucoseState = GlucoseState.LOW,
-            glucoseTrend = GlucoseTrend(GlucoseTrendDirection.DOWN, "0,8")
-        ),
-        syncState = DashboardSyncUiState(displayedTime = "Сегодня, 10:42")
-    )
-}
-
-@Preview(name = "Нет измерений", widthDp = 360, heightDp = 760, showBackground = true)
-@Composable
-private fun GlucoseDashboardEmptyPreview() {
-    GlucoseDashboardContent(
-        uiState = GlucoseDashboardUiState(),
-        syncState = DashboardSyncUiState(displayedTime = "Нет измерений")
-    )
-}
-
-@Preview(name = "Ошибка синхронизации", widthDp = 360, heightDp = 760, showBackground = true)
-@Composable
-private fun GlucoseDashboardSyncErrorPreview() {
-    GlucoseDashboardContent(
-        uiState = PopulatedPreviewState,
-        syncState = DashboardSyncUiState(
-            displayedTime = "Сегодня, 10:42",
-            statusMessage = "Устройство недоступно"
-        )
-    )
-}
-
-@Preview(name = "Синхронизация", widthDp = 360, heightDp = 760, showBackground = true)
-@Composable
-private fun GlucoseDashboardSyncPreview() {
-    GlucoseDashboardContent(
-        uiState = PopulatedPreviewState,
-        syncState = DashboardSyncUiState(
-            displayedTime = "Сегодня, 10:42",
-            statusMessage = "Синхронизация с прибором...",
-            isSyncing = true
-        )
-    )
 }
 
 /** Measure the actual header, including the device panel, before assigning chart space. */

@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.main.records.ui.adapter.items
+package com.elta.android.presentation.features.main.records.mapper
 
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import org.junit.Assert.assertEquals

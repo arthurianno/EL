@@ -1,9 +1,12 @@
-package com.elta.android.presentation.features.statistic.period.ui.compose
+package com.elta.android.presentation.features.statistic.period.preferences
 
 import android.content.Context
+import com.elta.android.presentation.features.statistic.period.model.StatisticsBlock
+import com.elta.android.presentation.features.statistic.period.model.DEFAULT_VISIBLE_STATISTICS_BLOCKS
+import javax.inject.Inject
 
 /** Stores the order of visible dashboard sections in app-private preferences. */
-internal class StatisticsBlockPreferences(context: Context) {
+class StatisticsBlockPreferences @Inject constructor(context: Context) {
     private val preferences = context.applicationContext.getSharedPreferences(
         "statistics_dashboard_blocks",
         Context.MODE_PRIVATE

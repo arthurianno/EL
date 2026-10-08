@@ -1,5 +1,7 @@
-package com.elta.android.presentation.features.statistic.period.ui.compose
+package com.elta.android.presentation.features.statistic.period.preferences
 
+import com.elta.android.presentation.features.statistic.period.model.StatisticsBlock
+import com.elta.android.presentation.features.statistic.period.model.DEFAULT_VISIBLE_STATISTICS_BLOCKS
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

@@ -41,7 +41,7 @@ abstract class BaseComposeFragment<VM : BaseViewModel<*>> :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (viewModel as? LifecycleEventObserver)?.let { lifecycle.addObserver(it) }
+        (viewModel as? LifecycleEventObserver)?.let { viewLifecycleOwner.lifecycle.addObserver(it) }
         view.findViewById<ComposeView>(R.id.main_view)
             .apply {
                 setViewCompositionStrategy(

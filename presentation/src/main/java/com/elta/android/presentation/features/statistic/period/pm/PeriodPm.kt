@@ -9,9 +9,11 @@ import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.date.DateChangedEvent
-import com.elta.android.presentation.core.pm.BaseListPm
+import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.statistic.period.ui.Period
+import com.elta.android.presentation.features.statistic.period.model.StatisticsBlock
+import com.elta.android.presentation.features.statistic.period.preferences.StatisticsBlockPreferences
 import io.reactivex.Observable
 import io.reactivex.Single
 import me.dmdev.rxpm.action
@@ -20,15 +22,18 @@ import javax.inject.Inject
 
 class PeriodPm @Inject constructor(
     private val getStatisticByPeriodUseCase: GetStatisticByPeriodUseCase,
+    private val blockPreferences: StatisticsBlockPreferences,
     services: ServiceFacade
-) : BaseListPm(services) {
+) : BasePm(services) {
 
     private val loadScreenAction = action<Period>()
     private val periodState = state<Period>()
     val statisticsByPeriodState = state<StatisticsPeriodModels>()
+    val visibleBlocksState = state<List<StatisticsBlock>>()
 
     override fun onCreate() {
         super.onCreate()
+        visibleBlocksState.consumer.accept(blockPreferences.read())
 
         loadScreenAction.observable
             .skipWhileInProgress()
@@ -66,6 +71,11 @@ class PeriodPm @Inject constructor(
     fun setPeriod(period: Period) {
         periodState.consumer.accept(period)
         loadScreenAction.consumer.accept(period)
+    }
+
+    fun saveVisibleBlocks(blocks: List<StatisticsBlock>) {
+        blockPreferences.save(blocks)
+        visibleBlocksState.consumer.accept(blocks)
     }
 
     private fun createPeriods(period: Period): StatisticsPeriods {

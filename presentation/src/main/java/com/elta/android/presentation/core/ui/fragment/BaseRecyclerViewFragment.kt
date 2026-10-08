@@ -31,6 +31,12 @@ abstract class BaseRecyclerViewFragment<T : BaseListPm, B : ViewBinding>(
         pm.items.bindTo(adapter::submitList)
     }
 
+    override fun onDestroyView() {
+        itemsView?.adapter = null
+        itemsView = null
+        super.onDestroyView()
+    }
+
     protected open fun provideLayoutManager(): RecyclerView.LayoutManager =
         FixedLinearLayoutManager(requireContext())
 }

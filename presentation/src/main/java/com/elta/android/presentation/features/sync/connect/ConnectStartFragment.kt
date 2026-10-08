@@ -5,7 +5,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.ButtonDefaults
@@ -73,7 +72,6 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
                         .fillMaxSize()
                         .background(color = colors.white)
                         .statusBarsPadding()
-                        .navigationBarsPadding()
                 ) {
                     TopAppBar(viewModel)
                     MainImage(
