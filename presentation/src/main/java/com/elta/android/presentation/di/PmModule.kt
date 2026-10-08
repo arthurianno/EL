@@ -37,7 +37,6 @@ import com.elta.android.presentation.features.profile.settings.password.pm.Profi
 import com.elta.android.presentation.features.profile.settings.reminders.create.pm.CreateRemindPm
 import com.elta.android.presentation.features.profile.settings.reminders.edit.pm.EditRemindPm
 import com.elta.android.presentation.features.profile.support.pm.SupportPm
-import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
 import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
 import com.elta.android.presentation.features.registration.policy.pm.RegistrationPrivacyPolicyPm
 import com.elta.android.presentation.features.shops.flow.pm.ShopsFlowPm
@@ -104,11 +103,6 @@ abstract class PmModule {
     @IntoMap
     @PmKey(LanguageSelectionPm::class)
     abstract fun bindLanguageSelectionPm(pm: LanguageSelectionPm): PresentationModel
-
-    @Binds
-    @IntoMap
-    @PmKey(EmailConfirmationPm::class)
-    abstract fun bindEmailConfirmationPm(pm: EmailConfirmationPm): PresentationModel
 
     // SHOPS FLOW
     @Binds
