@@ -387,6 +387,36 @@ class ConsultantViewModel @Inject constructor(
 
             is ConsultantAction.OnDownIconClick -> sendEvent(ScrollToDown)
             is ConsultantAction.OnSwipeRefresh -> loadNextCachedMessages()
+            is ConsultantAction.SelectPhotoClick -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    sendEvent(PhotoSelect)
+                } else {
+                    verifyPermission(
+                        status = action.permissionStatus,
+                        onGranted = { sendEvent(PhotoSelect) },
+                        onShouldShow = { storageDialog.dialogOpen() },
+                        onDenied = { sendEvent(PermissionEvent.Storage()) }
+                    )
+                }
+            }
+            is ConsultantAction.MakePhotoClick -> verifyPermission(
+                status = action.permissionStatus,
+                onGranted = { sendEvent(OpenCamera) },
+                onShouldShow = { cameraDialog.dialogOpen() },
+                onDenied = { sendEvent(PermissionEvent.Camera) }
+            )
+            is ConsultantAction.SelectFileClick -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    sendEvent(FileSelect)
+                } else {
+                    verifyPermission(
+                        status = action.permissionStatus,
+                        onGranted = { sendEvent(FileSelect) },
+                        onShouldShow = { storageDialog.dialogOpen() },
+                        onDenied = { sendEvent(PermissionEvent.Storage()) }
+                    )
+                }
+            }
         }
     }
 
@@ -401,81 +431,7 @@ class ConsultantViewModel @Inject constructor(
     override fun reduceStateByAction(
         currentState: ConsultantViewState,
         action: Action
-    ): ConsultantViewState =
-        when (action) {
-            is ConsultantAction.InputChanged -> currentState.copy(inputMessage = action.text)
-            is ConsultantAction.SelectPhotoClick -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    sendEvent(PhotoSelect)
-                } else {
-                    verifyPermission(
-                        status = action.permissionStatus,
-                        onGranted = { sendEvent(PhotoSelect) },
-                        onShouldShow = { storageDialog.dialogOpen() },
-                        onDenied = { sendEvent(PermissionEvent.Storage()) }
-                    )
-                }
-
-                currentState.copy(isOpenBottomSheet = false)
-            }
-
-            is ConsultantAction.PhotoTaken -> currentState.copy(
-                previewState = currentState.previewState.copy(
-                    isPhotoPreview = true,
-                    isFromCamera = true
-                )
-            )
-
-            is ConsultantAction.MakePhotoClick -> {
-                verifyPermission(
-                    status = action.permissionStatus,
-                    onGranted = { sendEvent(OpenCamera) },
-                    onShouldShow = { cameraDialog.dialogOpen() },
-                    onDenied = { sendEvent(PermissionEvent.Camera) }
-                )
-
-                currentState.copy(isOpenBottomSheet = false)
-            }
-
-            is ConsultantAction.SelectFileClick -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    sendEvent(FileSelect)
-                } else {
-                    verifyPermission(
-                        status = action.permissionStatus,
-                        onGranted = { sendEvent(FileSelect) },
-                        onShouldShow = { storageDialog.dialogOpen() },
-                        onDenied = { sendEvent(PermissionEvent.Storage()) }
-                    )
-                }
-
-                currentState.copy(isOpenBottomSheet = false)
-            }
-
-            ConsultantAction.FileClick -> currentState.copy(isOpenBottomSheet = true)
-            is ConsultantAction.OnDismissContextMenu -> currentState.copy(
-                contextMenuEntity = currentState.contextMenuEntity.copy(isOpenContextMenu = false)
-            )
-
-            is ConsultantAction.ChatMessageLongClick -> currentState.copy(
-                contextMenuEntity = currentState.contextMenuEntity.copy(
-                    isOpenContextMenu = true,
-                    selectedMessage = action.message
-                )
-            )
-
-            is ConsultantAction.EditMessageClick -> currentState.copy(
-                inputMessage = action.message.text.orEmpty(),
-                messageForEdit = action.message,
-                isEditMessage = true,
-                contextMenuEntity = state.value.contextMenuEntity.copy(
-                    isOpenContextMenu = false,
-                    selectedMessage = null
-                )
-            )
-
-            else -> currentState
-        }
+    ): ConsultantViewState = ConsultantStateReducer.reduce(currentState, action)
 
     private fun handleFileState(message: MessageUiEntity) {
         val document = message.document
