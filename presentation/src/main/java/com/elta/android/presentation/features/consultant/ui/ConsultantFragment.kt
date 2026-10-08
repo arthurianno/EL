@@ -29,6 +29,7 @@ import com.elta.android.presentation.features.consultant.model.BottomBarIconStat
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
 import com.elta.android.presentation.features.consultant.model.FileSelect
 import com.elta.android.presentation.features.consultant.model.MakeVibration
+import com.elta.android.presentation.features.consultant.model.MessageSendFailed
 import com.elta.android.presentation.features.consultant.model.OpenCamera
 import com.elta.android.presentation.features.consultant.model.OpenSettings
 import com.elta.android.presentation.features.consultant.model.PhotoSelect
@@ -37,6 +38,8 @@ import com.elta.android.presentation.features.consultant.model.ScrollToDown
 import com.elta.android.presentation.features.consultant.model.SendAutoMessage
 import com.elta.android.presentation.features.consultant.ui.components.ConsultantContent
 import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
+import com.elta.android.presentation.messages.SnackBarMessageData
+import com.elta.android.presentation.utils.makeSnackBar
 import com.elta.android.presentation.utils.openSettingsIntent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -177,6 +180,9 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                         getString(R.string.consultant_auto_message_question_not_resolved)
                     )
 
+                    MessageSendFailed ->
+                        showMessage(getString(R.string.consultant_message_send_failed))
+
                     is PermissionEvent.Storage -> storageAccessPermission.launchPermissionRequest()
                     is PermissionEvent.RecordAudio -> recordAudioPermission.launchPermissionRequest()
                     is PermissionEvent.Camera -> cameraPermission.launchPermissionRequest()
@@ -282,5 +288,12 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                 viewModel sendAction ConsultantAction.OnSwipeRefresh
             }
         )
+    }
+
+    private fun showMessage(message: String) {
+        makeSnackBar(
+            requireActivity().findViewById(android.R.id.content),
+            SnackBarMessageData.SimpleTextMessage(message)
+        ).show()
     }
 }

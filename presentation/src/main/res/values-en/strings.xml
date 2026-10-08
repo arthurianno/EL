@@ -851,6 +851,7 @@
     <string name="consultant_connect">We are here for you 24/7</string>
     <string name="consultant_offline">Failed to connect</string>
     <string name="consultant_message_placeholder">Write a message</string>
+    <string name="consultant_message_send_failed">Couldn\'t send the message. Please try again.</string>
     <string name="consultant_chat_empty_text">We will be happy to answer your questions.</string>
     <string name="consultant_bottom_sheet_item_select_photo">Choose Photo</string>
     <string name="consultant_bottom_sheet_item_make_photo">Take Photo</string>

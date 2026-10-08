@@ -38,6 +38,7 @@ import com.elta.android.presentation.features.consultant.model.ConsultantViewSta
 import com.elta.android.presentation.features.consultant.model.ContextMenuUiEntity
 import com.elta.android.presentation.features.consultant.model.FileSelect
 import com.elta.android.presentation.features.consultant.model.MakeVibration
+import com.elta.android.presentation.features.consultant.model.MessageSendFailed
 import com.elta.android.presentation.features.consultant.model.MessageType
 import com.elta.android.presentation.features.consultant.model.MessageUiEntity
 import com.elta.android.presentation.features.consultant.model.OpenCamera
@@ -57,7 +58,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -67,7 +67,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import org.threeten.bp.LocalTime
 import org.threeten.bp.temporal.ChronoUnit
-import timber.log.Timber
 import javax.inject.Inject
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -75,7 +74,7 @@ class ConsultantViewModel @Inject constructor(
     private val sessionLifecycle: ConsultantSessionLifecycle,
     private val webimNetworkState: WebimNetworkStateUseCase,
     private val chatState: WebimChatStateUseCase,
-    private val sendMessage: SendMessageUseCase,
+    private val messageSender: ConsultantMessageSender,
     private val getMessages: GetMessagesUseCase,
     private val loadLastMessages: LoadLastMessagesUseCase,
     private val loadNextCachedMessages: LoadNextCachedMessagesUseCase,
@@ -324,14 +323,7 @@ class ConsultantViewModel @Inject constructor(
                     )
                 )
 
-            is ConsultantAction.SendMessageClick -> {
-                postMessage(
-                    SendMessageUseCase.Params(
-                        text = state.value.inputMessage
-                    )
-                )
-                reduceState { state.value.copy(inputMessage = "") }
-            }
+            is ConsultantAction.SendMessageClick -> sendTextMessage()
 
             is ConsultantAction.SendAutoMessage ->
                 postMessage(
@@ -353,18 +345,7 @@ class ConsultantViewModel @Inject constructor(
                 }
             }
 
-            ConsultantAction.PictureSendClick -> {
-                postMessage(
-                    SendMessageUseCase.Params(
-                        uri = state.value.previewState.uriPhoto
-                    )
-                )
-                reduceState {
-                    state.value.copy(
-                        previewState = state.value.previewState.copy(isPhotoPreview = false)
-                    )
-                }
-            }
+            ConsultantAction.PictureSendClick -> sendPreviewPhoto()
 
             is ConsultantAction.VerifyFile -> handleFileState(action.message)
             is ConsultantAction.SelectedOperatorRate -> rateOperator(action.number)
@@ -478,8 +459,37 @@ class ConsultantViewModel @Inject constructor(
             currentState.audioFileUri == Uri.EMPTY
         ) return
 
-        postMessage(SendMessageUseCase.Params(uri = currentState.audioFileUri))
-        resetRecordingState()
+        val uri = currentState.audioFileUri
+        postMessage(SendMessageUseCase.Params(uri = uri)) {
+            if (state.value.audioFileUri == uri) resetRecordingState()
+        }
+    }
+
+    private fun sendTextMessage() {
+        val text = state.value.inputMessage
+        if (text.isBlank()) return
+
+        postMessage(SendMessageUseCase.Params(text = text)) {
+            reduceState {
+                val currentState = state.value
+                if (currentState.inputMessage == text) currentState.copy(inputMessage = "")
+                else currentState
+            }
+        }
+    }
+
+    private fun sendPreviewPhoto() {
+        val uri = state.value.previewState.uriPhoto?.takeUnless { it == Uri.EMPTY } ?: return
+        postMessage(SendMessageUseCase.Params(uri = uri)) {
+            reduceState {
+                val currentState = state.value
+                if (currentState.previewState.uriPhoto == uri) {
+                    currentState.copy(
+                        previewState = currentState.previewState.copy(isPhotoPreview = false)
+                    )
+                } else currentState
+            }
+        }
     }
 
     @OptIn(ExperimentalPermissionsApi::class)
@@ -496,18 +506,20 @@ class ConsultantViewModel @Inject constructor(
         }
     }
 
-    private fun postMessage(params: SendMessageUseCase.Params) {
-        launch {
-            try {
-                sendMessage(params)
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (e: Exception) {
-                // fixme обработка ошибок
-                Timber.d("EltaTag handle error: $e")
+    private fun postMessage(
+        params: SendMessageUseCase.Params,
+        onAccepted: () -> Unit = {}
+    ) {
+        val started = messageSender.send(
+            scope = viewModelScope,
+            params = params,
+            onAccepted = onAccepted,
+            onFailure = { error ->
+                handleError(error)
+                sendEvent(MessageSendFailed)
             }
-        }
-        if (state.value.chat.ratingEntity.isRatingMessageShowing) {
+        )
+        if (started && state.value.chat.ratingEntity.isRatingMessageShowing) {
             hideRatingMessage()
         }
     }

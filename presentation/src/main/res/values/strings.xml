@@ -982,6 +982,7 @@
     <string name="consultant_connect">Мы с вами 24/7</string>
     <string name="consultant_offline">Не удалось подключиться</string>
     <string name="consultant_message_placeholder">Напишите сообщение</string>
+    <string name="consultant_message_send_failed">Не удалось отправить сообщение. Попробуйте ещё раз.</string>
     <string name="consultant_chat_empty_text">Мы с удовольствием ответим\nна интересующие Вас вопросы</string>
     <string name="consultant_bottom_sheet_item_select_photo">Выбрать фото</string>
     <string name="consultant_bottom_sheet_item_make_photo">Сделать фото</string>

@@ -10,3 +10,4 @@ data object OpenSettings : Event
 data object SendAutoMessage : Event
 data object MakeVibration : Event
 data object ScrollToDown : Event
+data object MessageSendFailed : Event

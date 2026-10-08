@@ -23,7 +23,7 @@ data class ConsultantViewState(
     val bottomBarIconState: BottomBarIconState
         get() = when {
             isEditMessage -> BottomBarIconState.SaveEdit
-            inputMessage.isEmpty() -> BottomBarIconState.StartRecord
+            inputMessage.isBlank() -> BottomBarIconState.StartRecord
             else -> BottomBarIconState.SendMessage
         }
 }

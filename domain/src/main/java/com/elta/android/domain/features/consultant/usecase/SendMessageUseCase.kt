@@ -10,8 +10,13 @@ import com.elta.android.domain.common.repository.FileInfoRepository
 import com.elta.android.domain.common.repository.MediaRepository
 import com.elta.android.domain.features.consultant.model.ContentType
 import com.elta.android.domain.features.consultant.model.ContentType.Companion.toContentType
+import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
+import java.io.File
+import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 class SendMessageUseCase @Inject constructor(
     private val consultantRepository: ConsultantRepository,
@@ -21,8 +26,9 @@ class SendMessageUseCase @Inject constructor(
     suspend operator fun invoke(params: Params) {
         if (!params.text.isNullOrEmpty()) consultantRepository.sendMessage(message = params.text)
         else {
-            val fileType = mediaRepository.getFileType(params.uri ?: Uri.EMPTY) ?: FileType.Pdf
-            val fileName = params.uri?.lastPathSegment.orEmpty()
+            val uri = requireNotNull(params.uri) { "Message has neither text nor file" }
+            val fileType = mediaRepository.getFileType(uri) ?: FileType.Pdf
+            val fileName = uri.lastPathSegment.orEmpty()
                 .replace(":", "_")
 
             when (fileType) {
@@ -35,13 +41,11 @@ class SendMessageUseCase @Inject constructor(
                     fileName = fileName
                 )
 
-                else -> params.uri?.let {
-                    sendSharedFile(
-                        fileUri = it,
-                        type = fileType,
-                        fileName = fileName.addExtension(fileType)
-                    )
-                }
+                else -> sendSharedFile(
+                    fileUri = uri,
+                    type = fileType,
+                    fileName = fileName.addExtension(fileType)
+                )
             }
         }
     }
@@ -53,12 +57,14 @@ class SendMessageUseCase @Inject constructor(
             uri = fileUri
         )
 
-        val cachedFile = mediaRepository.getFileFromDirectory(
-            directory = FileDirectory.Document,
-            fileName = cachedFileUri.lastPathSegment.orEmpty()
-        )
+        val cachedFile = requireNotNull(
+            mediaRepository.getFileFromDirectory(
+                directory = FileDirectory.Document,
+                fileName = cachedFileUri.lastPathSegment.orEmpty()
+            )
+        ) { "Cached consultant file was not found" }
         saveFileInfo(fileName, type.toContentType())
-        consultantRepository.sendFile(cachedFile)
+        sendAndAwaitResult(cachedFile)
     }
 
     private suspend fun sendFile(params: Params, type: FileType, fileName: String) {
@@ -73,8 +79,14 @@ class SendMessageUseCase @Inject constructor(
             uriFromCache
         } else params.uri
 
-        val cachedFile = mediaRepository.getCachedFile(fileUri?.lastPathSegment.orEmpty())
-        consultantRepository.sendFile(cachedFile)
+        val cachedFile = requireNotNull(
+            mediaRepository.getCachedFile(fileUri?.lastPathSegment.orEmpty())
+        ) { "Cached consultant file was not found" }
+        sendAndAwaitResult(cachedFile)
+    }
+
+    private suspend fun sendAndAwaitResult(file: File) {
+        consultantRepository.sendFile(file).awaitSent()
     }
 
     private fun saveFileInfo(fileName: String, contentType: ContentType) {
@@ -95,4 +107,13 @@ class SendMessageUseCase @Inject constructor(
         val uri: Uri? = null,
         val needCaching: Boolean = false
     )
+}
+
+internal suspend fun Flow<WebimMessageSendStatus>.awaitSent() {
+    val status = first { it != WebimMessageSendStatus.Sending }
+    when (status) {
+        WebimMessageSendStatus.Sent -> Unit
+        is WebimMessageSendStatus.Error -> throw IOException(status.message)
+        WebimMessageSendStatus.Sending -> error("File send did not complete")
+    }
 }

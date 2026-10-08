@@ -19,7 +19,7 @@ interface ConsultantRepository : BaseRepository {
     suspend fun sendMessage(message: String)
     suspend fun editMessage(id: String, newText: String)
     suspend fun deleteMessage(id: String)
-    suspend fun sendFile(file: File?): Flow<WebimMessageSendStatus>
+    suspend fun sendFile(file: File): Flow<WebimMessageSendStatus>
     suspend fun sendRate(rateNumber: Int)
     suspend fun loadLastMessages(size: Int): List<ConsultantMessage>
     suspend fun loadNextCachedMessages(size: Int): List<ConsultantMessage>
@@ -27,4 +27,3 @@ interface ConsultantRepository : BaseRepository {
     fun chatNetworkStatus(): Flow<ConnectionStatus>
     val chat: Flow<ConsultantChat>
 }
-

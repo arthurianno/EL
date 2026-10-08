@@ -60,38 +60,38 @@ class ConsultantDataRepository @Inject constructor(
     }
 
     override suspend fun sendMessage(message: String) {
-        webimSession?.stream?.sendMessage(message)
+        checkNotNull(webimSession?.stream) { "Webim session is unavailable" }
+            .sendMessage(message)
     }
 
-    override suspend fun sendFile(file: File?): Flow<WebimMessageSendStatus> {
+    override suspend fun sendFile(file: File): Flow<WebimMessageSendStatus> {
+        val stream = checkNotNull(webimSession?.stream) { "Webim session is unavailable" }
+        val mimeType = requireNotNull(
+            MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension)
+        ) { "Unsupported file type: ${file.extension}" }
         val sendFlow = MutableStateFlow<WebimMessageSendStatus>(WebimMessageSendStatus.Sending)
-        file?.let {
-            MimeTypeMap.getSingleton().getMimeTypeFromExtension(it.extension)
-                ?.let<String, Unit> { mimeType ->
-                    webimSession?.stream?.sendFile(
-                        it,
-                        it.name,
-                        mimeType,
-                        object : SendFileCallback {
-                            @Deprecated("Deprecated in Java")
-                            override fun onProgress(id: Message.Id, sentBytes: Long) {
-                            }
-
-                            override fun onSuccess(id: Message.Id) {
-                                sendFlow.tryEmit(WebimMessageSendStatus.Sent)
-                            }
-
-                            override fun onFailure(
-                                id: Message.Id,
-                                error: WebimError<SendFileCallback.SendFileError>
-                            ) {
-                                Timber.e("Webim send file error -> ${error.errorString}, message Id - $id, file name - ${file.name}")
-                                sendFlow.tryEmit(WebimMessageSendStatus.Error(error.errorString))
-                            }
-                        }
-                    )
+        stream.sendFile(
+            file,
+            file.name,
+            mimeType,
+            object : SendFileCallback {
+                @Deprecated("Deprecated in Java")
+                override fun onProgress(id: Message.Id, sentBytes: Long) {
                 }
-        }
+
+                override fun onSuccess(id: Message.Id) {
+                    sendFlow.tryEmit(WebimMessageSendStatus.Sent)
+                }
+
+                override fun onFailure(
+                    id: Message.Id,
+                    error: WebimError<SendFileCallback.SendFileError>
+                ) {
+                    Timber.e("Webim send file error -> ${error.errorString}, message Id - $id, file name - ${file.name}")
+                    sendFlow.tryEmit(WebimMessageSendStatus.Error(error.errorString))
+                }
+            }
+        )
         return sendFlow
     }
 
