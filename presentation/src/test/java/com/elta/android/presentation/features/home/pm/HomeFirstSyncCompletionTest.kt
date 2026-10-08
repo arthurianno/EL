@@ -15,8 +15,8 @@ class HomeFirstSyncCompletionTest {
         var attempts = 0
         val completion = HomeFirstSyncCompletion(
             saveCompleted = {
-                if (++attempts == 1) throw IOException("offline")
-                Completable.complete()
+                if (++attempts == 1) Completable.error(IOException("offline"))
+                else Completable.complete()
             },
             setFirstSync = { states += it },
             reportError = { errors += it }
@@ -30,6 +30,24 @@ class HomeFirstSyncCompletionTest {
         observer.assertComplete().assertNoErrors()
         assertEquals(2, attempts)
         assertEquals(listOf(false, true, false), states)
+        assertEquals(1, errors.size)
+    }
+
+    @Test
+    fun `synchronous save failure also restores first sync`() {
+        val states = mutableListOf<Boolean>()
+        val errors = mutableListOf<Throwable>()
+        val completion = HomeFirstSyncCompletion(
+            saveCompleted = {
+                throw IOException("cannot create request")
+            },
+            setFirstSync = { states += it },
+            reportError = { errors += it }
+        )
+
+        completion.complete().test().assertComplete().assertNoErrors()
+
+        assertEquals(listOf(false, true), states)
         assertEquals(1, errors.size)
     }
 }
