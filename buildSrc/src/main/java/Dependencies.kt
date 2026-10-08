@@ -69,7 +69,7 @@ object Dependencies {
 
         object Compose {
             const val compilerVersion = "2.2.0"
-            private const val bomVersion = "2024.09.01"
+            private const val bomVersion = "2025.08.00"
             private const val activityVersion = "1.9.2"
 
             const val bom = "androidx.compose:compose-bom:$bomVersion"

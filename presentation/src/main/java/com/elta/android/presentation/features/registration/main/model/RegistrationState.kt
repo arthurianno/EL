@@ -14,11 +14,16 @@ data class RegistrationState(
     val passwordError: String? = null,
     val serverError: String? = null,
     val isLoading: Boolean = false,
-    val screenConfig: ScreenEntity? = null
+    val screenConfig: ScreenEntity? = null,
+    val dialog: RegistrationDialog? = null
 ) {
     val canSubmit: Boolean
         get() = isEmailValid(email) && isPasswordValid(password) && isPrivacyPolicyAccepted && !isLoading
 }
+
+enum class RegistrationMode { Recoverable, Legacy }
+
+enum class RegistrationDialog { ProfileDeleted }
 
 sealed interface RegistrationAction : Action {
     data class EmailChanged(val email: String) : RegistrationAction

@@ -93,6 +93,7 @@ internal fun RegistrationScreen(
                 error = state.emailError,
                 enabled = !state.isLoading,
                 imeAction = ImeAction.Next,
+                maxLength = 254,
                 onSubmit = { focusManager.moveFocus(FocusDirection.Next) }
             )
             Spacer(Modifier.height(16.dp))

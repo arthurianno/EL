@@ -11,11 +11,6 @@ import com.elta.android.common.errors.ServiceUnavailableError
 import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytic.core.analytics.Analytics
-import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
-import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
-import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
-import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.viewmodel.ComposeScreenConfigurable
 import com.elta.android.presentation.core.navigation.FlowRouter
@@ -41,8 +36,7 @@ sealed interface LoginEffect {
 
 class LoginViewModel @Inject constructor(
     private val session: LoginSession,
-    private val analytics: Analytics,
-    private val appMetric: AppMetricTracker,
+    private val telemetry: LoginTelemetry,
     private val remindersManager: RemindersManager,
     private val context: Context,
     override val getScreenConfigUseCase: GetScreenConfigFromCache
@@ -107,7 +101,7 @@ class LoginViewModel @Inject constructor(
 
     fun forgotPassword() {
         if (state.value.isLoading) return
-        analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.PASSWORD_RECOVERY))
+        telemetry.passwordRecoveryOpened()
         router.navigateTo(Screens.PasswordRecovery)
     }
 
@@ -144,7 +138,7 @@ class LoginViewModel @Inject constructor(
         if (!state.value.canSubmit) return
         val email = state.value.email
         val password = state.value.password
-        appMetric.trackEvent(AppMetricEvent.LoginClick)
+        telemetry.loginClicked()
         reduceState { state.value.copy(isLoading = true, serverError = null) }
         launch {
             try {
