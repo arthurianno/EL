@@ -15,8 +15,6 @@ import com.elta.android.domain.features.consultant.model.ChatState
 import com.elta.android.domain.features.consultant.model.WebimUser
 import com.elta.android.domain.features.consultant.usecase.DeleteMessageUseCase
 import com.elta.android.domain.features.consultant.usecase.EditMessageUseCase
-import com.elta.android.domain.features.consultant.usecase.GetAudioDurationUseCase
-import com.elta.android.domain.features.consultant.usecase.GetCachedFilesUriUseCase
 import com.elta.android.domain.features.consultant.usecase.GetMessagesUseCase
 import com.elta.android.domain.features.consultant.usecase.LoadLastMessagesUseCase
 import com.elta.android.domain.features.consultant.usecase.LoadNextCachedMessagesUseCase
@@ -33,8 +31,6 @@ import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.PermissionEvent
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
-import com.elta.android.presentation.features.consultant.model.AudioState
-import com.elta.android.presentation.features.consultant.model.BottomBarIconState
 import com.elta.android.presentation.features.consultant.model.CachingState
 import com.elta.android.presentation.features.consultant.model.ChatUiEntity
 import com.elta.android.presentation.features.consultant.model.ConnectState
@@ -44,7 +40,6 @@ import com.elta.android.presentation.features.consultant.model.ContextMenuUiEnti
 import com.elta.android.presentation.features.consultant.model.FileSelect
 import com.elta.android.presentation.features.consultant.model.MakeVibration
 import com.elta.android.presentation.features.consultant.model.MessageType
-import com.elta.android.presentation.features.consultant.model.MessageType.Companion.toContentType
 import com.elta.android.presentation.features.consultant.model.MessageUiEntity
 import com.elta.android.presentation.features.consultant.model.OpenCamera
 import com.elta.android.presentation.features.consultant.model.OpenSettings
@@ -59,12 +54,10 @@ import com.elta.android.presentation.features.consultant.model.reduceAudioState
 import com.elta.android.presentation.features.consultant.model.reduceChatState
 import com.elta.android.presentation.features.consultant.model.toUi
 import com.elta.android.presentation.features.consultant.ui.ConsultantFragment
-import com.elta.android.presentation.features.consultant.viewmodel.analyzer.ChatMessagesAnalyzer
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
@@ -89,12 +82,11 @@ class ConsultantViewModel @Inject constructor(
     private val loadNextCachedMessages: LoadNextCachedMessagesUseCase,
     private val editMessage: EditMessageUseCase,
     private val deleteMessage: DeleteMessageUseCase,
-    private val getCachedFilesUri: GetCachedFilesUriUseCase,
+    private val messageTimeline: ConsultantMessageTimeline,
     private val fileDownloads: ConsultantFileDownloads,
     private val photoCreate: PhotoCreateUseCase,
     private val voiceRecorder: ConsultantVoiceRecorder,
     private val audioPlayer: ConsultantAudioPlayer,
-    private val getVoiceDuration: GetAudioDurationUseCase,
     private val deleteFile: FileDeleteUseCase,
     private val sendRate: SendRateUseCase,
     private val copyText: CopyTextUseCase,
@@ -109,7 +101,6 @@ class ConsultantViewModel @Inject constructor(
                 recordGraph = emptyList(),
                 duration = LocalTime.MIN
             ),
-            bottomBarIconState = BottomBarIconState.SendMessage,
             connectState = ConnectState.Connecting,
             chat = ChatUiEntity(
                 messages = emptyList(),
@@ -142,7 +133,7 @@ class ConsultantViewModel @Inject constructor(
 
     private var messageFromCache: List<MessageUiEntity> = emptyList()
 
-    private var estimateOperatorSubscriber: Job? = null
+    private val ratingScheduler by lazy { ConsultantRatingScheduler { sendRate(it) } }
 
     val cameraDialog = BaseDialogWidgetModel<Unit>(
         positiveOnCLick = { sendEvent(OpenSettings) }, negativeOnCLick = {}
@@ -185,16 +176,11 @@ class ConsultantViewModel @Inject constructor(
                 .catch { handleError(it) }
                 .map { it.messages.toUi() to it.hasNewMessage }
                 .collectLatest { (messages, hasNewMessages) ->
-                    val chatWithCache = messageFromCache + messages
-                    val chatWithFilesFromCache = setupCachedFiles(chatWithCache)
-                    val messagesWithCorner =
-                        ChatMessagesAnalyzer.defineMessagesInSequence(chatWithFilesFromCache)
-                    val messagesWithDate =
-                        ChatMessagesAnalyzer.defineChangingDateMessages(messagesWithCorner)
+                    val preparedMessages = messageTimeline.prepare(messageFromCache + messages)
                     reduceState {
                         state.value.copy(
                             chat = ChatUiEntity(
-                                messages = messagesWithDate,
+                                messages = preparedMessages,
                                 ratingEntity = RatingUiEntity(
                                     isRatingMessageShowing = false,
                                     starsCount = null
@@ -202,19 +188,6 @@ class ConsultantViewModel @Inject constructor(
                             ),
                             hasNewMessages = hasNewMessages
                         )
-                    }
-                }
-        }
-        launch {
-            state
-                .collectLatest {
-                    val iconState = when {
-                        it.isEditMessage -> BottomBarIconState.SaveEdit
-                        it.inputMessage.isEmpty() -> BottomBarIconState.StartRecord
-                        else -> BottomBarIconState.SendMessage
-                    }
-                    reduceState {
-                        state.value.copy(bottomBarIconState = iconState)
                     }
                 }
         }
@@ -235,11 +208,14 @@ class ConsultantViewModel @Inject constructor(
                         val messagesFromHistory =
                             loadLastMessages(COUNT_MESSAGES_FROM_HISTORY).toUi()
                         if (messagesFromHistory.isNotEmpty()) {
+                            val preparedHistory = messageTimeline.attachCachedFiles(messagesFromHistory)
                             messageFromCache = messagesFromHistory
                             reduceState {
                                 state.value.copy(
                                     chat = state.value.chat.copy(
-                                        messages = messageFromCache + state.value.chat.messages,
+                                        messages = messageTimeline.decorate(
+                                            preparedHistory + state.value.chat.messages
+                                        ),
                                     ),
                                     hasNewMessages = true
                                 )
@@ -274,7 +250,7 @@ class ConsultantViewModel @Inject constructor(
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         event.handleSessionState()
-        event.handleEstimateOperatorSubscriber()
+        event.handleRatingLifecycle()
     }
 
     override fun handleFragmentArguments(arguments: Bundle) {
@@ -726,13 +702,18 @@ class ConsultantViewModel @Inject constructor(
             }
             val nextMessagesFromCache =
                 loadNextCachedMessages(COUNT_MESSAGES_FROM_HISTORY).toUi()
+            val preparedHistory = messageTimeline.attachCachedFiles(nextMessagesFromCache)
             // PullRefreshIndicator на версии Compose 1.3.1 имеет баг: индикатор загрузки не исчезает
             // мгновенной загрузки. С помощью делея можно решить его
             delay(1_000)
             reduceState {
                 state.value.copy(
                     isLoadingNextMessagesPage = false,
-                    chat = state.value.chat.copy(messages = nextMessagesFromCache + state.value.chat.messages)
+                    chat = state.value.chat.copy(
+                        messages = messageTimeline.decorate(
+                            preparedHistory + state.value.chat.messages
+                        )
+                    )
                 )
             }
             messageFromCache = messageFromCache + nextMessagesFromCache
@@ -740,7 +721,6 @@ class ConsultantViewModel @Inject constructor(
     }
 
     private fun rateOperator(rateNumber: Int) {
-        if (estimateOperatorSubscriber?.isCompleted == true) estimateOperatorSubscriber?.cancel()
         reduceState {
             state.value.copy(
                 chat = state.value.chat.updateRatingEntity(
@@ -748,15 +728,11 @@ class ConsultantViewModel @Inject constructor(
                 )
             )
         }
-        if (
-            estimateOperatorSubscriber?.isActive == false ||
-            estimateOperatorSubscriber == null
-        ) {
-            estimateOperatorSubscriber = launch {
-                delay(DELAY_BEFORE_SENDING_RATE)
-                sendOperatorRate()
-            }
-        }
+        ratingScheduler.schedule(
+            scope = viewModelScope,
+            currentStars = { state.value.chat.ratingEntity.starsCount },
+            onFinished = ::hideRatingMessage
+        )
     }
 
     private fun handleCopingMessage(text: String) {
@@ -855,22 +831,6 @@ class ConsultantViewModel @Inject constructor(
         }
     }
 
-    private suspend fun sendOperatorRate() {
-        state.value.chat.ratingEntity.starsCount?.let { starsCount ->
-            sendRate(starsCount)
-        }
-        reduceState {
-            state.value.copy(
-                chat = state.value.chat.updateRatingEntity(
-                    RatingUiEntity(
-                        isRatingMessageShowing = false,
-                        starsCount = null
-                    )
-                )
-            )
-        }
-    }
-
     private fun Lifecycle.Event.handleSessionState() {
         when (this) {
             Lifecycle.Event.ON_CREATE -> launch { webimSession.create(state.value.user) }
@@ -890,46 +850,18 @@ class ConsultantViewModel @Inject constructor(
         }
     }
 
-    private fun Lifecycle.Event.handleEstimateOperatorSubscriber() {
+    private fun Lifecycle.Event.handleRatingLifecycle() {
         when (this) {
             Lifecycle.Event.ON_STOP -> launch {
-                if (estimateOperatorSubscriber?.isActive == true) sendOperatorRate()
-                estimateOperatorSubscriber?.cancel()
-                estimateOperatorSubscriber = null
+                ratingScheduler.flush(
+                    currentStars = { state.value.chat.ratingEntity.starsCount },
+                    onFinished = ::hideRatingMessage
+                )
             }
 
             else -> Unit
         }
     }
-
-    private fun setupCachedFiles(messages: List<MessageUiEntity>): List<MessageUiEntity> =
-        messages.map { message ->
-            if (message.document != null && message.type != MessageType.Text) {
-                val uri = getCachedFilesUri(
-                    fileName = message.document.fileName,
-                    type = message.type.toContentType()
-                )
-
-                val voiceDuration = message.type.takeIf { it == MessageType.Voice }
-                    ?.run {
-                        getVoiceDuration(message.document.fileName)
-                    }
-
-                message.copy(
-                    document = message.document.copy(
-                        uri = uri,
-                        cachingState = if (uri == null) CachingState.NotCached else CachingState.Cached
-                    ),
-                    audioState = if (voiceDuration != null) {
-                        AudioState(
-                            isPlaying = false,
-                            duration = voiceDuration,
-                            trackPosition = 0
-                        )
-                    } else null
-                )
-            } else message
-        }
 
     private fun ChatUiEntity.updateRatingEntity(
         rating: RatingUiEntity
@@ -943,7 +875,4 @@ class ConsultantViewModel @Inject constructor(
     )
 }
 
-private const val DELETE_FILE_DELAY_MILLIS = 500L
-private const val RECORD_STEP_DELAY_MILLIS = 100L
-private const val DELAY_BEFORE_SENDING_RATE = 10_000L
 private const val COUNT_MESSAGES_FROM_HISTORY = 10
