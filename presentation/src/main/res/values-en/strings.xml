@@ -385,7 +385,7 @@
     <string name="sync_connection_scanner_sheet_already_connected_text">Reconnection is not required, try scanning another device.</string>
     <string name="sync_connection_scanner_sheet_device_already_connected_title">This glucose meter is already connected.</string>
     <string name="sync_connection_scanner_sheet_device_already_connected_text">Reconnection is not required, try scanning another device.</string>
-    <string name="sync_connected_text">Congratulations! The glucose meter has been successfully connected. You can proceed to use the application after the sync is complete.</string>
+    <string name="sync_connected_text">Congratulations! The %s glucose meter has been successfully connected. You can proceed to use the application after the sync is complete.</string>
     <string name="sync_connect_by_pin_boton_text">Connect via PIN Code</string>
     <string name="repeat_search_button_text">Search Again</string>
     <string name="repeat_connect_button_text">Reconnect</string>
@@ -690,12 +690,12 @@
     <string name="statistic_general_index_description_by_period_hour_insulin">Total insulin amount</string>
     <string name="statistic_general_index_description_by_hour_bolus_insulin">%s: %s</string>
     <string name="statistic_general_index_description_by_period_hour_bolus_insulin">Average hourly bolus insulin %s: %s</string>
-    <string name="statistic_general_index_description_by_hour_basal_insulin">Basal insulin amount</string>
+    <string name="statistic_general_index_description_by_hour_basal_insulin">Basal insulin amount %s this hour: %s</string>
     <string name="statistic_general_index_description_by_period_hour_basal_insulin">%s</string>
     <string name="statistic_general_index_description_value_by_period_insulin">%s units</string>
     <string name="statistic_general_index_description_by_day_activity">Number of workouts on this day: %1$s.\\nAverage workout duration: %2$s</string>
-    <string name="statistic_general_index_description_by_period_activity">Number of workouts this hour: %1$s.</string>
-    <string name="statistic_glucose_index_average_unit">Average workout duration: %2$s</string>
+    <string name="statistic_general_index_description_by_period_activity">Number of workouts during the period: %1$s.\nAverage workout duration: %2$s</string>
+    <string name="statistic_glucose_index_average_unit">mmol/L</string>
     <string name="statistic_glucose_index_total_unit">for the period</string>
     <string name="statistic_glucose_index_day_unit">for the day</string>
     <string name="statistic_glucose_index_hour_unit">за час</string>

@@ -594,7 +594,7 @@
     <string name="profile_settings_dialog_hba1c_description">В данном разделе отображается последний результат анализа HbA1c</string>
     <string name="profile_settings_dialog_hba1c_action_button">Добавить новую запись</string>
     <string name="profile_settings_hemoglobin_description">Гликированный гемоглобин (HbA1c) —\nбиохимический показатель крови, отражающий\nсреднее содержание глюкозы в крови за\nдлительный период (3–4 месяца)</string>
-    <string name="profile_settings_hemoglobin_percent_mask">%s \%%</string>
+    <string name="profile_settings_hemoglobin_percent_mask">%s %%</string>
     <string name="profile_settings_hemoglobin_date_mask">- %s</string>
     <string name="profile_settings_hemoglobin_header">Последние анализы</string>
 
@@ -802,7 +802,7 @@
     <string name="statistic_glucose_index_average_unit">ммоль/л</string>
     <string name="statistic_glucose_index_total_unit">за&#160;период</string>
     <string name="statistic_glucose_index_day_unit">за&#160;день</string>
-    <string name="statistic_glucose_index_level_unit">(%s\%% от измерений)</string>
+    <string name="statistic_glucose_index_level_unit">(%s%% от измерений)</string>
     <string name="statistic_chart_period_dates_mask">%s - %s</string>
     <string name="statistic_daily_glucose_title">Мои показатели</string>
 
@@ -1125,10 +1125,10 @@
     <string name="statistic_general_index_description_by_period_hour_bread">По результатам записей вы потребляете в среднем %s в день.</string>
     <string name="statistic_general_index_description_by_hour_insulin">Количество общего инсулина %s: %s</string>
     <string name="statistic_general_index_description_by_period_hour_insulin">Количество общего инсулина</string>
-    <string name="statistic_general_index_description_by_hour_bolus_insulin">%ед: %ед</string>
+    <string name="statistic_general_index_description_by_hour_bolus_insulin">%s ед.: %s ед.</string>
     <string name="statistic_general_index_description_by_period_hour_bolus_insulin">Среднечасовое количество болюсного инсулина %s: %s</string>
     <string name="statistic_general_index_description_by_hour_basal_insulin">Количество базального инсулина %s в этот час: %s</string>
-    <string name="statistic_general_index_description_by_period_hour_basal_insulin">%ед</string>
+    <string name="statistic_general_index_description_by_period_hour_basal_insulin">%s ед.</string>
     <string name="statistic_general_index_description_by_hour_activity">Количество тренировок в этот час: %1$s. Средняя продолжительность тренировки: %2$s</string>
     <string name="statistic_glucose_index_hour_unit">per hour</string>
     <string name="statistic_error_date">Невозможно выгрузить статистику без Интернет-соединения</string>
