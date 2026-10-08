@@ -13,9 +13,11 @@ private val PreviewChartPoints = listOf(
 
 private val PopulatedPreviewState = GlucoseDashboardUiState(
     glucoseValue = "6,7",
+    glucoseValueNumber = 6.7,
     deltaText = "0,5",
     glucoseTrend = GlucoseTrend(GlucoseTrendDirection.UP, "0,5"),
     tirPercentage = "73%",
+    tirPercent = 73,
     syncTimeText = "Сегодня, 10:42",
     breadUnitsText = "2,5 ХЕ",
     insulinText = "4,0 Ед.",
@@ -40,6 +42,7 @@ private fun GlucoseDashboardHighPreview() {
     GlucoseDashboardContent(
         uiState = PopulatedPreviewState.copy(
             glucoseValue = "12,4",
+            glucoseValueNumber = 12.4,
             glucoseState = GlucoseState.HIGH,
             isDarkTheme = true
         ),
@@ -53,6 +56,7 @@ private fun GlucoseDashboardLowPreview() {
     GlucoseDashboardContent(
         uiState = PopulatedPreviewState.copy(
             glucoseValue = "3,2",
+            glucoseValueNumber = 3.2,
             glucoseState = GlucoseState.LOW,
             glucoseTrend = GlucoseTrend(GlucoseTrendDirection.DOWN, "0,8")
         ),

@@ -93,10 +93,11 @@ enum class GlucoseTrendDirection {
 @Composable
 fun GlucoseRingGauge(
     glucoseValue: String,
+    tirPercentage: String,
+    tirPercent: Int?,
     glucoseUnit: String = "ммоль/л",
     deltaText: String = "—",
     glucoseTrend: GlucoseTrend? = null,
-    tirPercentage: String = "49%",
     syncTimeText: String = "Нет измерений",
     breadUnitsText: String = "0,9 Ед.",
     insulinText: String = "0,1 ХЕ",
@@ -243,11 +244,11 @@ fun GlucoseRingGauge(
                         val centerY = size.height / 2f
                         val radius = diameter / 2f
 
-                        val tirValue = tirPercentage.replace("%", "").trim().toFloatOrNull() ?: 0f
+                        val tirValue = tirPercent?.coerceIn(0, 100) ?: 0
                         // In the Figma reference 73% occupies ~263° (73% of a full circle),
                         // so the visual progress is calculated from 360°, not from the 260°
                         // gap used by the former hard-coded implementation.
-                        val progressSweep = (360f * (tirValue / 100f)).coerceIn(0f, 360f)
+                        val progressSweep = 360f * tirValue / 100f
 
                         // Thin outer background ring contour around the central disc
                         drawCircle(

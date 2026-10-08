@@ -59,6 +59,7 @@ internal fun DashboardHeader(
                     deltaText = uiState.deltaText,
                     glucoseTrend = uiState.glucoseTrend,
                     tirPercentage = uiState.tirPercentage,
+                    tirPercent = uiState.tirPercent,
                     syncTimeText = syncState.displayedTime,
                     breadUnitsText = uiState.breadUnitsText,
                     insulinText = uiState.insulinText,

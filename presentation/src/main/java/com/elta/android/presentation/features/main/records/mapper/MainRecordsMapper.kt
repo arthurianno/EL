@@ -27,10 +27,14 @@ class MainRecordsMapper @Inject constructor() {
         val dailyModel = model.dailyGlucoseModel
         val events = model.eventsBlocks.flatMap { it.events }
         val detailedPoints = DetailedChartItemsBuilder.buildPoints(dailyModel, events)
-        val glucoseValue = model.lastGlucoseEvent?.value.format(numberFormat)?.takeIf(String::isNotBlank) ?: "—"
-        val numericValue = glucoseValue.replace(',', '.').toFloatOrNull()
+        val glucoseValueNumber = model.lastGlucoseEvent?.value?.takeIf { it.isFinite() }
+        val glucoseValue = glucoseValueNumber.format(numberFormat)?.takeIf(String::isNotBlank) ?: "—"
         val settings = dailyModel.glucoseLevelSettings
         val glucoseEvents = dailyModel.glucoseEvents
+        val tirPercent = timeInRangePercent(
+            glucoseEvents.map { it.glucoseValue(dailyModel.glucoseFormat) },
+            settings.normal
+        )
         val trend = glucoseEvents.sortedBy { it.additionTime }.takeLast(2).let { lastEvents ->
             if (lastEvents.size < 2) null else {
                 val difference = lastEvents[1].glucoseValue(dailyModel.glucoseFormat) -
@@ -49,19 +53,18 @@ class MainRecordsMapper @Inject constructor() {
         return GlucoseDashboardUiState(
             device = device,
             glucoseValue = glucoseValue,
+            glucoseValueNumber = glucoseValueNumber,
             deltaText = model.glucoseLevelDifference.format(numberFormat)?.takeIf(String::isNotBlank) ?: "—",
             glucoseTrend = trend,
-            tirPercentage = formatTimeInRange(
-                glucoseEvents.map { it.glucoseValue(dailyModel.glucoseFormat) },
-                settings.normal
-            ),
+            tirPercentage = formatTimeInRange(tirPercent),
+            tirPercent = tirPercent,
             syncTimeText = "",
             breadUnitsText = model.breadUnitsTotal.format(numberFormat)?.let { "$it ХЕ" } ?: "0,0 ХЕ",
             insulinText = model.insulinTotal.format(numberFormat)?.let { "$it Ед." } ?: "0,0 Ед.",
             glucoseState = when {
-                numericValue == null -> GlucoseState.NORMAL
-                numericValue.toDouble() in settings.low -> GlucoseState.LOW
-                numericValue.toDouble() in settings.high -> GlucoseState.HIGH
+                glucoseValueNumber == null -> GlucoseState.NORMAL
+                glucoseValueNumber in settings.low -> GlucoseState.LOW
+                glucoseValueNumber in settings.high -> GlucoseState.HIGH
                 else -> GlucoseState.NORMAL
             },
             chartPoints = detailedPoints.map { GlucosePoint(it.timeLabel, it.value) },
@@ -80,5 +83,7 @@ class MainRecordsMapper @Inject constructor() {
         this?.let { format.format(it) }
 }
 
-internal fun formatTimeInRange(values: List<Double>, normalRange: DoubleRange): String =
-    if (values.isEmpty()) "—" else "${values.count { it in normalRange } * 100 / values.size}%"
+internal fun timeInRangePercent(values: List<Double>, normalRange: DoubleRange): Int? =
+    if (values.isEmpty()) null else values.count { it in normalRange } * 100 / values.size
+
+internal fun formatTimeInRange(percent: Int?): String = percent?.let { "$it%" } ?: "—"

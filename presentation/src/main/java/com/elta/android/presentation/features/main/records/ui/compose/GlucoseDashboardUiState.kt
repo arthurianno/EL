@@ -8,9 +8,11 @@ data class GlucoseDashboardUiState(
     val device: DashboardDevice? = null,
     val sensor: DashboardSensor? = null,
     val glucoseValue: String = "—",
+    val glucoseValueNumber: Double? = null,
     val deltaText: String = "—",
     val glucoseTrend: GlucoseTrend? = null,
     val tirPercentage: String = "—",
+    val tirPercent: Int? = null,
     val syncTimeText: String = "Нет измерений",
     val breadUnitsText: String = "0,0 ХЕ",
     val insulinText: String = "0,0 Ед.",
@@ -21,7 +23,7 @@ data class GlucoseDashboardUiState(
 ) {
     val hasMeasurements: Boolean
         get() = detailedChartData.dailyGlucoseModel?.hasEvents == true ||
-            glucoseValue.replace(',', '.').toFloatOrNull() != null
+            glucoseValueNumber != null
 }
 
 /** Data required by the full-screen chart. It is kept separate from the dashboard summary. */

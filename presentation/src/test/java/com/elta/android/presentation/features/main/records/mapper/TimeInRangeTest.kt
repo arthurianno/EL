@@ -9,16 +9,25 @@ class TimeInRangeTest {
 
     @Test
     fun `single measurement in range shows one hundred percent`() {
-        assertEquals("100%", formatTimeInRange(listOf(7.0), normalRange))
+        val percent = timeInRangePercent(listOf(7.0), normalRange)
+
+        assertEquals(100, percent)
+        assertEquals("100%", formatTimeInRange(percent))
     }
 
     @Test
     fun `single measurement outside range shows zero percent`() {
-        assertEquals("0%", formatTimeInRange(listOf(2.1), normalRange))
+        val percent = timeInRangePercent(listOf(2.1), normalRange)
+
+        assertEquals(0, percent)
+        assertEquals("0%", formatTimeInRange(percent))
     }
 
     @Test
     fun `no measurements shows dash`() {
-        assertEquals("—", formatTimeInRange(emptyList(), normalRange))
+        val percent = timeInRangePercent(emptyList(), normalRange)
+
+        assertEquals(null, percent)
+        assertEquals("—", formatTimeInRange(percent))
     }
 }
