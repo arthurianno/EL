@@ -2,54 +2,63 @@ package com.elta.android.presentation.features.registration.activation.ui
 
 import android.os.Bundle
 import android.view.View
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.ViewCompositionStrategy
-import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
-import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
-import com.elta.android.presentation.databinding.FragmentActivateProfileBinding
-import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
-import com.elta.android.presentation.theme.EltaTheme
-import me.dmdev.rxpm.bindTo
+import com.elta.android.presentation.features.registration.activation.viewmodel.ActivationEffect
+import com.elta.android.presentation.features.registration.activation.viewmodel.ActivationViewModel
+import com.elta.android.presentation.messages.SnackBarMessageData
+import com.elta.android.presentation.utils.makeSnackBar
+import com.nullgr.core.ui.extensions.setStatusBarColor
+import kotlinx.coroutines.launch
 
-class ActivationFragment :
-    BaseFragment<ActivationPm, FragmentActivateProfileBinding>(FragmentActivateProfileBinding::inflate) {
-
-    override val screenLayout: Int = R.layout.fragment_activate_profile
-    override val classToken: Class<ActivationPm> = ActivationPm::class.java
-    override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
-    override val applyBottomSystemInsets = false
-    override val applyPlatformSystemWindowFitting = false
-
-    private var isLoading by mutableStateOf(false)
+class ActivationFragment : BaseComposeFragment<ActivationViewModel>() {
+    override val viewModel: ActivationViewModel by viewModels { viewModelFactory }
+    override val padContentForNavigationBar = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.activationComposeView.setViewCompositionStrategy(
-            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
-        )
-        binding.activationComposeView.setContent {
-            EltaTheme {
-                ActivationScreen(
-                    isLoading = isLoading,
-                    onBack = { router.exit() },
-                    onResend = {
-                        if (!isLoading) presentationModel.sendAgainAction.consumer.accept(Unit)
-                    },
-                    onCheckActivation = {
-                        if (!isLoading) presentationModel.continueAction.consumer.accept(Unit)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.effects.collect { effect ->
+                    when (effect) {
+                        is ActivationEffect.ShowMessage -> makeSnackBar(
+                            requireActivity().findViewById(android.R.id.content),
+                            SnackBarMessageData.SimpleTextMessage(effect.message)
+                        ).show()
                     }
-                )
+                }
             }
         }
     }
 
-    override fun onBindPresentationModel(pm: ActivationPm) {
-        super.onBindPresentationModel(pm)
-        pm.progressState.bindTo { isLoading = it }
+    override fun onStart() {
+        super.onStart()
+        with(LightStatusBarConfigProvider) {
+            requireActivity().window.setStatusBarColor(statusBarColor, lightStatusBar)
+        }
+    }
+
+    @Composable
+    override fun Content(viewModel: ActivationViewModel) {
+        val lifecycle = viewLifecycleOwner.lifecycle
+        val state = remember(viewModel, lifecycle) {
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+        }.collectAsState(initial = viewModel.state.value)
+
+        ActivationScreen(
+            isLoading = state.value.isLoading,
+            onBack = viewModel::backClick,
+            onResend = viewModel::resend,
+            onCheckActivation = viewModel::checkActivation
+        )
     }
 
     companion object {
