@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.calcutator.custom.viewmodel
 
-import com.elta.android.domain.common.mapDistinct
+import com.elta.android.presentation.core.flow.mapDistinct
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.AddProductUseCase
 import com.elta.android.domain.features.calculator.interactor.GetServingsProductUseCase

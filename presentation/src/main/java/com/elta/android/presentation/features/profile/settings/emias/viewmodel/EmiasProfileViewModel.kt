@@ -6,7 +6,7 @@ import com.elta.android.common.errors.EmiasError
 import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.common.errors.ServiceUnavailableError
 import com.elta.android.common.utils.CommonFormats.FORMAT_ONLY_DIGITS
-import com.elta.android.domain.common.mapDistinct
+import com.elta.android.presentation.core.flow.mapDistinct
 import com.elta.android.domain.features.emias.interactor.UnbindEmiasUseCase
 import com.elta.android.domain.features.emias.interactor.UpdateEmiasUseCase
 import com.elta.android.domain.features.emias.model.Emias

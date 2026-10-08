@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.calcutator.products.viewmodel
 
 import com.elta.android.common.utils.findOrFirst
-import com.elta.android.domain.common.mapDistinct
+import com.elta.android.presentation.core.flow.mapDistinct
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.GetDishUseCase
 import com.elta.android.domain.features.calculator.model.DishType
