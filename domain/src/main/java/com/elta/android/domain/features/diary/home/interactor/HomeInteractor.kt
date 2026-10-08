@@ -15,7 +15,6 @@ import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.userinfo.model.UserInfo
-import timber.log.Timber
 import java.util.Date
 import kotlin.math.abs
 
@@ -32,9 +31,6 @@ fun buildHomeModel(
     val sortedEvents = events
         .modifyValues(glucoseFormat)
         .sortAndFilter()
-    sortedEvents.forEach { event ->
-        Timber.i("<<<<<<< GetHomeModelUseCase >>>>>>  Event: id = ${event.id} , additionTime = ${event.additionTime} , value = ${event.value} , type = ${event.type}, state = ${event.state}")
-    }
 
     var lastBreadEvent: EventV2? = null
     var lastInsulinEvent: EventV2? = null
@@ -105,32 +101,14 @@ fun getEventsBlocks(
     tags: List<Tag>,
     calculatorFlow: CalculatorFlow
 ): List<EventsBlock> {
-    if (events.isEmpty()) {
-        return emptyList()
-    }
-
-    val nullTagId = "null_tag_id"
-    val blocksMap = mutableMapOf<String, MutableList<EventV2>>()
-    events.forEach { event ->
-        val tagId = event.tagId ?: nullTagId
-        blocksMap.getOrDefault(tagId, mutableListOf())
-            .apply { add(event) }
-            .also { blocksMap[tagId] = it }
-    }
-
-    val blocks = mutableListOf<EventsBlock>()
-    blocksMap.forEach { entry ->
-        val tagId = entry.key
-        val tag = tags.firstOrNull { it.id == tagId }
-        val newBlock = EventsBlock(
-            tag = tag,
-            events = entry.value,
+    val tagsById = tags.associateBy(Tag::id)
+    return events.groupBy(EventV2::tagId).map { (tagId, groupedEvents) ->
+        EventsBlock(
+            tag = tagId?.let(tagsById::get),
+            events = groupedEvents,
             calculatorFlow = calculatorFlow
         )
-        blocks.add(newBlock)
     }
-
-    return blocks
 }
 
 private fun Double?.orZero(): Double = this ?: DOUBLE_ZERO

@@ -6,6 +6,7 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.home.interactor.getEventsBlocks
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class GetEventsBlocksTest {
@@ -67,5 +68,28 @@ class GetEventsBlocksTest {
         assert(blocks[1].tag == tag)
         assert(blocks[1].events.size == 1)
         assert(blocks[1].events[0] == event2)
+    }
+
+    @Test
+    fun getEventsBlocks_KeepsUntaggedEventsSeparateFromMatchingTagId() {
+        val tag = TagTestFactory.create("null_tag_id")
+        val untaggedFirst = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL))
+        val tagged = EventTestFactory.create(
+            type = EventType.Glucose(GlucoseInputType.MANUAL),
+            tagId = tag.id
+        )
+        val untaggedSecond = EventTestFactory.create(type = EventType.Glucose(GlucoseInputType.MANUAL))
+
+        val blocks = getEventsBlocks(
+            listOf(untaggedFirst, tagged, untaggedSecond),
+            listOf(tag),
+            CalculatorFlow.BREAD_UNITS
+        )
+
+        assertEquals(2, blocks.size)
+        assertEquals(null, blocks[0].tag)
+        assertEquals(listOf(untaggedFirst, untaggedSecond), blocks[0].events)
+        assertEquals(tag, blocks[1].tag)
+        assertEquals(listOf(tagged), blocks[1].events)
     }
 }
