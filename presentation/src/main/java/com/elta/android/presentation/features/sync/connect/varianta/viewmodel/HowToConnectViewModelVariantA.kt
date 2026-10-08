@@ -2,7 +2,6 @@ package com.elta.android.presentation.features.sync.connect.viewmodel
 
 import android.os.Build
 import android.os.Bundle
-import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.getMetricName
@@ -24,7 +23,6 @@ import com.google.accompanist.permissions.shouldShowRationale
 import javax.inject.Inject
 // fixme Variant A : improved_enabling_location
 
-@ExperimentalCameraProviderConfiguration
 @OptIn(ExperimentalPermissionsApi::class)
 class HowToConnectViewModelVariantA @Inject constructor(
     private val appMetric: AppMetricTracker

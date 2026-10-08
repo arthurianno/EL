@@ -333,6 +333,7 @@ class RangeBarView @JvmOverloads constructor(
         textColor = ContextCompat.getColor(context, defaultTextColor)
     }
 
+    @SuppressLint("Range") // Paint alpha uses 0..255; Lint expects a 0..1 fraction here.
     private fun initPaints() {
         backgroundPaint = Paint().apply {
             color = viewBackgroundColor

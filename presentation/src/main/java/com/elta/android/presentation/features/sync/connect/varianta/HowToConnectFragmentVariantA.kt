@@ -5,7 +5,6 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,7 +31,6 @@ private val requiredPermissions = listOf(
 )
 
 // fixme Variant A : improved_enabling_location
-@ExperimentalCameraProviderConfiguration
 class HowToConnectFragmentVariantA : BaseComposeFragment<HowToConnectViewModelVariantA>() {
     companion object {
         fun newInstance(isOnBoarding: Boolean) = HowToConnectFragmentVariantA().apply {

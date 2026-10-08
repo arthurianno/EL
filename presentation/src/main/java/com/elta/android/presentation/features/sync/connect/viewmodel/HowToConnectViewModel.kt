@@ -2,7 +2,6 @@ package com.elta.android.presentation.features.sync.connect.viewmodel
 
 import android.os.Build
 import android.os.Bundle
-import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import com.elta.android.domain.features.diary.home.interactor.GetLocationNeededUseCase
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
@@ -19,7 +18,6 @@ import com.elta.android.presentation.features.sync.connect.model.howtoconnect.Ho
 import kotlinx.coroutines.rx2.await
 import javax.inject.Inject
 
-@ExperimentalCameraProviderConfiguration
 class HowToConnectViewModel @Inject constructor(
     private val getLocationNeededUseCase: GetLocationNeededUseCase,
     private val appMetric: AppMetricTracker,

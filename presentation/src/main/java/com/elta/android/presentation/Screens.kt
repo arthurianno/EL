@@ -3,7 +3,6 @@ package com.elta.android.presentation
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.fragment.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.GlucoseInputType
@@ -309,12 +308,10 @@ object Screens {
         override fun getFragment() = HowToConnectFragmentVariantA.newInstance(isOnBoarding)
     }
 
-    @ExperimentalCameraProviderConfiguration
     data class ScannerDmcScreen(val isOnBoarding: Boolean) : SupportAppScreen() {
         override fun getFragment() = ScannerDmcFragment.newInstance(isOnBoarding)
     }
 
-    @ExperimentalCameraProviderConfiguration
     data class ScannerDmcScreenVariantA(val isOnBoarding: Boolean) : SupportAppScreen() {
         override fun getFragment() = ScannerDmcFragmentVariantA.newInstance(isOnBoarding)
     }

@@ -50,7 +50,7 @@ private const val NUMBER_SUFFIX = "D"
 private const val NUMBER_SUFFIX_2 = "E"
 private const val NUMBERS_COUNT_FOR_NAME = 4
 
-@ExperimentalGetImage
+@androidx.annotation.OptIn(markerClass = [ExperimentalGetImage::class])
 class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
     companion object {
         fun newInstance(isOnBoarding: Boolean) = ScannerDmcFragment().apply {

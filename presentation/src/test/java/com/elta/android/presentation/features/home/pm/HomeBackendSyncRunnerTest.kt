@@ -15,11 +15,10 @@ class HomeBackendSyncRunnerTest {
     fun `sync requests remain available after construction and asynchronous errors`() {
         val actions = PublishSubject.create<Unit>()
         val bus = RxBus()
-        val events = mutableListOf<Events.Sync.Server>()
         val progress = mutableListOf<Boolean>()
         val errors = mutableListOf<Throwable>()
         var attempts = 0
-        bus.events<Events.Sync.Server>().subscribe { events += it }
+        val eventObserver = bus.events<Events.Sync.Server>().test()
         val runner = HomeBackendSyncRunner(
             syncLocalChanges = {
                 when (++attempts) {
@@ -42,7 +41,7 @@ class HomeBackendSyncRunnerTest {
         assertEquals(3, attempts)
         assertEquals(2, errors.size)
         assertEquals(listOf(true, false, true, false, true, false), progress)
-        assertEquals(3, events.count { it == Events.Sync.Server.Started })
-        assertEquals(1, events.count { it == Events.Sync.Server.Success })
+        assertEquals(3, eventObserver.values().count { it == Events.Sync.Server.Started })
+        assertEquals(1, eventObserver.values().count { it == Events.Sync.Server.Success })
     }
 }

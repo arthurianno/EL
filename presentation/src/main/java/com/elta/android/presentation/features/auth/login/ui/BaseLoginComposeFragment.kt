@@ -7,11 +7,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.elta.android.presentation.R
@@ -70,10 +68,7 @@ abstract class BaseLoginComposeFragment : BaseComposeFragment<LoginViewModel>() 
 
     @Composable
     override fun Content(viewModel: LoginViewModel) {
-        val lifecycle = viewLifecycleOwner.lifecycle
-        val state = remember(viewModel, lifecycle) {
-            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-        }.collectAsState(initial = viewModel.state.value)
+        val state = viewModel.state.collectAsState()
 
         LoginScreen(
             state = state.value,

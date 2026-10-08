@@ -53,7 +53,7 @@ private const val SATELLITE_VOICE_MODEL = "SatelliteVoice"
 
 // fixme Variant A : improved_enabling_location
 
-@ExperimentalGetImage
+@androidx.annotation.OptIn(markerClass = [ExperimentalGetImage::class])
 class ScannerDmcFragmentVariantA : BaseComposeFragment<ScannerDmcViewModelVariantA>() {
     companion object {
         fun newInstance(isOnBoarding: Boolean) = ScannerDmcFragmentVariantA().apply {

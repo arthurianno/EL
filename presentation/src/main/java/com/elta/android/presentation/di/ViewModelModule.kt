@@ -1,6 +1,5 @@
 package com.elta.android.presentation.di
 
-import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.elta.android.presentation.core.compose.viewmodel.ViewModelFactory
@@ -120,7 +119,6 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(HowToConnectViewModel::class)
-    @ExperimentalCameraProviderConfiguration
     abstract fun bindHowToConnectViewModel(viewModel: HowToConnectViewModel): ViewModel
 
     @Binds
@@ -137,7 +135,6 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(HowToConnectViewModelVariantA::class)
-    @ExperimentalCameraProviderConfiguration
     abstract fun bindHowToConnectViewModelVariantA(viewModel: HowToConnectViewModelVariantA): ViewModel
 
     @Binds

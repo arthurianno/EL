@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.elta.android.presentation.R
@@ -66,10 +64,7 @@ class AuthPasswordCreateFragment : BaseComposeFragment<PasswordCreateViewModel>(
 
     @Composable
     override fun Content(viewModel: PasswordCreateViewModel) {
-        val lifecycle = viewLifecycleOwner.lifecycle
-        val state = remember(viewModel, lifecycle) {
-            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-        }.collectAsState(initial = viewModel.state.value)
+        val state = viewModel.state.collectAsState()
         PasswordCreateScreen(
             state = state.value,
             onAction = viewModel.actionReceiver,

@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.elta.android.presentation.R
@@ -68,10 +66,7 @@ class AuthPasswordRecoveryFragment : BaseComposeFragment<PasswordRecoveryViewMod
 
     @Composable
     override fun Content(viewModel: PasswordRecoveryViewModel) {
-        val lifecycle = viewLifecycleOwner.lifecycle
-        val state = remember(viewModel, lifecycle) {
-            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-        }.collectAsState(initial = viewModel.state.value)
+        val state = viewModel.state.collectAsState()
         PasswordRecoveryScreen(
             state = state.value,
             onAction = viewModel.actionReceiver,

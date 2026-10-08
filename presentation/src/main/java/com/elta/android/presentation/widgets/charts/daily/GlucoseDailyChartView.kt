@@ -457,6 +457,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         maxTitle = resources.getString(R.string.main_records_daily_chart_max_title)
     }
 
+    @SuppressLint("Range") // Paint alpha uses 0..255; Lint expects a 0..1 fraction here.
     private fun initPaints() {
         lowRangePaint.apply {
             color = lowRangeBackgroundColor

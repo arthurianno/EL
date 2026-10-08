@@ -3,7 +3,6 @@ package com.elta.android.presentation.features.sync.connect
 import android.Manifest
 import android.app.Activity
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
@@ -24,7 +23,6 @@ import com.elta.android.presentation.utils.openSettingsIntent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.flow.collectLatest
 
-@ExperimentalCameraProviderConfiguration
 class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
     companion object {
         fun newInstance(isOnBoarding: Boolean) = HowToConnectFragment().apply {

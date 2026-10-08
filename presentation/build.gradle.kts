@@ -26,10 +26,12 @@ android {
 
     lint {
         quiet = true
-        abortOnError = false
-        ignoreWarnings = true
+        abortOnError = true
+        ignoreWarnings = false
         disable.add("InvalidPackage")
         disable.add("OldTargetApi")
+        disable.add("NullSafeMutableLiveData")
+        disable.add("RememberInComposition")
     }
     testOptions {
         unitTests {
