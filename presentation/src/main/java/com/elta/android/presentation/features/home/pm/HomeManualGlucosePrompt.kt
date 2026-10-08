@@ -12,26 +12,33 @@ internal enum class ManualGlucoseRoute {
 internal class HomeManualGlucosePrompt(
     private val shouldShowReminder: () -> Single<Boolean>,
     private val isEmiasLinked: () -> Single<Boolean>,
-    private val disableReminder: () -> Completable
+    private val disableReminder: () -> Completable,
+    private val reportError: (Throwable) -> Unit
 ) {
     fun route(): Single<ManualGlucoseRoute> =
-        shouldShowReminder().flatMap { showReminder ->
-            if (!showReminder) {
-                Single.just(ManualGlucoseRoute.OPEN_ENTRY)
-            } else {
-                isEmiasLinked()
-                    .onErrorReturnItem(false)
-                    .map { linked ->
-                        if (linked) ManualGlucoseRoute.SHOW_REMINDER
-                        else ManualGlucoseRoute.OPEN_ENTRY
-                    }
+        Single.defer { shouldShowReminder() }
+            .flatMap { showReminder ->
+                if (!showReminder) {
+                    Single.just(ManualGlucoseRoute.OPEN_ENTRY)
+                } else {
+                    isEmiasLinked()
+                        .onErrorReturnItem(false)
+                        .map { linked ->
+                            if (linked) ManualGlucoseRoute.SHOW_REMINDER
+                            else ManualGlucoseRoute.OPEN_ENTRY
+                        }
+                }
             }
-        }
+            .doOnError(reportError)
+            .onErrorReturnItem(ManualGlucoseRoute.OPEN_ENTRY)
 
     fun shouldOpenAfterDialog(result: DialogResult): Single<Boolean> =
         when (result) {
             DialogResult.POSITIVE -> Single.just(true)
             DialogResult.NEGATIVE -> Single.just(false)
-            DialogResult.NEURAL -> disableReminder().andThen(Single.just(true))
+            DialogResult.NEURAL -> Completable.defer { disableReminder() }
+                .andThen(Single.just(true))
+                .doOnError(reportError)
+                .onErrorReturnItem(true)
         }
 }

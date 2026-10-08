@@ -134,7 +134,7 @@ class HomeFlowPmVariantA @Inject constructor(
     val btControl = bluetoothControl2VariantA()
     private val navigator by lazy { HomeFlowNavigator(router) }
     private val backendSyncRunner by lazy {
-        HomeBackendSyncRunner(syncWithBackendUseCase, { connectIomt.execute() }, bus)
+        HomeBackendSyncRunner({ syncWithBackendUseCase.execute() }, { connectIomt.execute() }, bus)
     }
     private val autoSyncRunner by lazy {
         HomeAutoSyncRunner(
@@ -153,7 +153,8 @@ class HomeFlowPmVariantA @Inject constructor(
             isEmiasLinked = {
                 getEmiasStatus.execute().map { it.first == EmiasStatus.LINKED }
             },
-            disableReminder = { setManualGlucoseRemind.execute(false) }
+            disableReminder = { setManualGlucoseRemind.execute(false) },
+            reportError = ::handleError
         )
     }
     private val feedbackWorkflow by lazy {
@@ -198,7 +199,6 @@ class HomeFlowPmVariantA @Inject constructor(
 
     private val syncWithBackendProgressState = state(false)
     private val startSyncWithBackendAction = action<Unit>()
-    private val startSyncWithIomtAction = action<Unit>()
     private val sendAppVersionAction = action<Unit>()
 
     private val feedbackAction = action<Unit>()
@@ -503,18 +503,7 @@ class HomeFlowPmVariantA @Inject constructor(
         startSyncWithBackendAction.observable
             .skipWhileInProgress(syncWithBackendProgressState.observable)
             .flatMapCompletable {
-                backendSyncRunner.syncAll(syncWithBackendProgressState.consumer)
-                    .doOnError(::handleError)
-            }
-            .retry(3)
-            .subscribe()
-            .untilDestroy()
-
-        startSyncWithIomtAction.observable
-            .skipWhileInProgress(syncWithBackendProgressState.observable)
-            .flatMapCompletable {
-                backendSyncRunner.syncIomt(syncWithBackendProgressState.consumer)
-                    .doOnError(::handleError)
+                backendSyncRunner.syncAll(syncWithBackendProgressState.consumer, ::handleError)
             }
             .subscribe()
             .untilDestroy()
