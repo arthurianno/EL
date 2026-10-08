@@ -38,6 +38,7 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
 import com.nullgr.core.rx.RxBus
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
 import org.threeten.bp.YearMonth
@@ -93,9 +94,9 @@ fun GlucoseDashboardScreen(
     DisposableEffect(bus) {
         if (bus == null) return@DisposableEffect onDispose { }
 
-        val syncDisposable = bus.events<Events.Sync>().subscribe { event ->
-            syncState.handle(event, scope)
-        }
+        val syncDisposable = bus.events<Events.Sync>()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { event -> syncState.handle(event, scope) }
         onDispose {
             syncDisposable.dispose()
         }
