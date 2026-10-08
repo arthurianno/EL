@@ -1,7 +1,6 @@
 package com.elta.android.common.utils
 
 data class EltaMessageClient(
-    var isConsultantScreenActive: Boolean,
-    var isNewsScreenActive: Boolean
-
+    @Volatile var isConsultantScreenActive: Boolean,
+    @Volatile var isNewsScreenActive: Boolean
 )

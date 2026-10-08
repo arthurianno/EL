@@ -7,7 +7,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
-import com.elta.android.common.utils.EltaMessageClient
 import com.elta.android.domain.common.usecase.CopyTextUseCase
 import com.elta.android.domain.common.usecase.FileDeleteUseCase
 import com.elta.android.domain.common.usecase.PhotoCreateUseCase
@@ -85,7 +84,7 @@ class ConsultantViewModel @Inject constructor(
     private val sendRate: SendRateUseCase,
     private val copyText: CopyTextUseCase,
     private val appMetricTracker: AppMetricTracker,
-    private val messageClient: EltaMessageClient
+    private val screenPresence: ConsultantScreenPresence
 ) : BaseViewModel<ConsultantViewState>(), LifecycleEventObserver {
     override fun createInitState(): ConsultantViewState =
         ConsultantViewState(
@@ -155,7 +154,6 @@ class ConsultantViewModel @Inject constructor(
 
     init {
         appMetricTracker.trackEvent(AppMetricEvent.TapOnlineConsultant)
-        messageClient.isConsultantScreenActive = true
         launch {
             webimNetworkState()
                 .catch { handleError(it) }
@@ -238,13 +236,19 @@ class ConsultantViewModel @Inject constructor(
         }
 
     override fun backClick() {
-        messageClient.isConsultantScreenActive = false
+        screenPresence.leave()
         super.backClick()
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        screenPresence.onEvent(event)
         sessionLifecycle.onEvent(event, viewModelScope, state.value.user)
         event.handleRatingLifecycle()
+    }
+
+    override fun onCleared() {
+        screenPresence.leave()
+        super.onCleared()
     }
 
     override fun handleFragmentArguments(arguments: Bundle) {
