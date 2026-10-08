@@ -20,7 +20,6 @@ import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCaseVariantA
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
 import com.elta.android.domain.features.diary.home.interactor.SetManualGlucoseRemindUseCase
 import com.elta.android.domain.features.diary.home.interactor.ShouldManualGlucoseRemindShowUseCase
@@ -42,7 +41,6 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
-import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.getMetricAttributes
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
@@ -135,6 +133,10 @@ class HomeFlowPmVariantA @Inject constructor(
 
 
     val btControl = bluetoothControl2VariantA()
+    private val navigator by lazy { HomeFlowNavigator(router) }
+    private val backendSyncRunner by lazy {
+        HomeBackendSyncRunner(syncWithBackendUseCase, { connectIomt.execute() }, bus)
+    }
 
     val googlePlayDialogControl = dialogControl<DialogData, DialogResult>()
     val feedbackDialogControl = dialogControl<DialogData, DialogResult>()
@@ -256,15 +258,7 @@ class HomeFlowPmVariantA @Inject constructor(
     }
 
     override fun navigateToLaunchScreen() {
-        router.newTabs(
-            arrayOf(
-                Screens.MainTab,
-                Screens.DiaryTab,
-                Screens.StatisticTab,
-                Screens.ProfileTab
-            )
-        )
-        router.navigateToTab(Screens.MainTab)
+        navigator.showTabs()
     }
 
     private fun initGlucoseFormat() {
@@ -301,7 +295,7 @@ class HomeFlowPmVariantA @Inject constructor(
                             .map { events -> events.diabetes.toCalculatorFlow() }
                             .map { EventType.Bread(it) }
                             .doOnSuccess {
-                                router.startFlow(Screens.EventsCreationScreen(it))
+                                navigator.openEvent(it)
                             }
                             .ignoreElement()
                     }
@@ -315,7 +309,7 @@ class HomeFlowPmVariantA @Inject constructor(
                     is EventType.Medicaments,
                     is EventType.Activity ->
                         Completable.fromCallable {
-                            router.startFlow(Screens.EventsCreationScreen(meta as EventType))
+                            navigator.openEvent(meta as EventType)
                         }
 
                     META_SYNC -> {
@@ -346,7 +340,7 @@ class HomeFlowPmVariantA @Inject constructor(
                     "HomeFlowPmVariantA.menuItemSelectedAction(id=$id,current=${selectedItemIdState.valueOrNull})"
                 )
             }
-            .map { it to handleBottomMenuClick(it) }
+            .map { it to navigator.tabForMenu(it) }
             .doOnNext { pair ->
                 Log.i(
                     NAV_TRACE_TAG,
@@ -354,7 +348,7 @@ class HomeFlowPmVariantA @Inject constructor(
                 )
             }
             .trackEvent { AnalyticsEvent(it.second.second) }
-            .doOnNext { router.navigateToTab(it.second.first) }
+            .doOnNext { navigator.openTab(it.second.first) }
             .map { it.first }
             .doOnError { error ->
                 Log.e(NAV_TRACE_TAG, "HomeFlowPmVariantA.menuItemSelectedAction stream error", error)
@@ -392,7 +386,7 @@ class HomeFlowPmVariantA @Inject constructor(
 
         hardwareErrorSupportAction.observable
             .doOnNext { closeHardwareErrorBottomSheetCommand.consumer.accept(Unit) }
-            .subscribe { router.navigateTo(Screens.Feedback) }
+            .subscribe { navigator.navigateToFeedback() }
             .untilDestroy()
 
         closeHardwareErrorBottomSheetAction.observable
@@ -495,15 +489,7 @@ class HomeFlowPmVariantA @Inject constructor(
         startSyncWithBackendAction.observable
             .skipWhileInProgress(syncWithBackendProgressState.observable)
             .flatMapCompletable {
-                syncWithBackendUseCase.execute()
-                    .mergeWith(connectIomt.execute())
-                    .bindProgress(syncWithBackendProgressState.consumer)
-                    .doOnSubscribe { bus.event(Events.Sync.Server.Started) }
-                    .doOnComplete { bus.event(Events.Sync.Server.Success) }
-                    .doOnComplete {
-                        bus.event(Events.EventsChanged(false))
-                        bus.event(Events.ProfileUpdated)
-                    }
+                backendSyncRunner.syncAll(syncWithBackendProgressState.consumer)
                     .doOnError(::handleError)
             }
             .retry(3)
@@ -513,10 +499,7 @@ class HomeFlowPmVariantA @Inject constructor(
         startSyncWithIomtAction.observable
             .skipWhileInProgress(syncWithBackendProgressState.observable)
             .flatMapCompletable {
-                connectIomt.execute()
-                    .bindProgress(syncWithBackendProgressState.consumer)
-                    .doOnSubscribe { bus.event(Events.Sync.Server.Started) }
-                    .doOnComplete { bus.event(Events.Sync.Server.Success) }
+                backendSyncRunner.syncIomt(syncWithBackendProgressState.consumer)
                     .doOnError(::handleError)
             }
             .subscribe()
@@ -555,7 +538,7 @@ class HomeFlowPmVariantA @Inject constructor(
             .flatMapCompletable {
                 updateUserInfoUseCase.execute(createUserInfoParams())
                     .doOnComplete {
-                        router.navigateTo(Screens.PlayMarketScreen)
+                        navigator.openPlayMarket()
                     }
             }
             .subscribe()
@@ -583,20 +566,10 @@ class HomeFlowPmVariantA @Inject constructor(
         feedbackDialogAction.observable
             .switchMapMaybe { feedbackDialogControl.showForResult(feedbackDialogData) }
             .filter { it == DialogResult.POSITIVE }
-            .map { Screens.Feedback }
-            .doOnNext(router::startFlow)
+            .doOnNext { navigator.startFeedbackFlow() }
             .subscribe()
             .untilDestroy()
     }
-
-    private fun handleBottomMenuClick(id: Int) =
-        when (id) {
-            R.id.mainMenuItemView -> Screens.MainTab to AnalyticsEventType.HOMEPAGE
-            R.id.notesMenuItemView -> Screens.DiaryTab to AnalyticsEventType.DIARY_OPEN
-            R.id.statsMenuItemView -> Screens.StatisticTab to AnalyticsEventType.STATISTICS_OPEN
-            R.id.profileMenuItemView -> Screens.ProfileTab to AnalyticsEventType.PROFILE_OPEN
-            else -> throw IllegalArgumentException("$id is not supported.")
-        }
 
     private fun EventType.toListItem() =
         UserEventItem(
@@ -796,18 +769,12 @@ class HomeFlowPmVariantA @Inject constructor(
     }
 
     private fun navigateToCreationManualGlucoseScreen() {
-        router.startFlow(Screens.EventsCreationScreen(EventType.Glucose(GlucoseInputType.MANUAL)))
+        navigator.openManualGlucose()
     }
 
     private fun openConnectScreen() {
-
-        //TODO: тест всех комманд глюкометра. Работает 100%.
-//        testUseCase.execute()
-//            .subscribe()
-//            .untilDestroy()
-
         bus.event(Events.Sync.Glucometer.Error)
-        router.startFlow(Screens.ConnectStartScreen(isOnBoarding = false))
+        navigator.openConnectDevice()
     }
 
     private fun bindAppMetricEvents() {
