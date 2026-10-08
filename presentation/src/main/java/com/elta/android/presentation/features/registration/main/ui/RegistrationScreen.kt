@@ -16,6 +16,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -104,6 +105,7 @@ internal fun RegistrationScreen(
                 helperText = stringResource(R.string.registration_password_pattern),
                 errorText = state.passwordError,
                 enabled = !state.isLoading,
+                autofillContentType = ContentType.NewPassword,
                 onSubmit = submit
             )
             state.serverError?.let { message ->

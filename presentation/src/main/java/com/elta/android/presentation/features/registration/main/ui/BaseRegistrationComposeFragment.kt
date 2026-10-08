@@ -82,8 +82,11 @@ abstract class BaseRegistrationComposeFragment<PM : BasePm> :
                     onAction = { action ->
                         if (!uiState.isLoading) {
                             when (action) {
-                                is RegistrationAction.EmailChanged ->
-                                    emailInput.textChanges.consumer.accept(action.email.take(254))
+                                is RegistrationAction.EmailChanged -> {
+                                    val email = action.email.take(254)
+                                    uiState = uiState.copy(email = email)
+                                    emailInput.textChanges.consumer.accept(email)
+                                }
                                 is RegistrationAction.PasswordChanged ->
                                     passwordInput.textChanges.consumer.accept(action.password)
                                 is RegistrationAction.PrivacyPolicyAcceptedChanged ->

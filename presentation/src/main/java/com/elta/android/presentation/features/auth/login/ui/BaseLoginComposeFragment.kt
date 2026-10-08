@@ -72,7 +72,9 @@ abstract class BaseLoginComposeFragment<PM : BasePm> :
                     onAction = { action ->
                         when (action) {
                             is LoginAction.EmailChanged -> if (!uiState.isLoading) {
-                                emailInput.textChanges.consumer.accept(action.email.take(254))
+                                val email = action.email.take(254)
+                                uiState = uiState.copy(email = email)
+                                emailInput.textChanges.consumer.accept(email)
                             }
                             is LoginAction.PasswordChanged -> if (!uiState.isLoading) {
                                 passwordInput.textChanges.consumer.accept(action.password)

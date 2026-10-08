@@ -12,6 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -82,6 +83,7 @@ internal fun LoginScreen(
                 error = state.emailError,
                 enabled = !state.isLoading,
                 imeAction = ImeAction.Next,
+                autofillContentType = ContentType.Username,
                 onSubmit = { focusManager.moveFocus(FocusDirection.Next) }
             )
             Spacer(Modifier.height(16.dp))
