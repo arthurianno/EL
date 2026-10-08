@@ -22,7 +22,6 @@ import com.elta.android.domain.features.consultant.usecase.SendMessageUseCase
 import com.elta.android.domain.features.consultant.usecase.SendRateUseCase
 import com.elta.android.domain.features.consultant.usecase.WebimChatStateUseCase
 import com.elta.android.domain.features.consultant.usecase.WebimNetworkStateUseCase
-import com.elta.android.domain.features.consultant.usecase.WebimSessionUseCase
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
@@ -73,7 +72,7 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalPermissionsApi::class)
 class ConsultantViewModel @Inject constructor(
-    private val webimSession: WebimSessionUseCase,
+    private val sessionLifecycle: ConsultantSessionLifecycle,
     private val webimNetworkState: WebimNetworkStateUseCase,
     private val chatState: WebimChatStateUseCase,
     private val sendMessage: SendMessageUseCase,
@@ -249,7 +248,7 @@ class ConsultantViewModel @Inject constructor(
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        event.handleSessionState()
+        sessionLifecycle.onEvent(event, viewModelScope, state.value.user)
         event.handleRatingLifecycle()
     }
 
@@ -684,25 +683,6 @@ class ConsultantViewModel @Inject constructor(
                     duration = state.value.recordGraphState.duration.plus(100L, ChronoUnit.MILLIS)
                 )
             )
-        }
-    }
-
-    private fun Lifecycle.Event.handleSessionState() {
-        when (this) {
-            Lifecycle.Event.ON_CREATE -> launch { webimSession.create(state.value.user) }
-            Lifecycle.Event.ON_START -> {
-                launch {
-                    try {
-                        webimSession.onResume()
-                    } catch (e: IllegalStateException) {
-                        webimSession.create(state.value.user)
-                    }
-                }
-            }
-            Lifecycle.Event.ON_RESUME -> webimSession.onResume()
-            Lifecycle.Event.ON_PAUSE -> webimSession.onPause()
-            Lifecycle.Event.ON_DESTROY -> webimSession.onDestroy()
-            else -> Unit
         }
     }
 
