@@ -87,8 +87,10 @@ abstract class BaseRegistrationComposeFragment<PM : BasePm> :
                                     uiState = uiState.copy(email = email)
                                     emailInput.textChanges.consumer.accept(email)
                                 }
-                                is RegistrationAction.PasswordChanged ->
+                                is RegistrationAction.PasswordChanged -> {
+                                    uiState = uiState.copy(password = action.password)
                                     passwordInput.textChanges.consumer.accept(action.password)
+                                }
                                 is RegistrationAction.PrivacyPolicyAcceptedChanged ->
                                     onConsentChanged(action.accepted)
                                 RegistrationAction.TogglePasswordVisibility ->
@@ -115,6 +117,7 @@ abstract class BaseRegistrationComposeFragment<PM : BasePm> :
 
     override fun onDestroyView() {
         backAction = null
+        uiState = RegistrationState()
         super.onDestroyView()
     }
 

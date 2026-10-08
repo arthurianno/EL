@@ -6,6 +6,9 @@ import com.elta.android.domain.features.statistics.model.glucoseManagementIndica
 import com.elta.android.presentation.features.statistic.period.ui.Period
 import com.elta.android.presentation.utils.NumberFormatter
 import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.TextStyle
+import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
@@ -18,6 +21,7 @@ import kotlin.math.sqrt
 data class StatisticsDashboardUiState(
     val period: Period,
     val periodTitle: String,
+    val periodCompactTitle: String = periodTitle,
     val average: String = "—",
     val unit: String = "ммоль/л",
     val lowPercent: Int = 0,
@@ -84,11 +88,12 @@ enum class HourlyRangeStatus {
 /** Converts domain data once at the presentation boundary. */
 fun StatisticByPeriodModel?.toStatisticsDashboardUiState(
     selectedPeriod: Period,
-    previous: StatisticByPeriodModel? = null
+    previous: StatisticByPeriodModel? = null,
+    locale: Locale = Locale.getDefault()
 ): StatisticsDashboardUiState {
     val model = this ?: return StatisticsDashboardUiState(
         period = selectedPeriod,
-        periodTitle = selectedPeriod.displayName
+        periodTitle = ""
     )
     val glucose = model.glucose
     val glucoseEvents = model.allDays.toSortedMap().flatMap { it.value.glucose.dailyGlucoseModel?.glucoseEvents.orEmpty() }
@@ -104,7 +109,7 @@ fun StatisticByPeriodModel?.toStatisticsDashboardUiState(
             .orEmpty()
         HourlyRange(
             date = date,
-            dayLabel = date.toShortWeekday(),
+            dayLabel = date.toShortWeekday(locale),
             statuses = glucoseEventsForDay
                 .groupBy { it.additionTime.hour }
                 .toHourlyStatuses(glucose)
@@ -126,7 +131,8 @@ fun StatisticByPeriodModel?.toStatisticsDashboardUiState(
 
     return StatisticsDashboardUiState(
         period = selectedPeriod,
-        periodTitle = model.period.toDisplayTitle(),
+        periodTitle = model.period.toDisplayTitle(locale),
+        periodCompactTitle = model.period.toDisplayTitle(locale, compact = true),
         average = NumberFormatter.format(glucose.averageLevel),
         lowPercent = glucose.eventsLowPercent,
         inRangePercent = glucose.eventsNormalPercent,
@@ -144,7 +150,7 @@ fun StatisticByPeriodModel?.toStatisticsDashboardUiState(
                 event.glucoseValue(glucose.glucoseFormat) in glucose.settings.low
         },
         hourlyRanges = hourlyRanges,
-        dailyRangeTitle = hourlyRanges.takeLast(DAYS_IN_HEATMAP).toDateRangeTitle(),
+        dailyRangeTitle = hourlyRanges.takeLast(DAYS_IN_HEATMAP).toDateRangeTitle(locale),
         distribution = glucoseEvents.toDistributionBuckets(glucose.glucoseFormat),
         dailyEpisodes = dailyEpisodes,
         comparison = previous
@@ -236,41 +242,27 @@ private fun com.elta.android.domain.features.statistics.model.StatisticPeriod.da
     }.toList()
 }
 
-private fun List<HourlyRange>.toDateRangeTitle(): String {
+private fun List<HourlyRange>.toDateRangeTitle(locale: Locale): String {
     val week = takeLast(DAYS_IN_HEATMAP)
     val first = week.firstOrNull()?.date ?: return ""
     val last = week.lastOrNull()?.date ?: return ""
-    return "${first.dayOfMonth} ${first.monthValue.toRussianMonthName()} – ${last.dayOfMonth} ${last.monthValue.toRussianMonthName()}"
+    return formatDateRange(first, last, locale)
 }
 
-private fun LocalDate.toShortWeekday(): String = when (dayOfWeek.value) {
-    1 -> "ПН"
-    2 -> "ВТ"
-    3 -> "СР"
-    4 -> "ЧТ"
-    5 -> "ПТ"
-    6 -> "СБ"
-    else -> "ВС"
+private fun LocalDate.toShortWeekday(locale: Locale): String =
+    dayOfWeek.getDisplayName(TextStyle.SHORT, locale).removeSuffix(".").uppercase(locale)
+
+private fun com.elta.android.domain.features.statistics.model.StatisticPeriod.toDisplayTitle(
+    locale: Locale,
+    compact: Boolean = false
+): String = formatDateRange(start.toLocalDate(), end.toLocalDate(), locale, compact)
+
+internal fun formatDateRange(start: LocalDate, end: LocalDate, locale: Locale, compact: Boolean = false): String {
+    val formatter = DateTimeFormatter.ofPattern(if (compact) "d MMM" else "d MMMM", locale)
+    return "${start.format(formatter)} – ${end.format(formatter)}"
 }
-
-private fun com.elta.android.domain.features.statistics.model.StatisticPeriod.toDisplayTitle(): String =
-    "${start.dayOfMonth} ${start.monthValue.toRussianMonthName()} – ${end.dayOfMonth} ${end.monthValue.toRussianMonthName()}"
-
-internal val Period.displayName: String
-    get() = when (this) {
-        Period.SEVEN -> "Последние 7 дней"
-        Period.FOURTEEN -> "Последние 14 дней"
-        Period.THIRTY -> "Последние 30 дней"
-        Period.NINETY -> "Последние 90 дней"
-    }
-
-private fun Int.toRussianMonthName() = RUSSIAN_MONTH_NAMES[this - 1]
 
 private const val DISTRIBUTION_BUCKETS_COUNT = 6
 private const val DAYS_IN_HEATMAP = 7
 private val NIGHT_HYPO_HOURS = 2..4
 private val HOURS = 0..23
-private val RUSSIAN_MONTH_NAMES = arrayOf(
-    "января", "февраля", "марта", "апреля", "мая", "июня",
-    "июля", "августа", "сентября", "октября", "ноября", "декабря"
-)

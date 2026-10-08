@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.elta.android.presentation.features.statistic.period.ui.Period
+import java.util.Locale
 
 private val DEMO_CURRENT_SERIES = listOf(
     3.4, 0.8, 3.8, 4.2, 7.6, 6.1, 12.9,
@@ -98,9 +99,11 @@ private fun DemoModeOption(title: String, isSelected: Boolean, onClick: () -> Un
 internal fun StatisticsDashboardUiState.toDemoDashboard(): StatisticsDashboardUiState {
     val endDate = org.threeten.bp.LocalDate.now()
     val dates = (13 downTo 0).map { endDate.minusDays(it.toLong()) }
+    val locale = Locale.getDefault()
     return copy(
         period = Period.FOURTEEN,
-        periodTitle = "12 июля – 25 июля",
+        periodTitle = formatDateRange(dates.first(), endDate, locale),
+        periodCompactTitle = formatDateRange(dates.first(), endDate, locale, compact = true),
         average = "6,8",
         lowPercent = 5,
         inRangePercent = 78,

@@ -1,20 +1,12 @@
 package com.elta.android.presentation.features.home.pm
 
 import android.util.Log
-import com.elta.android.common.errors.BluetoothNotEnabledError
-import com.elta.android.common.errors.BluetoothPermissionNotGrantedError
-import com.elta.android.common.errors.BluetoothScannerError
-import com.elta.android.common.errors.CommandError
-import com.elta.android.common.errors.GlucometerDeviceHardwareError
 import com.elta.android.common.errors.GlucometerTestConfig
 
 import com.elta.android.common.errors.GlucometerConnectionException
 
-import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.InvalidRefreshTokenError
-import com.elta.android.common.errors.LocationNotEnabledError
-import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
@@ -69,7 +61,6 @@ import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.bindProgress
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.ObservableSource
 import io.reactivex.rxkotlin.Singles
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
@@ -78,7 +69,6 @@ import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
@@ -138,6 +128,19 @@ class HomeFlowPm @Inject constructor(
 
 
     val btControl = bluetoothControl2()
+    private val glucometerSyncRunner by lazy {
+        HomeGlucometerSyncRunner(
+            syncWithGlucometer = syncWithGlucometerUseCase,
+            syncGlucometers = syncGlucometers,
+            permissions = btControl,
+            bus = bus,
+            appMetric = appMetric,
+            onInvalidTime = { deviceInvalidTimeBottomSheetCommand.accept(Unit) },
+            onServerSync = { startSyncWithBackendAction.consumer.accept(Unit) },
+            onManualError = ::handleManualSyncError,
+            onAutoError = ::handleAutoSyncError
+        )
+    }
 
     val googlePlayDialogControl = dialogControl<DialogData, DialogResult>()
     val feedbackDialogControl = dialogControl<DialogData, DialogResult>()
@@ -645,91 +648,7 @@ class HomeFlowPm @Inject constructor(
             }
 
     private fun syncWithGlucometer(isAuto: Boolean): Observable<com.elta.android.domain.features.devices.model.GlucometerSyncResult> =
-        syncWithGlucometerUseCase.execute(SyncWithGlucometerUseCase.Params())
-            .concatWith(
-                if (!isAuto) syncGlucometers.execute() else Completable.complete()
-            )
-            .bindProgress(syncProgressState.consumer)
-            .doOnSubscribe {
-                bus.event(Events.Sync.Glucometer.Started)
-            }
-            .doOnNext { result ->
-                appMetric.trackEvent(AppMetricEvent.SnackProcessing)
-                if (result.count > 0) {
-                    appMetric.trackEvent(AppMetricEvent.ReceivedMeasurementsSugar)
-                    bus.event(Events.EventsChanged(true))
-                    if (result.hasInvalidTime) {
-                        deviceInvalidTimeBottomSheetCommand.accept(Unit)
-                    }
-                    bus.event(Events.Sync.Glucometer.Success)
-                } else bus.event(Events.Sync.Glucometer.NoNewEvents)
-            }
-            .doOnComplete { if (!isAuto) startSyncWithBackendAction.consumer.accept(Unit) }
-            .doOnError { error ->
-                if (isAuto) {
-                    handleAutoSyncError(error)
-                } else {
-                    handleManualSyncError(error)
-                }
-            }
-            .onErrorResumeNext { error: Throwable ->
-                observableSyncError(error, isAuto)
-            }
-
-    private fun observableSyncError(
-        error: Throwable,
-        isAuto: Boolean
-    ): ObservableSource<out com.elta.android.domain.features.devices.model.GlucometerSyncResult> = when (error) {
-        is BluetoothNotEnabledError -> {
-            appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
-            bluetoothEnableAndRepeat(isAuto)
-        }
-
-        is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
-        is LocationPermissionNotGrantedError -> {
-            appMetric.trackEvent(AppMetricEvent.Permission.Alert.Location)
-            requestLocationPermissionAndRepeat(isAuto)
-        }
-
-        is BluetoothPermissionNotGrantedError -> {
-            appMetric.trackEvent(AppMetricEvent.Permission.Alert.Bluetooth)
-            requestBluetoothPermissionAndRepeat(isAuto)
-        }
-
-        is GlucometerSyncError ->
-            when (error.cause) {
-                is BluetoothNotEnabledError -> {
-                    appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
-                    bluetoothEnableAndRepeat(isAuto)
-                }
-
-                is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
-
-                else -> {
-                    Observable.error(error)
-                }
-            }
-
-        else -> Observable.error(error)
-    }
-
-    private fun requestLocationPermissionAndRepeat(isAuto: Boolean) =
-        btControl.requestLocationPermission()
-            .filter { it }
-            .flatMapObservable { syncWithGlucometer(isAuto) }
-
-    private fun requestBluetoothPermissionAndRepeat(isAuto: Boolean) =
-        btControl.requestBluetoothPermission()
-            .filter { it }
-            .flatMapObservable { syncWithGlucometer(isAuto) }
-
-    private fun locationEnableAndRepeat(isAuto: Boolean) = btControl.requestEnableLocation()
-        .filter { it }
-        .flatMapObservable { syncWithGlucometer(isAuto) }
-
-    private fun bluetoothEnableAndRepeat(isAuto: Boolean) = btControl.requestEnableBluetooth()
-        .filter { it }
-        .flatMapObservable { syncWithGlucometer(isAuto) }
+        glucometerSyncRunner.execute(isAuto).bindProgress(syncProgressState.consumer)
 
 
     private fun handleManualSyncError(error: Throwable) {
@@ -737,66 +656,35 @@ class HomeFlowPm @Inject constructor(
         // published as an error so every sync-status surface can show the correct state.
         bus.event(Events.Sync.Glucometer.Error)
 
-        when (error) {
-
-
-            is BluetoothNotEnabledError, LocationNotEnabledError -> {
-                manualSyncError.accept(ManualSyncError.ErrorSync)
-            }
-
-            is PrimaryGlucometerNotFoundError -> {
-                openConnectScreen()
-            }
-
-            is LocationPermissionNotGrantedError, is BluetoothPermissionNotGrantedError -> {
+        when (classifyManualSyncFailure(error)) {
+            ManualSyncFailure.CONNECTION_DISABLED -> manualSyncError.accept(ManualSyncError.ErrorSync)
+            ManualSyncFailure.DEVICE_MISSING -> openConnectScreen()
+            ManualSyncFailure.PERMISSION_DENIED -> {
                 manualSyncError.accept(ManualSyncError.PermissionNotGranted)
                 manualSyncErrorBottomSheetCommand.accept(Unit)
             }
-
-            is GlucometerOfflineError -> {
+            ManualSyncFailure.DEVICE_OFFLINE, ManualSyncFailure.DEVICE_TIMEOUT -> {
                 appMetric.trackEvent(AppMetricEvent.SnackSynchronization(SnackStatusParam.DEVICE_NOT_FOUND))
                 manualSyncError.accept(ManualSyncError.NotFound)
                 manualSyncErrorBottomSheetCommand.accept(Unit)
             }
-
-            is GlucometerDeviceHardwareError -> {
+            ManualSyncFailure.HARDWARE -> {
                 deviceHardwareErrorBottomSheetCommand.accept(Unit)
             }
-
-            is GlucometerSyncError, is CommandError, is GlucometerConnectionException -> {
-                if (error.cause is GlucometerDeviceHardwareError) {
-                    deviceHardwareErrorBottomSheetCommand.accept(Unit)
-                } else {
-                    val manualSyncError = if (error.cause is TimeoutException) {
-                        appMetric.trackEvent(AppMetricEvent.SnackSynchronization(SnackStatusParam.DEVICE_NOT_FOUND))
-                        ManualSyncError.NotFound
-                    } else {
-                        ManualSyncError.ErrorSync
-                    }
-                    this.manualSyncError.accept(manualSyncError)
-                    manualSyncErrorBottomSheetCommand.accept(Unit)
-                }
+            ManualSyncFailure.DEVICE_ERROR -> {
+                manualSyncError.accept(ManualSyncError.ErrorSync)
+                manualSyncErrorBottomSheetCommand.accept(Unit)
             }
-
-            else -> handleError(error)
+            ManualSyncFailure.UNEXPECTED -> handleError(error)
         }
     }
 
-
     private fun handleAutoSyncError(error: Throwable) {
-        when {
-            error is BluetoothNotEnabledError || error is LocationNotEnabledError ||
-                    error.cause is BluetoothNotEnabledError || error.cause is LocationNotEnabledError ||
-                    error is LocationPermissionNotGrantedError || error is BluetoothPermissionNotGrantedError ||
-                    error is CommandError || error is BluetoothScannerError ->
-                bus.event(Events.Sync.Glucometer.Error)
-
-            error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException) || error is GlucometerConnectionException ->
-                bus.event(Events.Sync.Glucometer.ErrorWithMessage)
-
-            error is PrimaryGlucometerNotFoundError -> openConnectScreen()
-
-            else -> handleError(error)
+        when (classifyAutoSyncFailure(error)) {
+            AutoSyncFailure.SILENT -> bus.event(Events.Sync.Glucometer.Error)
+            AutoSyncFailure.MESSAGE -> bus.event(Events.Sync.Glucometer.ErrorWithMessage)
+            AutoSyncFailure.DEVICE_MISSING -> openConnectScreen()
+            AutoSyncFailure.UNEXPECTED -> handleError(error)
         }
     }
 

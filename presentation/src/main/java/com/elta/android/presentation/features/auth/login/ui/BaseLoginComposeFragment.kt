@@ -77,6 +77,7 @@ abstract class BaseLoginComposeFragment<PM : BasePm> :
                                 emailInput.textChanges.consumer.accept(email)
                             }
                             is LoginAction.PasswordChanged -> if (!uiState.isLoading) {
+                                uiState = uiState.copy(password = action.password)
                                 passwordInput.textChanges.consumer.accept(action.password)
                             }
                             LoginAction.TogglePasswordVisibility -> {
@@ -94,6 +95,7 @@ abstract class BaseLoginComposeFragment<PM : BasePm> :
 
     override fun onDestroyView() {
         backAction = null
+        uiState = LoginState()
         super.onDestroyView()
     }
 

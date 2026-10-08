@@ -52,6 +52,7 @@ private object StatisticsDashboardPreviewFixture {
     val state = StatisticsDashboardUiState(
         period = Period.FOURTEEN,
         periodTitle = "15 июля – 28 июля",
+        periodCompactTitle = "15 июл. – 28 июл.",
         average = "4,1",
         lowPercent = 5,
         inRangePercent = 78,

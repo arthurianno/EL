@@ -70,7 +70,8 @@ class PeriodFragment :
         pm.statisticsByPeriodState.bindTo { models ->
             uiState = models.current.toStatisticsDashboardUiState(
                 selectedPeriod = selectedPeriod,
-                previous = models.previous
+                previous = models.previous,
+                locale = resources.configuration.locales[0]
             )
         }
         pm.visibleBlocksState.bindTo { visibleBlocks = it }

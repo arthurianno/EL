@@ -15,6 +15,7 @@ class AudioPlayerDataRepository @Inject constructor(
     private val audioPlayer: AudioPlayer,
     dispatcher: CoroutineDispatcher
 ) : AudioPlayerRepository {
+    private var preparedUri: Uri? = null
 
     @OptIn(ObsoleteCoroutinesApi::class)
     private val tickerChannel = ticker(delayMillis = 1000L)
@@ -28,14 +29,16 @@ class AudioPlayerDataRepository @Inject constructor(
         }.flowOn(dispatcher)
 
     override fun start(uri: Uri, trackPosition: Int?) {
-        if (trackPosition == null) {
+        if (trackPosition == null || preparedUri != uri) {
             audioPlayer.prepare(uri)
+            preparedUri = uri
         }
         audioPlayer.play(trackPosition)
     }
 
     override fun stop(time: Long) {
         audioPlayer.stop()
+        preparedUri = null
     }
 
     override fun pause(): Int = audioPlayer.pause()

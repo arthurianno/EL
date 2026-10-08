@@ -6,20 +6,14 @@ import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewModelScope
 import com.elta.android.common.utils.EltaMessageClient
-import com.elta.android.domain.common.usecase.AudioVolumeUseCase
 import com.elta.android.domain.common.usecase.CopyTextUseCase
 import com.elta.android.domain.common.usecase.FileDeleteUseCase
-import com.elta.android.domain.common.usecase.GetTrackPositionUseCase
-import com.elta.android.domain.common.usecase.PauseAudioTrackUseCase
 import com.elta.android.domain.common.usecase.PhotoCreateUseCase
-import com.elta.android.domain.common.usecase.PlayAudioTrackUseCase
-import com.elta.android.domain.common.usecase.StartAudioRecordUseCase
-import com.elta.android.domain.common.usecase.StopAudioRecordUseCase
 import com.elta.android.domain.features.consultant.model.ChatState
 import com.elta.android.domain.features.consultant.model.WebimUser
 import com.elta.android.domain.features.consultant.usecase.DeleteMessageUseCase
-import com.elta.android.domain.features.consultant.usecase.DownloadFileUseCase
 import com.elta.android.domain.features.consultant.usecase.EditMessageUseCase
 import com.elta.android.domain.features.consultant.usecase.GetAudioDurationUseCase
 import com.elta.android.domain.features.consultant.usecase.GetCachedFilesUriUseCase
@@ -71,10 +65,10 @@ import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -96,16 +90,12 @@ class ConsultantViewModel @Inject constructor(
     private val editMessage: EditMessageUseCase,
     private val deleteMessage: DeleteMessageUseCase,
     private val getCachedFilesUri: GetCachedFilesUriUseCase,
-    private val downloadFile: DownloadFileUseCase,
+    private val fileDownloads: ConsultantFileDownloads,
     private val photoCreate: PhotoCreateUseCase,
-    private val startAudioRecord: StartAudioRecordUseCase,
-    private val stopAudioRecord: StopAudioRecordUseCase,
-    private val playAudioTrack: PlayAudioTrackUseCase,
-    private val pauseAudioTrack: PauseAudioTrackUseCase,
-    private val trackPositionFlow: GetTrackPositionUseCase,
+    private val voiceRecorder: ConsultantVoiceRecorder,
+    private val audioPlayer: ConsultantAudioPlayer,
     private val getVoiceDuration: GetAudioDurationUseCase,
     private val deleteFile: FileDeleteUseCase,
-    private val audioFlow: AudioVolumeUseCase,
     private val sendRate: SendRateUseCase,
     private val copyText: CopyTextUseCase,
     private val appMetricTracker: AppMetricTracker,
@@ -152,10 +142,7 @@ class ConsultantViewModel @Inject constructor(
 
     private var messageFromCache: List<MessageUiEntity> = emptyList()
 
-    private var volumeLevelSubscriber: Job? = null
     private var estimateOperatorSubscriber: Job? = null
-    private var downloadFileSubscriber: Job? = null
-    private var trackPositionSubscriber: Job? = null
 
     val cameraDialog = BaseDialogWidgetModel<Unit>(
         positiveOnCLick = { sendEvent(OpenSettings) }, negativeOnCLick = {}
@@ -530,10 +517,7 @@ class ConsultantViewModel @Inject constructor(
             }
 
             CachingState.Downloading -> {
-                if (downloadFileSubscriber?.isActive == true) {
-                    downloadFileSubscriber?.cancel()
-                    downloadFileSubscriber = null
-                }
+                fileDownloads.cancel(message.id)
                 document?.uri?.let { deleteFile(it) }
                 reduceState {
                     currentState.copy(
@@ -545,11 +529,11 @@ class ConsultantViewModel @Inject constructor(
                 }
             }
 
-            else -> downloadFileSubscriber = launch { startDownloadFile(message) }
+            else -> startDownloadFile(message)
         }
     }
 
-    private suspend fun startDownloadFile(message: MessageUiEntity) {
+    private fun startDownloadFile(message: MessageUiEntity) {
         val document = message.document
 
         reduceState {
@@ -561,28 +545,37 @@ class ConsultantViewModel @Inject constructor(
             )
         }
 
-        val updatedChat = try {
-            val downloadedFileUri = downloadFile(
-                url = document?.url.orEmpty(),
-                fileName = document?.fileName.orEmpty()
-            )
-
-            state.value.chat.reduceChatState(
-                messageId = message.id,
-                cachingState = CachingState.Cached,
-                uri = downloadedFileUri
-            )
-
-        } catch (e: Exception) {
-            state.value.chat.reduceChatState(
-                messageId = message.id,
-                cachingState = CachingState.NotCached,
-            )
-        }
-        reduceState { state.value.copy(chat = updatedChat) }
+        fileDownloads.start(
+            scope = viewModelScope,
+            messageId = message.id,
+            url = document?.url.orEmpty(),
+            fileName = document?.fileName.orEmpty(),
+            onSuccess = { uri ->
+                reduceState {
+                    state.value.copy(
+                        chat = state.value.chat.reduceChatState(
+                            messageId = message.id,
+                            cachingState = CachingState.Cached,
+                            uri = uri
+                        )
+                    )
+                }
+            },
+            onFailure = {
+                reduceState {
+                    state.value.copy(
+                        chat = state.value.chat.reduceChatState(
+                            messageId = message.id,
+                            cachingState = CachingState.NotCached
+                        )
+                    )
+                }
+            }
+        )
     }
 
     private fun startPlayingTrack(message: MessageUiEntity) {
+        val voiceMessageUri = message.document?.uri ?: return
         val initialAudioStateMessages = state.value.chat.reduceAudioState(
             messageId = message.id,
             isPlaying = true,
@@ -592,36 +585,28 @@ class ConsultantViewModel @Inject constructor(
             state.value.copy(chat = state.value.chat.copy(messages = initialAudioStateMessages.messages))
         }
         val position = message.audioState?.trackPosition.takeIf { it != null && it != 0 }
-        val voiceMessageUri = message.document?.uri
-        voiceMessageUri?.let {
-            playAudioTrack(
-                uri = it,
-                trackPosition = position
-            )
-        }
-        trackPositionSubscriber?.cancel()
-        trackPositionSubscriber = null
-        trackPositionSubscriber = launch { observeTrackPosition(message.id) }
+        audioPlayer.play(viewModelScope, voiceMessageUri, position,
+            onPosition = { updateTrackPosition(message.id, it) },
+            onFinished = { finishTrack(message.id) }
+        )
     }
 
     private fun seekToPositionAndPlay(message: MessageUiEntity, pressAndTrackRelation: Float) {
+        val voiceMessageUri = message.document?.uri ?: return
         message.audioState?.let {
             if (message.audioState.isPlaying) pausePlayingTrack(message.id)
 
-            val seekToPosition = it.duration * pressAndTrackRelation
-
-            playAudioTrack(
-                uri = message.document?.uri ?: Uri.EMPTY,
-                trackPosition = seekToPosition.toInt()
+            val seekToPosition = it.duration * pressAndTrackRelation.coerceIn(0f, 1f)
+            audioPlayer.play(
+                viewModelScope, voiceMessageUri, seekToPosition.toInt(),
+                onPosition = { position -> updateTrackPosition(message.id, position) },
+                onFinished = { finishTrack(message.id) }
             )
-            trackPositionSubscriber = launch { observeTrackPosition(message.id) }
         }
     }
 
     private fun pausePlayingTrack(messageId: String) {
-        trackPositionSubscriber?.cancel()
-        trackPositionSubscriber = null
-        val positionOnPause = pauseAudioTrack.invoke()
+        val positionOnPause = audioPlayer.pause()
 
         reduceState {
             state.value.copy(
@@ -670,6 +655,8 @@ class ConsultantViewModel @Inject constructor(
         launch {
             try {
                 sendMessage(params)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (e: Exception) {
                 // fixme обработка ошибок
                 Timber.d("EltaTag handle error: $e")
@@ -698,9 +685,7 @@ class ConsultantViewModel @Inject constructor(
     }
 
     private fun stopRecordVoice() {
-        stopAudioRecord()
-        volumeLevelSubscriber?.cancel()
-        volumeLevelSubscriber = null
+        voiceRecorder.stop()
         reduceState {
             state.value.copy(
                 recordGraphState = state.value.recordGraphState.copy(
@@ -716,19 +701,18 @@ class ConsultantViewModel @Inject constructor(
             status = permissionStatus,
             onGranted = {
                 sendEvent(MakeVibration)
-                val audioFile = startAudioRecord()
-                reduceState {
-                    state.value.copy(
-                        recordGraphState = state.value.recordGraphState.copy(
-                            recordState = RecordState.Recording
-                        ),
-                        audioFileUri = audioFile
-                    )
-                }
-
-                volumeLevelSubscriber = launch {
-                    observeAudioFlow()
-                }
+                voiceRecorder.start(
+                    scope = viewModelScope,
+                    onStarted = { audioFile ->
+                        reduceState {
+                            state.value.copy(
+                                recordGraphState = state.value.recordGraphState.copy(recordState = RecordState.Recording),
+                                audioFileUri = audioFile
+                            )
+                        }
+                    },
+                    onLevel = ::appendRecordLevel
+                )
             },
             onShouldShow = { audioDialog.dialogOpen() },
             onDenied = { sendEvent(PermissionEvent.RecordAudio()) }
@@ -836,49 +820,39 @@ class ConsultantViewModel @Inject constructor(
         }
     }
 
-    private suspend fun observeAudioFlow() {
-        audioFlow.invoke()
-            .collect { volumeLevel ->
-                reduceState {
-                    state.value.copy(
-                        recordGraphState = state.value.recordGraphState.copy(
-                            recordGraph = state.value.recordGraphState.recordGraph + volumeLevel,
-                            duration = state.value.recordGraphState.duration
-                                .plus(100L, ChronoUnit.MILLIS)
-                        )
-                    )
-                }
-            }
+    private fun appendRecordLevel(volumeLevel: Float) {
+        reduceState {
+            state.value.copy(
+                recordGraphState = state.value.recordGraphState.copy(
+                    recordGraph = state.value.recordGraphState.recordGraph + volumeLevel,
+                    duration = state.value.recordGraphState.duration.plus(100L, ChronoUnit.MILLIS)
+                )
+            )
+        }
     }
 
-    private suspend fun observeTrackPosition(messageId: String) {
-        trackPositionFlow.invoke()
-            .distinctUntilChanged { old, new ->
-                val isEndOfTrack = old == new
-                if (isEndOfTrack) {
-                    reduceState {
-                        state.value.copy(
-                            chat = state.value.chat.reduceAudioState(
-                                messageId = messageId,
-                                trackPosition = 0,
-                                isPlaying = false
-                            )
-                        )
-                    }
-                }
-                isEndOfTrack
-            }
-            .collect { position ->
-                reduceState {
-                    state.value.copy(
-                        chat = state.value.chat.reduceAudioState(
-                            messageId = messageId,
-                            trackPosition = position,
-                            isPlaying = true
-                        )
-                    )
-                }
-            }
+    private fun updateTrackPosition(messageId: String, position: Int) {
+        reduceState {
+            state.value.copy(
+                chat = state.value.chat.reduceAudioState(
+                    messageId = messageId,
+                    trackPosition = position,
+                    isPlaying = true
+                )
+            )
+        }
+    }
+
+    private fun finishTrack(messageId: String) {
+        reduceState {
+            state.value.copy(
+                chat = state.value.chat.reduceAudioState(
+                    messageId = messageId,
+                    trackPosition = 0,
+                    isPlaying = false
+                )
+            )
+        }
     }
 
     private suspend fun sendOperatorRate() {

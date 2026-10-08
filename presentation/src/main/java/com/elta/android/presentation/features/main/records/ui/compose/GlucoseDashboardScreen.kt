@@ -12,7 +12,6 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,75 +29,37 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
-import com.elta.android.domain.features.diary.events.model.glucoseValue
 import com.elta.android.presentation.BuildConfig
-import com.elta.android.presentation.Events
-import com.elta.android.presentation.core.bus.event
-import com.elta.android.presentation.core.bus.events
-import com.nullgr.core.rx.RxBus
-import io.reactivex.android.schedulers.AndroidSchedulers
+import com.elta.android.presentation.features.main.records.mapper.chartPointsFor
+import com.elta.android.presentation.features.main.records.mapper.detailedEventsFor
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
 import org.threeten.bp.YearMonth
-import java.util.Locale
 
-/**
- * Production entry point. RxBus integration is kept at this boundary;
- * [GlucoseDashboardContent] is an independent, previewable Compose UI.
- */
+/** Dashboard UI receives state and reports user actions to its host. */
 @Composable
 fun GlucoseDashboardScreen(
     uiState: GlucoseDashboardUiState,
     loadedEventsByMonth: Map<YearMonth, List<EventV2>> = emptyMap(),
-    bus: RxBus? = null,
+    syncState: DashboardSyncUiState,
+    onAction: (GlucoseDashboardAction) -> Unit,
+    onDebugPaletteSelected: (NewDesignPalette) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    val syncState = rememberDashboardSyncState(uiState.syncTimeText)
     var selectedChartDate by remember { mutableStateOf(LocalDate.now()) }
     val detailedEvents = remember(uiState.detailedChartData.events, loadedEventsByMonth) {
-        (uiState.detailedChartData.events + loadedEventsByMonth.values.flatten()).distinct()
+        detailedEventsFor(uiState, loadedEventsByMonth)
     }
     val chartPoints = remember(selectedChartDate, uiState.chartPoints, uiState.detailedChartData.dailyGlucoseModel, loadedEventsByMonth) {
-        if (selectedChartDate == LocalDate.now()) {
-            uiState.chartPoints
-        } else {
-            val model = uiState.detailedChartData.dailyGlucoseModel
-            if (model == null) emptyList() else loadedEventsByMonth[YearMonth.from(selectedChartDate)].orEmpty()
-                .asSequence()
-                .filter { it.type is EventType.Glucose && it.additionTime.toLocalDate() == selectedChartDate }
-                .sortedBy { it.additionTime }
-                .map { event ->
-                    GlucosePoint(
-                        timeLabel = String.format(Locale.US, "%02d:%02d", event.additionTime.hour, event.additionTime.minute),
-                        value = event.glucoseValue(model.glucoseFormat).toFloat()
-                    )
-                }
-                .toList()
-        }
+        chartPointsFor(selectedChartDate, uiState, loadedEventsByMonth)
     }
 
-    LaunchedEffect(uiState.syncTimeText) {
-        syncState.updateDisplayedTime(uiState.syncTimeText)
-    }
-
-    LaunchedEffect(selectedChartDate, loadedEventsByMonth, bus) {
+    LaunchedEffect(selectedChartDate, loadedEventsByMonth) {
         val month = YearMonth.from(selectedChartDate)
         if (selectedChartDate != LocalDate.now() && month !in loadedEventsByMonth) {
-            bus?.event(Events.DetailedChartRangeRequested(month.atDay(1), month.atEndOfMonth()))
-        }
-    }
-
-    DisposableEffect(bus) {
-        if (bus == null) return@DisposableEffect onDispose { }
-
-        val syncDisposable = bus.events<Events.Sync>()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { event -> syncState.handle(event, scope) }
-        onDispose {
-            syncDisposable.dispose()
+            onAction(GlucoseDashboardAction.RequestDetailedRange(month.atDay(1), month.atEndOfMonth()))
         }
     }
 
@@ -114,8 +75,7 @@ fun GlucoseDashboardScreen(
         sheetContent = {
             if (BuildConfig.DEBUG) {
                 PaletteSelectionSheet { palette ->
-                    NewDesignPaletteController.select(palette)
-                    bus?.event(Events.NewDesignPaletteChanged)
+                    onDebugPaletteSelected(palette)
                     scope.launch { paletteSheetState.hide() }
                 }
             } else {
@@ -129,47 +89,10 @@ fun GlucoseDashboardScreen(
             chartPoints = chartPoints,
             onChartDateSelected = { date ->
                 selectedChartDate = date
-                val month = YearMonth.from(date)
-                if (date != LocalDate.now() && month !in loadedEventsByMonth) {
-                    bus?.event(Events.DetailedChartRangeRequested(month.atDay(1), month.atEndOfMonth()))
-                }
             },
-            syncState = syncState.asUiState(),
+            syncState = syncState,
             detailedEvents = detailedEvents,
-            onAction = { action ->
-                when (action) {
-                    GlucoseDashboardAction.RequestSync -> {
-                        if (syncState.isSyncing) return@GlucoseDashboardContent
-                        if (bus == null) {
-                            syncState.showMessage(scope, "Синхронизация недоступна", 3_000L, isError = true)
-                        } else {
-                            bus.event(Events.ManualGlucometerSyncRequested)
-                        }
-                    }
-                    is GlucoseDashboardAction.RetrySync -> {
-                        if (!syncState.isSyncing) bus?.event(
-                            if (action.target == DashboardSyncTarget.SERVER) Events.ServerSyncRequested
-                            else Events.ManualGlucometerSyncRequested
-                        )
-                    }
-                    GlucoseDashboardAction.DismissSyncMessage -> syncState.dismiss()
-                    GlucoseDashboardAction.ConnectDevice -> bus?.event(Events.DashboardConnectDeviceRequested)
-                    is GlucoseDashboardAction.OpenDevice -> bus?.event(
-                        Events.DashboardDeviceInfoRequested(action.device.name, action.device.address)
-                    )
-                    is GlucoseDashboardAction.RequestDetailedRange -> {
-                        var month = YearMonth.from(action.start)
-                        val lastMonth = YearMonth.from(action.end)
-                        while (!month.isAfter(lastMonth)) {
-                            bus?.event(
-                                Events.DetailedChartRangeRequested(month.atDay(1), month.atEndOfMonth())
-                            )
-                            month = month.plusMonths(1)
-                        }
-                    }
-                    is GlucoseDashboardAction.SelectCategory -> Unit
-                }
-            },
+            onAction = onAction,
             onDebugPaletteLongClick = if (BuildConfig.DEBUG) {
                 { scope.launch { paletteSheetState.show() } }
             } else {

@@ -1,9 +1,7 @@
 package com.elta.android.presentation.features.main.records.ui.compose
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.elta.android.presentation.Events
 import kotlinx.coroutines.CoroutineScope
@@ -102,13 +100,5 @@ internal class DashboardSyncState(
         showMessage(scope, message, 3_000L)
     }
 }
-
-@Composable
-internal fun rememberDashboardSyncState(initialTime: String): DashboardSyncState =
-    remember {
-        DashboardSyncState(
-            initialTime = initialTime
-        )
-    }
 
 private const val SyncFallbackTimeoutMillis = 60_000L

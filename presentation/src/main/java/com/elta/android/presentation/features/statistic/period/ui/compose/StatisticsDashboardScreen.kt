@@ -31,6 +31,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -42,7 +43,10 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -69,22 +73,16 @@ internal val CompactScreenWidth = 360.dp
 // conspicuous empty header band on Android devices with a 24dp status inset.
 private val DashboardSurfaceTop = 151.dp
 private val HomeBottomNavigationHeight = 72.dp
-private fun String.compactForStatisticsHeader(isCompact: Boolean): String {
-    if (!isCompact && length <= 18) return this
-    return replace("января", "янв.")
-        .replace("февраля", "февр.")
-        .replace("марта", "мар.")
-        .replace("апреля", "апр.")
-        .replace("мая", "мая")
-        .replace("июня", "июн.")
-        .replace("июля", "июл.")
-        .replace("августа", "авг.")
-        .replace("сентября", "сент.")
-        .replace("октября", "окт.")
-        .replace("ноября", "нояб.")
-        .replace("декабря", "дек.")
-}
 
+@Composable
+private fun Period.localizedName(): String = stringResource(
+    when (this) {
+        Period.SEVEN -> R.string.statistic_period_seven_days
+        Period.FOURTEEN -> R.string.statistic_period_fourteen_days
+        Period.THIRTY -> R.string.statistic_period_thirty_days
+        Period.NINETY -> R.string.statistic_period_ninety_days
+    }
+)
 @Composable
 internal fun StatisticsDashboardScreen(
     uiState: StatisticsDashboardUiState,
@@ -100,6 +98,8 @@ internal fun StatisticsDashboardScreen(
     val displayedState = remember(uiState, isDemoMode) {
         if (BuildConfig.DEBUG && isDemoMode) uiState.toDemoDashboard() else uiState
     }
+    var topBarHeightPx by remember { mutableIntStateOf(0) }
+    val topBarHeight = with(LocalDensity.current) { topBarHeightPx.toDp() }
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
@@ -128,11 +128,12 @@ internal fun StatisticsDashboardScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .widthIn(max = ContentMaxWidth)
-                .align(Alignment.TopCenter),
+                .align(Alignment.TopCenter)
+                .onSizeChanged { topBarHeightPx = it.height },
             isCompact = isCompact
         )
         Surface(
-            modifier = Modifier.padding(top = DashboardSurfaceTop).fillMaxSize(),
+            modifier = Modifier.padding(top = maxOf(DashboardSurfaceTop, topBarHeight + 16.dp)).fillMaxSize(),
             color = ScreenBackground,
             shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp)
         ) {
@@ -223,12 +224,12 @@ private fun StatisticsTopBar(
         ) {
             androidx.compose.material.Icon(
                 painter = painterResource(R.drawable.ic_arrow_left),
-                contentDescription = "Назад",
+                contentDescription = stringResource(R.string.content_description_back_button),
                 tint = Color.White,
                 modifier = Modifier.size(40.dp).clickable(onClick = onBack).padding(8.dp).rotate(180f)
             )
             Text(
-                text = "Статистика",
+                text = stringResource(R.string.statistic_title),
                 modifier = Modifier.weight(1f),
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
@@ -243,7 +244,9 @@ private fun StatisticsTopBar(
             )
         }
         Box(modifier = Modifier.padding(horizontal = 13.dp)) {
-            val periodTitle = uiState.periodTitle.compactForStatisticsHeader(isCompact)
+            val periodName = uiState.period.localizedName()
+            val periodTitle = (if (isCompact) uiState.periodCompactTitle else uiState.periodTitle)
+                .ifBlank { periodName }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -264,7 +267,7 @@ private fun StatisticsTopBar(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = uiState.period.displayName,
+                    text = periodName,
                     modifier = Modifier.weight(1f),
                     color = TextPrimary,
                     fontSize = if (isCompact) 12.sp else 14.sp,
@@ -282,7 +285,7 @@ private fun StatisticsTopBar(
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 Period.values().forEach { period ->
                     DropdownMenuItem(onClick = { expanded = false; onPeriodSelected(period) }) {
-                        Text(period.displayName)
+                        Text(period.localizedName())
                     }
                 }
             }
