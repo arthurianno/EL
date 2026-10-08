@@ -13,6 +13,8 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentRegistrationComposeBinding
+import com.elta.android.presentation.features.auth.ui.emailInputError
+import com.elta.android.presentation.features.auth.ui.passwordInputError
 import com.elta.android.presentation.features.registration.main.model.RegistrationAction
 import com.elta.android.presentation.features.registration.main.model.RegistrationState
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
@@ -69,10 +71,10 @@ abstract class BaseRegistrationComposeFragment<PM : BasePm> :
         onPersonalData: () -> Unit
     ) {
         backAction = onBack
-        emailInput.text.bindTo { uiState = uiState.copy(email = it) }
-        emailInput.error.bindTo { uiState = uiState.copy(emailError = it.takeIf(String::isNotEmpty)) }
-        passwordInput.text.bindTo { uiState = uiState.copy(password = it) }
-        passwordInput.error.bindTo { uiState = uiState.copy(passwordError = it.takeIf(String::isNotEmpty)) }
+        uiState = uiState.copy(
+            email = emailInput.text.value,
+            password = passwordInput.text.value
+        )
         consentState.bindTo { uiState = uiState.copy(isPrivacyPolicyAccepted = it) }
 
         binding.registrationComposeView.setContent {
@@ -84,12 +86,16 @@ abstract class BaseRegistrationComposeFragment<PM : BasePm> :
                             when (action) {
                                 is RegistrationAction.EmailChanged -> {
                                     val email = action.email.take(254)
-                                    uiState = uiState.copy(email = email)
-                                    emailInput.textChanges.consumer.accept(email)
+                                    uiState = uiState.copy(
+                                        email = email,
+                                        emailError = emailInputError(email, getString(R.string.registration_error_input_email))
+                                    )
                                 }
                                 is RegistrationAction.PasswordChanged -> {
-                                    uiState = uiState.copy(password = action.password)
-                                    passwordInput.textChanges.consumer.accept(action.password)
+                                    uiState = uiState.copy(
+                                        password = action.password,
+                                        passwordError = passwordInputError(action.password, getString(R.string.registration_password_pattern))
+                                    )
                                 }
                                 is RegistrationAction.PrivacyPolicyAcceptedChanged ->
                                     onConsentChanged(action.accepted)
@@ -97,7 +103,11 @@ abstract class BaseRegistrationComposeFragment<PM : BasePm> :
                                     uiState = uiState.copy(isPasswordVisible = !uiState.isPasswordVisible)
                                 RegistrationAction.PrivacyPolicyClicked -> onPrivacyPolicy()
                                 RegistrationAction.PersonalDataClicked -> onPersonalData()
-                                RegistrationAction.Submit -> if (uiState.canSubmit) onSubmit()
+                                RegistrationAction.Submit -> if (uiState.canSubmit) {
+                                    emailInput.textChanges.consumer.accept(uiState.email)
+                                    passwordInput.textChanges.consumer.accept(uiState.password)
+                                    onSubmit()
+                                }
                             }
                         }
                     },

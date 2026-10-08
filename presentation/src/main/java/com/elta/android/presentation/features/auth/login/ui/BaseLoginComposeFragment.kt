@@ -14,6 +14,8 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.databinding.FragmentLoginComposeBinding
 import com.elta.android.presentation.features.auth.login.model.LoginAction
 import com.elta.android.presentation.features.auth.login.model.LoginState
+import com.elta.android.presentation.features.auth.ui.emailInputError
+import com.elta.android.presentation.features.auth.ui.passwordInputError
 import com.elta.android.presentation.theme.EltaTheme
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.InputControl
@@ -60,10 +62,10 @@ abstract class BaseLoginComposeFragment<PM : BasePm> :
         onForgotPassword: () -> Unit
     ) {
         backAction = onBack
-        emailInput.text.bindTo { uiState = uiState.copy(email = it) }
-        emailInput.error.bindTo { uiState = uiState.copy(emailError = it.takeIf(String::isNotEmpty)) }
-        passwordInput.text.bindTo { uiState = uiState.copy(password = it) }
-        passwordInput.error.bindTo { uiState = uiState.copy(passwordError = it.takeIf(String::isNotEmpty)) }
+        uiState = uiState.copy(
+            email = emailInput.text.value,
+            password = passwordInput.text.value
+        )
 
         binding.loginComposeView.setContent {
             EltaTheme {
@@ -73,17 +75,25 @@ abstract class BaseLoginComposeFragment<PM : BasePm> :
                         when (action) {
                             is LoginAction.EmailChanged -> if (!uiState.isLoading) {
                                 val email = action.email.take(254)
-                                uiState = uiState.copy(email = email)
-                                emailInput.textChanges.consumer.accept(email)
+                                uiState = uiState.copy(
+                                    email = email,
+                                    emailError = emailInputError(email, getString(R.string.registration_error_input_email))
+                                )
                             }
                             is LoginAction.PasswordChanged -> if (!uiState.isLoading) {
-                                uiState = uiState.copy(password = action.password)
-                                passwordInput.textChanges.consumer.accept(action.password)
+                                uiState = uiState.copy(
+                                    password = action.password,
+                                    passwordError = passwordInputError(action.password, getString(R.string.registration_password_pattern))
+                                )
                             }
                             LoginAction.TogglePasswordVisibility -> {
                                 uiState = uiState.copy(isPasswordVisible = !uiState.isPasswordVisible)
                             }
-                            LoginAction.Submit -> if (uiState.canSubmit) onSubmit()
+                            LoginAction.Submit -> if (uiState.canSubmit) {
+                                emailInput.textChanges.consumer.accept(uiState.email)
+                                passwordInput.textChanges.consumer.accept(uiState.password)
+                                onSubmit()
+                            }
                         }
                     },
                     onBack = onBack,
