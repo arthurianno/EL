@@ -67,7 +67,6 @@ import com.nullgr.core.rx.bindProgress
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
-import io.reactivex.rxkotlin.Singles
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.skipWhileInProgress
@@ -137,6 +136,36 @@ class HomeFlowPmVariantA @Inject constructor(
     private val backendSyncRunner by lazy {
         HomeBackendSyncRunner(syncWithBackendUseCase, { connectIomt.execute() }, bus)
     }
+    private val autoSyncRunner by lazy {
+        HomeAutoSyncRunner(
+            loadUserInfo = { getUserInfoUseCase.execute() },
+            hasPrimaryDevice = {
+                getDevicesUseCase.execute().map { devices -> devices.any { it.first.isPrimary } }
+            },
+            syncDevice = { syncWithGlucometer(isAuto = true).map { Unit } },
+            onDeviceError = ::handleSyncAutoError,
+            startBackendSync = { startSyncWithBackendAction.consumer.accept(Unit) }
+        )
+    }
+    private val manualGlucosePrompt by lazy {
+        HomeManualGlucosePrompt(
+            shouldShowReminder = { shouldShowGlucoseDialog.execute() },
+            isEmiasLinked = {
+                getEmiasStatus.execute().map { it.first == EmiasStatus.LINKED }
+            },
+            disableReminder = { setManualGlucoseRemind.execute(false) }
+        )
+    }
+    private val feedbackWorkflow by lazy {
+        HomeFeedbackWorkflow(
+            loadFeedback = { shouldSendFeedbackUseCase.execute(Unit) },
+            markFeedbackSent = {
+                updateUserInfoUseCase.execute(
+                    UpdateUserInfoUseCase.Params(UserInfo(isFeedbackSent = true))
+                )
+            }
+        )
+    }
 
     val googlePlayDialogControl = dialogControl<DialogData, DialogResult>()
     val feedbackDialogControl = dialogControl<DialogData, DialogResult>()
@@ -160,7 +189,6 @@ class HomeFlowPmVariantA @Inject constructor(
     private val feedbackDialogAction = action<Unit>()
     private val googlePlayDialogAction = action<Unit>()
     private val glucoseDataReminderDialogAction = action<Unit>()
-    private val checkEmiasStatusAction = action<Unit>()
     private val getManualGlucoseRemindAction = action<Unit>()
     private val feedbackDialogData by lazy { Dialogs.FeedbackData(resources) }
     private val googlePlayDialogData by lazy { Dialogs.GooglePlayRateData(resources) }
@@ -408,7 +436,7 @@ class HomeFlowPmVariantA @Inject constructor(
 
         startAutoSyncAction.observable
             .skipWhileInProgress(syncProgressState.observable)
-            .flatMap { autoSyncObservable() }
+            .flatMap { autoSyncRunner.execute() }
             .retry()
             .subscribe()
             .untilDestroy()
@@ -428,27 +456,13 @@ class HomeFlowPmVariantA @Inject constructor(
     private fun bindGlucoseDialog() {
         getManualGlucoseRemindAction.observable
             .flatMapSingle {
-                shouldShowGlucoseDialog.execute()
-                    .doOnSuccess {
-                        if (it) checkEmiasStatusAction.consumer.accept(Unit)
-                        else navigateToCreationManualGlucoseScreen()
-                    }
+                manualGlucosePrompt.route()
             }
-            .subscribe()
-            .untilDestroy()
-        checkEmiasStatusAction.observable
-            .flatMapSingle {
-                getEmiasStatus.execute()
-                    .onErrorReturn { EmiasStatus.UNLINKED to null }
-                    .doOnSuccess {
-                        when (it.first) {
-                            EmiasStatus.LINKED -> glucoseDataReminderDialogAction.consumer.accept(
-                                Unit
-                            )
-
-                            EmiasStatus.UNLINKED -> navigateToCreationManualGlucoseScreen()
-                        }
-                    }
+            .doOnNext { route ->
+                when (route) {
+                    ManualGlucoseRoute.OPEN_ENTRY -> navigateToCreationManualGlucoseScreen()
+                    ManualGlucoseRoute.SHOW_REMINDER -> glucoseDataReminderDialogAction.consumer.accept(Unit)
+                }
             }
             .subscribe()
             .untilDestroy()
@@ -459,17 +473,9 @@ class HomeFlowPmVariantA @Inject constructor(
                     glucoseDataReminderDialogData
                 )
             }
-            .flatMapCompletable { dialogResult ->
-                when (dialogResult) {
-                    DialogResult.POSITIVE -> Completable.fromCallable {
-                        navigateToCreationManualGlucoseScreen()
-                    }
-
-                    DialogResult.NEGATIVE -> Completable.complete()
-                    DialogResult.NEURAL -> setManualGlucoseRemind.execute(false)
-                        .doOnComplete { navigateToCreationManualGlucoseScreen() }
-                }
-            }
+            .flatMapSingle(manualGlucosePrompt::shouldOpenAfterDialog)
+            .filter { it }
+            .doOnNext { navigateToCreationManualGlucoseScreen() }
             .subscribe()
             .untilDestroy()
     }
@@ -519,9 +525,7 @@ class HomeFlowPmVariantA @Inject constructor(
     private fun bindFeedbackAction() {
         feedbackAction.observable
             .flatMap {
-                shouldSendFeedbackUseCase.execute(Unit)
-                    .filter { it.isSendFeedback }
-                    .map { it.step }
+                feedbackWorkflow.promptStep()
                     .doOnSuccess(likeAppDialogAction.consumer)
                     .doOnError(::handleError)
                     .toObservable()
@@ -536,7 +540,7 @@ class HomeFlowPmVariantA @Inject constructor(
             .switchMapMaybe { googlePlayDialogControl.showForResult(googlePlayDialogData) }
             .filter { it == DialogResult.POSITIVE }
             .flatMapCompletable {
-                updateUserInfoUseCase.execute(createUserInfoParams())
+                feedbackWorkflow.confirmPlayMarketRating()
                     .doOnComplete {
                         navigator.openPlayMarket()
                     }
@@ -551,11 +555,10 @@ class HomeFlowPmVariantA @Inject constructor(
                 likeAppDialogControl.showForResult(Dialogs.LikeAppRateData(resources, step))
             }
             .doOnNext { result ->
-                when (result) {
-                    DialogResult.POSITIVE -> googlePlayDialogAction.consumer.accept(Unit)
-                    DialogResult.NEGATIVE -> feedbackDialogAction.consumer.accept(Unit)
-                    else -> {
-                    }
+                when (feedbackWorkflow.routeAfterLikeDialog(result)) {
+                    FeedbackRoute.PLAY_MARKET -> googlePlayDialogAction.consumer.accept(Unit)
+                    FeedbackRoute.FEEDBACK -> feedbackDialogAction.consumer.accept(Unit)
+                    FeedbackRoute.DISMISS -> Unit
                 }
             }
             .subscribe()
@@ -577,24 +580,6 @@ class HomeFlowPmVariantA @Inject constructor(
             iconRes = this.toIcon(),
             meta = this
         )
-
-    private fun createUserInfoParams(): UpdateUserInfoUseCase.Params =
-        UpdateUserInfoUseCase.Params(UserInfo(isFeedbackSent = true))
-
-    private fun autoSyncObservable(): Observable<Unit> =
-        Singles.zip(getUserInfoUseCase.execute(), getDevicesUseCase.execute())
-            .flatMapObservable { (info, devices) ->
-                if (devices.find { it.first.isPrimary } != null && info.isFirstHomeEntrance != true) {
-                    syncWithGlucometer(isAuto = true)
-                        .map { Unit }
-                        .doOnError(::handleSyncAutoError)
-                        .doOnComplete { startSyncWithBackendAction.consumer.accept(Unit) }
-                } else {
-                    Observable.fromCallable {
-                        startSyncWithBackendAction.consumer.accept(Unit)
-                    }
-                }
-            }
 
     private fun syncWithGlucometer(isAuto: Boolean): Observable<com.elta.android.domain.features.devices.model.GlucometerSyncResult> =
         syncWithGlucometerUseCase.execute(SyncWithGlucometerUseCaseVariantA.Params())
