@@ -170,7 +170,8 @@ class HomeFlowPm @Inject constructor(
                 updateUserInfoUseCase.execute(
                     UpdateUserInfoUseCase.Params(UserInfo(isFeedbackSent = true))
                 )
-            }
+            },
+            reportError = ::handleError
         )
     }
     private val statusUpdates by lazy {
@@ -545,14 +546,8 @@ class HomeFlowPm @Inject constructor(
 
     private fun bindFeedbackAction() {
         feedbackAction.observable
-            .flatMap {
-                feedbackWorkflow.promptStep()
-                    .doOnSuccess(likeAppDialogAction.consumer)
-                    .doOnError(::handleError)
-                    .toObservable()
-            }
-            .retry()
-            .subscribe()
+            .flatMapMaybe { feedbackWorkflow.promptStep() }
+            .subscribe(likeAppDialogAction.consumer)
             .untilDestroy()
     }
 
@@ -560,13 +555,8 @@ class HomeFlowPm @Inject constructor(
         googlePlayDialogAction.observable
             .switchMapMaybe { googlePlayDialogControl.showForResult(googlePlayDialogData) }
             .filter { it == DialogResult.POSITIVE }
-            .flatMapCompletable {
-                feedbackWorkflow.confirmPlayMarketRating()
-                    .doOnComplete {
-                        navigator.openPlayMarket()
-                    }
-            }
-            .subscribe()
+            .flatMapMaybe { feedbackWorkflow.confirmPlayMarketRating() }
+            .subscribe { navigator.openPlayMarket() }
             .untilDestroy()
     }
 

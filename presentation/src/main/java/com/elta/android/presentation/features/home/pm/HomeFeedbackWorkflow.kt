@@ -14,12 +14,15 @@ internal enum class FeedbackRoute {
 
 internal class HomeFeedbackWorkflow(
     private val loadFeedback: () -> Single<FeedbackDataModel>,
-    private val markFeedbackSent: () -> Completable
+    private val markFeedbackSent: () -> Completable,
+    private val reportError: (Throwable) -> Unit
 ) {
     fun promptStep(): Maybe<Int> =
-        loadFeedback()
+        Single.defer { loadFeedback() }
             .filter { it.isSendFeedback }
             .map { it.step }
+            .doOnError(reportError)
+            .onErrorComplete()
 
     fun routeAfterLikeDialog(result: DialogResult): FeedbackRoute =
         when (result) {
@@ -28,5 +31,9 @@ internal class HomeFeedbackWorkflow(
             DialogResult.NEURAL -> FeedbackRoute.DISMISS
         }
 
-    fun confirmPlayMarketRating(): Completable = markFeedbackSent()
+    fun confirmPlayMarketRating(): Maybe<Unit> =
+        Completable.defer { markFeedbackSent() }
+            .andThen(Maybe.just(Unit))
+            .doOnError(reportError)
+            .onErrorComplete()
 }
