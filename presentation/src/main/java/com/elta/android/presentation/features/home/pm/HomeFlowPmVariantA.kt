@@ -174,6 +174,16 @@ class HomeFlowPmVariantA @Inject constructor(
         )
     }
 
+    private val firstSyncCompletion by lazy {
+        HomeFirstSyncCompletion(
+            saveCompleted = {
+                updateUserInfoUseCase.execute(UpdateUserInfoUseCase.Params(UserInfo(isFirstSync = false)))
+            },
+            setFirstSync = { isFirstSync.consumer.accept(it) },
+            reportError = ::handleError
+        )
+    }
+
     val googlePlayDialogControl = dialogControl<DialogData, DialogResult>()
     val feedbackDialogControl = dialogControl<DialogData, DialogResult>()
     val likeAppDialogControl = dialogControl<DialogData, DialogResult>()
@@ -398,11 +408,7 @@ class HomeFlowPmVariantA @Inject constructor(
         firstSyncAction.observable
             .doOnNext(startSyncAction.consumer)
             .doOnNext(closeHelpBottomSheetCommand.consumer)
-            .map { false }
-            .doOnNext(isFirstSync.consumer)
-            .flatMapCompletable {
-                updateUserInfoUseCase.execute(UpdateUserInfoUseCase.Params(UserInfo(isFirstSync = it)))
-            }
+            .concatMapCompletable { firstSyncCompletion.complete() }
             .subscribe()
             .untilDestroy()
 
