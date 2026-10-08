@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.elta.android.presentation.core.compose.viewmodel.ViewModelFactory
 import com.elta.android.presentation.core.compose.viewmodel.ViewModelKey
 import com.elta.android.presentation.features.auth.password.recovery.viewmodel.PasswordRecoveryViewModel
+import com.elta.android.presentation.features.auth.login.viewmodel.LoginViewModel
 import com.elta.android.presentation.features.auth.password.create.viewmodel.PasswordCreateViewModel
 import com.elta.android.presentation.features.calcutator.custom.viewmodel.CreateCustomProductViewModel
 import com.elta.android.presentation.features.calcutator.products.viewmodel.CalculatorViewModel
@@ -36,6 +37,11 @@ import kotlinx.coroutines.FlowPreview
 
 @Module
 abstract class ViewModelModule {
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(LoginViewModel::class)
+    abstract fun bindLoginViewModel(viewModel: LoginViewModel): ViewModel
 
     @Binds
     @IntoMap

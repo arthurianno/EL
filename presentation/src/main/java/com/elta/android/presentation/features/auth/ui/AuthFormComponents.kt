@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,7 +40,8 @@ internal fun AuthEmailField(
     onSubmit: () -> Unit,
     modifier: Modifier = Modifier,
     imeAction: ImeAction = ImeAction.Done,
-    autofillContentType: ContentType = ContentType.EmailAddress
+    autofillContentType: ContentType = ContentType.EmailAddress,
+    maxLength: Int = Int.MAX_VALUE
 ) {
     val colors = LocalColors.current
     val types = LocalTypes.current
@@ -48,8 +50,10 @@ internal fun AuthEmailField(
         mutableStateOf(false)
     }
     var fieldValue by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
-    if (fieldValue.text != value) {
-        fieldValue = TextFieldValue(value, TextRange(value.length))
+    LaunchedEffect(value) {
+        if (fieldValue.text != value) {
+            fieldValue = TextFieldValue(value, TextRange(value.length))
+        }
     }
 
     val lineColor = when {
@@ -65,8 +69,14 @@ internal fun AuthEmailField(
         BasicTextField(
             value = fieldValue,
             onValueChange = {
-                fieldValue = it
-                if (it.text != value) onValueChange(it.text)
+                val updated = if (it.text.length > maxLength) {
+                    val text = it.text.take(maxLength)
+                    it.copy(text = text, selection = TextRange(text.length))
+                } else {
+                    it
+                }
+                fieldValue = updated
+                if (updated.text != value) onValueChange(updated.text)
             },
             enabled = enabled,
             singleLine = true,

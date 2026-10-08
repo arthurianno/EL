@@ -110,6 +110,8 @@ dependencies {
     implementation(Dependencies.Kotlin.coroutinesRx2)
 
     implementation(platform(Dependencies.Jetpack.Compose.bom))
+    // ContentType autofill hints used by the auth forms require Compose UI 1.9 in release too.
+    implementation("androidx.compose.ui:ui:1.9.0")
     implementation(Dependencies.Jetpack.Compose.bomMaterial)
     implementation(Dependencies.Jetpack.Compose.bomRxJava2)
     implementation(Dependencies.Jetpack.Compose.Accompanist.permissions)

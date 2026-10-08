@@ -5,8 +5,6 @@ import com.elta.android.presentation.core.pm.factory.GeneralPmFactory
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.features.auth.flow.pm.AuthFlowPm
-import com.elta.android.presentation.features.auth.login.pm.LoginPm
-import com.elta.android.presentation.features.auth.login.pm.LoginPmVariantA
 import com.elta.android.presentation.features.devices.all.pm.DevicesPm
 import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePm
 import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePmVariantA
@@ -124,17 +122,6 @@ abstract class PmModule {
     @IntoMap
     @PmKey(LanguageSelectionPm::class)
     abstract fun bindLanguageSelectionPm(pm: LanguageSelectionPm): PresentationModel
-
-    @Binds
-    @IntoMap
-    @PmKey(LoginPm::class)
-    abstract fun bindLoginPm(pm: LoginPm): PresentationModel
-
-    // fixme Variant A : recovery_account
-    @Binds
-    @IntoMap
-    @PmKey(LoginPmVariantA::class)
-    abstract fun bindLoginPmVariantA(pm: LoginPmVariantA): PresentationModel
 
     @Binds
     @IntoMap

@@ -83,7 +83,8 @@ internal fun LoginScreen(
                 error = state.emailError,
                 enabled = !state.isLoading,
                 imeAction = ImeAction.Next,
-                autofillContentType = ContentType.Username,
+                autofillContentType = ContentType.Username + ContentType.EmailAddress,
+                maxLength = 254,
                 onSubmit = { focusManager.moveFocus(FocusDirection.Next) }
             )
             Spacer(Modifier.height(16.dp))

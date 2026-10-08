@@ -13,11 +13,16 @@ data class LoginState(
     val passwordError: String? = null,
     val serverError: String? = null,
     val isLoading: Boolean = false,
-    val screenConfig: ScreenEntity? = null
+    val screenConfig: ScreenEntity? = null,
+    val dialog: LoginDialog? = null
 ) {
     val canSubmit: Boolean
         get() = isEmailValid(email) && isPasswordValid(password) && !isLoading
 }
+
+enum class LoginMode { Recoverable, Legacy }
+
+enum class LoginDialog { ProfileDeleted, ProfileRestored }
 
 sealed interface LoginAction : Action {
     data class EmailChanged(val email: String) : LoginAction
