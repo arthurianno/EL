@@ -8,9 +8,11 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -45,6 +47,8 @@ import com.elta.android.presentation.features.newsChannel.model.reduceChatState
 import com.elta.android.presentation.features.newsChannel.model.toUi
 import com.elta.android.presentation.features.newsChannel.ui.components.analyzer.NewsChatAnalyzer
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import kotlinx.coroutines.Dispatchers as CoroutineDispatchers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -53,9 +57,6 @@ import org.threeten.bp.LocalTime
 import javax.inject.Inject
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-import java.io.File
-import java.io.FileOutputStream
-import androidx.core.content.FileProvider
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.newsChannel.model.PreviewStateNews
 import com.elta.android.presentation.utils.LocaleHelper
@@ -287,7 +288,7 @@ class NewsViewModel @Inject constructor(
                 if (allMessagesUi.isNotEmpty()) {
                     Log.d(
                         "NewsViewModel",
-                        "Updating chat with titles: ${allMessagesUi.map { it.title }}"
+                        "Updating chat with ${allMessagesUi.size} messages"
                     )
                     updateChatState(allMessagesUi)
                 } else {
@@ -463,123 +464,63 @@ class NewsViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalEncodingApi::class)
     private fun handleDownloadImage(imageData: String?, imageUrl: String?) {
         launch {
             try {
-                Log.d("NewsViewModel", "Начало скачивания: imageData=$imageData, imageUrl=$imageUrl")
-                if (imageData == null && imageUrl == null) {
+                if (imageData.isNullOrBlank() && imageUrl.isNullOrBlank()) {
                     Log.e("NewsViewModel", "No valid image data or url for download")
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            context,
-                            "Ошибка: нет данных изображения",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    showImageMessage(R.string.news_image_missing_data)
                     return@launch
                 }
 
                 val fileName = "downloaded_image_${System.currentTimeMillis()}.jpg"
-                val downloadedUri = if (imageData != null) {
-                    // Декодируем Base64
-                    val imageBytes = Base64.decode(imageData)
-                    Log.d("NewsViewModel", "Decoded bytes length: ${imageBytes.size}")
-                    mediaRepository.saveImageToCache(imageBytes, fileName)
-                } else {
-                    // Скачиваем по URL
-                    downloadFile(imageUrl!!, fileName)
-                }
+                val downloadedUri = loadImageUri(imageData, imageUrl, fileName)
 
                 if (downloadedUri != null) {
-                    Log.d("NewsViewModel", "Изображение успешно сохранено/скачано: $downloadedUri")
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "Изображение успешно скачано", Toast.LENGTH_SHORT)
-                            .show()
-                    }
                     val mediaStoreUri = saveToMediaStore(downloadedUri, fileName)
-                    sendEvent(OpenDownloadedFile(mediaStoreUri ?: downloadedUri))
-                    reduceState {
-                        state.value.copy(
-                            previewState = state.value.previewState.copy(
-                                isPhotoPreview = false,
-                                imageData = null,
-                                imageUrl = null
+                    showImageMessage(
+                        if (mediaStoreUri != null) R.string.news_image_saved
+                        else R.string.news_image_save_failed
+                    )
+                    if (mediaStoreUri != null) {
+                        sendEvent(OpenDownloadedFile(mediaStoreUri))
+                        reduceState {
+                            state.value.copy(
+                                previewState = state.value.previewState.copy(
+                                    isPhotoPreview = false,
+                                    imageData = null,
+                                    imageUrl = null
+                                )
                             )
-                        )
+                        }
                     }
                 } else {
                     Log.e("NewsViewModel", "Failed to save image to cache or download")
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            context,
-                            "Ошибка при скачивании изображения",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    showImageMessage(R.string.news_image_download_failed)
                 }
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 Log.e("NewsViewModel", "Error downloading image: ${e.message}", e)
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        context,
-                        "Ошибка при скачивании: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                showImageMessage(R.string.news_image_download_failed)
             }
         }
     }
 
-    @OptIn(ExperimentalEncodingApi::class)
     private fun handleShareImage(imageData: String?, imageUrl: String?) {
         launch {
             try {
-                Log.d("NewsViewModel", "Начало шаринга: imageData=$imageData, imageUrl=$imageUrl")
-                if (imageData == null && imageUrl == null) {
+                if (imageData.isNullOrBlank() && imageUrl.isNullOrBlank()) {
                     Log.e("NewsViewModel", "No valid image data or url for share")
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            context,
-                            "Ошибка: нет изображения для шаринга",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    showImageMessage(R.string.news_image_share_missing)
                     return@launch
                 }
 
                 val fileName = "shared_image_${System.currentTimeMillis()}.jpg"
-                val file = if (imageData != null) {
-                    // Декодируем Base64 в кэш-директорию
-                    val imageBytes = Base64.decode(imageData)
-                    Log.d("NewsViewModel", "Decoded bytes length: ${imageBytes.size}")
-                    val cacheFile = File(context.cacheDir, fileName)
-                    FileOutputStream(cacheFile).use { it.write(imageBytes) }
-                    cacheFile
-                } else {
-                    // Скачиваем по URL в Document directory
-                    downloadFile(imageUrl!!, fileName)
-                    File(File(context.filesDir, "documentDirectory"), fileName)
-                }
-
-                // Проверяем существование файла
-                Log.d("NewsViewModel", "File path: ${file.absolutePath}, exists: ${file.exists()}")
-                if (!file.exists()) {
-                    Log.e("NewsViewModel", "File does not exist")
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "Файл не существует", Toast.LENGTH_SHORT).show()
-                    }
+                val shareUri = loadImageUri(imageData, imageUrl, fileName)
+                if (shareUri == null) {
+                    showImageMessage(R.string.news_image_prepare_failed)
                     return@launch
                 }
-
-                Log.d("NewsViewModel", "Authority being used: com.elta.android.fileprovider")
-                Log.d("NewsViewModel", "File path: ${file.absolutePath}, exists: ${file.exists()}, length: ${file.length()}")
-                // Получаем Uri через FileProvider
-                val shareUri = FileProvider.getUriForFile(
-                    context,
-                    "com.elta.android.fileprovider",
-                    file
-                )
 
                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
                     type = "image/jpeg"
@@ -587,7 +528,6 @@ class NewsViewModel @Inject constructor(
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
 
-                Log.d("NewsViewModel", "Share intent prepared for $shareUri")
                 sendEvent(ShareImage(shareIntent))
 
                 reduceState {
@@ -600,47 +540,72 @@ class NewsViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 Log.e("NewsViewModel", "Error sharing image: ${e.message}", e)
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Ошибка при шаринге: ${e.message}", Toast.LENGTH_SHORT)
-                        .show()
-                }
+                showImageMessage(R.string.news_image_share_failed)
             }
         }
     }
 
+    private fun showImageMessage(@StringRes messageRes: Int) {
+        Toast.makeText(context, messageRes, Toast.LENGTH_SHORT).show()
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private suspend fun loadImageUri(imageData: String?, imageUrl: String?, fileName: String): Uri? =
+        withContext(CoroutineDispatchers.IO) {
+            when {
+                !imageData.isNullOrBlank() ->
+                    mediaRepository.saveImageToCache(Base64.decode(imageData), fileName)
+                !imageUrl.isNullOrBlank() -> downloadFile(imageUrl, fileName)
+                else -> null
+            }
+        }
+
     private suspend fun saveToMediaStore(downloadedUri: Uri, fileName: String): Uri? {
-        return withContext(Dispatchers.Main) {
+        return withContext(CoroutineDispatchers.IO) {
+            val resolver = context.contentResolver
+            var newUri: Uri? = null
             try {
-                val resolver = context.contentResolver
                 val contentValues = ContentValues().apply {
                     put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
                     put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/EltaApp")
-                    put(MediaStore.Images.Media.IS_PENDING, 1)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/EltaApp")
+                        put(MediaStore.Images.Media.IS_PENDING, 1)
+                    }
                 }
 
-                val collection =
+                val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-                val newUri = resolver.insert(collection, contentValues)
+                } else {
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                }
+                val savedUri = resolver.insert(collection, contentValues)
+                    ?: return@withContext null
+                newUri = savedUri
 
-                newUri?.let { uri ->
-                    resolver.openInputStream(downloadedUri)?.use { input ->
-                        resolver.openOutputStream(uri)?.use { output ->
-                            input.copyTo(output)
-                        }
-                    }
+                val input = resolver.openInputStream(downloadedUri)
+                    ?: error("Cannot open source image")
+                input.use { source ->
+                    val output = resolver.openOutputStream(savedUri)
+                        ?: error("Cannot open destination image")
+                    output.use { source.copyTo(it) }
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     contentValues.clear()
                     contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
-                    resolver.update(uri, contentValues, null, null)
-
-                    uri
-                } ?: run {
-
-                    null
+                    check(resolver.update(savedUri, contentValues, null, null) > 0) {
+                        "Cannot publish saved image"
+                    }
                 }
+                savedUri
             } catch (e: Exception) {
-
+                newUri?.let { uri ->
+                    runCatching { resolver.delete(uri, null, null) }
+                }
+                if (e is CancellationException) throw e
+                Log.e("NewsViewModel", "Failed to save image to gallery", e)
                 null
             }
         }
@@ -793,9 +758,6 @@ class NewsViewModel @Inject constructor(
                 }
                 return
             }
-
-            // Проверяем существование файла
-            val file = File(context.getExternalFilesDir(null), fileName)
 
             // Получаем размер файла
             val fileSize = mediaRepository.getFileSize(downloadedFileUri) ?: document.size

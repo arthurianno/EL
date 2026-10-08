@@ -839,6 +839,14 @@
     <string name="news_chat_empty_text">Привет, уважаемый пользователь, пока новостей нет</string>
     <string name="news_chat_loading_text">Загрузка новостей!</string>
     <string name="news_chat_noConnect_text">Загрузка новостей не возможна\nпроверьте подключение</string>
+    <string name="news_image_storage_permission_required">Для сохранения изображения разрешите доступ к памяти</string>
+    <string name="news_image_missing_data">Нет данных изображения</string>
+    <string name="news_image_saved">Изображение сохранено</string>
+    <string name="news_image_save_failed">Не удалось сохранить изображение</string>
+    <string name="news_image_download_failed">Не удалось загрузить изображение</string>
+    <string name="news_image_share_missing">Нет изображения для отправки</string>
+    <string name="news_image_prepare_failed">Не удалось подготовить изображение</string>
+    <string name="news_image_share_failed">Не удалось отправить изображение</string>
 
     <!-- FIRMWARE -->
     <string name="firmware_title_updates_not_found">Обновления не найдены</string>

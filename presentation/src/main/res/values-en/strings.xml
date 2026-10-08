@@ -729,6 +729,14 @@
     <string name="news_chat_empty_text">Hello, dear user, no news yet</string>
     <string name="news_chat_loading_text">Loading news!</string>
     <string name="news_chat_noConnect_text">Cannot load news, check your connection</string>
+    <string name="news_image_storage_permission_required">Allow storage access to save the image</string>
+    <string name="news_image_missing_data">No image data available</string>
+    <string name="news_image_saved">Image saved</string>
+    <string name="news_image_save_failed">Could not save the image</string>
+    <string name="news_image_download_failed">Could not download the image</string>
+    <string name="news_image_share_missing">No image available to share</string>
+    <string name="news_image_prepare_failed">Could not prepare the image</string>
+    <string name="news_image_share_failed">Could not share the image</string>
     <string name="firmware_title_updates_not_found">No updates found</string>
     <string name="firmware_title_checking_updates">Checking for updates...</string>
     <string name="firmware_title_updates_found">New glucose meter firmware version found: %s</string>

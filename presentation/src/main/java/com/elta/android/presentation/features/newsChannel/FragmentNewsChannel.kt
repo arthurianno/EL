@@ -1,10 +1,15 @@
 package com.elta.android.presentation.features.newsChannel
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Vibrator
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
@@ -12,13 +17,17 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.elta.android.presentation.core.compose.common.AppAction
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.features.newsChannel.model.MakeVibration
 import com.elta.android.presentation.features.newsChannel.model.NewsAction
@@ -60,6 +69,22 @@ class FragmentNewsChannel : BaseComposeFragment<NewsViewModel>() {
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
         val state = viewModel.state.collectAsState()
         val listState = rememberLazyListState()
+        val pendingDownload = remember { mutableStateOf<Pair<String?, String?>?>(null) }
+        val storagePermission = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { granted ->
+            val request = pendingDownload.value
+            pendingDownload.value = null
+            if (granted && request != null) {
+                viewModel sendAction NewsAction.DownloadImage(request.first, request.second)
+            } else if (!granted) {
+                Toast.makeText(
+                    context,
+                    R.string.news_image_storage_permission_required,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
 
         LaunchedEffect(Unit) {
             viewModel.event.collect { event ->
@@ -206,7 +231,17 @@ class FragmentNewsChannel : BaseComposeFragment<NewsViewModel>() {
                 viewModel sendAction NewsAction.OnSwipeRefresh
             },
             onDownloadClick = { imageData, imageUrl ->
-                viewModel sendAction NewsAction.DownloadImage(imageData, imageUrl)
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    pendingDownload.value = imageData to imageUrl
+                    storagePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                } else {
+                    viewModel sendAction NewsAction.DownloadImage(imageData, imageUrl)
+                }
             },
             onShareClick = { imageData, imageUrl ->
                 viewModel sendAction NewsAction.ShareImage(imageData, imageUrl)
