@@ -37,8 +37,10 @@ class AudioRecorderImpl @Inject constructor(
     }
 
     override fun stop(release: Boolean) {
-        with(mediaRecorder) {
-            stop()
+        try {
+            mediaRecorder.stop()
+        } finally {
+            if (release) mediaRecorder.release() else mediaRecorder.reset()
         }
     }
 

@@ -83,10 +83,10 @@ class ConsultantViewModel @Inject constructor(
     private val editMessage: EditMessageUseCase,
     private val deleteMessage: DeleteMessageUseCase,
     private val messageTimeline: ConsultantMessageTimeline,
-    private val fileDownloads: ConsultantFileDownloads,
+    private val fileController: ConsultantFileController,
     private val photoCreate: PhotoCreateUseCase,
     private val voiceRecorder: ConsultantVoiceRecorder,
-    private val audioPlayer: ConsultantAudioPlayer,
+    private val playback: ConsultantPlaybackController,
     private val deleteFile: FileDeleteUseCase,
     private val sendRate: SendRateUseCase,
     private val copyText: CopyTextUseCase,
@@ -285,7 +285,7 @@ class ConsultantViewModel @Inject constructor(
             ConsultantAction.StopRecordVoiceClick -> stopRecordVoice()
             ConsultantAction.DeleteRecordVoiceClick -> abortAudioRecordDialog.dialogOpen()
             is ConsultantAction.VoiceRecordClick -> {
-                pauseAnyActiveTrack()
+                playback.pauseActive(::updateAudioState)
                 startRecordVoice(action.permissionStatus)
             }
             ConsultantAction.CancelPhotoClick -> launch {
@@ -377,13 +377,18 @@ class ConsultantViewModel @Inject constructor(
                 if (state.value.recordGraphState.recordState == RecordState.Recording) {
                     abortAudioRecordDialog.dialogOpen()
                 } else {
-                    pauseAnyActiveTrack()
-                    startPlayingTrack(action.message)
+                    playback.play(viewModelScope, currentMessage(action.message), ::updateAudioState)
                 }
             }
-            is ConsultantAction.PauseAudioClick -> pausePlayingTrack(action.message.id)
+            is ConsultantAction.PauseAudioClick ->
+                playback.pause(action.message.id, ::updateAudioState)
             is ConsultantAction.OnAudioTrackClick ->
-                seekToPositionAndPlay(action.message, action.percentOfTrack)
+                playback.seek(
+                    viewModelScope,
+                    currentMessage(action.message),
+                    action.percentOfTrack,
+                    ::updateAudioState
+                )
 
             is ConsultantAction.OnDownIconClick -> sendEvent(ScrollToDown)
             is ConsultantAction.OnSwipeRefresh -> loadNextCachedMessages()
@@ -420,153 +425,62 @@ class ConsultantViewModel @Inject constructor(
         }
     }
 
-    private fun pauseAnyActiveTrack() {
-        state.value.chat.messages.forEach {
-            if (it.audioState?.isPlaying == true) {
-                pausePlayingTrack(it.id)
-            }
-        }
-    }
-
     override fun reduceStateByAction(
         currentState: ConsultantViewState,
         action: Action
     ): ConsultantViewState = ConsultantStateReducer.reduce(currentState, action)
 
     private fun handleFileState(message: MessageUiEntity) {
-        val document = message.document
-        val currentState = state.value
-
-        when (message.document?.cachingState) {
-
-            CachingState.Cached -> {
-                val screen = if (message.type == MessageType.Document) {
-                    Screens.ViewPdfScreen(document?.uri ?: Uri.EMPTY)
+        fileController.handle(
+            scope = viewModelScope,
+            message = currentMessage(message),
+            openFile = { uri, type ->
+                val screen = if (type == MessageType.Document) {
+                    Screens.ViewPdfScreen(uri)
                 } else {
-                    Screens.ViewVideoScreen(document?.uri ?: Uri.EMPTY)
+                    Screens.ViewVideoScreen(uri)
                 }
                 router.navigateTo(screen)
-            }
-
-            CachingState.Downloading -> {
-                fileDownloads.cancel(message.id)
-                document?.uri?.let { deleteFile(it) }
-                reduceState {
-                    currentState.copy(
-                        chat = currentState.chat.reduceChatState(
-                            messageId = message.id,
-                            cachingState = CachingState.NotCached
-                        )
-                    )
-                }
-            }
-
-            else -> startDownloadFile(message)
-        }
+            },
+            updateCache = ::updateFileCache
+        )
     }
 
-    private fun startDownloadFile(message: MessageUiEntity) {
-        val document = message.document
+    private fun currentMessage(message: MessageUiEntity): MessageUiEntity =
+        state.value.chat.messages.firstOrNull { it.id == message.id } ?: message
 
+    private fun updateFileCache(messageId: String, cachingState: CachingState, uri: Uri?) {
         reduceState {
             state.value.copy(
                 chat = state.value.chat.reduceChatState(
-                    messageId = message.id,
-                    cachingState = CachingState.Downloading
+                    messageId = messageId,
+                    cachingState = cachingState,
+                    uri = uri
                 )
             )
         }
-
-        fileDownloads.start(
-            scope = viewModelScope,
-            messageId = message.id,
-            url = document?.url.orEmpty(),
-            fileName = document?.fileName.orEmpty(),
-            onSuccess = { uri ->
-                reduceState {
-                    state.value.copy(
-                        chat = state.value.chat.reduceChatState(
-                            messageId = message.id,
-                            cachingState = CachingState.Cached,
-                            uri = uri
-                        )
-                    )
-                }
-            },
-            onFailure = {
-                reduceState {
-                    state.value.copy(
-                        chat = state.value.chat.reduceChatState(
-                            messageId = message.id,
-                            cachingState = CachingState.NotCached
-                        )
-                    )
-                }
-            }
-        )
     }
 
-    private fun startPlayingTrack(message: MessageUiEntity) {
-        val voiceMessageUri = message.document?.uri ?: return
-        val initialAudioStateMessages = state.value.chat.reduceAudioState(
-            messageId = message.id,
-            isPlaying = true,
-            trackPosition = message.audioState?.trackPosition
-        )
-        reduceState {
-            state.value.copy(chat = state.value.chat.copy(messages = initialAudioStateMessages.messages))
-        }
-        val position = message.audioState?.trackPosition.takeIf { it != null && it != 0 }
-        audioPlayer.play(viewModelScope, voiceMessageUri, position,
-            onPosition = { updateTrackPosition(message.id, it) },
-            onFinished = { finishTrack(message.id) }
-        )
-    }
-
-    private fun seekToPositionAndPlay(message: MessageUiEntity, pressAndTrackRelation: Float) {
-        val voiceMessageUri = message.document?.uri ?: return
-        message.audioState?.let {
-            if (message.audioState.isPlaying) pausePlayingTrack(message.id)
-
-            val seekToPosition = it.duration * pressAndTrackRelation.coerceIn(0f, 1f)
-            audioPlayer.play(
-                viewModelScope, voiceMessageUri, seekToPosition.toInt(),
-                onPosition = { position -> updateTrackPosition(message.id, position) },
-                onFinished = { finishTrack(message.id) }
-            )
-        }
-    }
-
-    private fun pausePlayingTrack(messageId: String) {
-        val positionOnPause = audioPlayer.pause()
-
+    private fun updateAudioState(messageId: String, isPlaying: Boolean, position: Int?) {
         reduceState {
             state.value.copy(
                 chat = state.value.chat.reduceAudioState(
                     messageId = messageId,
-                    isPlaying = false,
-                    trackPosition = positionOnPause
+                    isPlaying = isPlaying,
+                    trackPosition = position
                 )
             )
         }
     }
 
     private fun sendVoiceMessage() {
-        postMessage(
-            SendMessageUseCase.Params(
-                uri = state.value.audioFileUri
-            )
-        )
-        reduceState {
-            state.value.copy(
-                recordGraphState = RecordGraphState(
-                    recordState = RecordState.Empty,
-                    recordGraph = emptyList(),
-                    duration = LocalTime.MIN
-                ),
-                audioFileUri = Uri.EMPTY
-            )
-        }
+        val currentState = state.value
+        if (currentState.recordGraphState.recordState != RecordState.Complete ||
+            currentState.audioFileUri == Uri.EMPTY
+        ) return
+
+        postMessage(SendMessageUseCase.Params(uri = currentState.audioFileUri))
+        resetRecordingState()
     }
 
     @OptIn(ExperimentalPermissionsApi::class)
@@ -600,28 +514,38 @@ class ConsultantViewModel @Inject constructor(
     }
 
     private fun deleteRecordVoice() {
-        launch {
-            if (state.value.recordGraphState.recordState == RecordState.Recording) stopRecordVoice()
-            deleteFile.invoke(state.value.audioFileUri)
-            reduceState {
-                state.value.copy(
-                    audioFileUri = Uri.EMPTY,
-                    recordGraphState = RecordGraphState(
-                        recordState = RecordState.Empty,
-                        recordGraph = emptyList(),
-                        duration = LocalTime.MIN
-                    ),
-                )
-            }
-        }
+        val currentState = state.value
+        if (currentState.recordGraphState.recordState == RecordState.Recording) voiceRecorder.stop()
+        resetRecordingState()
+        val uri = currentState.audioFileUri
+        if (uri != Uri.EMPTY) launch { deleteFile(uri) }
     }
 
     private fun stopRecordVoice() {
-        voiceRecorder.stop()
+        if (state.value.recordGraphState.recordState != RecordState.Recording) return
+        val uri = state.value.audioFileUri
+        if (voiceRecorder.stop()) {
+            reduceState {
+                state.value.copy(
+                    recordGraphState = state.value.recordGraphState.copy(
+                        recordState = RecordState.Complete
+                    )
+                )
+            }
+        } else {
+            resetRecordingState()
+            if (uri != Uri.EMPTY) launch { deleteFile(uri) }
+        }
+    }
+
+    private fun resetRecordingState() {
         reduceState {
             state.value.copy(
-                recordGraphState = state.value.recordGraphState.copy(
-                    recordState = RecordState.Complete
+                audioFileUri = Uri.EMPTY,
+                recordGraphState = RecordGraphState(
+                    recordState = RecordState.Empty,
+                    recordGraph = emptyList(),
+                    duration = LocalTime.MIN
                 )
             )
         }
@@ -758,30 +682,6 @@ class ConsultantViewModel @Inject constructor(
                 recordGraphState = state.value.recordGraphState.copy(
                     recordGraph = state.value.recordGraphState.recordGraph + volumeLevel,
                     duration = state.value.recordGraphState.duration.plus(100L, ChronoUnit.MILLIS)
-                )
-            )
-        }
-    }
-
-    private fun updateTrackPosition(messageId: String, position: Int) {
-        reduceState {
-            state.value.copy(
-                chat = state.value.chat.reduceAudioState(
-                    messageId = messageId,
-                    trackPosition = position,
-                    isPlaying = true
-                )
-            )
-        }
-    }
-
-    private fun finishTrack(messageId: String) {
-        reduceState {
-            state.value.copy(
-                chat = state.value.chat.reduceAudioState(
-                    messageId = messageId,
-                    trackPosition = 0,
-                    isPlaying = false
                 )
             )
         }
