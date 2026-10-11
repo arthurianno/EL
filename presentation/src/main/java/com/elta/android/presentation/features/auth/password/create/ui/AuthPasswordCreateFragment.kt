@@ -24,6 +24,7 @@ class AuthPasswordCreateFragment :
 
     override val screenLayout: Int = R.layout.fragment_auth_password_create
     override val classToken: Class<AuthPasswordCreatePm> = AuthPasswordCreatePm::class.java
+    override val handlesWindowInsets: Boolean = true
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {

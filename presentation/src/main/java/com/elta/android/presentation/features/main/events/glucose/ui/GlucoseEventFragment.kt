@@ -89,7 +89,7 @@ class GlucoseEventFragment :
 
     override fun onStop() {
         super.onStop()
-        view?.removeWindowBottomInsetsListener(insetsListener)
+        view?.removeWindowBottomInsetsListener()
     }
 
     override fun onAttach(context: Context) {

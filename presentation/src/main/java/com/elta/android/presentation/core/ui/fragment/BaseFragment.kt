@@ -68,6 +68,8 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
     protected abstract val statusBarConfigProvider: StatusBarConfigProvider?
 
+    protected open val handlesWindowInsets: Boolean = false
+
     protected open val backgroundColor: Int? = R.color.color_window_background
 
     open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
@@ -149,7 +151,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
     protected fun StatusBarConfigProvider?.applyStatusBarConfig() {
         this?.let {
-            view?.applyInsetsToContentView(!it.drawUnderStatusBar)
+            view?.applyInsetsToContentView(!handlesWindowInsets && !it.drawUnderStatusBar)
             activity?.window?.setStatusBarColor(it.statusBarColor, it.lightStatusBar)
         }
     }

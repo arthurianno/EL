@@ -12,7 +12,6 @@ import com.elta.android.presentation.features.registration.main.variantA.pm.Base
 import com.elta.android.presentation.utils.applyStatusBarInsetsPadding
 import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.hideKeyboardFun
-import com.elta.android.presentation.utils.isKeyboardOpen
 import com.elta.android.presentation.utils.lostFocusOnClickOutside
 import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
@@ -31,12 +30,13 @@ abstract class BaseAuthFragmentVariantA<PM : BaseAuthPmVariantA> :
     protected abstract val authSubtitleText: Int
 
     override val screenLayout: Int = R.layout.fragment_auth_base
+    override val handlesWindowInsets: Boolean = true
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.root.applyStatusBarInsetsPadding(
-            onApplyInsets = ::clearFocusesFromInputs,
+            onImeVisibilityChanged = ::onKeyboardVisibilityChanged,
             applyNavigationBarInset = true,
             applyImeInset = true
         )
@@ -54,8 +54,8 @@ abstract class BaseAuthFragmentVariantA<PM : BaseAuthPmVariantA> :
         }
     }
 
-    private fun clearFocusesFromInputs(view: View) {
-        if (!requireActivity().isKeyboardOpen(view)) {
+    private fun onKeyboardVisibilityChanged(isVisible: Boolean) {
+        if (!isVisible) {
             binding.emailInputView.clearFocus()
             binding.passwordInputView.clearFocus()
         }

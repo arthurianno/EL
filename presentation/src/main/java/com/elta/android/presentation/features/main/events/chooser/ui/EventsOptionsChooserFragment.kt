@@ -14,6 +14,8 @@ import com.elta.android.presentation.features.main.events.chooser.models.Chooser
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.EventOptionsChooseAdapter
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
+import com.elta.android.presentation.utils.applyWindowBottomInsetsListener
+import com.elta.android.presentation.utils.WindowBottomInsetsForViewListenerFactory
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
@@ -46,6 +48,9 @@ class EventsOptionsChooserFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.root.applyWindowBottomInsetsListener(
+            WindowBottomInsetsForViewListenerFactory.instance { }
+        )
         with(binding.toolbar) {
             toolbarView.applyWindowInsetsForChildrenView()
             toolbarTitleView.setTextColor(Color.WHITE)

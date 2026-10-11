@@ -21,6 +21,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnAttach
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.widget.NestedScrollView
 import com.elta.android.presentation.R
@@ -49,34 +51,38 @@ fun View.applyInsetsToContentView(fitsSystemWindows: Boolean) {
 }
 
 fun View.applyStatusBarInsetsPadding(
-    onApplyInsets: (View) -> Unit = {},
+    onImeVisibilityChanged: (Boolean) -> Unit = {},
     applyNavigationBarInset: Boolean = false,
     applyImeInset: Boolean = false
 ) {
+    // Explicit insets own the padding; legacy fitting can overwrite it during IME changes.
+    fitsSystemWindows = false
     val initialLeft = paddingLeft
     val initialTop = paddingTop
     val initialRight = paddingRight
     val initialBottom = paddingBottom
+    var previousImeVisibility: Boolean? = null
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
         val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
         val navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
         val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
         val isImeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-        val bottomInset = when {
-            applyImeInset && isImeVisible -> ime.bottom
-            applyNavigationBarInset -> navigationBars.bottom
-            else -> 0
-        }
+        val navigationBottom = if (applyNavigationBarInset) navigationBars.bottom else 0
+        val imeBottom = if (applyImeInset && isImeVisible) ime.bottom else 0
+        val bottomInset = maxOf(navigationBottom, imeBottom)
         view.updatePadding(
-            left = initialLeft,
+            left = initialLeft + if (applyNavigationBarInset) navigationBars.left else 0,
             top = initialTop + statusBars.top,
-            right = initialRight,
+            right = initialRight + if (applyNavigationBarInset) navigationBars.right else 0,
             bottom = initialBottom + bottomInset
         )
-        onApplyInsets(view)
+        if (previousImeVisibility != isImeVisible) {
+            previousImeVisibility = isImeVisible
+            onImeVisibilityChanged(isImeVisible)
+        }
         insets
     }
-    ViewCompat.requestApplyInsets(this)
+    doOnAttach { ViewCompat.requestApplyInsets(it) }
 }
 
 fun View.applyWindowInsetsForChildrenView() {
@@ -93,12 +99,13 @@ fun NestedScrollView.scrollToBottom() {
 
 inline fun Activity.findAndClearFocus() = currentFocus?.clearFocus()
 
-inline fun View.applyWindowBottomInsetsListener(listener: OnApplyWindowInsetsListener) {
+fun View.applyWindowBottomInsetsListener(listener: OnApplyWindowInsetsListener) {
     ViewCompat.setOnApplyWindowInsetsListener(this, listener)
+    doOnAttach { ViewCompat.requestApplyInsets(it) }
 }
 
-inline fun View.removeWindowBottomInsetsListener(listener: OnApplyWindowInsetsListener) {
-    ViewCompat.setOnApplyWindowInsetsListener(this, listener)
+fun View.removeWindowBottomInsetsListener() {
+    ViewCompat.setOnApplyWindowInsetsListener(this, null)
 }
 
 object WindowBottomInsetsForViewListenerFactory {
@@ -107,26 +114,39 @@ object WindowBottomInsetsForViewListenerFactory {
 }
 
 class OnApplyBottomWindowInsetsListener(
-    private val views: List<View>,
+    views: List<View>,
     private val callback: (Int) -> Unit
 ) : OnApplyWindowInsetsListener {
+    private val initialBottomMargins = views.associateWith {
+        (it.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
+    }
+    private var initialPadding: Rect? = null
 
     override fun onApplyWindowInsets(v: View, insets: WindowInsetsCompat): WindowInsetsCompat {
-        val offset = getBottomOffset(insets)
-        views.forEach { applyBottomOffsetToView(it, offset) }
-        callback(offset)
-        return insets.consumeSystemWindowInsets()
-    }
-
-    private fun getBottomOffset(insets: WindowInsetsCompat): Int =
-        when {
-            insets.systemWindowInsetBottom < insets.stableInsetBottom -> insets.systemWindowInsetBottom
-            else -> insets.systemWindowInsetBottom - insets.stableInsetBottom
+        val padding = initialPadding ?: Rect(v.paddingLeft, v.paddingTop, v.paddingRight, v.paddingBottom)
+            .also { initialPadding = it }
+        val navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+        val imeBottom = if (insets.isVisible(WindowInsetsCompat.Type.ime())) {
+            insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+        } else {
+            0
         }
-
-    private fun applyBottomOffsetToView(view: View, offset: Int) {
-        val params = view.layoutParams as ViewGroup.MarginLayoutParams
-        params.bottomMargin = offset
+        // The root reserves system navigation once; child margins cover only the extra IME area.
+        v.updatePadding(
+            left = padding.left + navigationBars.left,
+            top = padding.top,
+            right = padding.right + navigationBars.right,
+            bottom = padding.bottom + navigationBars.bottom
+        )
+        val keyboardOffset = (imeBottom - navigationBars.bottom).coerceAtLeast(0)
+        initialBottomMargins.forEach { (view, initialMargin) ->
+            val bottomMargin = initialMargin + keyboardOffset
+            if ((view.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin != bottomMargin) {
+                view.updateLayoutParams<ViewGroup.MarginLayoutParams> { this.bottomMargin = bottomMargin }
+            }
+        }
+        callback(keyboardOffset)
+        return insets
     }
 }
 

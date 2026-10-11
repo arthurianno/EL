@@ -74,7 +74,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        insetsListener = instance(binding.formContainerView) { offset ->
+        insetsListener = instance(binding.formSaveButtonView, binding.formContainerView) { offset ->
             if (!isTouchingScroll || !isTouchingAppBar) {
                 val isOffsetZero = offset == 0
                 binding.appBarLayoutView.setExpanded(isOffsetZero, true)
@@ -154,7 +154,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
 
     override fun onStop() {
         super.onStop()
-        view?.removeWindowBottomInsetsListener(insetsListener)
+        view?.removeWindowBottomInsetsListener()
     }
 
     override fun onPause() {

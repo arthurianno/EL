@@ -12,7 +12,6 @@ import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
 import com.elta.android.presentation.utils.applyStatusBarInsetsPadding
 import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.hideKeyboardFun
-import com.elta.android.presentation.utils.isKeyboardOpen
 import com.elta.android.presentation.utils.lostFocusOnClickOutside
 import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
@@ -30,12 +29,13 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> :
     protected abstract val authSubtitleText: Int
 
     override val screenLayout: Int = R.layout.fragment_auth_base
+    override val handlesWindowInsets: Boolean = true
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.root.applyStatusBarInsetsPadding(
-            onApplyInsets = ::clearFocusesFromInputs,
+            onImeVisibilityChanged = ::onKeyboardVisibilityChanged,
             applyNavigationBarInset = true,
             applyImeInset = true
         )
@@ -47,16 +47,17 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> :
         }
     }
 
-    private fun clearFocusesFromInputs(view: View) {
-        if (!requireActivity().isKeyboardOpen(view)) {
-            // Код для случая, когда клавиатура ЗАКРЫЛАСЬ:
+    private fun onKeyboardVisibilityChanged(isVisible: Boolean) {
+        if (!isVisible) {
             binding.emailInputView.clearFocus()
             binding.passwordInputView.clearFocus()
         } else {
-            // НОВЫЙ КОД для случая, когда клавиатура ОТКРЫЛАСЬ:
-            binding.scrollView.postDelayed({
-                // Вместо кражи фокуса через fullScroll, скроллим безопасно:
-                binding.scrollView.smoothScrollTo(0, binding.passwordFrameLayout.top)
+            val scrollView = binding.scrollView
+            val passwordFrame = binding.passwordFrameLayout
+            scrollView.postDelayed({
+                if (scrollView.isAttachedToWindow) {
+                    scrollView.smoothScrollTo(0, passwordFrame.top)
+                }
             }, 150)
         }
     }

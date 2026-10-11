@@ -11,7 +11,6 @@ import com.elta.android.presentation.databinding.FragmentAuthPasswordRecoveryBin
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
 import com.elta.android.presentation.utils.applyStatusBarInsetsPadding
 import com.elta.android.presentation.utils.error
-import com.elta.android.presentation.utils.isKeyboardOpen
 import com.jakewharton.rxbinding2.view.clicks
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
@@ -23,13 +22,14 @@ class AuthPasswordRecoveryFragment :
 
     override val screenLayout: Int = R.layout.fragment_auth_password_recovery
     override val classToken: Class<AuthPasswordRecoveryPm> = AuthPasswordRecoveryPm::class.java
+    override val handlesWindowInsets: Boolean = true
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.root.applyStatusBarInsetsPadding(
 
-            onApplyInsets = ::clearFocusesFromInputs,
+            onImeVisibilityChanged = ::onKeyboardVisibilityChanged,
             applyNavigationBarInset = true,
             applyImeInset = true
         )
@@ -38,13 +38,16 @@ class AuthPasswordRecoveryFragment :
 
 
 
-    private fun clearFocusesFromInputs(view: View) {
-        if (!requireActivity().isKeyboardOpen(view)) {
+    private fun onKeyboardVisibilityChanged(isVisible: Boolean) {
+        if (!isVisible) {
             binding.emailInputView.clearFocus()
 
-        }else {
-            binding.scrollView4.postDelayed({
-                binding.scrollView4.fullScroll(View.FOCUS_DOWN)
+        } else {
+            val scrollView = binding.scrollView4
+            scrollView.postDelayed({
+                if (scrollView.isAttachedToWindow) {
+                    scrollView.smoothScrollTo(0, scrollView.getChildAt(0)?.height ?: 0)
+                }
             }, 150)
         }
 
