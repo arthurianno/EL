@@ -50,6 +50,25 @@ fun View.applyInsetsToContentView(fitsSystemWindows: Boolean) {
     ViewCompat.requestApplyInsets(this)
 }
 
+fun View.applyNavigationBarInsetsPadding() {
+    fitsSystemWindows = false
+    val initialPadding = Rect(
+        paddingLeft, paddingTop, paddingRight, paddingBottom
+    )
+    ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
+        val navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+        view.updatePadding(
+            left = initialPadding.left + navigationBars.left,
+            top = initialPadding.top,
+            right = initialPadding.right + navigationBars.right,
+            bottom = initialPadding.bottom + navigationBars.bottom
+        )
+        // Children receive coordinates inside the reserved navigation area, including a reduced IME inset.
+        insets.inset(navigationBars.left, 0, navigationBars.right, navigationBars.bottom)
+    }
+    doOnAttach { ViewCompat.requestApplyInsets(it) }
+}
+
 fun View.applyStatusBarInsetsPadding(
     onImeVisibilityChanged: (Boolean) -> Unit = {},
     applyNavigationBarInset: Boolean = false,

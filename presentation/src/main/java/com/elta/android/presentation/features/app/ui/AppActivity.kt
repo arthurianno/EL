@@ -18,6 +18,7 @@ import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.utils.LocaleHelper
+import com.elta.android.presentation.utils.applyNavigationBarInsetsPadding
 import com.elta.android.presentation.features.version.optional.ui.OptionalUpdateDialogFragment
 import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkProcessor
 import com.elta.android.presentation.utils.keyboard.KeyboardEventListener
@@ -68,6 +69,10 @@ class AppActivity : BaseActivity<AppPm>() {
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
             View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR  // тёмные иконки nav bar на светлой теме
         super.onCreate(savedInstanceState)
+
+        val content = findViewById<View>(android.R.id.content)
+        content.setBackgroundResource(R.color.color_window_background)
+        content.applyNavigationBarInsetsPadding()
 
         splashScreen.setKeepOnScreenCondition {
             !isAppReady

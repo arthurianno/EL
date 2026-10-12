@@ -65,6 +65,7 @@ import com.elta.android.presentation.features.sync.connect.model.ScannerState
 import com.elta.android.presentation.features.sync.connect.viewmodel.ScannerDmcViewModel
 import com.elta.android.presentation.features.sync.connect.widgets.AppTopBar
 import com.elta.android.presentation.features.sync.connect.widgets.HelpBottomSheet
+import com.elta.android.presentation.features.sync.connect.widgets.ScannerSystemBars
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.extractPinCode
@@ -121,6 +122,7 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content(viewModel: ScannerDmcViewModel) {
+        ScannerSystemBars(requireActivity().window)
         val event = viewModel.event.collectAsState(initial = null).value
         val state = viewModel.state.collectAsState().value
         val cropSize = state.cropRect
@@ -139,7 +141,7 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
             }
         }
         GetLocalProperties { _, _, colors, shapes, _ ->
-            Box(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize().background(colors.black)) {
                 BottomSheetScaffold(
                     scaffoldState = sheetState,
                     topBar = {
@@ -152,12 +154,11 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                     },
                     sheetGesturesEnabled = false,
                     sheetShape = shapes.sheet,
-                    sheetContent = {
-                        Column(Modifier.fillMaxWidth().navigationBarsPadding()) {
-                            BottomSheet(viewModel, state.scannerState)
-                        }
-                    },
-                    modifier = Modifier.statusBarsPadding()
+                    sheetContent = { BottomSheet(viewModel, state.scannerState) },
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .background(colors.white)
+                        .navigationBarsPadding()
                 ) {
                     CameraPreView(viewModel)
                 }

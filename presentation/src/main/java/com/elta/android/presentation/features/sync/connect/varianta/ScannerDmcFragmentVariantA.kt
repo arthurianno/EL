@@ -59,6 +59,7 @@ import com.elta.android.presentation.features.sync.connect.model.ConnectMainEven
 import com.elta.android.presentation.features.sync.connect.varianta.model.ScannerStateVariantA
 import com.elta.android.presentation.features.sync.connect.viewmodel.ScannerDmcViewModelVariantA
 import com.elta.android.presentation.features.sync.connect.widgets.AppTopBar
+import com.elta.android.presentation.features.sync.connect.widgets.ScannerSystemBars
 import com.elta.android.presentation.features.sync.connect.widgets.HelpBottomSheetVariantA
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
@@ -120,6 +121,7 @@ class ScannerDmcFragmentVariantA : BaseComposeFragment<ScannerDmcViewModelVarian
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content(viewModel: ScannerDmcViewModelVariantA) {
+        ScannerSystemBars(requireActivity().window)
         val event = viewModel.event.collectAsState(initial = null).value
         val state = viewModel.state.collectAsState().value
         val cropSize = state.cropRect
@@ -133,7 +135,7 @@ class ScannerDmcFragmentVariantA : BaseComposeFragment<ScannerDmcViewModelVarian
             }
         }
         GetLocalProperties { _, _, colors, shapes, _ ->
-            Box(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize().background(colors.black)) {
                 BottomSheetScaffold(
                     scaffoldState = sheetState,
                     topBar = {
@@ -146,12 +148,11 @@ class ScannerDmcFragmentVariantA : BaseComposeFragment<ScannerDmcViewModelVarian
                     },
                     sheetGesturesEnabled = false,
                     sheetShape = shapes.sheet,
-                    sheetContent = {
-                        Column(Modifier.fillMaxWidth().navigationBarsPadding()) {
-                            BottomSheet(viewModel, state.scannerState)
-                        }
-                    },
-                    modifier = Modifier.statusBarsPadding()
+                    sheetContent = { BottomSheet(viewModel, state.scannerState) },
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .background(colors.white)
+                        .navigationBarsPadding()
                 ) {
                     CameraPreView(viewModel)
                 }

@@ -12,8 +12,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -65,8 +63,6 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
     @Inject
     lateinit var bus: RxBus
 
-    private val statusViewBottomPaddings = mutableListOf<Pair<View, Int>>()
-
     // Используем lazy для безопасной инициализации RxPermissions
     private val rxPermissions: RxPermissions by lazy {
         RxPermissions(requireActivity())
@@ -74,21 +70,11 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupBottomNavigationInsets()
         savedInstanceState
             ?.takeIf { it.containsKey(KEY_SELECTED_MENU_ID) }
             ?.getInt(KEY_SELECTED_MENU_ID)
             ?.passTo(presentationModel.menuItemRestoredAction)
         initBottomSheetItemsView()
-    }
-
-    override fun onDestroyView() {
-        statusViewBottomPaddings.forEach { (view, originalBottomPadding) ->
-            ViewCompat.setOnApplyWindowInsetsListener(view, null)
-            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, originalBottomPadding)
-        }
-        statusViewBottomPaddings.clear()
-        super.onDestroyView()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -286,26 +272,6 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
         binding.homeBottomSheetView.findViewById<RecyclerView>(R.id.bottomSheetItemsView).apply {
             layoutManager = FixedLinearLayoutManager(requireActivity())
             adapter = this@HomeFlowFragment.adapter
-        }
-    }
-
-    private fun setupBottomNavigationInsets() {
-        listOf(R.id.syncStatusView, R.id.connectionStatusView).forEach { viewId ->
-            requireActivity().findViewById<View>(viewId)?.let { statusView ->
-                val originalBottomPadding = statusView.paddingBottom
-                statusViewBottomPaddings += statusView to originalBottomPadding
-                ViewCompat.setOnApplyWindowInsetsListener(statusView) { view, insets ->
-                    val navigationBarBottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-                    view.setPadding(
-                        view.paddingLeft,
-                        view.paddingTop,
-                        view.paddingRight,
-                        originalBottomPadding + navigationBarBottom
-                    )
-                    insets
-                }
-                ViewCompat.requestApplyInsets(statusView)
-            }
         }
     }
 

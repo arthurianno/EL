@@ -183,4 +183,7 @@ dependencies {
     implementation(Dependencies.Coil.core)
 
     testBaseDependencies()
+    androidTestImplementation(Dependencies.CustomView.expandableLayout)
+    androidTestImplementation(platform(Dependencies.Jetpack.Compose.bom))
+    androidTestImplementation(Dependencies.Jetpack.Compose.Test.bomJunit)
 }
