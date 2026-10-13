@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import com.elta.android.presentation.R
 
 data class GlucoseTrend(
@@ -304,7 +305,7 @@ fun GlucoseRingGauge(
                                 color = mainColor,
                                 modifier = Modifier
                                     .align(Alignment.TopCenter)
-                                    .offset(y = discHeight * 0.70f)
+                                    .offset(y = discHeight * 0.75f)
                             )
                             GlucoseTrendValue(
                                 trend = glucoseTrend,
@@ -633,13 +634,34 @@ private fun TirIndicator(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .offset(y = 29.dp * designScale)
-                    .size(width = 24.dp * designScale, height = 2.dp * designScale)
+                    .size(
+                        width = 24.dp * designScale,
+                        height = 2.dp * designScale
+                    )
             ) {
+                val lineColor = Color.White.copy(alpha = 0.9f)
+                val thickness = (3.25.dp * designScale).toPx()
+                val centerY = size.height / 2f
+                val inset = thickness / 2f
+                val gap = (4.dp * designScale).toPx()
+
+                // Учитываем закругления, чтобы видимый промежуток был равен gap.
+                val halfSeparation = (gap + thickness) / 2f
+                val centerX = size.width / 2f
+
                 drawLine(
-                    color = Color.White.copy(alpha = 0.9f),
-                    start = Offset(0f, size.height / 2f),
-                    end = Offset(size.width, size.height / 2f),
-                    strokeWidth = (1.25.dp * designScale).toPx(),
+                    color = lineColor,
+                    start = Offset(inset, centerY),
+                    end = Offset(centerX - halfSeparation, centerY),
+                    strokeWidth = thickness,
+                    cap = StrokeCap.Round
+                )
+
+                drawLine(
+                    color = lineColor,
+                    start = Offset(centerX + halfSeparation, centerY),
+                    end = Offset(size.width - inset, centerY),
+                    strokeWidth = thickness,
                     cap = StrokeCap.Round
                 )
             }
@@ -755,4 +777,33 @@ private fun SyncDeviceButton(
             textAlign = TextAlign.Center
         )
     }
+}
+
+@Preview(
+    showBackground = false,
+    widthDp = 375,
+    heightDp = 812)
+@Composable
+private fun GlucoseRingGaugePreview() {
+    GlucoseRingGauge(
+        glucoseValue = "5,6",
+        tirPercentage = " ",
+        tirPercent = 73,
+        glucoseUnit = "ммоль/л",
+        deltaText = "+0,2",
+        glucoseTrend = GlucoseTrend(GlucoseTrendDirection.UP, "+0,2"),
+        syncTimeText = "Последнее измерение 10:15",
+        breadUnitsText = "0,9 Ед.",
+        insulinText = "0,1 ХЕ",
+        state = GlucoseState.NORMAL,
+        isSyncing = true,
+        statusText = "Синхронизация с устройством",
+        isStatusVisible = true,
+        ringSize = 199.dp,
+        ringTopOffset = 126.24.dp,
+        lowerControlsExtraOffset = 0.dp,
+        onSyncClick = {},
+        showSyncControl = true,
+        onStatePillLongClick = {}
+    )
 }

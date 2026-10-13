@@ -11,7 +11,7 @@ data class GlucoseDashboardUiState(
     val glucoseValueNumber: Double? = null,
     val deltaText: String = "—",
     val glucoseTrend: GlucoseTrend? = null,
-    val tirPercentage: String = "—",
+    val tirPercentage: String = "— –",
     val tirPercent: Int? = null,
     val syncTimeText: String = "Нет измерений",
     val breadUnitsText: String = "0,0 ХЕ",
