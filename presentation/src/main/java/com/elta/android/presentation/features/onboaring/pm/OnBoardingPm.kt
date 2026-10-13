@@ -441,7 +441,7 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun handleSuccess() {
-        router.newRootScreen(Screens.ConnectStartScreen(isOnBoarding = true))
+        router.newRootScreen(Screens.ConnectTypeScreen(isOnBoarding = true))
     }
 
     private fun createOnBoardingEvent(): AnalyticsEvent? {

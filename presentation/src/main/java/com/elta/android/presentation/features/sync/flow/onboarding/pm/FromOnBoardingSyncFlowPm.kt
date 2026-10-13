@@ -10,5 +10,5 @@ class FromOnBoardingSyncFlowPm @Inject constructor(
     services: ServiceFacade
 ) : SyncFlowPm(services) {
 
-    override val screen = Screens.FromOnBoardingSyncStart
+    override val screen = Screens.ConnectTypeScreen(isOnBoarding = true)
 }

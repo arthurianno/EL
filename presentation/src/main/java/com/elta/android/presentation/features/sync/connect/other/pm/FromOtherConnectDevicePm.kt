@@ -16,6 +16,7 @@ import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.sync.connect.base.pm.ConnectDevicePm
+import com.elta.android.presentation.features.sync.connect.pin.PinConnectionStage
 import javax.inject.Inject
 
 // fixme Variant A : improved_enabling_location
@@ -48,7 +49,7 @@ class FromOtherConnectDevicePm @Inject constructor(
     override fun onCreate() {
         super.onCreate()
         connectState.observable
-            .filter { it == ViewState.CONNECTED }
+            .filter { it == PinConnectionStage.CONNECTED }
             .trackEvent(
                 AnalyticsEventType.GLUCOMETER_ADD,
                 AnalyticsEventParam.SOURCE to SOURCE_PROFILE

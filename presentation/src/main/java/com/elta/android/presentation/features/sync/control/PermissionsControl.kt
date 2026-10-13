@@ -57,13 +57,13 @@ fun PermissionsControl.bindTo(
 
     requestBluetoothPermissionCommand.observable
         .observeOn(AndroidSchedulers.mainThread())
-        .switchMap {
+        .switchMapSingle {
             permissions.requestEach(
                 android.Manifest.permission.BLUETOOTH_SCAN,
                 android.Manifest.permission.BLUETOOTH_CONNECT
-            )
+            ).toList()
         }
-        .subscribe(bluetoothPermissionsGrantedAction.consumer)
+        .subscribe { results -> results.completedPermissionResults().forEach(bluetoothPermissionsGrantedAction.consumer::accept) }
         .addTo(compositeUnbind)
 
     requestLocationPermissionsCommand.observable
@@ -76,19 +76,20 @@ fun PermissionsControl.bindTo(
 
     requestCombinedPermissionsCommand.observable
         .observeOn(AndroidSchedulers.mainThread())
-        .switchMap {
+        .switchMapSingle {
             permissions.requestEach(
                 android.Manifest.permission.BLUETOOTH_SCAN,
                 android.Manifest.permission.BLUETOOTH_CONNECT,
                 android.Manifest.permission.ACCESS_FINE_LOCATION
-            )
+            ).toList()
         }
-        .filter { !it.granted }
-        .subscribe {
-            if (it.name == android.Manifest.permission.ACCESS_FINE_LOCATION) {
-                locationPermissionsGrantedAction.consumer.accept(it)
-            } else {
-                bluetoothPermissionsGrantedAction.consumer.accept(it)
+        .subscribe { results ->
+            results.completedPermissionResults().forEach { permission ->
+                if (permission.name == android.Manifest.permission.ACCESS_FINE_LOCATION) {
+                    locationPermissionsGrantedAction.consumer.accept(permission)
+                } else {
+                    bluetoothPermissionsGrantedAction.consumer.accept(permission)
+                }
             }
         }
         .addTo(compositeUnbind)
@@ -100,6 +101,9 @@ fun PermissionsControl.bindTo(
         }
         .addTo(compositeUnbind)
 }
+
+internal fun List<Permission>.completedPermissionResults(): List<Permission> =
+    filter { !it.granted }.ifEmpty { take(1) }
 
 fun PermissionsControl.resolveResults(requestCode: Int, resultCode: Int) {
     if (requestCode == PermissionsControl.REQUEST_CODE_ENABLE_LOCATION) {

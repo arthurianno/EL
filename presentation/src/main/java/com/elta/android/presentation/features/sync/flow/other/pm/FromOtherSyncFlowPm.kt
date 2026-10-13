@@ -10,5 +10,5 @@ class FromOtherSyncFlowPm @Inject constructor(
     services: ServiceFacade
 ) : SyncFlowPm(services) {
 
-    override val screen = Screens.FromOtherSyncStart
+    override val screen = Screens.ConnectTypeScreen(isOnBoarding = false)
 }

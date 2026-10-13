@@ -38,7 +38,7 @@ internal class HomeFlowNavigator(private val router: FlowRouter) {
     }
 
     fun openConnectDevice() {
-        router.startFlow(Screens.ConnectStartScreen(isOnBoarding = false))
+        router.startFlow(Screens.ConnectTypeScreen(isOnBoarding = false))
     }
 
     fun navigateToFeedback() {

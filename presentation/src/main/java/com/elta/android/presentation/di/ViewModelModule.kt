@@ -23,7 +23,6 @@ import com.elta.android.presentation.features.profile.settings.emias.viewmodel.E
 import com.elta.android.presentation.features.profile.settings.glucoseformat.viewmodel.GlucoseFormatViewModel
 import com.elta.android.presentation.features.profile.settings.reminders.all.viewmodels.RemindersViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectHelpViewModel
-import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectStartViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectTypeViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectingViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectingViewModelVariantA
@@ -141,11 +140,6 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ScannerDmcViewModelVariantA::class)
     abstract fun bindScannerDmcViewModelVariantA(viewModel: ScannerDmcViewModelVariantA): ViewModel
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(ConnectStartViewModel::class)
-    abstract fun bindConnectStartViewModel(viewModel: ConnectStartViewModel): ViewModel
 
     @Binds
     @IntoMap

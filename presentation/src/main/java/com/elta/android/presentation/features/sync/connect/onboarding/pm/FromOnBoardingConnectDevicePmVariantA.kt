@@ -13,6 +13,7 @@ import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventPara
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.sync.connect.base.pm.ConnectDevicePmVariantA
+import com.elta.android.presentation.features.sync.connect.pin.PinConnectionStage
 import javax.inject.Inject
 
 class FromOnBoardingConnectDevicePmVariantA @Inject constructor(
@@ -40,7 +41,7 @@ class FromOnBoardingConnectDevicePmVariantA @Inject constructor(
     override fun onCreate() {
         super.onCreate()
         connectState.observable
-            .filter { it == ViewState.CONNECTED }
+            .filter { it == PinConnectionStage.CONNECTED }
             .trackEvent(
                 AnalyticsEventType.GLUCOMETER_ADD,
                 AnalyticsEventParam.SOURCE to SOURCE_ON_BOARDING

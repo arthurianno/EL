@@ -72,7 +72,6 @@ import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFra
 import com.elta.android.presentation.features.statistic.period.ui.Period
 import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
 import com.elta.android.presentation.features.sync.connect.ConnectHelpFragment
-import com.elta.android.presentation.features.sync.connect.ConnectStartFragment
 import com.elta.android.presentation.features.sync.connect.ConnectTypeFragment
 import com.elta.android.presentation.features.sync.connect.ConnectingFragment
 import com.elta.android.presentation.features.sync.connect.ConnectingFragmentVariantA
@@ -286,10 +285,6 @@ object Screens {
 
         object FromOtherConnectDeviceByPinVariantA : SupportAppScreen() {
         override fun getFragment(): Fragment = FromOtherConnectDeviceByPinFragmentVariantA.newInstance()
-    }
-
-    data class ConnectStartScreen(val isOnBoarding: Boolean) : SupportAppScreen() {
-        override fun getFragment() = ConnectStartFragment.newInstance(isOnBoarding)
     }
 
     data class ConnectTypeScreen(val isOnBoarding: Boolean) : SupportAppScreen() {

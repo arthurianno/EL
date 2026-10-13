@@ -39,6 +39,7 @@ import com.elta.android.presentation.analytic.getMetricAttributes
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.params.ConnectingPathParam
 import com.elta.android.presentation.analytic.model.appmetric.params.SnackStatusParam
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
@@ -661,6 +662,7 @@ class HomeFlowPm @Inject constructor(
     }
 
     private fun openConnectScreen() {
+        appMetric.trackEvent(AppMetricEvent.DeviceConnectingClick(ConnectingPathParam.SYNCHRONIZATION))
         bus.event(Events.Sync.Glucometer.Error)
         navigator.openConnectDevice()
     }
