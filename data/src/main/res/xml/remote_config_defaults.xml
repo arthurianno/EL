@@ -8,4 +8,24 @@
     <key>recovery_account</key>
     <value>true</value>
   </entry>
+  <entry>
+    <key>app_updates_enabled</key>
+    <value>false</value>
+  </entry>
+  <entry>
+    <key>android_google_latest_version_code</key>
+    <value>0</value>
+  </entry>
+  <entry>
+    <key>android_google_update_url</key>
+    <value>https://play.google.com/store/apps/details?id=com.elta.android</value>
+  </entry>
+  <entry>
+    <key>android_rustore_latest_version_code</key>
+    <value>0</value>
+  </entry>
+  <entry>
+    <key>android_rustore_update_url</key>
+    <value>https://www.rustore.ru/catalog/app/com.elta.android</value>
+  </entry>
 </defaults>

@@ -26,6 +26,8 @@ import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.domain.features.version.interactor.CheckAppVersionUseCase
 import com.elta.android.domain.features.version.model.VersionStatus
+import com.elta.android.domain.features.version.model.AppUpdateOffer
+import com.elta.android.domain.features.version.repository.StoreUpdateRepository
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
@@ -42,6 +44,7 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.features.app.model.SyncStatus
+import com.elta.android.presentation.features.version.optional.OptionalUpdatePromptState
 import com.elta.android.presentation.utils.LocaleHelper
 import com.elta.android.presentation.utils.OneSignalTags
 import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
@@ -52,6 +55,7 @@ import com.elta.android.presentation.widgets.status.Visibility
 import com.github.terrakok.cicerone.Screen
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.rx2.rxSingle
@@ -66,6 +70,7 @@ import kotlin.invoke
 private const val EMPTY_STATUS_DELAY_MILLIS = 400L
 private const val STATUS_DELAY_MILLIS = 2000L
 private const val LANG_FLOW_TAG = "LangFlow"
+private const val OPTIONAL_UPDATE_IDLE_DELAY_MILLIS = 750L
 
 class AppPm @Inject constructor(
     private val getUserInfo: GetUserInfoUseCase,
@@ -73,6 +78,7 @@ class AppPm @Inject constructor(
     private val getProfileSettings: GetProfileSettingsUseCase,
     private val getUserId: GetUserIdUseCase,
     private val checkAppVersion: CheckAppVersionUseCase,
+    private val storeUpdates: StoreUpdateRepository,
     private val cleanupFiles: CleanupCachedFilesUseCase,
     private val firebaseStorage: FirebaseStorage,
     private val crashlyticsReport: CrashlyticsReport,
@@ -110,11 +116,54 @@ class AppPm @Inject constructor(
     val syncStatusState = state<Status>()
     val syncStatusVisibility = state<Visibility>(Visibility.Hide)
 
-    val showOptionalUpdateDialogCommand = command<Unit>()
+    val showOptionalUpdateDialogCommand = command<List<AppUpdateOffer>>()
+    val closeOptionalUpdateDialogCommand = command<Unit>()
+    val optionalUpdateUiReadyAction = action<Boolean>()
+    val optionalUpdateDialogVisibilityAction = action<Boolean>()
+    private val optionalUpdatePrompt = OptionalUpdatePromptState()
+    private val checkStoreUpdatesAction = action<Unit>()
 
     @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
+
+        checkStoreUpdatesAction.observable
+            .debounce(OPTIONAL_UPDATE_IDLE_DELAY_MILLIS, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+            .doOnNext { evaluateOptionalStoreUpdates() }
+            .subscribe()
+            .untilDestroy()
+
+        optionalUpdateUiReadyAction.observable
+            .distinctUntilChanged()
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {
+                optionalUpdatePrompt.foreground = it
+                if (it) fetchRemoteConfigAction.consumer.accept(Unit)
+                checkOptionalStoreUpdates()
+            }
+            .subscribe()
+            .untilDestroy()
+
+        optionalUpdateDialogVisibilityAction.observable
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext(optionalUpdatePrompt::onDialogVisibilityChanged)
+            .subscribe()
+            .untilDestroy()
+
+        bus.events<Events.BackendSyncProgress>()
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {
+                optionalUpdatePrompt.backendSync = it.inProgress
+                checkOptionalStoreUpdates()
+            }
+            .subscribe()
+            .untilDestroy()
+
+        bus.events<Events.Sync>()
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext(::trackSyncForUpdates)
+            .subscribe()
+            .untilDestroy()
 
         coldStartAction.observable
             .skipWhileInProgress()
@@ -189,6 +238,8 @@ class AppPm @Inject constructor(
                                 router.newRootFlow(screen)
                             }
                         }
+                        optionalUpdatePrompt.startupComplete = true
+                        checkOptionalStoreUpdates()
                     }
                     .doOnError(::handleError)
             }
@@ -196,6 +247,8 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         networkStateCommand.observable
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext { optionalUpdatePrompt.online = it }
             .filter { it }
             .map { }
             .doOnNext(checkAppVersionAction.consumer)
@@ -206,18 +259,24 @@ class AppPm @Inject constructor(
             .flatMapSingle {
                 checkAppVersion.execute()
                     .doOnSuccess { versionStatus ->
+                        optionalUpdatePrompt.serverVersionChecked = true
                         when (versionStatus) {
                             VersionStatus.OPTIONAL -> {
-                                showOptionalUpdateDialogCommand.consumer.accept(Unit)
+                                if (BuildConfig.APP_STORE == "huawei") {
+                                    showOptionalUpdateDialogCommand.consumer.accept(emptyList())
+                                }
                             }
 
                             VersionStatus.MANDATORY -> {
+                                optionalUpdatePrompt.mandatoryUpdate = true
+                                closeOptionalUpdateDialogCommand.consumer.accept(Unit)
                                 setStatusVisibility(Visibility.Hide)
                                 router.newRootFlow(Screens.ForcedUpdateScreen)
                             }
 
                             else -> {}
                         }
+                        checkOptionalStoreUpdates()
                     }
                     .doOnError(::handleError)
             }
@@ -237,8 +296,11 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         fetchRemoteConfigAction.observable
-            .flatMapCompletable {
+            .concatMapCompletable {
                 fetchRemoteConfigUseCase.execute()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnComplete(::checkOptionalStoreUpdates)
+                    .onErrorComplete()
             }
             .subscribe()
             .untilDestroy()
@@ -570,6 +632,32 @@ class AppPm @Inject constructor(
 
     fun uploadLogs() {
         firebaseStorage.uploadLogFile()
+    }
+
+    private fun checkOptionalStoreUpdates() {
+        checkStoreUpdatesAction.consumer.accept(Unit)
+    }
+
+    private fun evaluateOptionalStoreUpdates() {
+        val updates = storeUpdates.availableUpdates()
+        if (optionalUpdatePrompt.requestPrompt(
+                hasUpdate = updates.isNotEmpty(),
+                lastShownAtMillis = storeUpdates.lastPromptTimeMillis(),
+                nowMillis = System.currentTimeMillis()
+            )
+        ) {
+            showOptionalUpdateDialogCommand.consumer.accept(updates)
+        }
+    }
+
+    private fun trackSyncForUpdates(event: Events.Sync) {
+        when (event) {
+            Events.Sync.Glucometer.Started -> optionalUpdatePrompt.glucometerSync = true
+            Events.Sync.Server.Started -> optionalUpdatePrompt.serverSync = true
+            is Events.Sync.Glucometer -> optionalUpdatePrompt.glucometerSync = false
+            is Events.Sync.Server -> optionalUpdatePrompt.serverSync = false
+        }
+        checkOptionalStoreUpdates()
     }
 
     override fun handleError(error: Throwable) {

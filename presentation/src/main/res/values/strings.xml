@@ -1,4 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="update_choose_store">Где обновить приложение?</string>
+    <string name="update_store_google_play" translatable="false">Google Play</string>
+    <string name="update_store_rustore" translatable="false">RuStore</string>
+    <string name="update_store_unavailable">Не удалось открыть магазин. Попробуйте позже.</string>
+    <string name="update_preview_store_selected">Предпросмотр: выбран %1$s.</string>
 
     <string name="app_name">Сателлит Online</string>
     <string name="input_font_name">roboto_regular.ttf</string>

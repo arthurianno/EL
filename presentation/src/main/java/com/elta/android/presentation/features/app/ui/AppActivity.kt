@@ -8,6 +8,8 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.fragment.app.DialogFragment
 import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
@@ -24,7 +26,6 @@ import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkProcessor
 import com.elta.android.presentation.utils.keyboard.KeyboardEventListener
 import com.elta.android.presentation.widgets.TwoStateStatusView
 import com.elta.android.presentation.widgets.status.StatusView
-import com.nullgr.core.ui.fragments.showDialog
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import javax.inject.Inject
@@ -35,6 +36,8 @@ class AppActivity : BaseActivity<AppPm>() {
        // const val OPEN_CONSULTANT_CHAT = "open_consultant_chat"
         private const val TAG = "LangFlow"
         private const val DEBUG_OPEN_HOW_TO_CONNECT = "debug_open_how_to_connect"
+        private const val UPDATE_DIALOG_TAG = "optional_app_update"
+        private const val DEBUG_PREVIEW_APP_UPDATE = "debug_preview_app_update"
     }
 
     @Inject
@@ -51,10 +54,12 @@ class AppActivity : BaseActivity<AppPm>() {
         findViewById<TwoStateStatusView>(R.id.connectionStatusView)
     }
     private var isAppReady = false
+    private var updatePreviewRequested = false
 
     private val splashFallbackRunnable = Runnable {
         Log.w(TAG, "splashFallbackRunnable fired after timeout")
         isAppReady = true
+        notifyUpdateUiReady()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,11 +79,19 @@ class AppActivity : BaseActivity<AppPm>() {
         content.setBackgroundResource(R.color.color_window_background)
         content.applyNavigationBarInsetsPadding()
 
+        supportFragmentManager.setFragmentResultListener(
+            OptionalUpdateDialogFragment.RESULT_KEY, this
+        ) { _, result ->
+            presentationModel.optionalUpdateDialogVisibilityAction.consumer.accept(
+                result.getBoolean(OptionalUpdateDialogFragment.RESULT_VISIBLE)
+            )
+        }
+
         splashScreen.setKeepOnScreenCondition {
             !isAppReady
         }
 
-        if (openDebugHowToConnectIfRequested(intent)) return
+        if (openDebugUpdatePreviewIfRequested(intent) || openDebugHowToConnectIfRequested(intent)) return
 
         val shouldOpenGreetingAfterLanguageSelection =
             LocaleHelper.consumePendingGreetingAfterLanguageSelection(this)
@@ -140,13 +153,46 @@ class AppActivity : BaseActivity<AppPm>() {
         pm.networkStateCommand.bindTo(connectionStatusView.changeState())
         pm.syncStatusVisibility.bindTo(statusView.visibleChanges())
         pm.syncStatusState.bindTo(statusView.statusChanges())
-        pm.showOptionalUpdateDialogCommand.bindTo {
-            supportFragmentManager.showDialog(OptionalUpdateDialogFragment.newInstance())
+        pm.closeOptionalUpdateDialogCommand.bindTo {
+            val dialog = supportFragmentManager.findFragmentByTag(UPDATE_DIALOG_TAG) as? DialogFragment
+            if (supportFragmentManager.isStateSaved) dialog?.dismissAllowingStateLoss()
+            else dialog?.dismiss()
+        }
+        pm.showOptionalUpdateDialogCommand.bindTo { updates ->
+            val manager = supportFragmentManager
+            when {
+                manager.findFragmentByTag(UPDATE_DIALOG_TAG) != null ->
+                    pm.optionalUpdateDialogVisibilityAction.consumer.accept(true)
+                manager.isStateSaved || !lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) ||
+                    manager.fragments.any { it is DialogFragment && it.isVisible } ->
+                    pm.optionalUpdateDialogVisibilityAction.consumer.accept(false)
+                else -> OptionalUpdateDialogFragment.newInstance(updates).show(manager, UPDATE_DIALOG_TAG)
+            }
         }
         pm.imagesLoadedCommand.bindTo {
             Log.i(TAG, "AppActivity: imagesLoadedCommand received")
             isAppReady = true
+            notifyUpdateUiReady()
         }
+    }
+
+    override fun onResumeFragments() {
+        super.onResumeFragments()
+        window.decorView.post {
+            notifyUpdateUiReady()
+            showPendingUpdatePreview()
+        }
+    }
+
+    override fun onPause() {
+        presentationModel.optionalUpdateUiReadyAction.consumer.accept(false)
+        super.onPause()
+    }
+
+    private fun notifyUpdateUiReady() {
+        presentationModel.optionalUpdateUiReadyAction.consumer.accept(
+            isAppReady && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+        )
     }
 
     override fun onDestroy() {
@@ -157,6 +203,10 @@ class AppActivity : BaseActivity<AppPm>() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        if (openDebugUpdatePreviewIfRequested(intent)) {
+            showPendingUpdatePreview()
+            return
+        }
         if (openDebugHowToConnectIfRequested(intent)) return
 
         DynamicLinkProcessor.from(intent)
@@ -181,6 +231,24 @@ class AppActivity : BaseActivity<AppPm>() {
         router.newRootScreen(screen)
         isAppReady = true
         return true
+    }
+
+    private fun openDebugUpdatePreviewIfRequested(intent: Intent?): Boolean {
+        if (!BuildConfig.DEBUG || intent?.getBooleanExtra(DEBUG_PREVIEW_APP_UPDATE, false) != true) return false
+        isAppReady = true
+        updatePreviewRequested = true
+        router.newRootFlow(Screens.GreetingFlow)
+        return true
+    }
+
+    private fun showPendingUpdatePreview() {
+        if (!updatePreviewRequested || supportFragmentManager.isStateSaved ||
+            !lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+        ) return
+        updatePreviewRequested = false
+        if (supportFragmentManager.findFragmentByTag(UPDATE_DIALOG_TAG) == null) {
+            OptionalUpdateDialogFragment.newPreviewInstance().show(supportFragmentManager, UPDATE_DIALOG_TAG)
+        }
     }
 
     override fun onStop() {

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="update_choose_store">Where would you like to update the app?</string>
+    <string name="update_store_unavailable">Could not open the store. Please try again later.</string>
+    <string name="update_preview_store_selected">Preview: selected %1$s.</string>
 
     <string name="app_name">Satellite Online</string>
     <string name="input_font_name">roboto_regular.ttf</string>

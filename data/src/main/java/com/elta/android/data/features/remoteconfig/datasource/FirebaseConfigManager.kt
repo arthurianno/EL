@@ -5,6 +5,7 @@ import com.elta.android.data.R
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class FirebaseConfigManager @Inject constructor(
@@ -17,12 +18,12 @@ class FirebaseConfigManager @Inject constructor(
         val configSettings = FirebaseRemoteConfigSettings.Builder()
             .setMinimumFetchIntervalInSeconds(updateConfigInterval)
             .build()
-        remoteConfig.setConfigSettingsAsync(configSettings)
-        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
-
         return try {
-            remoteConfig.fetch().await()
-            remoteConfig.activate().await()
+            remoteConfig.setConfigSettingsAsync(configSettings).await()
+            remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults).await()
+            remoteConfig.fetchAndActivate().await()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }

@@ -72,6 +72,8 @@ import com.elta.android.domain.features.newsChannel.repository.NewsRepository
 import com.elta.android.domain.features.observers.repository.ObserverRepository
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
 import com.elta.android.domain.features.remoteconfig.repository.RemoteConfigRepository
+import com.elta.android.domain.features.version.repository.StoreUpdateRepository
+import com.elta.android.data.features.version.repository.StoreUpdateDataRepository
 import com.elta.android.domain.features.reports.repository.ReportsRepository
 import com.elta.android.domain.features.rostech.repository.IomtRepository
 import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
@@ -243,5 +245,8 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindRemoteConfigRepository(source: RemoteConfigDataRepository): RemoteConfigRepository
+
+    @Binds
+    abstract fun bindStoreUpdateRepository(source: StoreUpdateDataRepository): StoreUpdateRepository
 
 }
