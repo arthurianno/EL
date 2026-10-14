@@ -603,7 +603,16 @@ private fun TirIndicator(
     modifier: Modifier = Modifier,
     designScale: Float
 ) {
-    val isDash = tirPercentage == "—" || tirPercentage.isBlank()
+    val normalizedValue = tirPercentage.trim()
+    val numericValue = normalizedValue
+        .removeSuffix("%")
+        .trim()
+        .replace(',', '.')
+        .toDoubleOrNull()
+
+    val isDash = normalizedValue.isBlank() ||
+            normalizedValue == "—" ||
+            numericValue == 0.0
     val density = LocalDensity.current
     val percentageFontSize = fittedTirValueFontSize(tirPercentage, designScale)
 
