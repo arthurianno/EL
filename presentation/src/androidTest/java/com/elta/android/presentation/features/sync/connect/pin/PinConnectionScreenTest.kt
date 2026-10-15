@@ -6,8 +6,13 @@ import android.view.WindowManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.test.assertIsDisplayed
@@ -21,12 +26,14 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.theme.EltaTheme
 import java.io.File
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,10 +51,17 @@ class PinConnectionScreenTest {
     @Test
     fun pinInputEnablesConfirmationOnlyAfterThreeDigits() {
         val state = mutableStateOf(PinConnectionUiState(stage = PinConnectionStage.ENTER_PIN))
+        val extraKeyboardHeight = mutableStateOf(0.dp)
         var confirmations = 0
         compose.setContent {
             EltaTheme {
-                PinConnectionScreen(state.value, {}, {}, {}, { state.value = state.value.copy(pin = it) }, { confirmations++ })
+                Column(Modifier.fillMaxSize()) {
+                    PinConnectionScreen(
+                        state.value, {}, {}, {}, { state.value = state.value.copy(pin = it) }, { confirmations++ },
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(Modifier.height(extraKeyboardHeight.value))
+                }
             }
         }
         val button = compose.onNodeWithText(compose.activity.getString(R.string.sync_pin_confirm))
@@ -67,6 +81,10 @@ class PinConnectionScreenTest {
         val displayBounds = compose.onNodeWithTag(PIN_DISPLAY_TAG).fetchSemanticsNode().boundsInRoot
         assertEquals(canvasBounds.top + canvasBounds.width * 0.373f, displayBounds.top, 1f)
         assertEquals(canvasBounds.width * 0.524f, displayBounds.width, 1f)
+        assertEquals(canvasBounds.width * 0.352f, displayBounds.height, 1f)
+        val actionBounds = compose.onNodeWithTag(PIN_ACTION_PANEL_TAG).fetchSemanticsNode().boundsInRoot
+        val clearance = 16f * compose.activity.resources.displayMetrics.density
+        assertTrue("LCD must clear the action panel above the keyboard", displayBounds.bottom + clearance <= actionBounds.top + 1f)
         input.performTextInput("03")
         button.assertIsNotEnabled()
         input.performTextInput("7")
@@ -74,12 +92,26 @@ class PinConnectionScreenTest {
         compose.runOnIdle {
             assertEquals("037", state.value.pin)
             assertEquals(1, confirmations)
+            state.value = state.value.copy(pin = "376")
         }
         val directory = File(InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null), "pin-screens")
         directory.mkdirs()
         compose.waitForIdle()
+        SystemClock.sleep(400)
         val screenshot = checkNotNull(InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot())
         File(directory, "enter_pin_keyboard.png").outputStream().use { screenshot.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        // IMEs may add a toolbar or use taller keys than the emulator's keyboard.
+        compose.runOnIdle { extraKeyboardHeight.value = 120.dp }
+        compose.waitForIdle()
+        val compactDisplay = compose.onNodeWithTag(PIN_DISPLAY_TAG).fetchSemanticsNode().boundsInRoot
+        val compactPanel = compose.onNodeWithTag(PIN_ACTION_PANEL_TAG).fetchSemanticsNode().boundsInRoot
+        val compactCanvas = compose.onNodeWithTag(PIN_ANIMATION_TAG).fetchSemanticsNode().boundsInRoot
+        assertEquals(compactCanvas.width * 0.352f, compactDisplay.height, 1f)
+        assertTrue("Tall IME must leave the entire LCD visible", compactDisplay.bottom + clearance <= compactPanel.top + 1f)
+        button.assertIsDisplayed().assertIsEnabled()
+        checkNotNull(InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()).let { bitmap ->
+            File(directory, "enter_pin_tall_keyboard.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        }
     }
 
     @Test

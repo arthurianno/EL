@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
@@ -36,7 +37,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.elta.android.presentation.R
 import com.elta.android.presentation.theme.LocalColors
-import com.elta.android.presentation.theme.LocalTypes
 
 @Composable
 internal fun AuthPasswordField(
@@ -53,7 +53,6 @@ internal fun AuthPasswordField(
     autofillContentType: ContentType = ContentType.Password
 ) {
     val colors = LocalColors.current
-    val types = LocalTypes.current
     var isFocused by remember { mutableStateOf(false) }
     val lineColor = when {
         errorText != null -> colors.red
@@ -67,7 +66,7 @@ internal fun AuthPasswordField(
             onValueChange = onValueChange,
             enabled = enabled,
             singleLine = true,
-            textStyle = types.body1.copy(color = colors.blackBlue),
+            textStyle = AuthTypography.field.copy(color = colors.blackBlue),
             cursorBrush = SolidColor(colors.gGreenB),
             visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
@@ -81,14 +80,15 @@ internal fun AuthPasswordField(
                 },
             decorationBox = { innerTextField ->
                 Column {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Box(Modifier.weight(1f).padding(vertical = 8.dp)) {
+                    Row(Modifier.fillMaxWidth().padding(vertical = 12.dp).heightIn(min = 24.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.weight(1f)) {
                             if (value.isEmpty()) {
-                                Text(label, style = types.body1, color = colors.shadeBlack2)
+                                Text(label, style = AuthTypography.field, color = colors.shadeBlack2)
                             }
                             innerTextField()
                         }
-                        IconButton(onClick = onToggleVisibility, enabled = enabled) {
+                        // Compose expands the 24dp visual to the minimum 48dp touch target.
+                        IconButton(onClick = onToggleVisibility, enabled = enabled, modifier = Modifier.size(24.dp)) {
                             Icon(
                                 painter = painterResource(
                                     if (isPasswordVisible) R.drawable.ic_password_hide else R.drawable.ic_show_password
@@ -107,9 +107,9 @@ internal fun AuthPasswordField(
         )
         Text(
             text = errorText ?: helperText,
-            style = if (errorText != null) types.descriptionError else types.caption1,
+            style = AuthTypography.helper,
             color = if (errorText != null) colors.red else colors.shadeBlack2,
-            modifier = Modifier.padding(top = 4.dp)
+            modifier = Modifier.padding(top = 7.dp)
         )
     }
 }

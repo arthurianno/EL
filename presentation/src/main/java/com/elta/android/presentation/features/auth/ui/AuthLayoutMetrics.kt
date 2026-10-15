@@ -9,7 +9,7 @@ internal data class AuthLayoutMetrics(
     val contentHeight: Int
 )
 
-/** Pixel measurements; the viewport already excludes the toolbar and window insets. */
+/** Pixel measurements; the viewport already excludes the toolbar, actions and window insets. */
 internal fun calculateAuthLayoutMetrics(
     viewportHeight: Int,
     contentWidth: Int,

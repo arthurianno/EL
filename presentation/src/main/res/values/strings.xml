@@ -41,8 +41,8 @@
 
     <!--REGISTRATION FLOW -->
     <string name="registration_main_toolbar_button_text">У вас уже есть аккаунт?</string>
-    <string name="registration_main_title_new_user">Новый пользователь</string>
-    <string name="registration_main_subtitle">Пожалуйста, введите email и пароль для вашего будущего аккаунта</string>
+    <string name="registration_main_title">Регистрация</string>
+    <string name="registration_main_subtitle">Введите email и пароль для вашего будущего аккаунта</string>
     <string name="registration_main_email_hint">Ваш email</string>
     <string name="registration_main_password_hint">Пароль</string>
     <string name="registration_main_description_privacy_policy">Я ознакомлен и согласен с условиями\nлицензионного договора и политики\nобработки персональных данных, а также\nдаю согласие на обработку персональных\nданных</string>
@@ -76,8 +76,8 @@
 
     <!-- AUTH FLOW -->
     <string name="auth_toolbar_button_text">Забыли пароль?</string>
-    <string name="auth_title">С возвращением!</string>
-    <string name="auth_subtitle">Чтобы продолжить, введите ваш email\nи пароль от аккаунта</string>
+    <string name="auth_title">Войти</string>
+    <string name="auth_subtitle">Чтобы продолжить, введите ваш email и пароль от аккаунта</string>
     <string name="auth_button_continue">Войти</string>
     <string name="auth_email_and_password_not_correct">Некорректный email или пароль</string>
 
@@ -91,6 +91,7 @@
     <string name="auth_password_create_title">Новый пароль</string>
     <string name="auth_password_create_subtitle">Придумайте новый пароль для входа в приложение</string>
     <string name="auth_password_create_password_hint">Пароль</string>
+    <string name="auth_password_create_button_continue">Продолжить</string>
     <string name="auth_password_create_login_button_title">Сохранить и войти</string>
     <string name="auth_password_create_error_input_password">Некорректный пароль</string>
     <string name="auth_password_create_password_pattern">Не менее 8 символов (A–Z, a–z, 0–9)</string>

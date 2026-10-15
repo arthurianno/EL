@@ -3,7 +3,6 @@ package com.elta.android.presentation.features.auth.login.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
@@ -21,6 +20,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.auth.login.model.LoginAction
 import com.elta.android.presentation.features.auth.login.model.LoginState
@@ -28,6 +28,7 @@ import com.elta.android.presentation.features.auth.ui.AuthEmailField
 import com.elta.android.presentation.features.auth.ui.AuthPasswordField
 import com.elta.android.presentation.features.auth.ui.AuthScreenLayout
 import com.elta.android.presentation.features.auth.ui.AuthSubmitButton
+import com.elta.android.presentation.features.auth.ui.AuthTypography
 import com.elta.android.presentation.theme.EltaTheme
 import com.elta.android.presentation.theme.LocalColors
 import com.elta.android.presentation.theme.LocalTypes
@@ -54,6 +55,7 @@ internal fun LoginScreen(
         subtitle = state.screenConfig?.description ?: stringResource(R.string.auth_subtitle),
         illustrationRes = R.drawable.img_login,
         compactIllustrationSize = DpSize(155.dp, 149.dp),
+        titleStyle = AuthTypography.title.copy(lineHeight = 27.sp),
         illustrationUrl = null,
         modifier = modifier,
         topBar = {
@@ -66,13 +68,22 @@ internal fun LoginScreen(
                 )
             }
             Spacer(Modifier.weight(1f))
-            TextButton(onClick = onForgotPassword, enabled = !state.isLoading) {
+            TextButton(onClick = onForgotPassword, enabled = !state.isLoading, modifier = Modifier.padding(end = 4.dp)) {
                 Text(
                     text = stringResource(R.string.auth_toolbar_button_text),
-                    style = LocalTypes.current.body1,
-                    color = if (state.isLoading) colors.shadeBlack2 else colors.blackBlue
+                    style = AuthTypography.toolbar,
+                    color = if (state.isLoading) colors.shadeBlack2 else colors.shadeBlack0
                 )
             }
+        },
+        actions = {
+            AuthSubmitButton(
+                text = stringResource(R.string.auth_button_continue),
+                enabled = state.canSubmit,
+                isLoading = state.isLoading,
+                shape = 10,
+                onClick = submit
+            )
         }
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
@@ -87,7 +98,6 @@ internal fun LoginScreen(
                 maxLength = 254,
                 onSubmit = { focusManager.moveFocus(FocusDirection.Next) }
             )
-            Spacer(Modifier.height(16.dp))
             AuthPasswordField(
                 value = state.password,
                 onValueChange = { onAction(LoginAction.PasswordChanged(it)) },
@@ -108,15 +118,6 @@ internal fun LoginScreen(
                 )
             }
         }
-        Spacer(Modifier.height(24.dp))
-        AuthSubmitButton(
-            text = stringResource(R.string.auth_button_continue),
-            enabled = state.canSubmit,
-            isLoading = state.isLoading,
-            shape = 10,
-            onClick = submit,
-            modifier = Modifier.padding(horizontal = 32.dp)
-        )
     }
 }
 

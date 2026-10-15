@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.elta.android.presentation.theme.LocalBrash
 import com.elta.android.presentation.theme.LocalColors
@@ -26,7 +27,8 @@ fun GradientActionButton(
     isLoading: Boolean,
     shape: Int = 0,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle? = null
 ) {
     val colors = LocalColors.current
     val cornerShape = RoundedCornerShape(shape.dp)
@@ -61,7 +63,7 @@ fun GradientActionButton(
                 strokeWidth = 2.dp
             )
         } else {
-            Text(text, style = LocalTypes.current.buttonLargeText)
+            Text(text, style = textStyle ?: LocalTypes.current.buttonLargeText)
         }
     }
 }

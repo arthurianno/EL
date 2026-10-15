@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.auth.password.recovery.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,9 +26,9 @@ import com.elta.android.presentation.features.auth.password.recovery.model.Passw
 import com.elta.android.presentation.features.auth.ui.AuthEmailField
 import com.elta.android.presentation.features.auth.ui.AuthScreenLayout
 import com.elta.android.presentation.features.auth.ui.AuthSubmitButton
+import com.elta.android.presentation.features.auth.ui.AuthTypography
 import com.elta.android.presentation.theme.EltaTheme
 import com.elta.android.presentation.theme.LocalColors
-import com.elta.android.presentation.theme.LocalTypes
 
 @Composable
 internal fun PasswordRecoveryScreen(
@@ -38,7 +37,6 @@ internal fun PasswordRecoveryScreen(
     onClose: () -> Unit
 ) {
     val colors = LocalColors.current
-    val types = LocalTypes.current
     val focusManager = LocalFocusManager.current
     val submit = {
         if (state.canSubmit) {
@@ -52,6 +50,7 @@ internal fun PasswordRecoveryScreen(
         subtitle = state.screenConfig?.description ?: stringResource(R.string.auth_password_recovery_subtitle),
         illustrationRes = R.drawable.img_password_recovery,
         compactIllustrationSize = DpSize(125.dp, 120.dp),
+        actionSpacing = 16.dp,
         topBar = {
             IconButton(onClick = onClose) {
                 Icon(
@@ -61,48 +60,42 @@ internal fun PasswordRecoveryScreen(
                     modifier = Modifier.size(24.dp)
                 )
             }
+        },
+        actions = {
+            AuthSubmitButton(
+                text = stringResource(R.string.auth_password_recovery_button_text),
+                enabled = state.canSubmit,
+                isLoading = state.isLoading,
+                shape = 10,
+                onClick = submit
+            )
         }
     ) {
-        BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val formPadding = if (maxWidth < 340.dp) 12.dp else 16.dp
-            val buttonPadding = if (maxWidth < 340.dp) 20.dp else 27.dp
-            Column(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(horizontal = formPadding)) {
-                    AuthEmailField(
-                        value = state.email,
-                        onValueChange = { onAction(PasswordRecoveryAction.EmailChanged(it)) },
-                        label = stringResource(R.string.auth_password_recovery_email_hint),
-                        error = state.emailError?.let { stringResource(it) },
-                        enabled = !state.isLoading && !state.isLinkSent,
-                        onSubmit = submit
-                    )
-                    Spacer(Modifier.height(24.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(11.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_info),
-                            contentDescription = null,
-                            tint = colors.shadeBlack2,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.auth_password_recovery_email_description),
-                            style = types.caption1,
-                            color = colors.shadeBlack2,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-                AuthSubmitButton(
-                    text = stringResource(R.string.auth_password_recovery_button_text),
-                    enabled = state.canSubmit,
-                    isLoading = state.isLoading,
-                    shape = 10,
-                    onClick = submit,
-                    modifier = Modifier.padding(horizontal = buttonPadding)
+        Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+            AuthEmailField(
+                value = state.email,
+                onValueChange = { onAction(PasswordRecoveryAction.EmailChanged(it)) },
+                label = stringResource(R.string.auth_password_recovery_email_hint),
+                error = state.emailError?.let { stringResource(it) },
+                enabled = !state.isLoading && !state.isLinkSent,
+                onSubmit = submit
+            )
+            Spacer(Modifier.height(16.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_info),
+                    contentDescription = null,
+                    tint = colors.shadeBlack2,
+                    modifier = Modifier.size(22.dp)
+                )
+                Text(
+                    text = stringResource(R.string.auth_password_recovery_email_description),
+                    style = AuthTypography.helper,
+                    color = colors.shadeBlack2,
+                    modifier = Modifier.weight(1f)
                 )
             }
         }

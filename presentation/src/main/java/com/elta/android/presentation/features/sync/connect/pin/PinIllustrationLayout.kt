@@ -9,6 +9,7 @@ internal data class PinIllustrationLayout(val width: Dp, val top: Dp) {
     val height: Dp get() = width * 1.5f
     val meterTop: Dp get() = top + width * 0.684f
     val lcdTop: Dp get() = top + width * 0.373f
+    val lcdBottom: Dp get() = top + width * 0.725f
 }
 
 internal fun normalPinIllustrationLayout(viewportWidth: Dp, viewportHeight: Dp): PinIllustrationLayout {
@@ -19,9 +20,12 @@ internal fun normalPinIllustrationLayout(viewportWidth: Dp, viewportHeight: Dp):
 internal fun enlargedPinIllustrationLayout(
     normal: PinIllustrationLayout,
     visibleHeight: Dp,
-    fontScale: Float
+    headerBottom: Dp,
+    footerHeight: Dp
 ): PinIllustrationLayout {
-    val bodyTop = minOf(48.dp + 112.dp * fontScale + 12.dp, visibleHeight * 0.45f)
-    val width = minOf(normal.width, ((visibleHeight - 80.dp - bodyTop) / 0.586f).coerceAtLeast(0.dp))
+    val bodyTop = headerBottom + 12.dp
+    // Fit the whole LCD above the measured action panel, including its glass edge.
+    val lcdBottomLimit = visibleHeight - footerHeight - 16.dp
+    val width = minOf(normal.width, ((lcdBottomLimit - bodyTop) / 0.586f).coerceAtLeast(0.dp))
     return PinIllustrationLayout(width, bodyTop - width * 0.139f)
 }

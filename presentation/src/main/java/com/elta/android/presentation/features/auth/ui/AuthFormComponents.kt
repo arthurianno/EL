@@ -2,7 +2,9 @@ package com.elta.android.presentation.features.auth.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.onFocusChanged
@@ -28,7 +31,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.elta.android.presentation.core.compose.widgets.buttons.GradientActionButton
 import com.elta.android.presentation.theme.LocalColors
-import com.elta.android.presentation.theme.LocalTypes
 
 @Composable
 internal fun AuthEmailField(
@@ -44,7 +46,6 @@ internal fun AuthEmailField(
     maxLength: Int = Int.MAX_VALUE
 ) {
     val colors = LocalColors.current
-    val types = LocalTypes.current
 
     var isFocused by remember {
         mutableStateOf(false)
@@ -65,7 +66,6 @@ internal fun AuthEmailField(
     Column(
         modifier = modifier
     ) {
-
         BasicTextField(
             value = fieldValue,
             onValueChange = {
@@ -80,7 +80,7 @@ internal fun AuthEmailField(
             },
             enabled = enabled,
             singleLine = true,
-            textStyle = types.body1.copy(
+            textStyle = AuthTypography.field.copy(
                 color = colors.blackBlue
             ),
             cursorBrush = SolidColor(colors.gGreenB),
@@ -99,24 +99,20 @@ internal fun AuthEmailField(
                     isFocused = it.isFocused
                 },
             decorationBox = { innerTextField ->
-
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(
-                                start = 0.dp,
-                                end = 0.dp,
-                                bottom = 8.dp
-                            )
+                            .padding(top = 12.dp, bottom = 12.dp)
+                            .heightIn(min = 24.dp),
+                        contentAlignment = Alignment.CenterStart
                     ) {
                         if (value.isEmpty()) {
                             Text(
                                 text = label,
-                                style = types.body1,
+                                style = AuthTypography.field,
                                 color = colors.shadeBlack2
                             )
                         }
@@ -136,13 +132,16 @@ internal fun AuthEmailField(
         if (error != null) {
             Text(
                 text = error,
-                style = types.descriptionError,
+                style = AuthTypography.helper,
                 color = colors.red,
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 7.dp)
             )
+        } else {
+            Spacer(Modifier.heightIn(min = 7.dp))
         }
     }
 }
+
 @Composable
 internal fun AuthSubmitButton(
     text: String,
@@ -158,6 +157,7 @@ internal fun AuthSubmitButton(
         isLoading = isLoading,
         shape = shape,
         onClick = onClick,
-        modifier = modifier
+        modifier = modifier,
+        textStyle = AuthTypography.button
     )
 }

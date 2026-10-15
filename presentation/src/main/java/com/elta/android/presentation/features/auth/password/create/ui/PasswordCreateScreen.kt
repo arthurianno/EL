@@ -1,10 +1,7 @@
 package com.elta.android.presentation.features.auth.password.create.ui
 
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
@@ -49,6 +46,7 @@ internal fun PasswordCreateScreen(
         subtitle = state.screenConfig?.description ?: stringResource(R.string.auth_password_create_subtitle),
         illustrationRes = R.drawable.img_new_password,
         compactIllustrationSize = DpSize(183.dp, 176.dp),
+        actionSpacing = 16.dp,
         topBar = {
             IconButton(onClick = onClose) {
                 Icon(
@@ -58,41 +56,35 @@ internal fun PasswordCreateScreen(
                     modifier = Modifier.size(24.dp)
                 )
             }
+        },
+        actions = {
+            AuthSubmitButton(
+                text = stringResource(R.string.auth_password_create_button_continue),
+                enabled = state.canSubmit,
+                isLoading = state.isLoading,
+                shape = 10,
+                onClick = submit
+            )
         }
     ) {
-        BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val formPadding = if (maxWidth < 340.dp) 12.dp else 16.dp
-            val buttonPadding = if (maxWidth < 340.dp) 20.dp else 32.dp
-            Column(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(horizontal = formPadding)) {
-                    AuthPasswordField(
-                        value = state.password,
-                        onValueChange = { onAction(PasswordCreateAction.PasswordChanged(it)) },
-                        isPasswordVisible = state.isPasswordVisible,
-                        onToggleVisibility = { onAction(PasswordCreateAction.TogglePasswordVisibility) },
-                        label = stringResource(R.string.auth_password_create_password_hint),
-                        helperText = stringResource(R.string.auth_password_create_password_pattern),
-                        errorText = state.passwordError?.let { stringResource(it) },
-                        enabled = state.hasResetToken && !state.isLoading && !state.isPasswordChanged,
-                        onSubmit = submit
-                    )
-                    if (!state.hasResetToken) {
-                        Text(
-                            text = stringResource(R.string.auth_password_create_invalid_link),
-                            style = types.descriptionError,
-                            color = colors.red,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-                AuthSubmitButton(
-                    text = stringResource(R.string.auth_password_create_login_button_title),
-                    enabled = state.canSubmit,
-                    isLoading = state.isLoading,
-                    shape = 10,
-                    onClick = submit,
-                    modifier = Modifier.padding(horizontal = buttonPadding)
+        Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+            AuthPasswordField(
+                value = state.password,
+                onValueChange = { onAction(PasswordCreateAction.PasswordChanged(it)) },
+                isPasswordVisible = state.isPasswordVisible,
+                onToggleVisibility = { onAction(PasswordCreateAction.TogglePasswordVisibility) },
+                label = stringResource(R.string.auth_password_create_password_hint),
+                helperText = stringResource(R.string.auth_password_create_password_pattern),
+                errorText = state.passwordError?.let { stringResource(it) },
+                enabled = state.hasResetToken && !state.isLoading && !state.isPasswordChanged,
+                onSubmit = submit
+            )
+            if (!state.hasResetToken) {
+                Text(
+                    text = stringResource(R.string.auth_password_create_invalid_link),
+                    style = types.descriptionError,
+                    color = colors.red,
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
         }

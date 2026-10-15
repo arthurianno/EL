@@ -2,8 +2,6 @@ package com.elta.android.presentation.features.registration.activation.ui
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
@@ -22,9 +20,9 @@ import androidx.compose.ui.unit.dp
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.auth.ui.AuthScreenLayout
 import com.elta.android.presentation.features.auth.ui.AuthSubmitButton
+import com.elta.android.presentation.features.auth.ui.AuthTypography
 import com.elta.android.presentation.theme.EltaTheme
 import com.elta.android.presentation.theme.LocalColors
-import com.elta.android.presentation.theme.LocalTypes
 
 @Composable
 internal fun ActivationScreen(
@@ -33,11 +31,9 @@ internal fun ActivationScreen(
     onResend: () -> Unit,
     onCheckActivation: () -> Unit,
     modifier: Modifier = Modifier,
-    // Replace with the original laptop artwork when its Figma export is available.
     @DrawableRes illustrationRes: Int = R.drawable.img_active_profile
 ) {
     val colors = LocalColors.current
-    val types = LocalTypes.current
 
     AuthScreenLayout(
         title = stringResource(R.string.registration_activate_title),
@@ -54,30 +50,27 @@ internal fun ActivationScreen(
                     modifier = Modifier.size(24.dp)
                 )
             }
-            Box(Modifier.weight(1f).padding(end = 8.dp), contentAlignment = Alignment.CenterEnd) {
+            Box(Modifier.weight(1f).padding(end = 4.dp), contentAlignment = Alignment.CenterEnd) {
                 TextButton(onClick = onResend, enabled = !isLoading) {
                     Text(
                         text = stringResource(R.string.registration_send_again),
-                        style = types.body1,
+                        style = AuthTypography.toolbar,
                         color = if (isLoading) colors.shadeBlack2 else colors.shadeBlack1,
                         textAlign = TextAlign.End
                     )
                 }
             }
-        }
-    ) {
-        BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val buttonPadding = if (maxWidth < 340.dp) 20.dp else 32.dp
+        },
+        actions = {
             AuthSubmitButton(
                 text = stringResource(R.string.registration_activation_check),
                 enabled = !isLoading,
                 isLoading = isLoading,
                 shape = 10,
-                onClick = onCheckActivation,
-                modifier = Modifier.padding(horizontal = buttonPadding, vertical = 4.dp)
+                onClick = onCheckActivation
             )
         }
-    }
+    ) {}
 }
 
 @Preview(showBackground = true, widthDp = 375, heightDp = 812, locale = "ru")

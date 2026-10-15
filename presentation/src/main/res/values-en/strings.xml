@@ -33,8 +33,8 @@
     <string name="greeting_message">Manage your diabetes with the Satellite Online glucose meter</string>
     <string name="greeting_menu_action">Do you already have an account?</string>
     <string name="registration_main_toolbar_button_text">Do you already have an account?</string>
-    <string name="registration_main_title_new_user">New User</string>
-    <string name="registration_main_subtitle">Please enter the email and password for your future account.</string>
+    <string name="registration_main_title">Registration</string>
+    <string name="registration_main_subtitle">Enter the email and password for your future account</string>
     <string name="registration_main_email_hint">Your Email</string>
     <string name="registration_main_password_hint">Password</string>
     <string name="registration_main_description_privacy_policy">I have read and agree to the terms of the License Agreement and the Personal Data Processing Policy, and I consent to the processing of my personal data.</string>
@@ -65,7 +65,7 @@
     <string name="registration_social_title_no_name">Greetings</string>
     <string name="registration_social_subtitle">Please enter the email and password for your future account</string>
     <string name="auth_toolbar_button_text">Forgot Password?</string>
-    <string name="auth_title">Welcome Back!</string>
+    <string name="auth_title">Sign in</string>
     <string name="auth_subtitle">To continue, please enter your account email and password</string>
     <string name="auth_button_continue">Log In</string>
     <string name="auth_email_and_password_not_correct">Invalid email or password</string>
@@ -78,6 +78,7 @@
     <string name="auth_password_create_title">New Password</string>
     <string name="auth_password_create_subtitle">Create a new password to log into the application.</string>
     <string name="auth_password_create_password_hint">Password</string>
+    <string name="auth_password_create_button_continue">Continue</string>
     <string name="auth_password_create_login_button_title">Save and Log In</string>
     <string name="auth_password_create_error_input_password">Invalid Password</string>
     <string name="auth_password_create_password_pattern">At least 8 characters (A–Z, a–z, 0–9)</string>

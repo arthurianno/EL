@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.sync.connect.pin
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.snap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -46,14 +47,15 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -83,6 +85,7 @@ import com.elta.android.presentation.theme.LocalTypes
 
 internal const val PIN_ANIMATION_TAG = "pin-animation"
 internal const val PIN_DISPLAY_TAG = "pin-display-input"
+internal const val PIN_ACTION_PANEL_TAG = "pin-action-panel"
 
 internal data class PinConnectionUiState(
     val stage: PinConnectionStage = PinConnectionStage.HOW_TO_CONNECT,
@@ -157,9 +160,13 @@ internal fun PinConnectionScreen(
             .statusBarsPadding()
             .navigationBarsPadding()
             .imePadding()
+            .clipToBounds()
     ) {
-        val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-        val fontScale = LocalDensity.current.fontScale
+        val density = LocalDensity.current
+        val imeVisible = WindowInsets.ime.getBottom(density) > 0
+        val fontScale = density.fontScale
+        var headerBottom by remember { mutableStateOf(48.dp + 112.dp * fontScale) }
+        var footerHeight by remember { mutableStateOf(80.dp) }
         var unobscuredHeight by remember(maxWidth) { mutableStateOf(maxHeight) }
         SideEffect {
             if (!imeVisible && !enteringPin) unobscuredHeight = maxHeight
@@ -168,9 +175,11 @@ internal fun PinConnectionScreen(
             maxWidth,
             if (imeVisible || enteringPin) unobscuredHeight else maxHeight
         )
-        val target = if (enteringPin) enlargedPinIllustrationLayout(normal, maxHeight, fontScale) else normal
-        val artWidth by animateDpAsState(target.width, tween(250), label = "pin-canvas-width")
-        val artTop by animateDpAsState(target.top, tween(if (enteringPin) 1000 else 250), label = "pin-canvas-top")
+        val target = if (enteringPin) enlargedPinIllustrationLayout(normal, maxHeight, headerBottom, footerHeight) else normal
+        // IME insets already animate the viewport. A second animation trails the
+        // keyboard and temporarily lets the LCD slide underneath the action panel.
+        val artWidth by animateDpAsState(target.width, if (enteringPin && imeVisible) snap() else tween(250), label = "pin-canvas-width")
+        val artTop by animateDpAsState(target.top, if (enteringPin && imeVisible) snap() else tween(if (enteringPin) 1000 else 250), label = "pin-canvas-top")
         var pinReady by remember { mutableStateOf(false) }
         val headerMaxHeight = if (enteringPin) minOf(112.dp * fontScale, maxHeight * 0.4f)
         else (normal.meterTop - 60.dp).coerceAtLeast(0.dp)
@@ -210,6 +219,9 @@ internal fun PinConnectionScreen(
             Column(
                 Modifier
                     .fillMaxWidth()
+                    .onGloballyPositioned {
+                        headerBottom = with(density) { (it.positionInParent().y + it.size.height).toDp() }
+                    }
                     .heightIn(max = headerMaxHeight)
                     .verticalScroll(rememberScrollState())
                     .background(colors.white)
@@ -252,7 +264,13 @@ internal fun PinConnectionScreen(
                 }
             }
             Spacer(Modifier.weight(1f))
-            Column(Modifier.fillMaxWidth().background(colors.white).padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 20.dp)) {
+            Column(
+                Modifier.fillMaxWidth()
+                    .testTag(PIN_ACTION_PANEL_TAG)
+                    .onSizeChanged { footerHeight = with(density) { it.height.toDp() } }
+                    .background(colors.white)
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = if (enteringPin && imeVisible) 8.dp else 20.dp)
+            ) {
                 if (state.stage == PinConnectionStage.HOW_TO_CONNECT) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -372,54 +390,10 @@ private fun PinDisplayInput(
         decorationBox = { input ->
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 input()
-                Canvas(Modifier.fillMaxSize()) {
-                    val digitHeight = size.height * 0.56f
-                    val digitWidth = minOf(digitHeight * 0.55f, size.width / 3.4f)
-                    val gap = digitWidth * 0.15f
-                    val width = pin.length * digitWidth + (pin.length - 1).coerceAtLeast(0) * gap
-                    pin.forEachIndexed { index, digit ->
-                        drawPinDigit(digit, Offset((size.width - width) / 2 + index * (digitWidth + gap), (size.height - digitHeight) / 2), digitWidth, digitHeight)
-                    }
-                }
+                Canvas(Modifier.fillMaxSize()) { drawPinCode(pin) }
             }
         }
     )
-}
-
-private val digitSegments = mapOf(
-    '0' to "abcdef", '1' to "bc", '2' to "abged", '3' to "abgcd", '4' to "fgbc",
-    '5' to "afgcd", '6' to "afgecd", '7' to "abc", '8' to "abcdefg", '9' to "abfgcd"
-)
-
-private fun DrawScope.drawPinDigit(digit: Char, origin: Offset, width: Float, height: Float) {
-    val thickness = width * 0.16f
-    val bevel = thickness / 2f
-    fun segment(x: Float, y: Float, length: Float, vertical: Boolean) {
-        val points = arrayOf(
-            Offset(bevel, 0f), Offset(length - bevel, 0f), Offset(length, bevel),
-            Offset(length - bevel, thickness), Offset(bevel, thickness), Offset(0f, bevel)
-        )
-        val path = Path()
-        points.forEachIndexed { index, point ->
-            val px = origin.x + x + if (vertical) point.y else point.x
-            val py = origin.y + y + if (vertical) point.x else point.y
-            if (index == 0) path.moveTo(px, py) else path.lineTo(px, py)
-        }
-        path.close()
-        drawPath(path, Color(0xFF414141))
-    }
-    val verticalLength = height / 2f - thickness
-    digitSegments[digit].orEmpty().forEach { id ->
-        when (id) {
-            'a' -> segment(0f, 0f, width, false)
-            'g' -> segment(0f, height / 2f - thickness / 2f, width, false)
-            'd' -> segment(0f, height - thickness, width, false)
-            'f' -> segment(0f, thickness, verticalLength, true)
-            'b' -> segment(width - thickness, thickness, verticalLength, true)
-            'e' -> segment(0f, height / 2f, verticalLength, true)
-            'c' -> segment(width - thickness, height / 2f, verticalLength, true)
-        }
-    }
 }
 
 @Preview(name = "Подключение по ПИН", widthDp = 375, heightDp = 812, showBackground = true, locale = "ru")

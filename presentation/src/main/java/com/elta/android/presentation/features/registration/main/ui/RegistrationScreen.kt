@@ -30,11 +30,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.auth.ui.AuthEmailField
 import com.elta.android.presentation.features.auth.ui.AuthPasswordField
 import com.elta.android.presentation.features.auth.ui.AuthScreenLayout
 import com.elta.android.presentation.features.auth.ui.AuthSubmitButton
+import com.elta.android.presentation.features.auth.ui.AuthTypography
 import com.elta.android.presentation.features.registration.main.model.RegistrationAction
 import com.elta.android.presentation.features.registration.main.model.RegistrationState
 import com.elta.android.presentation.theme.EltaTheme
@@ -60,11 +62,12 @@ internal fun RegistrationScreen(
     }
 
     AuthScreenLayout(
-        title = state.screenConfig?.title ?: stringResource(R.string.registration_main_title_new_user),
+        title = state.screenConfig?.title ?: stringResource(R.string.registration_main_title),
         subtitle = state.screenConfig?.description ?: stringResource(R.string.registration_main_subtitle),
         illustrationRes = R.drawable.img_registration,
         illustrationUrl = null,
         compactIllustrationSize = DpSize(125.dp, 120.dp),
+        titleStyle = AuthTypography.title.copy(lineHeight = 27.sp),
         modifier = modifier,
         topBar = {
             IconButton(onClick = onBack) {
@@ -76,13 +79,22 @@ internal fun RegistrationScreen(
                 )
             }
             Spacer(Modifier.weight(1f))
-            TextButton(onClick = onLogin, enabled = !state.isLoading) {
+            TextButton(onClick = onLogin, enabled = !state.isLoading, modifier = Modifier.padding(end = 4.dp)) {
                 Text(
                     text = stringResource(R.string.registration_main_toolbar_button_text),
-                    style = types.body1,
-                    color = if (state.isLoading) colors.shadeBlack2 else colors.blackBlue
+                    style = AuthTypography.toolbar,
+                    color = if (state.isLoading) colors.shadeBlack2 else colors.shadeBlack0
                 )
             }
+        },
+        actions = {
+            AuthSubmitButton(
+                text = stringResource(R.string.registration_main_button_continue),
+                enabled = state.canSubmit,
+                isLoading = state.isLoading,
+                shape = 10,
+                onClick = submit
+            )
         }
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
@@ -96,7 +108,6 @@ internal fun RegistrationScreen(
                 maxLength = 254,
                 onSubmit = { focusManager.moveFocus(FocusDirection.Next) }
             )
-            Spacer(Modifier.height(16.dp))
             AuthPasswordField(
                 value = state.password,
                 onValueChange = { onAction(RegistrationAction.PasswordChanged(it)) },
@@ -124,15 +135,6 @@ internal fun RegistrationScreen(
                 onAction = onAction
             )
         }
-        Spacer(Modifier.height(24.dp))
-        AuthSubmitButton(
-            text = stringResource(R.string.registration_main_button_continue),
-            enabled = state.canSubmit,
-            isLoading = state.isLoading,
-            shape = 10,
-            onClick = submit,
-            modifier = Modifier.padding(horizontal = 32.dp)
-        )
     }
 }
 

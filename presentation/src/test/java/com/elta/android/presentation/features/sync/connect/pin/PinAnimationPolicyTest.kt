@@ -37,14 +37,17 @@ class PinAnimationPolicyTest {
     }
 
     @Test
-    fun `PIN LCD stays above keyboard and button on smaller viewports`() {
-        val normal = normalPinIllustrationLayout(375.dp, 734.dp)
-        for (height in listOf(320, 400, 483, 734)) {
-            for (scale in listOf(1f, 1.3f)) {
-                val enlarged = enlargedPinIllustrationLayout(normal, height.dp, scale)
-                assertTrue(enlarged.width <= normal.width)
-                val lcdBottom = enlarged.lcdTop + enlarged.width * 0.352f
-                assertTrue(lcdBottom <= height.dp - 79.dp)
+    fun `PIN LCD clears measured controls with tall keyboards and larger text`() {
+        val normal = normalPinIllustrationLayout(393.dp, 780.dp)
+        for (height in listOf(320, 380, 450, 780)) {
+            for (header in listOf(140, 180)) {
+                for (footer in listOf(68, 96)) {
+                    val enlarged = enlargedPinIllustrationLayout(normal, height.dp, header.dp, footer.dp)
+                    assertTrue(enlarged.width > 0.dp)
+                    assertTrue(enlarged.width <= normal.width)
+                    assertEquals(header + 12f, (enlarged.top + enlarged.width * 0.139f).value, 0.01f)
+                    assertTrue("LCD overlaps action panel: $height/$header/$footer", enlarged.lcdBottom.value <= height - footer - 16f + 0.01f)
+                }
             }
         }
     }
