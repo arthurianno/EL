@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentStatisticPeriodBinding
 import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
 import com.elta.android.presentation.features.statistic.period.pm.PeriodPm
@@ -27,7 +28,7 @@ class PeriodFragment :
 
     override val screenLayout: Int = R.layout.fragment_statistic_period
     override val classToken: Class<PeriodPm> = PeriodPm::class.java
-    override val statusBarConfigProvider: StatusBarConfigProvider? = null
+    override val statusBarConfigProvider: StatusBarConfigProvider = TransparentLightStatusBarConfigProvider
 
     override val backgroundColor: Int? = null
 

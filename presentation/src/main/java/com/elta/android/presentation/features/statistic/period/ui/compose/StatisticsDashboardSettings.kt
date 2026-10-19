@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
@@ -64,7 +65,7 @@ internal fun StatisticsSettingsDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.35f))) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -73,7 +74,7 @@ internal fun StatisticsSettingsDialog(
                     .fillMaxHeight(0.9f)
                     .clip(RoundedCornerShape(24.dp))
                     .background(Color.White)
-                    .padding(horizontal = 24.dp, vertical = 14.dp)
+                    .padding(horizontal = 20.dp, vertical = 14.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -95,7 +96,7 @@ internal fun StatisticsSettingsDialog(
                         Image(
                             painter = painterResource(R.drawable.ic_statistics_settings_close),
                             contentDescription = "Закрыть настройки",
-                            modifier = Modifier.size(24.dp).clickable(onClick = onDismiss)
+                            modifier = Modifier.size(40.dp).clickable(onClick = onDismiss).padding(8.dp)
                         )
                     }
                     Text(
@@ -170,7 +171,7 @@ internal fun StatisticsSettingsDialog(
                         .padding(top = 20.dp, bottom = 8.dp)
                         .height(48.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(GreenDark)
+                        .background(Brush.horizontalGradient(listOf(Color(0xFF3EA58F), Color(0xFF3BB2B8))))
                         .clickable { onSave(selectedBlocks) }
                         .padding(top = 14.dp)
                 )
@@ -211,13 +212,12 @@ private fun StatisticsSettingsRow(
                 if (isVisible) R.drawable.ic_statistics_settings_eye else R.drawable.ic_statistics_settings_eye_off
             ),
             contentDescription = if (isVisible) "Скрыть ${block.title}" else "Показать ${block.title}",
-            modifier = Modifier.size(24.dp).clickable(onClick = onToggleVisibility)
+            modifier = Modifier.size(40.dp).clickable(onClick = onToggleVisibility).padding(10.dp)
         )
         if (canReorder) {
             StatisticsDragHandle(
                 modifier = Modifier
-                    .padding(start = 16.dp)
-                    .size(24.dp)
+                    .size(40.dp)
                     .pointerInput(block) {
                         detectDragGesturesAfterLongPress(
                             onDragStart = {
@@ -251,6 +251,7 @@ private fun StatisticsSettingsRow(
                             }
                         )
                     }
+                    .padding(10.dp)
             )
         } else {
             Spacer(modifier = Modifier.width(40.dp))

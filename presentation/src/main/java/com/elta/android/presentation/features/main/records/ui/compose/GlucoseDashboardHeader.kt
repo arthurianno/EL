@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import com.elta.android.presentation.core.compose.widgets.text.MetricValueText
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -157,7 +158,7 @@ private fun AccessibleGlucoseSummary(uiState: GlucoseDashboardUiState) {
             },
             color = Color.White, fontSize = 20.sp
         )
-        Text(uiState.glucoseValue, color = Color.White, fontSize = 40.sp, fontWeight = FontWeight.Bold)
+        MetricValueText(uiState.glucoseValue, color = Color.White, fontSize = 40.sp, fontWeight = FontWeight.Bold)
         if (uiState.hasMeasurements) {
             Text("ммоль/л", color = Color.White, fontSize = 16.sp)
             uiState.glucoseTrend?.let { trend ->
@@ -166,13 +167,16 @@ private fun AccessibleGlucoseSummary(uiState: GlucoseDashboardUiState) {
                     GlucoseTrendDirection.DOWN -> "↓"
                     GlucoseTrendDirection.STABLE -> "→"
                 }
-                Text("$direction ${trend.valueText}", color = Color.White, fontSize = 16.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(direction, color = Color.White, fontSize = 16.sp)
+                    MetricValueText(trend.valueText, color = Color.White, fontSize = 16.sp, modifier = Modifier.padding(start = 4.dp))
+                }
             }
             listOf("TIR" to uiState.tirPercentage, "Хлебных ед." to uiState.breadUnitsText, "Инсулина" to uiState.insulinText)
                 .forEach { (title, value) ->
                     Column(Modifier.fillMaxWidth().background(Color.White.copy(alpha = 0.13f), RoundedCornerShape(12.dp)).padding(12.dp)) {
                         Text(title, color = Color.White, fontSize = 14.sp)
-                        Text(value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        MetricValueText(value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     }
                 }
         } else Text("Добавьте показатели вручную через «+» или синхронизируйте их с устройством", color = Color.White, fontSize = 16.sp)

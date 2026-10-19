@@ -62,15 +62,6 @@ class GlucoseDashboardLayoutTest {
     }
 
     @Test
-    fun `shrinks long glucose values only when they do not fit the disc`() {
-        val ringSize = 199.dp
-        val discWidth = ringSize * (152f / 185f)
-
-        assertEquals(75f, fittedGlucoseValueFontSize("4,1", ringSize, discWidth), 0.01f)
-        assertEquals(59.96f, fittedGlucoseValueFontSize("10,0", ringSize, discWidth), 0.01f)
-    }
-
-    @Test
     fun `keeps short TIR values at the Figma size and fits 100 percent`() {
         assertEquals(38f, fittedTirValueFontSize("73%", 1f), 0.01f)
         assertEquals(34f, fittedTirValueFontSize("100%", 1f), 0.01f)

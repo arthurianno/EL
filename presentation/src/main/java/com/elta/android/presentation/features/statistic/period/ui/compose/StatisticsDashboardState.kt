@@ -24,6 +24,8 @@ data class StatisticsDashboardUiState(
     val periodCompactTitle: String = periodTitle,
     val average: String = "—",
     val unit: String = "ммоль/л",
+    val normalStart: Double = 3.9,
+    val normalEnd: Double = 10.0,
     val lowPercent: Int = 0,
     val inRangePercent: Int = 0,
     val highPercent: Int = 0,
@@ -40,7 +42,9 @@ data class StatisticsDashboardUiState(
     val dailyRangeTitle: String = "",
     val distribution: List<Int> = List(DISTRIBUTION_BUCKETS_COUNT) { 0 },
     val dailyEpisodes: List<DailyEpisodeCount> = emptyList(),
-    val comparison: ComparisonUiState? = null
+    val comparison: ComparisonUiState? = null,
+    val activity: ActivityStatisticsUiState = ActivityStatisticsUiState(),
+    val nutrition: NutritionStatisticsUiState = NutritionStatisticsUiState()
 )
 
 data class HourlyRange(
@@ -99,6 +103,8 @@ fun StatisticByPeriodModel?.toStatisticsDashboardUiState(
     val glucoseEvents = model.allDays.toSortedMap().flatMap { it.value.glucose.dailyGlucoseModel?.glucoseEvents.orEmpty() }
     val glucoseValues = glucoseEvents.map { it.glucoseValue(glucose.glucoseFormat) }
     val standardDeviation = glucoseValues.standardDeviation(glucose.averageLevel)
+    val hasGlucose = glucose.eventsCount > 0
+    fun glucoseLabel(value: Double) = if (hasGlucose && value.isFinite()) NumberFormatter.format(value) else "—"
 
     val allDates = model.period.dates()
     val hourlyRanges = allDates.map { date ->
@@ -133,18 +139,20 @@ fun StatisticByPeriodModel?.toStatisticsDashboardUiState(
         period = selectedPeriod,
         periodTitle = model.period.toDisplayTitle(locale),
         periodCompactTitle = model.period.toDisplayTitle(locale, compact = true),
-        average = NumberFormatter.format(glucose.averageLevel),
+        average = glucoseLabel(glucose.averageLevel),
+        normalStart = glucose.settings.normal.start,
+        normalEnd = glucose.settings.normal.end,
         lowPercent = glucose.eventsLowPercent,
         inRangePercent = glucose.eventsNormalPercent,
         highPercent = glucose.eventsHighPercent,
         lowCount = glucose.eventsLowCount,
         inRangeCount = glucose.eventsNormalCount,
         highCount = glucose.eventsHighCount,
-        minLabel = NumberFormatter.format(glucose.minLevel),
-        maxLabel = NumberFormatter.format(glucose.maxLevel),
+        minLabel = glucoseLabel(glucose.minLevel),
+        maxLabel = glucoseLabel(glucose.maxLevel),
         coefficientOfVariation = glucose.averageLevel.coefficientOfVariation(standardDeviation),
-        standardDeviation = NumberFormatter.format(standardDeviation),
-        gmi = NumberFormatter.format(glucoseManagementIndicatorPercent(glucose.averageLevel)),
+        standardDeviation = glucoseLabel(standardDeviation),
+        gmi = if (hasGlucose) "${NumberFormatter.format(glucoseManagementIndicatorPercent(glucose.averageLevel))}%" else "—",
         nightHypoEpisodes = glucoseEvents.count { event ->
             event.additionTime.hour in NIGHT_HYPO_HOURS &&
                 event.glucoseValue(glucose.glucoseFormat) in glucose.settings.low
@@ -154,8 +162,10 @@ fun StatisticByPeriodModel?.toStatisticsDashboardUiState(
         distribution = glucoseEvents.toDistributionBuckets(glucose.glucoseFormat),
         dailyEpisodes = dailyEpisodes,
         comparison = previous
-            ?.takeIf { it.glucose.eventsCount > 0 }
-            ?.toComparisonUiState(model)
+            ?.takeIf { hasGlucose && it.glucose.eventsCount > 0 }
+            ?.toComparisonUiState(model),
+        activity = model.toActivityStatistics(allDates),
+        nutrition = model.toNutritionStatistics()
     )
 }
 

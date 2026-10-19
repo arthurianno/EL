@@ -48,7 +48,7 @@ private fun StatisticsDashboardPreviewContent() {
     )
 }
 
-private object StatisticsDashboardPreviewFixture {
+internal object StatisticsDashboardPreviewFixture {
     val state = StatisticsDashboardUiState(
         period = Period.FOURTEEN,
         periodTitle = "15 июля – 28 июля",
@@ -64,7 +64,7 @@ private object StatisticsDashboardPreviewFixture {
         maxLabel = "15,8",
         coefficientOfVariation = "31%",
         standardDeviation = "2,1",
-        gmi = "6,7",
+        gmi = "6,7%",
         nightHypoEpisodes = 4,
         hourlyRanges = (15..28).map(::hourlyRange),
         dailyRangeTitle = "22 июля – 28 июля",
@@ -84,21 +84,21 @@ private object StatisticsDashboardPreviewFixture {
             currentAverageValue = 6.8,
             previousAverageValue = 7.2,
             normalStart = 3.9,
-            normalEnd = 10.0,
+            normalEnd = 7.0,
             currentHypoEpisodes = 4,
             previousHypoEpisodes = 6,
             axisDates = (15..28).map { LocalDate.of(2026, 7, it) },
             currentSeries = (15..28).map { day ->
                 DailyGlucosePoint(
                     date = LocalDate.of(2026, 7, day),
-                    value = 5.5 + (day % 5) * 0.7,
+                    value = listOf(2.2, 1.1, 4.4, 4.8, 7.4, 12.3, 8.0, 3.8, 4.5, 4.0, 1.2, 3.0, 11.8, 2.0)[day - 15],
                     position = (day - 15) / 14f
                 )
             },
             previousSeries = (15..28).map { day ->
                 DailyGlucosePoint(
                     date = LocalDate.of(2026, 7, day),
-                    value = 6.2 + (day % 4) * 0.5,
+                    value = listOf(3.0, 4.1, 5.9, 7.8, 6.0, 7.2, 9.1, 10.0, 6.2, 5.2, 4.1, 8.4, 7.0, 8.9)[day - 15],
                     position = (day - 15) / 14f
                 )
             }

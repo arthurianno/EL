@@ -996,4 +996,11 @@
     <string name="auth_password_create_invalid_link">The recovery code is missing. Open the link from your email or request a new one.</string>
     <string name="auth_show_password">Show password</string>
     <string name="auth_hide_password">Hide password</string>
+    <string name="glucose_chart_zoom_hint">Pinch with two fingers to zoom</string>
+    <string name="glucose_chart_zoom_hint_dismiss">Dismiss zoom hint</string>
+    <string name="statistic_dashboard_last_seven_days">Last 7 days</string>
+    <string name="statistic_dashboard_last_fourteen_days">Last 14 days</string>
+    <string name="statistic_dashboard_last_thirty_days">Last 30 days</string>
+    <string name="statistic_dashboard_last_ninety_days">Last 90 days</string>
+    <string name="metric_value_missing">No data</string>
 </resources>

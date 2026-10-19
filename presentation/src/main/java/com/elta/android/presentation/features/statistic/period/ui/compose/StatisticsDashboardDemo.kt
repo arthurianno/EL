@@ -115,7 +115,7 @@ internal fun StatisticsDashboardUiState.toDemoDashboard(): StatisticsDashboardUi
         maxLabel = "15,8",
         coefficientOfVariation = "31%",
         standardDeviation = "2,1",
-        gmi = "6,7",
+        gmi = "6,7%",
         nightHypoEpisodes = 4,
         hourlyRanges = dates.mapIndexed { dayIndex, date ->
             HourlyRange(

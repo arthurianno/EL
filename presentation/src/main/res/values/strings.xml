@@ -1217,4 +1217,11 @@
     <string name="sync_connect_method_dmc_description">Сканирование кода на задней стороне глюкометра</string>
     <string name="sync_connect_method_pin_description">Ввод кода с экрана глюкометра</string>
     <string name="sync_connect_later">Подключить позже</string>
+    <string name="glucose_chart_zoom_hint">Масштаб — двумя пальцами</string>
+    <string name="glucose_chart_zoom_hint_dismiss">Скрыть подсказку о масштабе</string>
+    <string name="statistic_dashboard_last_seven_days">Последние 7 дней</string>
+    <string name="statistic_dashboard_last_fourteen_days">Последние 14 дней</string>
+    <string name="statistic_dashboard_last_thirty_days">Последние 30 дней</string>
+    <string name="statistic_dashboard_last_ninety_days">Последние 90 дней</string>
+    <string name="metric_value_missing">Нет данных</string>
 </resources>

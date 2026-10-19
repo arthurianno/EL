@@ -34,14 +34,19 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import java.util.Locale
 import kotlin.math.roundToLong
 import kotlinx.coroutines.delay
 import org.threeten.bp.LocalDate
+
+internal val ContinuousTimeLabelsHeight = 18.dp
+internal val ContinuousEventTrackHeight = 12.dp
 
 @Composable
 internal fun ContinuousViewportSlider(
@@ -54,7 +59,7 @@ internal fun ContinuousViewportSlider(
     val currentDuration by rememberUpdatedState(duration)
     val currentUpdate by rememberUpdatedState(onViewportChanged)
     Canvas(
-        modifier = Modifier.fillMaxWidth().height(28.dp)
+        modifier = Modifier.fillMaxWidth().height(16.dp)
             .pointerInput(timelineDuration) {
                 fun seek(x: Float) {
                     val selectedDuration = currentDuration
@@ -136,11 +141,14 @@ internal fun ContinuousTimelineGraph(
     selectedPoint: DetailedGlucosePoint?,
     selectedEvent: ContinuousEvent?,
     trendLineStyle: ContinuousTrendLineStyle,
+    eventTrackHeight: Dp,
     onPointSelected: (DetailedGlucosePoint?) -> Unit,
     onEventSelected: (ContinuousEvent?) -> Unit,
+    onZoom: () -> Unit,
     onViewportChanged: (Long, Long) -> Unit
 ) {
     val density = LocalDensity.current
+    val currentOnZoom by rememberUpdatedState(onZoom)
     // The canvas tracks the fingers immediately. The expensive viewport-dependent
     // model and statistics are committed only after the gesture pauses.
     var visualViewportStart by remember { mutableStateOf(viewportStart) }
@@ -196,39 +204,43 @@ internal fun ContinuousTimelineGraph(
         val eventHitRadius = with(density) { 36.dp.toPx() }
         Column(Modifier.fillMaxSize()) {
             Canvas(
-                modifier = Modifier.weight(1f).fillMaxWidth()
-                    .pointerInput(visualRealPoints, visibleEvents, visualViewportStart, visualViewportDuration, selectedPoint, selectedEvent) {
+                modifier = Modifier.weight(1f).fillMaxWidth().testTag("continuous_chart_plot")
+                    .pointerInput(visualRealPoints, visibleEvents, visualViewportStart, visualViewportDuration, selectedPoint, selectedEvent, eventTrackHeight) {
                         detectTapGestures { offset ->
-                            val chartHeight = size.height - with(density) { 18.dp.toPx() }
+                            val trackHeight = with(density) { eventTrackHeight.toPx() }
+                            val chartHeight = size.height - trackHeight
                             val horizontalInset = with(density) { 7.dp.toPx() }.coerceAtMost(widthPx / 2f)
                             fun eventDistanceSquared(event: ContinuousEvent): Float {
                                 val x = ((event.centerMinute - visualViewportStart).toFloat() / visualViewportDuration * widthPx +
                                     with(density) { event.horizontalOffsetDp.dp.toPx() }).coerceIn(horizontalInset, widthPx - horizontalInset)
-                                val y = if (event.kind == ContinuousEventKind.ACTIVITY) chartHeight + with(density) { 8.dp.toPx() }
+                                val y = if (event.kind == ContinuousEventKind.ACTIVITY) chartHeight + trackHeight / 2f
                                     else chartHeight - (chartHeight * event.height).coerceAtLeast(with(density) { 7.dp.toPx() }) - with(density) { 10.dp.toPx() }
                                 return (x - offset.x) * (x - offset.x) + (y - offset.y) * (y - offset.y)
                             }
+                            fun pointDistanceSquared(point: DetailedGlucosePoint): Float {
+                                val x = (point.continuousMinute(origin) - visualViewportStart).toFloat() / visualViewportDuration * widthPx
+                                val y = chartHeight * (1f - (point.value / MAX_GLUCOSE).coerceIn(0f, 1f))
+                                return (x - offset.x) * (x - offset.x) + (y - offset.y) * (y - offset.y)
+                            }
+                            val nearest = if (visualResolution == ContinuousGlucoseResolution.RAW) {
+                                visualRealPoints.minByOrNull(::pointDistanceSquared)
+                            } else null
+                            val hit = nearest?.takeIf { point ->
+                                pointDistanceSquared(point) <= hitRadius * hitRadius
+                            }
                             val nearestEvent = visibleEvents.minByOrNull(::eventDistanceSquared)
-                            if (nearestEvent != null && eventDistanceSquared(nearestEvent) <= eventHitRadius * eventHitRadius) {
+                            if (nearestEvent != null && eventDistanceSquared(nearestEvent) <= eventHitRadius * eventHitRadius &&
+                                (hit == null || eventDistanceSquared(nearestEvent) < pointDistanceSquared(hit))
+                            ) {
                                 onEventSelected(nearestEvent.takeIf { it != selectedEvent })
                                 return@detectTapGestures
-                            }
-                            if (visualResolution != ContinuousGlucoseResolution.RAW) return@detectTapGestures
-                            val nearest = visualRealPoints.minByOrNull { point ->
-                                val x = (point.continuousMinute(origin) - visualViewportStart).toFloat() / visualViewportDuration * widthPx
-                                val y = chartHeight * (1f - (point.value / MAX_GLUCOSE).coerceIn(0f, 1f))
-                                (x - offset.x) * (x - offset.x) + (y - offset.y) * (y - offset.y)
-                            }
-                            val hit = nearest?.takeIf { point ->
-                                val x = (point.continuousMinute(origin) - visualViewportStart).toFloat() / visualViewportDuration * widthPx
-                                val y = chartHeight * (1f - (point.value / MAX_GLUCOSE).coerceIn(0f, 1f))
-                                (x - offset.x) * (x - offset.x) + (y - offset.y) * (y - offset.y) <= hitRadius * hitRadius
                             }
                             onPointSelected(hit?.takeIf { it != selectedPoint })
                         }
                     }
                     .pointerInput(widthPx) {
                         detectTransformGestures { centroid, pan, zoom, _ ->
+                            if (zoom != 1f) currentOnZoom()
                             val nextDuration = (currentVisualDuration / zoom).roundToLong()
                             val focusFraction = (centroid.x / widthPx).coerceIn(0f, 1f)
                             val focusMinute = currentVisualStart + (currentVisualDuration * focusFraction).roundToLong()
@@ -241,7 +253,7 @@ internal fun ContinuousTimelineGraph(
                         }
                     }
             ) {
-                val activityTrackHeight = 18.dp.toPx()
+                val activityTrackHeight = eventTrackHeight.toPx()
                 val chartHeight = size.height - activityTrackHeight
                 val xForMinute: (Long) -> Float = { minute ->
                     ((minute - visualViewportStart).toFloat() / visualViewportDuration * size.width)
@@ -264,7 +276,7 @@ internal fun ContinuousTimelineGraph(
                         size = Size(14.dp.toPx(), barHeight.coerceAtLeast(7.dp.toPx())),
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(3.dp.toPx(), 3.dp.toPx())
                     )
-                    drawCircle(event.color, 3.dp.toPx(), Offset(x, chartHeight + 8.dp.toPx()))
+                    drawCircle(event.color, 3.dp.toPx(), Offset(x, chartHeight + activityTrackHeight / 2f))
                     if (visualResolution == ContinuousGlucoseResolution.RAW) {
                         drawContinuousEventLabel(event, x, chartHeight - barHeight)
                     }
@@ -331,14 +343,14 @@ internal fun ContinuousTimelineGraph(
                     val right = xForMinute(event.endMinute).coerceIn(0f, size.width)
                     drawLine(
                         color = event.color,
-                        start = Offset(left, chartHeight + 8.dp.toPx()),
-                        end = Offset((right).coerceAtLeast(left + 10.dp.toPx()).coerceAtMost(size.width), chartHeight + 8.dp.toPx()),
+                        start = Offset(left, chartHeight + activityTrackHeight / 2f),
+                        end = Offset((right).coerceAtLeast(left + 10.dp.toPx()).coerceAtMost(size.width), chartHeight + activityTrackHeight / 2f),
                         strokeWidth = 7.dp.toPx(),
                         cap = StrokeCap.Round
                     )
                 }
             }
-            Box(Modifier.fillMaxWidth().height(24.dp)) {
+            Box(Modifier.fillMaxWidth().height(ContinuousTimeLabelsHeight * density.fontScale)) {
                 visibleLabels.forEach { label ->
                     Text(label.text, fontSize = 11.sp, color = ContinuousSecondary, fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(top = 3.dp).width(48.dp)

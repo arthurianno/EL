@@ -40,7 +40,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
@@ -53,9 +52,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import com.elta.android.presentation.core.compose.widgets.text.RoundedMetricPlaceholder
+import com.elta.android.presentation.core.compose.widgets.text.MetricValueText
 import com.elta.android.presentation.R
 
 data class GlucoseTrend(
@@ -146,11 +146,6 @@ fun GlucoseRingGauge(
     val metricsTop = metricsBottom - TirVisualHeight * scaleFactor
     // In the reference, the callout ends in the clear space beside the TIR heading.
     val tirAnchorY = metricsTop + (10.dp + TirTitleOffset) * scaleFactor
-    val glucoseValueFontSize = fittedGlucoseValueFontSize(
-        value = glucoseValue,
-        ringSize = ringSize,
-        discWidth = discWidth
-    )
     val showSyncStatus = isStatusVisible && statusText.isNotBlank()
     val syncActionText = if (showSyncStatus) statusText else "Синхронизация с устройством"
 
@@ -281,41 +276,15 @@ fun GlucoseRingGauge(
                             .align(Alignment.TopCenter)
                             .offset(y = visualRingOffset + discTopInset)
                     ) {
-                        // Keep each text baseline at a proportion of the inner disc. A centered
-                        // Column makes the large value pull the unit and trend upward on compact
-                        // devices, which no longer matches the intended gauge composition.
-                        Box(modifier = Modifier.matchParentSize()) {
-                            Text(
-                                text = glucoseValue,
-                                fontSize = glucoseValueFontSize.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = mainColor,
-                                letterSpacing = (-0.067f).em,
-                                lineHeight = 48.sp,
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    // The main Figma value is visually centred in the disc;
-                                    // its glyph box needs a lower anchor than the unit and trend.
-                                    .offset(y = discHeight * 0.29f)
-                            )
-                            Text(
-                                text = glucoseUnit,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Normal,
-                                color = mainColor,
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    .offset(y = discHeight * 0.75f)
-                            )
-                            GlucoseTrendValue(
-                                trend = glucoseTrend,
-                                fallbackText = deltaText,
-                                designScale = scaleFactor,
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    .offset(y = discHeight * 0.82f)
-                            )
-                        }
+                        GlucoseGaugeReading(
+                            value = glucoseValue,
+                            unit = glucoseUnit,
+                            trend = glucoseTrend,
+                            fallbackTrend = deltaText,
+                            color = mainColor,
+                            maximumValueFontSize = glucoseValueFontSize(ringSize),
+                            designScale = scaleFactor
+                        )
                     }
 
                 }
@@ -445,29 +414,12 @@ fun NoMeasurementsGlucoseGauge(
                     width = discWidth,
                     height = discHeight
                 ) {
-                    Canvas(
-                        modifier = Modifier
-                            .align(Alignment.Center)
+                    RoundedMetricPlaceholder(
+                        color = mainColor,
+                        modifier = Modifier.align(Alignment.Center)
                             .offset(y = (-8).dp * compactScale)
                             .size(width = 62.dp * compactScale, height = 8.dp * compactScale)
-                    ) {
-                        val strokeWidth = 8.dp.toPx() * compactScale
-                        val dashLength = 24.dp.toPx() * compactScale
-                        drawLine(
-                            color = mainColor,
-                            start = Offset(0f, size.height / 2f),
-                            end = Offset(dashLength, size.height / 2f),
-                            strokeWidth = strokeWidth,
-                            cap = StrokeCap.Round
-                        )
-                        drawLine(
-                            color = mainColor,
-                            start = Offset(size.width - dashLength, size.height / 2f),
-                            end = Offset(size.width, size.height / 2f),
-                            strokeWidth = strokeWidth,
-                            cap = StrokeCap.Round
-                        )
-                    }
+                    )
                     Text(
                         text = "ммоль/л",
                         fontSize = 12.sp,
@@ -547,153 +499,37 @@ internal fun glucoseGaugeDiscTopInset(ringSize: Dp): Dp =
     (19.87f * (ringSize.value / 199f)).dp
 
 @Composable
-private fun GlucoseTrendValue(
-    trend: GlucoseTrend?,
-    fallbackText: String,
-    designScale: Float,
-    modifier: Modifier = Modifier
-) {
-    val trendColor = Color(0xFFBBBFCA)
-
-    if (trend == null) {
-        Text(
-            text = fallbackText,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = trendColor,
-            modifier = modifier
-        )
-        return
-    }
-
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (trend.direction != GlucoseTrendDirection.STABLE) {
-            Canvas(modifier = Modifier.size(width = 14.dp * designScale, height = 8.dp * designScale)) {
-                val path = Path().apply {
-                    if (trend.direction == GlucoseTrendDirection.DOWN) {
-                        moveTo(size.width / 2f, size.height)
-                        lineTo(size.width, 0f)
-                        lineTo(0f, 0f)
-                    } else {
-                        moveTo(size.width / 2f, 0f)
-                        lineTo(size.width, size.height)
-                        lineTo(0f, size.height)
-                    }
-                    close()
-                }
-                drawPath(path = path, color = trendColor)
-            }
-            Spacer(modifier = Modifier.width(4.dp * designScale))
-        }
-        Text(
-            text = trend.valueText,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = trendColor
-        )
-    }
-}
-
-@Composable
 private fun TirIndicator(
     tirPercentage: String,
     modifier: Modifier = Modifier,
     designScale: Float
 ) {
-    val normalizedValue = tirPercentage.trim()
-    val numericValue = normalizedValue
-        .removeSuffix("%")
-        .trim()
-        .replace(',', '.')
-        .toDoubleOrNull()
-
-    val isDash = normalizedValue.isBlank() ||
-            normalizedValue == "—" ||
-            numericValue == 0.0
     val density = LocalDensity.current
     val percentageFontSize = fittedTirValueFontSize(tirPercentage, designScale)
-
-
-
     CompositionLocalProvider(
-        // This metric is part of the data visualisation rather than body text. Keep it
-        // geometrically aligned with Figma when a device has a custom font-scale setting.
+        // Keep the gauge metric aligned with its graphic anchors at custom font scales.
         LocalDensity provides Density(density.density, fontScale = 1f)
     ) {
-    Box(
-        modifier = modifier.height(TirVisualHeight * designScale),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "TIR",
-            fontSize = 12.sp,
-            lineHeight = 20.sp,
-            fontWeight = FontWeight.Normal,
-            color = Color.White,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = TirTitleOffset * designScale)
-        )
-
-        if (isDash) {
-            Canvas(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(y = 29.dp * designScale)
-                    .size(
-                        width = 24.dp * designScale,
-                        height = 2.dp * designScale
-                    )
-            ) {
-                val lineColor = Color.White.copy(alpha = 0.9f)
-                val thickness = (3.25.dp * designScale).toPx()
-                val centerY = size.height / 2f
-                val inset = thickness / 2f
-                val gap = (4.dp * designScale).toPx()
-
-                // Учитываем закругления, чтобы видимый промежуток был равен gap.
-                val halfSeparation = (gap + thickness) / 2f
-                val centerX = size.width / 2f
-
-                drawLine(
-                    color = lineColor,
-                    start = Offset(inset, centerY),
-                    end = Offset(centerX - halfSeparation, centerY),
-                    strokeWidth = thickness,
-                    cap = StrokeCap.Round
-                )
-
-                drawLine(
-                    color = lineColor,
-                    start = Offset(centerX + halfSeparation, centerY),
-                    end = Offset(size.width - inset, centerY),
-                    strokeWidth = thickness,
-                    cap = StrokeCap.Round
-                )
-            }
-        } else {
+        Box(modifier.height(TirVisualHeight * designScale), contentAlignment = Alignment.Center) {
             Text(
+                text = "TIR",
+                fontSize = 12.sp,
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.White,
+                modifier = Modifier.align(Alignment.TopCenter).offset(y = TirTitleOffset * designScale)
+            )
+            MetricValueText(
                 text = tirPercentage,
                 fontSize = percentageFontSize.sp,
                 lineHeight = (percentageFontSize + 6f).sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White.copy(alpha = 0.9f),
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Visible,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    // The TIR anchor is intentionally 80 dp wide to keep the leader line
-                    // at the Figma coordinate. The numeric value itself may be wider (100%),
-                    // so it is measured without that width constraint instead of being clipped.
+                modifier = Modifier.align(Alignment.TopCenter)
                     .wrapContentWidth(unbounded = true)
                     .offset(y = TirPercentageOffset * designScale)
             )
         }
-    }
     }
 }
 
@@ -727,7 +563,7 @@ private fun MetricValue(
             color = Color.White.copy(alpha = 0.8f),
             textAlign = TextAlign.Center
         )
-        Text(
+        MetricValueText(
             text = value,
             fontSize = (20f * designScale).sp,
             lineHeight = (26f * designScale).sp,

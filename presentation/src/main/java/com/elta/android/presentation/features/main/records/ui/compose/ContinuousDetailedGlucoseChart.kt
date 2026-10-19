@@ -7,7 +7,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -63,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
+import androidx.core.view.WindowCompat
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
@@ -85,10 +85,9 @@ internal const val INTERMEDIATE_BUCKET_MINUTES = 3L * 60L
 internal const val MAX_GLUCOSE = 16f
 internal const val TREND_LINE_DASH_GAP_MINUTES = DAY_MINUTES
 
-internal val ContinuousBackground get() = NewDesignPaletteController.colors.normalEnd
+internal val ContinuousBackground = Color(0xFF1FBFD2)
 internal val ContinuousPrimary = Color(0xFF3D4556)
 internal val ContinuousSecondary = Color(0xFF878B93)
-internal val ContinuousBorder = Color(0xFFA4A4A4)
 internal val ContinuousLow = Color(0xFFD93B17)
 internal val ContinuousNormal = GlucoseDashboardTheme.NormalChartColor
 internal val ContinuousHigh = Color(0xFFEE9C17)
@@ -149,6 +148,13 @@ internal fun ContinuousDetailedGlucoseChartScreen(
         mutableStateOf(chartPreferences.shouldShowZoomHint())
     }
     val maxViewportDuration = MAX_VIEWPORT_MINUTES.coerceAtMost(historyDuration)
+
+    fun dismissZoomHint() {
+        if (showZoomHint) {
+            showZoomHint = false
+            chartPreferences.markZoomHintShown()
+        }
+    }
 
     fun updateViewport(start: Long, duration: Long) {
         val safeDuration = duration.coerceIn(MIN_VIEWPORT_MINUTES.coerceAtMost(historyDuration), maxViewportDuration)
@@ -221,7 +227,16 @@ internal fun ContinuousDetailedGlucoseChartScreen(
             }
     }
 
-    Dialog(onDismissRequest = onBackClick, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    val eventTrackHeight = if (
+        (insulinVisible && insulinEntries.isNotEmpty()) ||
+        (foodVisible && foodEntries.isNotEmpty()) ||
+        (activityVisible && activityEntries.isNotEmpty())
+    ) ContinuousEventTrackHeight else 0.dp
+
+    Dialog(
+        onDismissRequest = onBackClick,
+        properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)
+    ) {
         val view = LocalView.current
         val contentAlpha = remember { Animatable(0f) }
         val contentScale = remember { Animatable(0.96f) }
@@ -238,6 +253,7 @@ internal fun ContinuousDetailedGlucoseChartScreen(
         SideEffect {
             (view.parent as? DialogWindowProvider)?.window?.let { window ->
                 window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                WindowCompat.setDecorFitsSystemWindows(window, false)
                 window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 window.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
@@ -264,8 +280,8 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                 }
         ) {
             val isShort = maxHeight < 420.dp
-            val topPadding = max(topInset, if (isShort) 8.dp else 12.dp)
-            val bottomPadding = max(bottomInset, if (isShort) 8.dp else 12.dp)
+            val topPadding = max(topInset, if (isShort) 4.dp else 12.dp)
+            val bottomPadding = max(bottomInset, if (isShort) 4.dp else 12.dp)
             val layout = continuousChartLayout(
                 screenWidth = maxWidth,
                 screenHeight = maxHeight,
@@ -286,9 +302,12 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(modifier = Modifier.fillMaxWidth().heightIn(min = 36.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 32.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Row(
-                        modifier = Modifier.heightIn(min = 36.dp)
+                        modifier = Modifier.heightIn(min = 32.dp)
                             .clip(RoundedCornerShape(6.dp))
                             .clickable(onClick = onBackClick)
                             .padding(horizontal = 4.dp),
@@ -298,6 +317,10 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                         Spacer(Modifier.width(6.dp))
                         Text("Назад", fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Color.White)
                     }
+                    Spacer(Modifier.weight(1f))
+                    if (showZoomHint) {
+                        ContinuousZoomHint(onDismiss = ::dismissZoomHint)
+                    }
                 }
                 Spacer(Modifier.height(if (isShort) 4.dp else 6.dp))
                 Box(
@@ -305,9 +328,8 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                         .fillMaxWidth()
                         .height(layout.chartCardHeight)
                         .clip(RoundedCornerShape(13.dp))
-                        .border(1.dp, ContinuousBorder, RoundedCornerShape(13.dp))
                         .background(Color.White)
-                        .padding(start = 16.dp, top = 12.dp, end = 12.dp, bottom = 6.dp)
+                        .padding(start = 16.dp, top = 8.dp, end = 12.dp, bottom = 4.dp)
                 ) {
                     Column(Modifier.fillMaxSize()) {
                         val periodTitle = when {
@@ -377,22 +399,14 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                                 }
                             }
                         }
-                        Spacer(Modifier.height(2.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("ммоль/л", fontSize = 11.sp, color = ContinuousSecondary)
-                            Text("хлебных ед./инсулин", fontSize = 11.sp, color = ContinuousSecondary, modifier = Modifier.padding(end = 36.dp))
-                        }
+                        Spacer(Modifier.height(10.dp))
                         if (!layout.inlineLegend) {
                             ContinuousLegend(Modifier.padding(start = 20.dp, top = 2.dp))
                             Spacer(Modifier.height(4.dp))
                         }
                         Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                             Row(modifier = Modifier.fillMaxSize()) {
-                                ContinuousAxisLabels(Modifier.width(20.dp).fillMaxHeight().padding(bottom = 20.dp))
+                                ContinuousAxisLabels(Modifier.width(20.dp).fillMaxHeight(), eventTrackHeight = eventTrackHeight)
                                 ContinuousTimelineGraph(
                                     modifier = Modifier.weight(1f).fillMaxHeight(),
                                     origin = historyStartDate,
@@ -407,14 +421,16 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                                     selectedPoint = selectedPoint,
                                     selectedEvent = selectedEvent,
                                     trendLineStyle = trendLineStyle,
+                                    eventTrackHeight = eventTrackHeight,
                                     onPointSelected = { selectedPoint = it; selectedEvent = null },
                                     onEventSelected = { selectedEvent = it; selectedPoint = null },
+                                    onZoom = ::dismissZoomHint,
                                     onViewportChanged = ::updateViewport
                                 )
-                                ContinuousAxisLabels(Modifier.width(20.dp).fillMaxHeight().padding(bottom = 20.dp), textAlign = TextAlign.End)
+                                ContinuousAxisLabels(Modifier.width(20.dp).fillMaxHeight(), textAlign = TextAlign.End, eventTrackHeight = eventTrackHeight)
                                 Spacer(Modifier.width(8.dp))
                                 Column(
-                                    modifier = Modifier.width(32.dp).fillMaxHeight().padding(bottom = 20.dp),
+                                    modifier = Modifier.width(32.dp).fillMaxHeight().padding(bottom = ContinuousTimeLabelsHeight),
                                     verticalArrangement = Arrangement.SpaceEvenly,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
@@ -430,25 +446,6 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                                         activityVisible = !activityVisible
                                         selectedEvent = null
                                     }
-                                }
-                            }
-                            if (showZoomHint) {
-                                Row(
-                                    modifier = Modifier.align(Alignment.TopCenter)
-                                        .padding(top = 8.dp)
-                                        .fillMaxWidth(0.95f)
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(ContinuousPrimary)
-                                        .clickable {
-                                            showZoomHint = false
-                                            chartPreferences.markZoomHintShown()
-                                        }
-                                        .padding(horizontal = 10.dp, vertical = 6.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text("Сведите или разведите два пальца для изменения периода", modifier = Modifier.weight(1f), color = Color.White, fontSize = 11.sp, lineHeight = 12.sp)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text("Понятно", color = Color(0xFF8FE5D8), fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -486,7 +483,7 @@ internal fun ContinuousDetailedGlucoseChartScreen(
                 Spacer(Modifier.height(if (isShort) 4.dp else 8.dp))
                 Box(
                     modifier = Modifier.fillMaxWidth().height(layout.summaryHeight).clip(RoundedCornerShape(13.dp))
-                        .border(1.dp, ContinuousBorder, RoundedCornerShape(13.dp)).background(Color.White)
+                        .background(Color.White)
                         .padding(horizontal = 20.dp, vertical = 6.dp)
                 ) {
                     when {

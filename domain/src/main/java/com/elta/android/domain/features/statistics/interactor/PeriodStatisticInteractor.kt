@@ -81,7 +81,8 @@ fun buildStatisticModel(
             eventsByType[EventType.Bread(calculatorFlow)],
             zoneId
         ),
-        activity = buildActivityStatisticModel(eventsByType[EventType.Activity])
+        activity = buildActivityStatisticModel(eventsByType[EventType.Activity]),
+        foodEvents = eventsByType[EventType.Bread(calculatorFlow)].orEmpty()
     )
 }
 

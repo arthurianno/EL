@@ -1,0 +1,19 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name="com.elta.android.presentation.features.main.records.ui.compose.ContinuousChartTestActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name="com.elta.android.presentation.features.statistic.period.ui.compose.StatisticsDashboardTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name="com.elta.android.presentation.features.main.records.ui.compose.DashboardAdaptiveTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+    </application>
+</manifest>

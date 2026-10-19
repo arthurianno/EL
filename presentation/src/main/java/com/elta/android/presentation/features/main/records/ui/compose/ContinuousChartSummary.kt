@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
@@ -23,29 +24,43 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
+import com.elta.android.presentation.core.compose.widgets.text.MetricValueText
 import com.elta.android.presentation.R
 import java.util.Locale
 import org.threeten.bp.LocalDate
 
 @Composable
-internal fun ContinuousAxisLabels(modifier: Modifier, textAlign: TextAlign = TextAlign.Start) = Column(
-    modifier = modifier,
-    verticalArrangement = Arrangement.SpaceBetween
+internal fun ContinuousAxisLabels(
+    modifier: Modifier,
+    textAlign: TextAlign = TextAlign.Start,
+    eventTrackHeight: Dp
 ) {
-    listOf("16", "12", "8", "4", "0").forEach {
-        Text(
-            text = it,
-            fontSize = 11.sp,
-            color = ContinuousSecondary,
-            fontWeight = FontWeight.Medium,
-            textAlign = textAlign,
-            modifier = Modifier.fillMaxWidth()
-        )
+    val labelsHeight = ContinuousTimeLabelsHeight * LocalDensity.current.fontScale
+    Layout(
+        modifier = modifier,
+        content = {
+            listOf("16", "12", "8", "4", "0").forEach {
+                Text(it, fontSize = 11.sp, color = ContinuousSecondary,
+                    fontWeight = FontWeight.Medium, textAlign = textAlign,
+                    modifier = Modifier.fillMaxWidth())
+            }
+        }
+    ) { measurables, constraints ->
+        val labels = measurables.map { it.measure(constraints.copy(minHeight = 0)) }
+        val plotHeight = (constraints.maxHeight - (labelsHeight + eventTrackHeight).roundToPx()).coerceAtLeast(0)
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            labels.forEachIndexed { index, label ->
+                label.placeRelative(0, plotHeight * index / 4 - label.height / 2)
+            }
+        }
     }
 }
 @Composable
@@ -58,8 +73,7 @@ internal fun ContinuousLayerButton(
 ) {
     Box(
         modifier = Modifier.size(32.dp)
-            .clip(CircleShape)
-            .background(if (active) color.copy(alpha = 0.16f) else Color(0xFFF3F4F6))
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -115,12 +129,20 @@ internal fun ContinuousStatisticsSummary(
         } else {
             Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
                 ContinuousDateMetric(title, Modifier.weight(1.1f))
+                ContinuousSummaryDivider()
                 ContinuousAverageMetric(statistics, isSingleDay, Modifier.weight(0.9f), compact = denseMetrics)
+                ContinuousSummaryDivider()
                 ContinuousTirMetrics(statistics, normalMinutes, highMinutes, lowMinutes, isSingleDay, Modifier.weight(1.6f), compact = denseMetrics)
+                ContinuousSummaryDivider()
                 ContinuousVariabilityMetrics(statistics, Modifier.weight(1.3f), compact = denseMetrics)
             }
         }
     }
+}
+
+@Composable
+private fun ContinuousSummaryDivider() {
+    Box(Modifier.width(1.dp).fillMaxHeight(0.8f).background(Color(0xFFDCE1E5)))
 }
 
 @Composable
@@ -131,14 +153,13 @@ private fun ContinuousDateMetric(title: String, modifier: Modifier) {
 
 @Composable
 private fun ContinuousAverageMetric(s: ContinuousStatistics, isSingleDay: Boolean, modifier: Modifier, compact: Boolean) {
-    ContinuousMetric(
-        value = continuousFormat(s.average),
-        subtitle = if (isSingleDay) "средний за день" else "средний за период",
-        label = "ммоль/л",
-        modifier = modifier,
-        color = Color(0xFFEE7300),
-        compact = compact
-    )
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        MetricValueText(continuousFormat(s.average), fontSize = if (compact) 20.sp else 24.sp,
+            fontWeight = FontWeight.Bold, color = Color(0xFFEE7300), maxLines = 1)
+        Text("ммоль/л", fontSize = 10.sp, color = ContinuousSecondary, maxLines = 1)
+        Text(if (isSingleDay) "средний за день" else "средний за период",
+            fontSize = 9.sp, lineHeight = 10.sp, color = ContinuousSecondary, maxLines = 1)
+    }
 }
 
 @Composable
@@ -180,13 +201,14 @@ private fun ContinuousTirColumn(
         Spacer(Modifier.width(3.dp))
         Text("TIR", fontSize = 10.sp, color = ContinuousSecondary)
     }
-    Text(percentText, fontSize = if (compact) 16.sp else 20.sp,
+    MetricValueText(percentText, fontSize = if (compact) 16.sp else 20.sp,
         fontWeight = FontWeight.Bold, color = ContinuousPrimary, maxLines = 1)
-    Text(timeText, fontSize = if (compact) 9.sp else 11.sp,
+    MetricValueText(timeText, fontSize = if (compact) 9.sp else 11.sp,
         color = ContinuousSecondary, maxLines = 1)
 }
 
 private fun formatDuration(mins: Long, isSingleDay: Boolean): String {
+    if (mins <= 0) return "—"
     return if (isSingleDay) {
         val h = mins / 60
         val m = mins % 60
@@ -220,7 +242,7 @@ private fun ContinuousMetric(
         }
         Text(label, fontSize = if (compact) 10.sp else 11.sp, color = ContinuousSecondary, maxLines = 1)
     }
-    Text(value, fontSize = if (compact) 16.sp else 20.sp, color = color,
+    MetricValueText(value, fontSize = if (compact) 16.sp else 20.sp, color = color,
         fontWeight = FontWeight.Bold, maxLines = 1)
     if (subtitle.isNotEmpty()) Text(subtitle, fontSize = if (compact) 9.sp else 10.sp,
         color = ContinuousSecondary, maxLines = 2, lineHeight = if (compact) 10.sp else 11.sp)

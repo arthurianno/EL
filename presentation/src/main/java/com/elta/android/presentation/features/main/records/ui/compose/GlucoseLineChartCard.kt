@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.R
 import org.threeten.bp.LocalTime
 import org.threeten.bp.LocalDate
-import org.threeten.bp.YearMonth
 import java.util.Locale
 
 data class GlucosePoint(
@@ -65,7 +64,6 @@ fun GlucoseLineChartCard(
     onChartClick: () -> Unit = {},
     points: List<GlucosePoint> = emptyList(),
     selectedDate: LocalDate = LocalDate.now(),
-    onDateSelected: (LocalDate) -> Unit = {},
     designScale: Float = 1f,
     cardHeight: androidx.compose.ui.unit.Dp = 201.dp * designScale,
     emptyStateText: String = "Нет измерений за выбранный период",
@@ -74,7 +72,6 @@ fun GlucoseLineChartCard(
     val fontScale = LocalDensity.current.fontScale
     val largeText = fontScale > 1.3f
     var activePeriod by remember { mutableStateOf(selectedPeriod) }
-    var isDatePickerVisible by remember { mutableStateOf(false) }
     val periods = listOf("3 ч", "6 ч", "12 ч", "24 ч")
 
     val cardBg = if (isDarkTheme) GlucoseDashboardTheme.DarkCardBackground else GlucoseDashboardTheme.LightCardBackground
@@ -128,11 +125,9 @@ fun GlucoseLineChartCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                // Date Picker Dropdown Button
+                // Read-only date label; period selection stays available on the right.
                 Row(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp * designScale))
-                        .clickable { isDatePickerVisible = true }
                         .heightIn(min = 40.dp * designScale)
                         .padding(vertical = 2.dp * designScale, horizontal = 4.dp * designScale),
                     verticalAlignment = Alignment.CenterVertically
@@ -144,13 +139,7 @@ fun GlucoseLineChartCard(
                         fontWeight = FontWeight.SemiBold,
                         color = cardTextColor
                     )
-                    Spacer(modifier = Modifier.width(4.dp * designScale))
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow_down),
-                        contentDescription = null,
-                        tint = cardTextColor,
-                        modifier = Modifier.size(14.dp * designScale)
-                    )
+
                 }
 
                 // Time Filter Segmented Switcher (149x24 dp in Figma reference)
@@ -390,17 +379,7 @@ fun GlucoseLineChartCard(
 
         Spacer(modifier = Modifier.height(ChartCardBottomInset * designScale))
     }
-    if (isDatePickerVisible) {
-        GlucoseDatePickerDialog(
-            initialDate = selectedDate,
-            minDate = YearMonth.from(LocalDate.now()).minusMonths(11).atDay(1),
-            onDismissRequest = { isDatePickerVisible = false },
-            onDateRangeSelected = { date, _ ->
-                onDateSelected(date)
-                isDatePickerVisible = false
-            }
-        )
-    }
+
 }
 
 private fun calculateChartPointOffsets(

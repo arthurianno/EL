@@ -12,7 +12,6 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,19 +47,12 @@ fun GlucoseDashboardScreen(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    var selectedChartDate by remember { mutableStateOf(LocalDate.now()) }
+    val selectedChartDate = LocalDate.now()
     val detailedEvents = remember(uiState.detailedChartData.events, loadedEventsByMonth) {
         detailedEventsFor(uiState, loadedEventsByMonth)
     }
     val chartPoints = remember(selectedChartDate, uiState.chartPoints, uiState.detailedChartData.dailyGlucoseModel, loadedEventsByMonth) {
         chartPointsFor(selectedChartDate, uiState, loadedEventsByMonth)
-    }
-
-    LaunchedEffect(selectedChartDate, loadedEventsByMonth) {
-        val month = YearMonth.from(selectedChartDate)
-        if (selectedChartDate != LocalDate.now() && month !in loadedEventsByMonth) {
-            onAction(GlucoseDashboardAction.RequestDetailedRange(month.atDay(1), month.atEndOfMonth()))
-        }
     }
 
     val paletteSheetState = rememberModalBottomSheetState(
@@ -87,9 +79,6 @@ fun GlucoseDashboardScreen(
             uiState = uiState,
             selectedChartDate = selectedChartDate,
             chartPoints = chartPoints,
-            onChartDateSelected = { date ->
-                selectedChartDate = date
-            },
             syncState = syncState,
             detailedEvents = detailedEvents,
             onAction = onAction,
@@ -108,7 +97,6 @@ internal fun GlucoseDashboardContent(
     uiState: GlucoseDashboardUiState,
     selectedChartDate: LocalDate = LocalDate.now(),
     chartPoints: List<GlucosePoint> = uiState.chartPoints,
-    onChartDateSelected: (LocalDate) -> Unit = {},
     syncState: DashboardSyncUiState,
     detailedEvents: List<EventV2> = uiState.detailedChartData.events,
     modifier: Modifier = Modifier,
@@ -154,7 +142,6 @@ internal fun GlucoseDashboardContent(
                             isDarkTheme = uiState.isDarkTheme,
                             points = chartPoints,
                             selectedDate = selectedChartDate,
-                            onDateSelected = onChartDateSelected,
                             designScale = layout.horizontalScale,
                             cardHeight = chartHeight,
                             showDetailHint = uiState.hasMeasurements,

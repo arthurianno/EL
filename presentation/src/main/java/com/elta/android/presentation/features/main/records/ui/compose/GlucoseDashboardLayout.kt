@@ -252,24 +252,6 @@ internal fun glucoseValueFontSize(ringSize: Dp): Float {
     }
 }
 
-/** Keeps multi-digit glucose values inside the inner disc without reducing short values. */
-internal fun fittedGlucoseValueFontSize(
-    value: String,
-    ringSize: Dp,
-    discWidth: Dp
-): Float {
-    val baseSize = glucoseValueFontSize(ringSize)
-    val glyphUnits = value.sumOf { symbol ->
-        when {
-            symbol.isDigit() -> 1.0
-            symbol == ',' || symbol == '.' -> 0.35
-            else -> 0.7
-        }
-    }.toFloat().coerceAtLeast(1f)
-    val maxSizeForDisc = discWidth.value * 0.86f / (glyphUnits * 0.7f)
-    return minOf(baseSize, maxSizeForDisc)
-}
-
 private fun interpolateByHeight(
     height: Float,
     compact: Float,

@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.statistics.model
 
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import org.threeten.bp.LocalDate
 
@@ -14,5 +15,6 @@ data class StatisticByPeriodModel(
     val glucose: GlucoseStatisticModel,
     val insulin: InsulinStatisticModelByPeriod,
     val food: BreadStatisticModelByPeriod,
-    val activity: ActivityStatisticModel
+    val activity: ActivityStatisticModel,
+    val foodEvents: List<EventV2> = emptyList()
 )

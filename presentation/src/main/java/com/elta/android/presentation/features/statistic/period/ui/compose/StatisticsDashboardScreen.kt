@@ -17,20 +17,19 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,8 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
@@ -48,13 +45,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
-import com.elta.android.presentation.features.main.records.ui.compose.NewDesignPaletteController
 import com.elta.android.presentation.features.statistic.period.model.DEFAULT_VISIBLE_STATISTICS_BLOCKS
 import com.elta.android.presentation.features.statistic.period.model.StatisticsBlock
 import com.elta.android.presentation.features.statistic.period.ui.Period
@@ -62,10 +59,11 @@ import com.elta.android.presentation.features.statistic.period.ui.Period
 internal val ScreenBackground = Color(0xFFF4F4F4)
 internal val TextPrimary = Color(0xFF3D4556)
 internal val TextSecondary = Color(0x8C3D4556)
-internal val Green get() = NewDesignPaletteController.colors.normalStart
-internal val GreenDark get() = NewDesignPaletteController.colors.normalEnd
-internal val Orange get() = NewDesignPaletteController.colors.highStart
-internal val Red get() = NewDesignPaletteController.colors.lowStart
+internal val StatisticsHeader = Color(0xFF1FBFD2)
+internal val Green = Color(0xFF3AE39D)
+internal val GreenDark = Color(0xFF29AF99)
+internal val Orange = Color(0xFFF3A30F)
+internal val Red = Color(0xFFE6380E)
 internal val Divider = Color(0xFFBBC0CA)
 private val ContentMaxWidth = 480.dp
 internal val CompactScreenWidth = 360.dp
@@ -77,10 +75,10 @@ private val HomeBottomNavigationHeight = 72.dp
 @Composable
 private fun Period.localizedName(): String = stringResource(
     when (this) {
-        Period.SEVEN -> R.string.statistic_period_seven_days
-        Period.FOURTEEN -> R.string.statistic_period_fourteen_days
-        Period.THIRTY -> R.string.statistic_period_thirty_days
-        Period.NINETY -> R.string.statistic_period_ninety_days
+        Period.SEVEN -> R.string.statistic_dashboard_last_seven_days
+        Period.FOURTEEN -> R.string.statistic_dashboard_last_fourteen_days
+        Period.THIRTY -> R.string.statistic_dashboard_last_thirty_days
+        Period.NINETY -> R.string.statistic_dashboard_last_ninety_days
     }
 )
 @Composable
@@ -91,7 +89,8 @@ internal fun StatisticsDashboardScreen(
     onPeriodSelected: (Period) -> Unit,
     onBack: () -> Unit,
     onExport: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = WindowInsets.systemBars
 ) {
     var isDemoMode by rememberSaveable { mutableStateOf(false) }
     var showDemoModePicker by remember { mutableStateOf(false) }
@@ -103,12 +102,7 @@ internal fun StatisticsDashboardScreen(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(
-                listOf(
-                    NewDesignPaletteController.colors.normalStart,
-                    NewDesignPaletteController.colors.normalEnd
-                )
-            ))
+            .background(StatisticsHeader)
             .then(
                 if (BuildConfig.DEBUG) Modifier.pointerInput(Unit) {
                     detectTapGestures(onLongPress = { showDemoModePicker = true })
@@ -117,7 +111,7 @@ internal fun StatisticsDashboardScreen(
     ) {
         val isCompact = maxWidth <= CompactScreenWidth
         var showSettings by remember { mutableStateOf(false) }
-        val navigationBottomPadding = WindowInsets.navigationBars
+        val navigationBottomPadding = windowInsets
             .asPaddingValues()
             .calculateBottomPadding()
         StatisticsTopBar(
@@ -126,11 +120,12 @@ internal fun StatisticsDashboardScreen(
             onBack = onBack,
             onExportClick = onExport,
             modifier = Modifier
-                .fillMaxWidth()
                 .widthIn(max = ContentMaxWidth)
+                .fillMaxWidth()
                 .align(Alignment.TopCenter)
                 .onSizeChanged { topBarHeightPx = it.height },
-            isCompact = isCompact
+            isCompact = isCompact,
+            windowInsets = windowInsets
         )
         Surface(
             modifier = Modifier.padding(top = maxOf(DashboardSurfaceTop, topBarHeight + 16.dp)).fillMaxSize(),
@@ -140,12 +135,12 @@ internal fun StatisticsDashboardScreen(
             Box(modifier = Modifier.fillMaxSize()) {
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth()
                         .widthIn(max = ContentMaxWidth)
+                        .fillMaxWidth()
                         .align(Alignment.TopCenter),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     contentPadding = PaddingValues(
-                        top = 31.dp,
+                        top = 0.dp,
                         // The host navigation overlays this Fragment. Keep the final items
                         // reachable above both the app navigation and the system gesture area.
                         bottom = 28.dp + HomeBottomNavigationHeight + navigationBottomPadding
@@ -155,28 +150,25 @@ internal fun StatisticsDashboardScreen(
                     item {
                         MainIndicatorsSection(
                             state = displayedState,
-                            isCompact = isCompact,
                             onSettingsClick = { showSettings = true }
                         )
                     }
-                    visibleBlocks.forEach { block ->
-                        item(key = block) {
-                            when (block) {
-                                StatisticsBlock.PERIOD -> Column {
-                                    DistributionSection(displayedState)
-                                    HypoHyperSection(displayedState)
-                                }
-                                StatisticsBlock.DAILY -> DailyVariationSection(displayedState)
-                                StatisticsBlock.KEY_METRICS -> KeyMetricsSection(displayedState)
-                                StatisticsBlock.COMPARISON -> PreviousPeriodSection(
+                    statisticsSections(visibleBlocks).forEach { section ->
+                        item(key = section) {
+                            when (section) {
+                                StatisticsSection.DISTRIBUTION -> DistributionSection(displayedState)
+                                StatisticsSection.DAILY -> DailyVariationSection(displayedState)
+                                StatisticsSection.EPISODES -> HypoHyperSection(displayedState)
+                                StatisticsSection.KEY_METRICS -> KeyMetricsSection(displayedState)
+                                StatisticsSection.COMPARISON -> PreviousPeriodSection(
                                     state = displayedState,
                                     isDemo = isDemoMode,
                                     onRequestDemoMode = {
                                         if (BuildConfig.DEBUG) showDemoModePicker = true
                                     }
                                 )
-                                StatisticsBlock.ACTIVITY,
-                                StatisticsBlock.FOOD -> UnavailableStatisticsSection(block)
+                                StatisticsSection.ACTIVITY -> ActivitySection(displayedState)
+                                StatisticsSection.FOOD -> NutritionSection(displayedState)
                             }
                         }
                     }
@@ -213,20 +205,21 @@ private fun StatisticsTopBar(
     onBack: () -> Unit,
     onExportClick: () -> Unit,
     modifier: Modifier,
-    isCompact: Boolean
+    isCompact: Boolean,
+    windowInsets: WindowInsets
 ) {
     var expanded by remember { mutableStateOf(false) }
     Column(modifier = modifier) {
-        Spacer(modifier = Modifier.height(WindowInsets.statusBars.asPaddingValues().calculateTopPadding()))
+        Spacer(modifier = Modifier.height(windowInsets.asPaddingValues().calculateTopPadding()))
         Row(
-            modifier = Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 12.dp),
+            modifier = Modifier.fillMaxWidth().height(44.dp).padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             androidx.compose.material.Icon(
-                painter = painterResource(R.drawable.ic_arrow_left),
+                painter = painterResource(R.drawable.ic_statistics_back),
                 contentDescription = stringResource(R.string.content_description_back_button),
                 tint = Color.White,
-                modifier = Modifier.size(40.dp).clickable(onClick = onBack).padding(8.dp).rotate(180f)
+                modifier = Modifier.size(40.dp).clickable(onClick = onBack).padding(8.dp)
             )
             Text(
                 text = stringResource(R.string.statistic_title),
@@ -237,15 +230,24 @@ private fun StatisticsTopBar(
                 fontSize = 17.sp
             )
             androidx.compose.material.Icon(
-                painter = painterResource(R.drawable.ic_download_normal),
+                painter = painterResource(R.drawable.ic_statistics_export),
                 contentDescription = "Выгрузить статистику",
                 tint = Color.White,
                 modifier = Modifier.size(40.dp).clickable(onClick = onExportClick).padding(8.dp)
             )
         }
-        Box(modifier = Modifier.padding(horizontal = 13.dp)) {
+        Spacer(Modifier.height(30.dp))
+        BoxWithConstraints(modifier = Modifier.padding(horizontal = 13.dp)) {
             val periodName = uiState.period.localizedName()
-            val periodTitle = (if (isCompact) uiState.periodCompactTitle else uiState.periodTitle)
+            val textSize = if (isCompact) 11.sp else 13.sp
+            val textMeasurer = rememberTextMeasurer()
+            val availableDateWidth = with(LocalDensity.current) { ((maxWidth - 42.dp) / 2).toPx() }
+            val fullDateWidth = textMeasurer.measure(
+                text = uiState.periodTitle,
+                style = LocalTextStyle.current.copy(fontSize = textSize, fontWeight = FontWeight.Bold),
+                maxLines = 1, softWrap = false
+            ).size.width
+            val periodTitle = (if (fullDateWidth > availableDateWidth) uiState.periodCompactTitle else uiState.periodTitle)
                 .ifBlank { periodName }
             Row(
                 modifier = Modifier
@@ -262,7 +264,7 @@ private fun StatisticsTopBar(
                     modifier = Modifier.weight(1f),
                     color = TextPrimary,
                     fontWeight = FontWeight.Bold,
-                    fontSize = if (isCompact) 12.sp else 14.sp,
+                    fontSize = textSize,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -270,7 +272,7 @@ private fun StatisticsTopBar(
                     text = periodName,
                     modifier = Modifier.weight(1f),
                     color = TextPrimary,
-                    fontSize = if (isCompact) 12.sp else 14.sp,
+                    fontSize = textSize,
                     textAlign = TextAlign.End,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -279,7 +281,7 @@ private fun StatisticsTopBar(
                     painter = painterResource(R.drawable.ic_arrow_down),
                     contentDescription = "Выбрать период",
                     tint = TextPrimary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(16.dp)
                 )
             }
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {

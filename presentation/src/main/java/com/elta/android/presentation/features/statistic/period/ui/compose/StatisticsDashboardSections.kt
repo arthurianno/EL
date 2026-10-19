@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -47,84 +48,72 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.elta.android.presentation.core.compose.widgets.text.MetricValueText
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
-import com.elta.android.presentation.features.statistic.period.model.StatisticsBlock
 import com.elta.android.presentation.utils.NumberFormatter
 
 @Composable
 internal fun MainIndicatorsSection(
     state: StatisticsDashboardUiState,
-    isCompact: Boolean,
     onSettingsClick: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = if (isCompact) 12.dp else 14.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+    Box(modifier = Modifier.fillMaxWidth()) {
+        androidx.compose.material.Icon(
+            painter = painterResource(R.drawable.ic_chart_settings),
+            contentDescription = "Настройки статистики",
+            tint = TextSecondary,
+            modifier = Modifier.align(Alignment.TopEnd).padding(top = 8.dp, end = 9.dp)
+                .size(40.dp).clickable(onClick = onSettingsClick).padding(8.dp)
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth().padding(start = 23.dp, end = 23.dp, top = 33.dp)
         ) {
-            androidx.compose.material.Icon(
-                painter = painterResource(R.drawable.ic_chart_settings),
-                contentDescription = "Настройки статистики",
-                tint = TextSecondary,
-                modifier = Modifier.size(40.dp).clickable(onClick = onSettingsClick).padding(8.dp)
-            )
-        }
-        BoxWithConstraints(
-            modifier = Modifier.fillMaxWidth().height(if (isCompact) 276.dp else 290.dp)
-        ) {
-            val gaugeSize = minOf(maxWidth * 0.54f, 184.dp).coerceAtLeast(164.dp)
-            val pillWidth = if (isCompact) 84.dp else 102.dp
-            val pillHeight = if (isCompact) 72.dp else 80.dp
-            Box(modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp)) {
-                GlucoseGauge(average = state.average, unit = state.unit, size = gaugeSize)
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth().height(324.dp)) {
+                val gaugeSize = minOf(maxWidth * 0.58f, 180.dp)
+                val pillHeight = 82.dp
+                Box(modifier = Modifier.align(Alignment.TopCenter).padding(top = 20.dp)) {
+                    GlucoseGauge(average = state.average, unit = state.unit, size = gaugeSize)
+                }
+                MinMaxLabel(
+                    label = "min", value = state.minLabel, color = Red,
+                    modifier = Modifier.align(Alignment.BottomStart).padding(bottom = pillHeight + 44.dp)
+                )
+                MinMaxLabel(
+                    label = "max", value = state.maxLabel, color = Orange,
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = pillHeight + 44.dp)
+                )
+                Row(
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(7.dp)
+                ) {
+                    TimeInRangePill("TBR", state.lowPercent, state.lowCount, Red, Modifier.weight(1f), pillHeight)
+                    TimeInRangePill("TIR", state.inRangePercent, state.inRangeCount, Green, Modifier.weight(1f), pillHeight)
+                    TimeInRangePill("TAR", state.highPercent, state.highCount, Orange, Modifier.weight(1f), pillHeight)
+                }
             }
-            MinMaxLabel(
-                text = "min ${state.minLabel}",
-                color = Red,
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(bottom = pillHeight + 6.dp)
-            )
-            MinMaxLabel(
-                text = "max ${state.maxLabel}",
-                color = Orange,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = pillHeight + 6.dp)
-            )
-            Row(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                horizontalArrangement = Arrangement.spacedBy(if (isCompact) 4.dp else 8.dp)
-            ) {
-                TimeInRangePill("TBR", state.lowPercent, state.lowCount, Red, pillWidth, pillHeight)
-                TimeInRangePill("TIR", state.inRangePercent, state.inRangeCount, Green, pillWidth, pillHeight)
-                TimeInRangePill("TAR", state.highPercent, state.highCount, Orange, pillWidth, pillHeight)
-            }
+            SectionDivider(top = 0.dp)
         }
-        SectionDivider()
     }
 }
 
 @Composable
 private fun GlucoseGauge(average: String, unit: String, size: Dp) {
-    val stroke = with(LocalDensity.current) { 9.dp.toPx() }
+    val stroke = with(LocalDensity.current) { 12.dp.toPx() }
     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(size)) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val arcSize = Size(this.size.width - stroke, this.size.height - stroke)
             val topLeft = Offset(stroke / 2, stroke / 2)
-            listOf(Red to 37f, Green to 162f, Orange to 112f).fold(-145f) { start, (color, sweep) ->
-                drawArc(color, start, sweep - 4f, false, topLeft, arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
+            listOf(Red to 30f, Orange to 130f, Green to 200f).fold(-170f) { start, (color, sweep) ->
+                drawArc(color, start, sweep - 9f, false, topLeft, arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
                 start + sweep
             }
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(average, color = GreenDark, fontWeight = FontWeight.SemiBold, fontSize = (size.value * 0.29f).sp)
-            Text(unit, color = GreenDark, fontSize = 12.sp)
-            Text("Среднее", color = Divider, fontSize = 12.sp)
+            MetricValueText(average, color = GreenDark, fontWeight = FontWeight.SemiBold, fontSize = (size.value * 0.34f).sp)
+            Text(unit, color = GreenDark, fontSize = 11.sp)
+            Text("Среднее", color = Divider, fontSize = 11.sp)
         }
     }
 }
@@ -135,13 +124,12 @@ private fun TimeInRangePill(
     percent: Int,
     count: Int,
     color: Color,
-    width: Dp,
+    modifier: Modifier,
     height: Dp
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(width)
+        modifier = modifier
             .height(height)
             .clip(RoundedCornerShape(26.dp))
             .border(1.dp, Color(0xFF626876), RoundedCornerShape(26.dp))
@@ -154,29 +142,28 @@ private fun TimeInRangePill(
             Spacer(Modifier.width(3.dp))
             Text(label, color = TextPrimary, fontSize = 11.sp)
         }
-        Text("$percent%", color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        Text("$count изм.", color = TextSecondary, fontSize = 10.sp)
+        MetricValueText("$percent%", color = TextPrimary, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+        MetricValueText("$count изм.", color = TextSecondary, fontSize = 10.sp)
     }
 }
 
 @Composable
-private fun MinMaxLabel(text: String, color: Color, modifier: Modifier = Modifier) {
-    Text(
-        text = text,
-        color = Color.White,
-        fontSize = 11.sp,
-        maxLines = 1,
-        modifier = modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(color)
-            .padding(horizontal = 6.dp, vertical = 3.dp)
-    )
+private fun MinMaxLabel(label: String, value: String, color: Color, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.clip(RoundedCornerShape(4.dp)).background(color)
+            .padding(horizontal = 6.dp, vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, color = Color.White, fontSize = 11.sp, lineHeight = 13.sp)
+        Spacer(Modifier.width(4.dp))
+        MetricValueText(value, color = Color.White, fontSize = 11.sp, lineHeight = 13.sp)
+    }
 }
 
 @Composable
 internal fun DistributionSection(state: StatisticsDashboardUiState) {
-    SectionCard(title = "Основные показатели за период") {
-        Text("Количество измерений", color = TextSecondary, fontSize = 10.sp)
+    SectionCard(title = "Основные показатели за период", minHeight = 260.dp) {
+        Text("Количество\nизмерений", color = TextSecondary, fontSize = 11.sp, lineHeight = 14.sp, modifier = Modifier.padding(top = 14.dp))
         DistributionChart(state.distribution)
         ChartLegend()
     }
@@ -185,9 +172,9 @@ internal fun DistributionSection(state: StatisticsDashboardUiState) {
 @Composable
 private fun DistributionChart(values: List<Int>) {
     val colors = listOf(Red, Red, Green, Green, Orange, Orange)
-    val labels = listOf("0–3", "3–4", "4–7", "7–10", "10–12", ">12")
+    val labels = listOf("<3", "3–4", "4–7", "7–10", "10–12", ">12")
     val axisMax = niceAxisMaximum(values.maxOrNull() ?: 0)
-    Box(modifier = Modifier.fillMaxWidth().height(151.dp).padding(top = 8.dp)) {
+    Box(modifier = Modifier.fillMaxWidth().height(126.dp).padding(top = 8.dp)) {
         Canvas(modifier = Modifier.fillMaxSize().padding(start = 28.dp, bottom = 38.dp)) {
             val gap = size.width / (values.size * 2f)
             val dash = PathEffect.dashPathEffect(floatArrayOf(3.dp.toPx(), 3.dp.toPx()))
@@ -202,7 +189,7 @@ private fun DistributionChart(values: List<Int>) {
             drawLine(Divider, Offset(0f, size.height), Offset(size.width, size.height), 1.dp.toPx())
         }
         Column(
-            modifier = Modifier.align(Alignment.CenterStart).padding(bottom = 38.dp).height(104.dp).width(26.dp),
+            modifier = Modifier.align(Alignment.CenterStart).padding(top = 0.dp, bottom = 38.dp).height(80.dp).width(26.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             listOf(axisMax, axisMax * 2 / 3, axisMax / 3, 0).forEach {
@@ -244,10 +231,10 @@ internal fun DailyVariationSection(state: StatisticsDashboardUiState) {
         val first = visibleDays.firstOrNull()?.date
         val last = visibleDays.lastOrNull()?.date
         if (first != null && last != null) {
-            "${first.dayOfMonth}.${first.monthValue} – ${last.dayOfMonth}.${last.monthValue}"
+            formatDateRange(first, last, java.util.Locale.getDefault())
         } else ""
     }
-    SectionCard(title = "Суточные колебания") {
+    SectionCard(title = "Суточные колебания", minHeight = 317.dp) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -296,8 +283,8 @@ internal fun DailyVariationSection(state: StatisticsDashboardUiState) {
 
 @Composable
 private fun Heatmap(days: List<HourlyRange>) {
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth().height(205.dp)) {
-        val timeAxisWidth = if (maxWidth <= CompactScreenWidth) 44.dp else 54.dp
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth().height(194.dp).padding(top = 7.dp)) {
+        val timeAxisWidth = 52.dp
         // The reference deliberately keeps the heatmap narrow instead of stretching its
         // columns to a tablet width. This also leaves a readable gutter for time labels.
         val gridWidth = minOf(236.dp, (maxWidth - timeAxisWidth).coerceAtLeast(0.dp))
@@ -305,7 +292,7 @@ private fun Heatmap(days: List<HourlyRange>) {
             Column(modifier = Modifier.width(timeAxisWidth)) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Column(
-                    modifier = Modifier.height(167.dp),
+                    modifier = Modifier.height(173.dp),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     listOf("00:00", "04:00", "08:00", "12:00", "16:00", "20:00", "24:00").forEach {
@@ -331,7 +318,7 @@ private fun Heatmap(days: List<HourlyRange>) {
                                 Spacer(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(6.dp)
+                                        .height(6.3.dp)
                                         .background(status.toChartColor(), RoundedCornerShape(1.dp))
                                 )
                             }
@@ -345,13 +332,13 @@ private fun Heatmap(days: List<HourlyRange>) {
 
 @Composable
 internal fun HypoHyperSection(state: StatisticsDashboardUiState) {
-    SectionCard(title = "Статистика гипо/гипергликемии") {
-        Text("Количество измерений", color = TextSecondary, fontSize = 10.sp)
+    SectionCard(title = "Статистика гипо/гипергликемии", minHeight = 272.dp) {
+        Text("Количество\nизмерений", color = TextSecondary, fontSize = 11.sp, lineHeight = 14.sp, modifier = Modifier.padding(top = 14.dp))
         val episodes = state.dailyEpisodes.takeLast(14)
         val axisMax = niceAxisMaximum(
             episodes.flatMap { listOf(it.low, it.high) }.maxOrNull() ?: 0
         )
-        Box(modifier = Modifier.fillMaxWidth().height(150.dp).padding(top = 8.dp)) {
+        Box(modifier = Modifier.fillMaxWidth().height(130.dp).padding(top = 8.dp)) {
             Canvas(modifier = Modifier.fillMaxSize().padding(start = 28.dp, bottom = 38.dp)) {
                 val step = size.width / episodes.size.coerceAtLeast(1)
                 val barWidth = minOf(7.dp.toPx(), step * 0.24f)
@@ -384,7 +371,7 @@ internal fun HypoHyperSection(state: StatisticsDashboardUiState) {
                 drawLine(Divider, Offset(0f, size.height), Offset(size.width, size.height), 1.dp.toPx())
             }
             Column(
-                modifier = Modifier.align(Alignment.CenterStart).padding(bottom = 38.dp).height(104.dp).width(26.dp),
+                modifier = Modifier.align(Alignment.CenterStart).padding(top = 0.dp, bottom = 38.dp).height(80.dp).width(26.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 listOf(axisMax, axisMax * 2 / 3, axisMax / 3, 0).forEach {
@@ -433,7 +420,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawEpisodeBar(
 
 @Composable
 internal fun KeyMetricsSection(state: StatisticsDashboardUiState) {
-    SectionCard(title = "Ключевые метрики") {
+    SectionCard(title = "Ключевые метрики", minHeight = 204.dp) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -463,9 +450,9 @@ internal fun KeyMetricsSection(state: StatisticsDashboardUiState) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text("Предупреждение", color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Text("Частые гипо ночью", color = TextPrimary, fontSize = 11.sp)
+                    Text("Низкие значения ночью", color = TextPrimary, fontSize = 11.sp)
                     Text(
-                        text = "${state.nightHypoEpisodes} эпизода между 02:00 и 05:00",
+                        text = "${state.nightHypoEpisodes} измерения между 02:00 и 05:00",
                         color = TextSecondary,
                         fontSize = 11.sp
                     )
@@ -473,25 +460,13 @@ internal fun KeyMetricsSection(state: StatisticsDashboardUiState) {
             }
         } else {
             Text(
-                text = "Ночных гипо за выбранный период не выявлено",
+                text = if (state.lowCount + state.inRangeCount + state.highCount == 0) "Нет измерений за выбранный период" else "Низких значений ночью не зарегистрировано",
                 color = GreenDark,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(top = 14.dp)
             )
         }
-    }
-}
-
-@Composable
-internal fun UnavailableStatisticsSection(block: StatisticsBlock) {
-    SectionCard(title = block.title) {
-        Text(
-            text = "Нет данных для отображения",
-            color = TextSecondary,
-            fontSize = 12.sp,
-            modifier = Modifier.padding(top = 12.dp)
-        )
     }
 }
 
@@ -524,7 +499,7 @@ internal fun PreviousPeriodSection(
     isDemo: Boolean,
     onRequestDemoMode: () -> Unit
 ) {
-    SectionCard(title = "Сравнение с предыдущим периодом") {
+    SectionCard(title = "Сравнение с предыдущим периодом", background = Color.White, minHeight = 300.dp) {
         val comparison = state.comparison
         if (comparison == null) {
             EmptyChart("Недостаточно данных для сравнения с предыдущим периодом")
@@ -624,7 +599,7 @@ private fun ComparisonLineChart(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             listOf(maxValue, maxValue * 2 / 3, maxValue / 3, minValue).forEach {
-                Text(NumberFormatter.format(it), color = TextSecondary, fontSize = 8.sp)
+                Text(it.toInt().toString(), color = TextSecondary, fontSize = 8.sp)
             }
         }
         Row(modifier = Modifier.align(Alignment.BottomEnd).padding(start = 28.dp, bottom = 27.dp).fillMaxWidth()) {
@@ -661,7 +636,7 @@ private fun comparisonAxisMaximum(maxValue: Double, normalEnd: Double): Double {
     return kotlin.math.ceil(requiredMaximum / 4.0) * 4.0
 }
 
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSmoothGlucoseSeries(
+internal fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSmoothGlucoseSeries(
     points: List<DailyGlucosePoint>,
     minValue: Double,
     range: Double,
@@ -689,7 +664,11 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSmoothGlucoseSe
     }
     if (currentGroup.isNotEmpty()) groups += currentGroup
 
-    groups.filter { it.size > 1 }.forEach { group ->
+    groups.forEach { group ->
+        if (group.size == 1) {
+            drawCircle(colorForValue(group.single().second), radius = 2.dp.toPx(), center = group.single().first)
+            return@forEach
+        }
         group.zipWithNext().forEachIndexed { index, (from, to) ->
             val before = group[(index - 1).coerceAtLeast(0)].first
             val after = group[(index + 2).coerceAtMost(group.lastIndex)].first
@@ -714,18 +693,21 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSmoothGlucoseSe
 }
 
 @Composable
-private fun SectionCard(title: String, subtitle: String? = null, background: Color = ScreenBackground, content: @Composable () -> Unit) {
+internal fun SectionCard(
+    title: String,
+    background: Color = ScreenBackground,
+    minHeight: Dp = 0.dp,
+    content: @Composable () -> Unit
+) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 27.dp)
-            .background(background)
-            .padding(top = 3.dp, bottom = 13.dp)
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
+            .background(background).heightIn(min = minHeight).padding(horizontal = 17.dp, vertical = 13.dp)
     ) {
         Text(title, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-        subtitle?.let { Text(it, color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 8.dp)) }
+        Spacer(Modifier.height(10.dp))
         content()
-        SectionDivider()
+        Spacer(Modifier.weight(1f))
+        if (background != Color.White) SectionDivider()
     }
 }
 
@@ -739,26 +721,29 @@ private fun ChartLegend() {
 }
 
 @Composable
-private fun SectionDivider() {
+private fun SectionDivider(top: Dp = 14.dp) {
     Spacer(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 14.dp)
+            .padding(top = top)
             .height(1.dp)
             .background(Divider)
     )
 }
 
 @Composable
-private fun Legend(text: String, color: Color) {
-    Text("●  $text", color = color.copy(alpha = 0.8f), fontSize = 10.sp)
+internal fun Legend(text: String, color: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Spacer(Modifier.size(9.dp).background(color, RoundedCornerShape(50)))
+        Text(text, modifier = Modifier.padding(start = 5.dp), color = TextSecondary, fontSize = 10.sp)
+    }
 }
 
 @Composable
 private fun Metric(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(label, color = TextSecondary, fontSize = 11.sp)
-        Text(value, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        MetricValueText(value, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 18.sp)
     }
 }
 
@@ -778,9 +763,9 @@ private fun CompareMetric(
     }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(label, color = TextSecondary, fontSize = 10.sp)
-        Text(value, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-        Text(
-            text = "$arrow $deltaText$suffix",
+        MetricValueText(value, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        MetricValueText(
+            text = if (delta.toDouble() == 0.0) "—" else "$arrow $deltaText$suffix",
             color = if (isPositive) GreenDark else Red,
             fontSize = 11.sp
         )
